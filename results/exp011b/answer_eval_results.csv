@@ -1,0 +1,81 @@
+id,group,question,expected_answer,acceptable_answers,scoring_rule,model_answer,normalized_model_answer,is_correct,output_token_count
+exp011_logic_001,logic,All mammals are animals. All dogs are mammals. Are dogs animals?,yes,['yes'],boundary_aware,Yes.,yes,True,7
+exp011_logic_002,logic,No reptiles are mammals. A lizard is a reptile. Is the lizard a mammal?,no,['no'],boundary_aware,The lizard is not a mammal.,the lizard is not a mammal,False,13
+exp011_logic_003,logic,All red objects are colored. This apple is red. Is the apple colored?,yes,['yes'],boundary_aware,Colored.,colored,False,8
+exp011_logic_004,logic,"If it rains, the ground is wet. It is raining. Is the ground wet?",yes,['yes'],boundary_aware,Yes.,yes,True,7
+exp011_logic_005,logic,"If a signal is active, an indicator is lit. The indicator is not lit. Can the signal be active?",no,['no'],boundary_aware,Yes.,yes,False,7
+exp011_logic_006,logic,All birds are animals. A penguin is a bird. Is a penguin an animal?,yes,['yes'],boundary_aware,Yes.,yes,True,7
+exp011_logic_007,logic,No squares are circles. This shape is a square. Is it a circle?,no,['no'],boundary_aware,No.,no,True,7
+exp011_logic_008,logic,All painters are artists. Lina is a painter. Is the conclusion that Lina is an artist valid?,valid,['valid'],boundary_aware,Valid.,valid,True,7
+exp011_logic_009,logic,All books are objects. This item is not an object. Can this item be a book?,no,['no'],boundary_aware,Yes.,yes,False,7
+exp011_logic_010,logic,A statement and its opposite cannot both be true. What is this situation called?,contradiction,['contradiction'],boundary_aware,Logical contradiction.,logical contradiction,True,8
+exp011_logic_011,logic,All metals conduct electricity. Copper is a metal. Does copper conduct electricity?,yes,['yes'],boundary_aware,Yes.,yes,True,7
+exp011_logic_012,logic,All triangles have three sides. This shape has four sides. Is it a triangle?,no,['no'],boundary_aware,No.,no,True,7
+exp011_logic_013,logic,"If an alarm rings, a sound is heard. The alarm rings. Is a sound heard?",yes,['yes'],boundary_aware,Yes.,yes,True,7
+exp011_logic_014,logic,"If a card is blue, it is colored. The card is not colored. Is it blue?",no,['no'],boundary_aware,Blue.,blue,False,7
+exp011_logic_015,logic,All teachers read books. Ada is a teacher. Does Ada read books?,yes,['yes'],boundary_aware,Yes.,yes,True,7
+exp011_logic_016,logic,No fish are mammals. A whale is a mammal. Is a whale a fish?,no,['no'],boundary_aware,No.,no,True,7
+exp011_logic_017,logic,A is taller than B. B is taller than C. Is A taller than C?,yes,['yes'],boundary_aware,Yes.,yes,True,7
+exp011_logic_018,logic,All cats are animals. All animals need water. Does a cat need water?,yes,['yes'],boundary_aware,Yes.,yes,True,7
+exp011_logic_019,logic,"If a number is even, it is divisible by two. Eight is even. Is eight divisible by two?",yes,['yes'],boundary_aware,Yes.,yes,True,7
+exp011_logic_020,logic,All flowers are plants. This object is not a plant. Can it be a flower?,no,['no'],boundary_aware,Yes.,yes,False,7
+exp011_causality_001,causality,Heavy rain makes roads wet. What is the cause of wet roads?,heavy rain,"['heavy rain', 'rain']",boundary_aware,The cause of wet roads is heavy rain.,the cause of wet roads is heavy rain,True,14
+exp011_causality_002,causality,Lack of water causes plants to wilt. What is the effect of lack of water?,wilting,"['wilting', 'wilt']",boundary_aware,The effect of lack of water is that plants wilt.,the effect of lack of water is that plants wilt,True,16
+exp011_causality_003,causality,Heating ice above freezing causes it to melt. What is the effect?,melting,"['melting', 'melt']",boundary_aware,The effect is that the ice melts.,the effect is that the ice melts,False,13
+exp011_causality_004,causality,Pressing a light switch causes the lamp to turn on. What is the effect of pressing the switch?,lamp turns on,"['lamp turns on', 'the lamp turns on']",boundary_aware,The effect of pressing the switch is to turn the lamp on.,the effect of pressing the switch is to turn the lamp on,False,18
+exp011_causality_005,causality,A power outage causes a computer to shut down. What is the effect of a power outage?,computer shuts down,"['computer shuts down', 'the computer shuts down']",boundary_aware,A power outage causes a computer to shut down.,a power outage causes a computer to shut down,False,15
+exp011_causality_006,causality,Sunlight allows a plant to make food. What is the cause that enables this process?,sunlight,"['sunlight', 'light']",boundary_aware,Photosynthesis,photosynthesis,False,7
+exp011_causality_007,causality,Cold temperatures cause water to freeze. What is the effect of cold temperatures?,freezing,"['freezing', 'freeze']",boundary_aware,The effect of cold temperatures is that water freezes.,the effect of cold temperatures is that water freezes,False,15
+exp011_causality_008,causality,Dropping a glass causes the glass to break. What is the effect of dropping the glass?,glass breaks,"['glass breaks', 'the glass breaks']",boundary_aware,The effect of dropping the glass is that it breaks.,the effect of dropping the glass is that it breaks,False,16
+exp011_causality_009,causality,Strong wind makes leaves move. What is the cause of moving leaves?,strong wind,"['strong wind', 'wind']",boundary_aware,The cause of moving leaves is strong wind.,the cause of moving leaves is strong wind,True,14
+exp011_causality_010,causality,Eating spoiled food causes sickness. What is the effect of eating spoiled food?,sickness,"['sickness', 'becoming sick']",boundary_aware,Eating spoiled food causes sickness.,eating spoiled food causes sickness,True,12
+exp011_causality_011,causality,Brake failure causes a car not to stop. What is the effect of brake failure?,car does not stop,"['car does not stop', 'the car does not stop']",boundary_aware,The effect of brake failure is that the car does not stop.,the effect of brake failure is that the car does not stop,True,18
+exp011_causality_012,causality,Too much rain can cause flooding. What is the effect of too much rain?,flooding,"['flooding', 'flood']",boundary_aware,Flooding.,flooding,True,8
+exp011_causality_013,causality,A fire produces smoke. What is the cause of smoke in this case?,fire,['fire'],boundary_aware,The cause of smoke in the case of a fire is the combustion of materials.,the cause of smoke in the case of a fire is the combustion of materials,True,21
+exp011_causality_014,causality,Removing a battery makes a flashlight stop working. What is the effect?,flashlight stops working,"['flashlight stops working', 'stops working']",boundary_aware,The flashlight stops working.,the flashlight stops working,True,10
+exp011_causality_015,causality,Lack of sleep causes a person to become tired. What is the effect of lack of sleep?,tired,"['tired', 'fatigue']",boundary_aware,Lack of sleep causes a person to become tired.,lack of sleep causes a person to become tired,True,16
+exp011_causality_016,causality,Pressing a keyboard key makes a letter appear on a screen. What is the effect?,letter appears,"['letter appears', 'appears on screen']",boundary_aware,The effect is that a letter appears on the screen.,the effect is that a letter appears on the screen,True,16
+exp011_causality_017,causality,Watering dry soil causes the soil to become wet. What is the effect of watering dry soil?,soil becomes wet,"['soil becomes wet', 'the soil becomes wet']",boundary_aware,The effect of watering dry soil is to make it wet.,the effect of watering dry soil is to make it wet,False,17
+exp011_causality_018,causality,An infection can cause a fever. What is the effect of an infection?,fever,['fever'],boundary_aware,An infection can cause a fever.,an infection can cause a fever,True,12
+exp011_causality_019,causality,Closing a water valve causes water flow to stop. What is the effect of closing the valve?,water flow stops,"['water flow stops', 'the water flow stops']",boundary_aware,The effect of closing the valve is to stop the water flow.,the effect of closing the valve is to stop the water flow,False,18
+exp011_causality_020,causality,Rubbing hands together creates heat from friction. What is the effect of friction?,heat,['heat'],boundary_aware,The effect of friction is to create heat.,the effect of friction is to create heat,True,14
+exp011_analogy_001,analogy,Bird is to nest as bee is to what?,hive,['hive'],boundary_aware,hive,hive,True,6
+exp011_analogy_002,analogy,Knife is to cut as pen is to what?,write,"['write', 'writing']",boundary_aware,: to write,: to write,True,8
+exp011_analogy_003,analogy,Bird is to nest as dog is to what?,kennel,"['kennel', 'a kennel']",boundary_aware,dog is to shelter,dog is to shelter,False,9
+exp011_analogy_004,analogy,Hand is to glove as foot is to what?,sock,"['sock', 'socks']",boundary_aware,foot is to shoe,foot is to shoe,False,9
+exp011_analogy_005,analogy,Puppy is to dog as kitten is to what?,cat,['cat'],boundary_aware,cat,cat,True,6
+exp011_analogy_006,analogy,Book is to read as movie is to what?,watch,"['watch', 'watching']",boundary_aware,film,film,False,6
+exp011_analogy_007,analogy,Eye is to see as ear is to what?,hear,"['hear', 'hearing']",boundary_aware,: hear,: hear,True,7
+exp011_analogy_008,analogy,Wheel is to bicycle as wing is to what vehicle?,airplane,"['airplane', 'an airplane']",boundary_aware,airplane,airplane,True,7
+exp011_analogy_009,analogy,Teacher is to school as doctor is to what?,hospital,['hospital'],boundary_aware,patient.,patient,False,7
+exp011_analogy_010,analogy,Oven is to bake as refrigerator is to what?,cool,"['cool', 'cooling']",boundary_aware,store,store,False,6
+exp011_analogy_011,analogy,Toothbrush is to teeth as comb is to what?,hair,['hair'],boundary_aware,Hair.,hair,True,7
+exp011_analogy_012,analogy,Lock is to key as account is to what?,password,"['password', 'a password']",boundary_aware,access code,access code,False,7
+exp011_analogy_013,analogy,Cow is to calf as sheep is to what?,lamb,['lamb'],boundary_aware,cow is to calf as sheep is to lamb.,cow is to calf as sheep is to lamb,True,15
+exp011_analogy_014,analogy,Day is to night as hot is to what?,cold,['cold'],boundary_aware,cold,cold,True,6
+exp011_analogy_015,analogy,Finger is to hand as toe is to what?,foot,['foot'],boundary_aware,foot,foot,True,6
+exp011_analogy_016,analogy,Scissors are to cut as needle is to what?,sew,"['sew', 'sewing']",boundary_aware,Cut.,cut,False,7
+exp011_analogy_017,analogy,Fish is to school as sheep is to what?,flock,"['flock', 'a flock']",boundary_aware,school of sheep,school of sheep,False,8
+exp011_analogy_018,analogy,Author is to book as composer is to what?,song,"['song', 'a song']",boundary_aware,performer,performer,False,7
+exp011_analogy_019,analogy,Thermometer is to temperature as scale is to what?,weight,['weight'],boundary_aware,unit,unit,False,6
+exp011_analogy_020,analogy,Chef is to kitchen as pilot is to what?,cockpit,"['cockpit', 'a cockpit']",boundary_aware,aircraft,aircraft,False,7
+exp011_definition_001,definition,What is a word that means the opposite of another word?,antonym,['antonym'],boundary_aware,Antonym,antonym,True,7
+exp011_definition_002,definition,What is the term for water changing from liquid to gas?,evaporation,['evaporation'],boundary_aware,Evaporation,evaporation,True,7
+exp011_definition_003,definition,What is a shape with three sides called?,triangle,['triangle'],boundary_aware,Triangle.,triangle,True,7
+exp011_definition_004,definition,What process lets green plants use light to make food?,photosynthesis,['photosynthesis'],boundary_aware,Photosynthesis,photosynthesis,True,7
+exp011_definition_005,definition,What do you call a person who designs buildings?,architect,"['architect', 'an architect']",boundary_aware,Builder,builder,False,6
+exp011_definition_006,definition,"What is a word that names a person, place, or thing?",noun,['noun'],boundary_aware,"A word that names a person, place, or thing is called a **noun**.","a word that names a person, place, or thing is called a **noun**",True,23
+exp011_definition_007,definition,What is the path of one object moving around another object called?,orbit,['orbit'],boundary_aware,Orbit,orbit,True,7
+exp011_definition_008,definition,What is the change from a solid to a liquid called?,melting,"['melting', 'melt']",boundary_aware,Melting,melting,True,7
+exp011_definition_009,definition,What do you call an animal that eats plants?,herbivore,['herbivore'],boundary_aware,Herbivore,herbivore,True,9
+exp011_definition_010,definition,What tool measures temperature?,thermometer,['thermometer'],boundary_aware,Thermometer,thermometer,True,8
+exp011_definition_011,definition,What is a group of stars that forms a recognizable pattern called?,constellation,['constellation'],boundary_aware,A group of stars that forms a recognizable pattern is called a constellation.,a group of stars that forms a recognizable pattern is called a constellation,True,19
+exp011_definition_012,definition,What is the study of weather called?,meteorology,['meteorology'],boundary_aware,The study of weather is called meteorology.,the study of weather is called meteorology,True,14
+exp011_definition_013,definition,What is the study of past events called?,history,['history'],boundary_aware,The study of past events is called history.,the study of past events is called history,True,14
+exp011_definition_014,definition,What is a word with the same or nearly the same meaning as another word?,synonym,['synonym'],boundary_aware,A word with the same or nearly the same meaning as another word is called a synonym.,a word with the same or nearly the same meaning as another word is called a synonym,True,23
+exp011_definition_015,definition,What object attracts iron?,magnet,['magnet'],boundary_aware,A magnet.,a magnet,True,8
+exp011_definition_016,definition,What organ pumps blood through the body?,heart,['heart'],boundary_aware,Heart,heart,True,6
+exp011_definition_017,definition,What do you call a person who treats sick people?,doctor,"['doctor', 'physician']",boundary_aware,A physician.,a physician,True,8
+exp011_definition_018,definition,What tool is used to cut paper?,scissors,['scissors'],boundary_aware,knife,knife,False,6
+exp011_definition_019,definition,What kind of sentence asks for information?,question,"['question', 'interrogative']",boundary_aware,A question sentence.,a question sentence,True,9
+exp011_definition_020,definition,What is a young frog called?,tadpole,['tadpole'],boundary_aware,A young frog is called a froglet.,a young frog is called a froglet,False,14

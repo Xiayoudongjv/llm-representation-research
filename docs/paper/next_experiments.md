@@ -16,16 +16,24 @@ EXP-011 should:
 - produce both group-level and item-level accuracy
 - optionally include conservative audit labels and a human annotation sample
 
-The dataset design is complete; model execution remains deferred to EXP-011B.
+The dataset design and EXP-011B normal-generation evaluation are complete.
 
 ## EXP-011 Status
 
-Dataset design only. No Qwen run or model accuracy evaluation has occurred.
+Dataset design, EXP-011B normal generation, and the EXP-011C conservative
+scoring audit are complete. The audit found eight defensible lexical or
+wording misses and a conservative audited accuracy of 0.750, but it does not
+replace independent human annotation or establish reasoning quality.
+
+EXP-011D applied exactly those eight approved additions and reproduced 0.750
+through offline rescoring. The expanded behavioral baseline is provisionally
+frozen pending independent annotation or new evidence.
 
 Future work:
 
-1. **EXP-011B:** Run Qwen on the expanded dataset.
-2. **EXP-011C:** Perform a scoring audit on the expanded answers.
+1. Prepare Paper Draft v0.4.
+2. Optionally replicate the frozen benchmark on a second model.
+3. Consider generation-time intervention only after those baseline steps.
 
 The previous exploratory options are retained below as historical planning
 context; this recommendation supersedes their priority ordering.

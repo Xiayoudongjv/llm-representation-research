@@ -1,0 +1,130 @@
+{
+  "total_items": 80,
+  "strict_correct_count": 52,
+  "likely_correct_scoring_miss_count": 8,
+  "partially_correct_count": 7,
+  "ambiguous_count": 3,
+  "likely_wrong_count": 10,
+  "strict_accuracy": 0.65,
+  "conservative_audited_accuracy": 0.75,
+  "review_ceiling": 0.875,
+  "group_metrics": {
+    "logic": {
+      "group": "logic",
+      "total": 20,
+      "strict_correct": 14,
+      "likely_correct_scoring_miss": 1,
+      "partially_correct": 1,
+      "ambiguous": 0,
+      "likely_wrong": 4,
+      "strict_accuracy": 0.7,
+      "conservative_audited_accuracy": 0.75,
+      "review_ceiling": 0.8,
+      "strict_ci95_low": 0.4810271816464765,
+      "strict_ci95_high": 0.8545227551323956,
+      "audited_ci95_low": 0.531299122381256,
+      "audited_ci95_high": 0.8881382985923343
+    },
+    "causality": {
+      "group": "causality",
+      "total": 20,
+      "strict_correct": 12,
+      "likely_correct_scoring_miss": 7,
+      "partially_correct": 0,
+      "ambiguous": 0,
+      "likely_wrong": 1,
+      "strict_accuracy": 0.6,
+      "conservative_audited_accuracy": 0.95,
+      "review_ceiling": 0.95,
+      "strict_ci95_low": 0.38658150076225317,
+      "strict_ci95_high": 0.7811934676271829,
+      "audited_ci95_low": 0.763868806553258,
+      "audited_ci95_high": 0.9911185511992047
+    },
+    "analogy": {
+      "group": "analogy",
+      "total": 20,
+      "strict_correct": 9,
+      "likely_correct_scoring_miss": 0,
+      "partially_correct": 5,
+      "ambiguous": 2,
+      "likely_wrong": 4,
+      "strict_accuracy": 0.45,
+      "conservative_audited_accuracy": 0.45,
+      "review_ceiling": 0.8,
+      "strict_ci95_low": 0.2581978582556243,
+      "strict_ci95_high": 0.6579146575496577,
+      "audited_ci95_low": 0.2581978582556243,
+      "audited_ci95_high": 0.6579146575496577
+    },
+    "definition": {
+      "group": "definition",
+      "total": 20,
+      "strict_correct": 17,
+      "likely_correct_scoring_miss": 0,
+      "partially_correct": 1,
+      "ambiguous": 1,
+      "likely_wrong": 1,
+      "strict_accuracy": 0.85,
+      "conservative_audited_accuracy": 0.85,
+      "review_ceiling": 0.95,
+      "strict_ci95_low": 0.6395811352592431,
+      "strict_ci95_high": 0.9476312541037835,
+      "audited_ci95_low": 0.6395811352592431,
+      "audited_ci95_high": 0.9476312541037835
+    }
+  },
+  "recommended_acceptable_answer_additions": [
+    {
+      "id": "exp011_logic_002",
+      "answer": "not a mammal"
+    },
+    {
+      "id": "exp011_causality_003",
+      "answer": "melts"
+    },
+    {
+      "id": "exp011_causality_004",
+      "answer": "turn the lamp on"
+    },
+    {
+      "id": "exp011_causality_005",
+      "answer": "computer to shut down"
+    },
+    {
+      "id": "exp011_causality_007",
+      "answer": "freezes"
+    },
+    {
+      "id": "exp011_causality_008",
+      "answer": "it breaks"
+    },
+    {
+      "id": "exp011_causality_017",
+      "answer": "make it wet"
+    },
+    {
+      "id": "exp011_causality_019",
+      "answer": "stop the water flow"
+    }
+  ],
+  "number_of_recommended_dataset_updates": 8,
+  "warnings": [
+    "Review ceiling is an uncertainty ceiling, not accuracy or final correctness.",
+    "This rule-based manual audit has no independent human annotator or semantic judge."
+  ],
+  "strict_scoring_appears_materially_brittle": true,
+  "behavioral_group_ranking_strict": [
+    "definition",
+    "logic",
+    "causality",
+    "analogy"
+  ],
+  "behavioral_group_ranking_audited": [
+    "causality",
+    "definition",
+    "logic",
+    "analogy"
+  ],
+  "ranking_changes_after_conservative_audit": true
+}

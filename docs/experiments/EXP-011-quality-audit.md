@@ -50,6 +50,10 @@ retained only for reproducibility.
 no remaining flagged ambiguity, duplicate, or raw-substring risk under the
 boundary-aware scoring configuration.
 
+EXP-011D subsequently applied only the eight clear lexical or wording additions
+identified by EXP-011C. No partial, ambiguous, or likely wrong answer was added
+to the accepted vocabulary.
+
 ## Limitations
 
 This is a rule-based/manual design audit and not empirical proof that items are

@@ -1,0 +1,9 @@
+id,group,expected_answer,added_acceptable_answer,audit_reason
+exp011_logic_002,logic,no,not a mammal,The response directly states the required negative conclusion.
+exp011_causality_003,causality,melting,melts,'melts' is a direct inflectional variant of the accepted effect.
+exp011_causality_004,causality,lamp turns on,turn the lamp on,The response expresses the same lamp-on effect with harmless word-order variation.
+exp011_causality_005,causality,computer shuts down,computer to shut down,The response states the same computer-shutdown effect with an infinitive form.
+exp011_causality_007,causality,freezing,freezes,'freezes' is a direct inflectional variant of the accepted effect.
+exp011_causality_008,causality,glass breaks,it breaks,The pronoun refers directly to the glass in the explicit question.
+exp011_causality_017,causality,soil becomes wet,make it wet,It expresses the same explicitly stated wet-soil effect.
+exp011_causality_019,causality,water flow stops,stop the water flow,It expresses the same water-flow-stopping effect.

@@ -201,9 +201,39 @@ analogy, and definition. Run its static quality audit with:
 python experiments/exp011/audit_dataset_quality.py
 ```
 
-It is dataset design only; Qwen evaluation is deferred. Its configured
-boundary-aware answer scoring has been validated against short-answer
-substring false positives.
+Its configured boundary-aware answer scoring was validated against short-answer
+substring false positives before the EXP-011B evaluation.
+
+## Current Milestone: EXP-011B Expanded Answer-Level Evaluation
+
+Run the deterministic Qwen evaluation on the quality-audited dataset:
+
+```bash
+python experiments/exp011b/run_expanded_answer_eval.py
+```
+
+EXP-011B uses normal generation only and boundary-aware scoring. The completed
+run scored 52/80 answers correctly (0.650); analogy remained the lowest-
+accuracy group, while group ranking differed from EXP-009.
+
+## Current Milestone: EXP-011C Expanded Answer Scoring Audit
+
+Run the offline conservative audit over the existing EXP-011B CSV:
+
+```bash
+python experiments/exp011c/audit_expanded_answers.py
+```
+
+The audit does not rerun Qwen. It raised conservative audited accuracy from
+0.650 to 0.750 through eight defensible lexical or wording misses; its 0.875
+review ceiling is not accuracy or final correctness.
+
+## Current Milestone: EXP-011D Behavioral Benchmark Freeze
+
+EXP-011D applied the eight audit-approved acceptable-answer additions and
+rescored the existing outputs offline. The provisionally frozen baseline is
+60/80 (0.750): causality 0.950, definition 0.850, logic 0.750, and analogy
+0.450. No model answers were regenerated.
 
 ## Project Status
 
