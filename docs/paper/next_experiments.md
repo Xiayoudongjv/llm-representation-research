@@ -16,7 +16,16 @@ EXP-011 should:
 - produce both group-level and item-level accuracy
 - optionally include conservative audit labels and a human annotation sample
 
-No EXP-011 implementation is proposed here yet.
+The dataset design is complete; model execution remains deferred to EXP-011B.
+
+## EXP-011 Status
+
+Dataset design only. No Qwen run or model accuracy evaluation has occurred.
+
+Future work:
+
+1. **EXP-011B:** Run Qwen on the expanded dataset.
+2. **EXP-011C:** Perform a scoring audit on the expanded answers.
 
 The previous exploratory options are retained below as historical planning
 context; this recommendation supersedes their priority ordering.

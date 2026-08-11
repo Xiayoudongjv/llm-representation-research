@@ -4,7 +4,7 @@ Research on representation geometry, task-conditioned transformations and relati
 
 Current Stage:
 
-EXP-010 complete; Paper Draft v0.3 prepared
+EXP-011 dataset design added; no Qwen run yet
 
 ## Current Milestone: EXP-000B Hidden State Extraction
 
@@ -185,6 +185,17 @@ python experiments/exp010/representation_behavior_link.py
 
 EXP-010 computes four-group Pearson correlations for exploratory comparison.
 It is non-causal, underpowered, and does not rerun Qwen.
+
+## Current Milestone: EXP-011 Expanded Answer-level Dataset
+
+Validate the expanded dataset without running a model:
+
+```bash
+python experiments/exp011/validate_dataset.py
+```
+
+EXP-011 adds 80 deterministic short-answer items across logic, causality,
+analogy, and definition. It is dataset design only; Qwen evaluation is deferred.
 
 ## Project Status
 

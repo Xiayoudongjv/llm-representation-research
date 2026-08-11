@@ -1,0 +1,11 @@
+{
+  "total_items": 80,
+  "group_counts": {
+    "analogy": 20,
+    "causality": 20,
+    "definition": 20,
+    "logic": 20
+  },
+  "validation_passed": true,
+  "warnings": []
+}
