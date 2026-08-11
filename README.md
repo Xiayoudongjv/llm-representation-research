@@ -4,7 +4,7 @@ Research on representation geometry, task-conditioned transformations and relati
 
 Current Stage:
 
-EXP-002
+EXP-003
 
 ## Current Milestone: EXP-000B Hidden State Extraction
 
@@ -64,6 +64,18 @@ python experiments/exp002/analyze_layers.py --model_name Qwen/Qwen3-1.7B
 EXP-002 evaluates layers 0, 4, 8, 12, 16, 20, 24, and 28 using one forward
 pass per prompt. It saves only compact metrics, diagnostics, and plots; full
 representation tensors are not saved.
+
+## Current Milestone: EXP-003 Lexical and Paraphrase Control
+
+Run the controlled Qwen analysis:
+
+```bash
+python experiments/exp003/analyze_controlled_geometry.py --model_name Qwen/Qwen3-1.7B
+```
+
+EXP-003 evaluates original-style and paraphrased prompts across the same
+selected layers. It saves compact control metrics and plots only; full hidden
+state tensors are not saved.
 
 Environment Setup
 

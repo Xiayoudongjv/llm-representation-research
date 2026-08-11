@@ -1,0 +1,17 @@
+{
+  "min_token_count": 9,
+  "max_token_count": 18,
+  "mean_token_count_by_group": {
+    "logic": 14.333333333333334,
+    "causality": 10.666666666666666,
+    "analogy": 14.5,
+    "definition": 10.5
+  },
+  "mean_token_count_by_variant_type": {
+    "original_style": 12.333333333333334,
+    "paraphrase": 12.666666666666666
+  },
+  "token_count_final_representation_norm_pearson_r": -0.005023732724404237,
+  "zero_variance_layers": [],
+  "note": "These diagnostics are preliminary and do not eliminate lexical confounds."
+}
