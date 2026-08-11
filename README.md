@@ -4,7 +4,7 @@ Research on representation geometry, task-conditioned transformations and relati
 
 Current Stage:
 
-EXP-007
+EXP-008
 
 ## Current Milestone: EXP-000B Hidden State Extraction
 
@@ -136,6 +136,19 @@ python experiments/exp007/validity_frontier.py
 EXP-007 summarizes the trade-off between transition success, invariant
 violation, and perturbation magnitude. Its scalar validity scores are
 exploratory and do not define a final theory.
+
+## Current Milestone: EXP-008 Invariant-constrained Steering
+
+Run the invariant-constrained selection analysis over existing EXP-006 and
+EXP-007 results:
+
+```bash
+python experiments/exp008/invariant_constrained_selection.py
+```
+
+EXP-008 selects among discrete beta candidates using assignment success,
+invariant violation, and relative perturbation penalties. It does not rerun
+Qwen, learn a transformation, or save full hidden-state tensors.
 
 Environment Setup
 
