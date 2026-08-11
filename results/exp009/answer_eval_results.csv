@@ -1,0 +1,25 @@
+id,group,question,expected_answer,model_answer,is_correct
+logic_eval_01,logic,All dogs are mammals. All mammals are animals. Are dogs animals? Answer yes or no.,yes,yes,True
+logic_eval_02,logic,All squares are rectangles. This shape is a square. Is it a rectangle? Answer yes or no.,yes,yes,True
+logic_eval_03,logic,No reptiles are mammals. A lizard is a reptile. Is the lizard a mammal? Answer yes or no.,no,no,True
+logic_eval_04,logic,"What number comes next: 2, 4, 6, 8, ? Answer with the number.",10,9,False
+logic_eval_05,logic,A is taller than B. B is taller than C. Is A taller than C? Answer yes or no.,yes,yes,True
+logic_eval_06,logic,Which number is greater: 7 or 5? Choose A for 7 or B for 5.,A,A,True
+causality_eval_01,causality,A road is wet after a storm. What likely caused the wetness? Answer rain or snow.,rain,rain or snow,True
+causality_eval_02,causality,What happens to ice when it is kept above freezing? Answer briefly.,melts,Ice melts.,True
+causality_eval_03,causality,Why can a plant grow poorly without enough sunlight? Answer briefly.,less photosynthesis,"Photosynthesis requires sunlight for plants to produce energy. Without enough sunlight, plants cannot perform photosynthesis and thus grow poorly.",False
+causality_eval_04,causality,What usually happens after a ball is pushed on a smooth floor? Answer briefly.,moves,The ball usually rolls.,True
+causality_eval_05,causality,What usually happens to metal when it is heated? Choose A for expansion or B for freezing.,A,A,True
+causality_eval_06,causality,Why does an umbrella help keep a person dry in rain? Answer briefly.,blocks water,An umbrella helps keep a person dry in rain by providing an additional layer of protection against raindrops.,False
+analogy_eval_01,analogy,Complete the analogy: bird is to nest as bee is to what? Answer one word.,hive,hive,True
+analogy_eval_02,analogy,Complete the analogy: hot is to cold as high is to what? Answer one word.,low,cold is to hot as low is to high,True
+analogy_eval_03,analogy,Complete the analogy: book is to reading as fork is to what? Answer one word.,eating,meal,False
+analogy_eval_04,analogy,A puppy is a young dog. A kitten is a young what? Answer one word.,cat,animal,False
+analogy_eval_05,analogy,Hand is to glove as foot is to what? Choose A for sock or B for hat.,A,B,False
+analogy_eval_06,analogy,Complete the analogy: day is to night as hot is to what? Answer one word.,cold,dark,False
+definition_eval_01,definition,What is a triangle in basic geometric terms? Answer briefly.,three sides,A triangle is a polygon with three sides and three angles.,True
+definition_eval_02,definition,What does fragile mean when describing an object? Answer briefly.,easily broken,A fragile object is one that is easily broken or damaged.,True
+definition_eval_03,definition,What process lets green plants use light to make food? Answer one word.,photosynthesis,Photosynthesis,True
+definition_eval_04,definition,What does a thermometer measure? Choose A for temperature or B for weight.,A,A thermometer measures temperature.,True
+definition_eval_05,definition,What is evaporation? Answer briefly.,liquid to gas,Evaporation is the process by which a liquid turns into a gas.,False
+definition_eval_06,definition,What is democracy in simple terms? Answer briefly.,rule by the people,Democracy is a system of government where people choose their leaders through free and fair elections.,False

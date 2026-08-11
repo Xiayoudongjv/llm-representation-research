@@ -1,0 +1,14 @@
+{
+  "model_name": "Qwen/Qwen3-1.7B",
+  "prompt_count": 24,
+  "overall_accuracy": 0.625,
+  "group_accuracy": {
+    "logic": 0.8333333333333334,
+    "causality": 0.6666666666666666,
+    "analogy": 0.3333333333333333,
+    "definition": 0.6666666666666666
+  },
+  "max_new_tokens": 32,
+  "temperature": 0.0,
+  "note": "Normal generation only; no activation steering or hidden-state intervention was applied."
+}

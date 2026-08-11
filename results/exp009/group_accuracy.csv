@@ -1,0 +1,5 @@
+group,num_items,num_correct,accuracy
+logic,6,5,0.8333333333333334
+causality,6,4,0.6666666666666666
+analogy,6,2,0.3333333333333333
+definition,6,4,0.6666666666666666

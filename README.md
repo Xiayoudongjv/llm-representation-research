@@ -4,7 +4,7 @@ Research on representation geometry, task-conditioned transformations and relati
 
 Current Stage:
 
-EXP-008
+EXP-009
 
 ## Current Milestone: EXP-000B Hidden State Extraction
 
@@ -149,6 +149,18 @@ python experiments/exp008/invariant_constrained_selection.py
 EXP-008 selects among discrete beta candidates using assignment success,
 invariant violation, and relative perturbation penalties. It does not rerun
 Qwen, learn a transformation, or save full hidden-state tensors.
+
+## Current Milestone: EXP-009 Answer-level Reasoning Evaluation
+
+Run the normal-generation behavioral baseline:
+
+```bash
+python experiments/exp009/run_answer_eval.py --model_name Qwen/Qwen3-1.7B
+```
+
+EXP-009 evaluates concise answers on 24 deterministic prompts across logic,
+causality, analogy, and definition. It does not apply activation steering or
+save full hidden-state tensors.
 
 Environment Setup
 
