@@ -1,0 +1,13 @@
+{
+  "number_of_pairs": 12,
+  "beta_counts_for_recommended_beta": {
+    "0.75": 12
+  },
+  "mean_recommended_beta": 0.75,
+  "mean_assignment_at_recommended_beta": 1.0,
+  "mean_ivs_at_recommended_beta": 0.0028496942764711375,
+  "mean_rsm_pearson_at_recommended_beta": 0.9971503057235288,
+  "mean_relative_perturbation_at_recommended_beta": 0.34516438841819763,
+  "most_common_recommended_beta": 0.75,
+  "note": "This is an exploratory frontier analysis; the scalar validity scores are not final theoretical definitions."
+}

@@ -1,0 +1,13 @@
+source_group,target_group,minimal_beta_assignment_ge_0_5,minimal_beta_assignment_ge_1,beta_max_success_minus_violation,beta_max_balanced_validity,beta_min_ivs_given_assignment_1,beta_min_perturbation_given_assignment_1,recommended_beta,recommended_reason,assignment_at_recommended_beta,ivs_at_recommended_beta,rsm_pearson_at_recommended_beta,relative_perturbation_at_recommended_beta
+logic,causality,0.5,0.75,0.75,0.75,0.75,0.75,0.75,minimum IVS among beta values with assignment rate 1.0,1.0,0.0006648109043912998,0.9993351890956087,0.3776656687259674
+logic,analogy,0.5,0.75,0.75,0.75,0.75,0.75,0.75,minimum IVS among beta values with assignment rate 1.0,1.0,0.0009703679245414154,0.9990296320754586,0.33360084891319275
+logic,definition,0.5,0.75,0.75,0.75,0.75,0.75,0.75,minimum IVS among beta values with assignment rate 1.0,1.0,0.00026376332717203965,0.999736236672828,0.355024129152298
+causality,logic,0.75,0.75,0.75,0.75,0.75,0.75,0.75,minimum IVS among beta values with assignment rate 1.0,1.0,0.006512560265031331,0.9934874397349687,0.34463346004486084
+causality,analogy,0.5,0.75,0.75,0.75,0.75,0.75,0.75,minimum IVS among beta values with assignment rate 1.0,1.0,0.003597561196052479,0.9964024388039475,0.3879530131816864
+causality,definition,0.5,0.75,0.75,0.75,0.75,0.75,0.75,minimum IVS among beta values with assignment rate 1.0,1.0,0.0004214930977544107,0.9995785069022456,0.25955843925476074
+analogy,logic,0.75,0.75,0.75,0.75,0.75,0.75,0.75,minimum IVS among beta values with assignment rate 1.0,1.0,0.001975150913399726,0.9980248490866003,0.32332921028137207
+analogy,causality,0.75,0.75,0.75,0.75,0.75,0.75,0.75,minimum IVS among beta values with assignment rate 1.0,1.0,0.0019109922918736366,0.9980890077081264,0.4120471775531769
+analogy,definition,0.75,0.75,0.75,0.75,0.75,0.75,0.75,minimum IVS among beta values with assignment rate 1.0,1.0,0.002175512169488525,0.9978244878305115,0.3781648874282837
+definition,logic,0.5,0.75,0.75,0.75,0.75,0.75,0.75,minimum IVS among beta values with assignment rate 1.0,1.0,0.004489160842186646,0.9955108391578134,0.3344588279724121
+definition,causality,0.5,0.75,0.75,0.75,0.75,0.75,0.75,minimum IVS among beta values with assignment rate 1.0,1.0,0.00563945696506063,0.9943605430349394,0.2679600417613983
+definition,analogy,0.5,0.75,0.75,0.75,0.75,0.75,0.75,minimum IVS among beta values with assignment rate 1.0,1.0,0.005575501420701512,0.9944244985792985,0.3675769567489624

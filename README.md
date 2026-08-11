@@ -4,7 +4,7 @@ Research on representation geometry, task-conditioned transformations and relati
 
 Current Stage:
 
-EXP-006
+EXP-007
 
 ## Current Milestone: EXP-000B Hidden State Extraction
 
@@ -124,6 +124,18 @@ python experiments/exp006/relational_invariant_score.py --model_name Qwen/Qwen3-
 EXP-006 compares source-group representation similarity matrices before and
 after calibrated steering. RSM correlation is only a proxy invariant; full
 hidden-state tensors are not saved.
+
+## Current Milestone: EXP-007 Transition Validity Frontier
+
+Run the frontier analysis over EXP-006 results:
+
+```bash
+python experiments/exp007/validity_frontier.py
+```
+
+EXP-007 summarizes the trade-off between transition success, invariant
+violation, and perturbation magnitude. Its scalar validity scores are
+exploratory and do not define a final theory.
 
 Environment Setup
 
