@@ -1,0 +1,14 @@
+[
+  {"id": "logic_01", "group": "logic", "text": "If all mammals are animals and dogs are mammals, what relation holds between dogs and animals?"},
+  {"id": "logic_02", "group": "logic", "text": "If A is greater than B and B is greater than C, what can you conclude about A and C?"},
+  {"id": "logic_03", "group": "logic", "text": "If no birds are mammals and a robin is a bird, can the robin be a mammal?"},
+  {"id": "causality_01", "group": "causality", "text": "Why does a wet road often suggest that it has rained?"},
+  {"id": "causality_02", "group": "causality", "text": "What may happen to ice if the temperature rises above freezing?"},
+  {"id": "causality_03", "group": "causality", "text": "Why can removing sunlight cause a plant to grow poorly?"},
+  {"id": "analogy_01", "group": "analogy", "text": "Complete the analogy: bird is to nest as bee is to what?"},
+  {"id": "analogy_02", "group": "analogy", "text": "Complete the analogy: hot is to cold as high is to what?"},
+  {"id": "analogy_03", "group": "analogy", "text": "Complete the analogy: book is to reading as fork is to what?"},
+  {"id": "definition_01", "group": "definition", "text": "What is a triangle?"},
+  {"id": "definition_02", "group": "definition", "text": "What does the word fragile mean?"},
+  {"id": "definition_03", "group": "definition", "text": "What is photosynthesis?"}
+]

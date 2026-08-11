@@ -1,0 +1,38 @@
+{
+  "model_name": "Qwen/Qwen3-1.7B",
+  "selected_layer": 28,
+  "num_prompts": 12,
+  "hidden_size": 2048,
+  "prompt_ids": [
+    "logic_01",
+    "logic_02",
+    "logic_03",
+    "causality_01",
+    "causality_02",
+    "causality_03",
+    "analogy_01",
+    "analogy_02",
+    "analogy_03",
+    "definition_01",
+    "definition_02",
+    "definition_03"
+  ],
+  "groups": [
+    "logic",
+    "logic",
+    "logic",
+    "causality",
+    "causality",
+    "causality",
+    "analogy",
+    "analogy",
+    "analogy",
+    "definition",
+    "definition",
+    "definition"
+  ],
+  "pca_explained_variance_ratio": [
+    0.3656724989414215,
+    0.17456723749637604
+  ]
+}
