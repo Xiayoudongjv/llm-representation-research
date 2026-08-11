@@ -1,21 +1,36 @@
 # LLM Representation Research
 
-## Goal
+Research on representation geometry, task-conditioned transformations and relational invariants in LLM reasoning.
 
-Research task-conditioned representation transformation and relational invariants in large language models.
-
-## Current Stage
+Current Stage:
 
 EXP-000
 
 Environment Setup
 
-## Project Structure
+Roadmap
 
-```text
-docs/
-experiments/
-notebooks/
-results/
-src/
-```
+EXP000
+¡ý
+
+Representation
+
+¡ý
+
+Geometry
+
+¡ý
+
+Steering
+
+¡ý
+
+Task-conditioned Transformation
+
+¡ý
+
+Relational Invariant
+
+¡ý
+
+Papers

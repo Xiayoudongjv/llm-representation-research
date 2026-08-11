@@ -1,17 +1,20 @@
+# Python
 .venv/
-
 __pycache__/
-
 *.pyc
 
+# Experiment output
 results/
+*.log
 
+# Hugging Face cache
 .cache/
 
+# Model files
 *.safetensors
-
 *.bin
-
 *.pt
-
 *.pth
+
+# VS Code
+.vscode/
