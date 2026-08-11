@@ -4,7 +4,7 @@ Research on representation geometry, task-conditioned transformations and relati
 
 Current Stage:
 
-EXP-004B
+EXP-005
 
 ## Current Milestone: EXP-000B Hidden State Extraction
 
@@ -100,6 +100,18 @@ python experiments/exp004b/calibrated_steering.py --model_name Qwen/Qwen3-1.7B -
 EXP-004B scales the raw centroid-difference vector by beta and reports
 similarity movement, centroid assignments, and relative perturbation size. It
 is not generation-time steering and does not save full hidden-state tensors.
+
+## Current Milestone: EXP-005 Multi-pair Calibrated Steering Generalization
+
+Run the multi-pair steering analysis:
+
+```bash
+python experiments/exp005/multipair_steering.py --model_name Qwen/Qwen3-1.7B --layer 16
+```
+
+EXP-005 evaluates all 12 ordered transitions among the four controlled task
+groups. It saves pair summaries, asymmetry metrics, and heatmaps without saving
+full hidden-state tensors.
 
 Environment Setup
 

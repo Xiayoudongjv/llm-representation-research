@@ -1,0 +1,7 @@
+group_a,group_b,a_to_b_min_beta_assignment_ge_0_5,b_to_a_min_beta_assignment_ge_0_5,a_to_b_final_assignment_rate,b_to_a_final_assignment_rate,asymmetry_score
+logic,causality,0.5,0.75,1.0,1.0,0.0
+logic,analogy,0.5,0.75,1.0,1.0,0.0
+logic,definition,0.5,0.5,1.0,1.0,0.0
+causality,analogy,0.5,0.75,1.0,1.0,0.0
+causality,definition,0.5,0.5,1.0,1.0,0.0
+analogy,definition,0.75,0.5,1.0,1.0,0.0
