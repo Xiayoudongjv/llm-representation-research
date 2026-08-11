@@ -1,0 +1,292 @@
+[
+  {
+    "layer": 0,
+    "shape": [
+      1,
+      12,
+      2048
+    ],
+    "dtype": "torch.float16",
+    "device": "cuda:0"
+  },
+  {
+    "layer": 1,
+    "shape": [
+      1,
+      12,
+      2048
+    ],
+    "dtype": "torch.float16",
+    "device": "cuda:0"
+  },
+  {
+    "layer": 2,
+    "shape": [
+      1,
+      12,
+      2048
+    ],
+    "dtype": "torch.float16",
+    "device": "cuda:0"
+  },
+  {
+    "layer": 3,
+    "shape": [
+      1,
+      12,
+      2048
+    ],
+    "dtype": "torch.float16",
+    "device": "cuda:0"
+  },
+  {
+    "layer": 4,
+    "shape": [
+      1,
+      12,
+      2048
+    ],
+    "dtype": "torch.float16",
+    "device": "cuda:0"
+  },
+  {
+    "layer": 5,
+    "shape": [
+      1,
+      12,
+      2048
+    ],
+    "dtype": "torch.float16",
+    "device": "cuda:0"
+  },
+  {
+    "layer": 6,
+    "shape": [
+      1,
+      12,
+      2048
+    ],
+    "dtype": "torch.float16",
+    "device": "cuda:0"
+  },
+  {
+    "layer": 7,
+    "shape": [
+      1,
+      12,
+      2048
+    ],
+    "dtype": "torch.float16",
+    "device": "cuda:0"
+  },
+  {
+    "layer": 8,
+    "shape": [
+      1,
+      12,
+      2048
+    ],
+    "dtype": "torch.float16",
+    "device": "cuda:0"
+  },
+  {
+    "layer": 9,
+    "shape": [
+      1,
+      12,
+      2048
+    ],
+    "dtype": "torch.float16",
+    "device": "cuda:0"
+  },
+  {
+    "layer": 10,
+    "shape": [
+      1,
+      12,
+      2048
+    ],
+    "dtype": "torch.float16",
+    "device": "cuda:0"
+  },
+  {
+    "layer": 11,
+    "shape": [
+      1,
+      12,
+      2048
+    ],
+    "dtype": "torch.float16",
+    "device": "cuda:0"
+  },
+  {
+    "layer": 12,
+    "shape": [
+      1,
+      12,
+      2048
+    ],
+    "dtype": "torch.float16",
+    "device": "cuda:0"
+  },
+  {
+    "layer": 13,
+    "shape": [
+      1,
+      12,
+      2048
+    ],
+    "dtype": "torch.float16",
+    "device": "cuda:0"
+  },
+  {
+    "layer": 14,
+    "shape": [
+      1,
+      12,
+      2048
+    ],
+    "dtype": "torch.float16",
+    "device": "cuda:0"
+  },
+  {
+    "layer": 15,
+    "shape": [
+      1,
+      12,
+      2048
+    ],
+    "dtype": "torch.float16",
+    "device": "cuda:0"
+  },
+  {
+    "layer": 16,
+    "shape": [
+      1,
+      12,
+      2048
+    ],
+    "dtype": "torch.float16",
+    "device": "cuda:0"
+  },
+  {
+    "layer": 17,
+    "shape": [
+      1,
+      12,
+      2048
+    ],
+    "dtype": "torch.float16",
+    "device": "cuda:0"
+  },
+  {
+    "layer": 18,
+    "shape": [
+      1,
+      12,
+      2048
+    ],
+    "dtype": "torch.float16",
+    "device": "cuda:0"
+  },
+  {
+    "layer": 19,
+    "shape": [
+      1,
+      12,
+      2048
+    ],
+    "dtype": "torch.float16",
+    "device": "cuda:0"
+  },
+  {
+    "layer": 20,
+    "shape": [
+      1,
+      12,
+      2048
+    ],
+    "dtype": "torch.float16",
+    "device": "cuda:0"
+  },
+  {
+    "layer": 21,
+    "shape": [
+      1,
+      12,
+      2048
+    ],
+    "dtype": "torch.float16",
+    "device": "cuda:0"
+  },
+  {
+    "layer": 22,
+    "shape": [
+      1,
+      12,
+      2048
+    ],
+    "dtype": "torch.float16",
+    "device": "cuda:0"
+  },
+  {
+    "layer": 23,
+    "shape": [
+      1,
+      12,
+      2048
+    ],
+    "dtype": "torch.float16",
+    "device": "cuda:0"
+  },
+  {
+    "layer": 24,
+    "shape": [
+      1,
+      12,
+      2048
+    ],
+    "dtype": "torch.float16",
+    "device": "cuda:0"
+  },
+  {
+    "layer": 25,
+    "shape": [
+      1,
+      12,
+      2048
+    ],
+    "dtype": "torch.float16",
+    "device": "cuda:0"
+  },
+  {
+    "layer": 26,
+    "shape": [
+      1,
+      12,
+      2048
+    ],
+    "dtype": "torch.float16",
+    "device": "cuda:0"
+  },
+  {
+    "layer": 27,
+    "shape": [
+      1,
+      12,
+      2048
+    ],
+    "dtype": "torch.float16",
+    "device": "cuda:0"
+  },
+  {
+    "layer": 28,
+    "shape": [
+      1,
+      12,
+      2048
+    ],
+    "dtype": "torch.float16",
+    "device": "cuda:0"
+  }
+]
