@@ -186,6 +186,13 @@ python experiments/exp010/representation_behavior_link.py
 EXP-010 computes four-group Pearson correlations for exploratory comparison.
 It is non-causal, underpowered, and does not rerun Qwen.
 
+## Developer Checks
+
+```bash
+python -m compileall src experiments
+python -m pytest tests
+```
+
 Environment Setup
 
 Roadmap
