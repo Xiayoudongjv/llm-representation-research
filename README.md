@@ -4,7 +4,7 @@ Research on representation geometry, task-conditioned transformations and relati
 
 Current Stage:
 
-EXP-005
+EXP-006
 
 ## Current Milestone: EXP-000B Hidden State Extraction
 
@@ -112,6 +112,18 @@ python experiments/exp005/multipair_steering.py --model_name Qwen/Qwen3-1.7B --l
 EXP-005 evaluates all 12 ordered transitions among the four controlled task
 groups. It saves pair summaries, asymmetry metrics, and heatmaps without saving
 full hidden-state tensors.
+
+## Current Milestone: EXP-006 Relational Invariant Score
+
+Run the relational invariant analysis:
+
+```bash
+python experiments/exp006/relational_invariant_score.py --model_name Qwen/Qwen3-1.7B --layer 16
+```
+
+EXP-006 compares source-group representation similarity matrices before and
+after calibrated steering. RSM correlation is only a proxy invariant; full
+hidden-state tensors are not saved.
 
 Environment Setup
 

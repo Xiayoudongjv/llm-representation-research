@@ -1,0 +1,25 @@
+{
+  "model_name": "Qwen/Qwen3-1.7B",
+  "layer": 16,
+  "groups": [
+    "logic",
+    "causality",
+    "analogy",
+    "definition"
+  ],
+  "betas": [
+    0.0,
+    0.25,
+    0.5,
+    0.75,
+    1.0,
+    1.5,
+    2.0
+  ],
+  "prompt_count": 24,
+  "hidden_size": 2048,
+  "number_of_pairs": 12,
+  "invariant_definition": "IVS = 1 - Pearson correlation between upper-triangle source RSM values before and after steering.",
+  "note_rsm_correlation": "RSM correlation is only a proxy for relational invariance.",
+  "note_analysis_scope": "This is representation-level analysis, not generation-time reasoning evaluation."
+}
