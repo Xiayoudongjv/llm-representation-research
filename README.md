@@ -4,7 +4,7 @@ Research on representation geometry, task-conditioned transformations and relati
 
 Current Stage:
 
-EXP-001
+EXP-002
 
 ## Current Milestone: EXP-000B Hidden State Extraction
 
@@ -52,6 +52,18 @@ python experiments/exp001/compute_geometry.py --model_name Qwen/Qwen3-1.7B
 The geometry baseline saves compact metadata, cosine similarities, PCA
 coordinates, and a PCA plot. Full hidden-state tensors and model weights are
 not saved.
+
+## Current Milestone: EXP-002 Layer-wise Representation Geometry
+
+Run the layer-wise Qwen analysis:
+
+```bash
+python experiments/exp002/analyze_layers.py --model_name Qwen/Qwen3-1.7B
+```
+
+EXP-002 evaluates layers 0, 4, 8, 12, 16, 20, 24, and 28 using one forward
+pass per prompt. It saves only compact metrics, diagnostics, and plots; full
+representation tensors are not saved.
 
 Environment Setup
 

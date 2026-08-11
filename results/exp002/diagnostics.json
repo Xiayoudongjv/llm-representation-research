@@ -1,0 +1,12 @@
+{
+  "token_count_final_representation_norm_pearson_r": -0.3028964727366622,
+  "mean_token_count_by_group": {
+    "logic": 20.0,
+    "causality": 12.0,
+    "analogy": 14.0,
+    "definition": 5.666666666666667
+  },
+  "min_token_count": 5,
+  "max_token_count": 22,
+  "note": "This is a preliminary diagnostic and does not eliminate lexical or template confounds."
+}

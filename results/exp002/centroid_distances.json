@@ -1,0 +1,210 @@
+{
+  "0": {
+    "logic": {
+      "logic": 0.0,
+      "causality": 0.0,
+      "analogy": 0.0,
+      "definition": 0.0
+    },
+    "causality": {
+      "logic": 0.0,
+      "causality": 0.0,
+      "analogy": 0.0,
+      "definition": 0.0
+    },
+    "analogy": {
+      "logic": 0.0,
+      "causality": 0.0,
+      "analogy": 0.0,
+      "definition": 0.0
+    },
+    "definition": {
+      "logic": 0.0,
+      "causality": 0.0,
+      "analogy": 0.0,
+      "definition": 0.0
+    }
+  },
+  "4": {
+    "logic": {
+      "logic": 0.0,
+      "causality": 0.05774021411181818,
+      "analogy": 0.10963994477357242,
+      "definition": 0.11528076054204628
+    },
+    "causality": {
+      "logic": 0.05774021411181818,
+      "causality": 2.220446049250313e-16,
+      "analogy": 0.1190603335148519,
+      "definition": 0.08181143685515913
+    },
+    "analogy": {
+      "logic": 0.10963994477357242,
+      "causality": 0.1190603335148519,
+      "analogy": 0.0,
+      "definition": 0.15525885817227747
+    },
+    "definition": {
+      "logic": 0.11528076054204628,
+      "causality": 0.08181143685515913,
+      "analogy": 0.15525885817227747,
+      "definition": 2.220446049250313e-16
+    }
+  },
+  "8": {
+    "logic": {
+      "logic": 0.0,
+      "causality": 0.12653519982551775,
+      "analogy": 0.13842635889954313,
+      "definition": 0.21856199887520322
+    },
+    "causality": {
+      "logic": 0.12653519982551775,
+      "causality": 2.220446049250313e-16,
+      "analogy": 0.1580486541239694,
+      "definition": 0.1854651062821272
+    },
+    "analogy": {
+      "logic": 0.13842635889954313,
+      "causality": 0.1580486541239694,
+      "analogy": -2.220446049250313e-16,
+      "definition": 0.22840281591299338
+    },
+    "definition": {
+      "logic": 0.21856199887520322,
+      "causality": 0.1854651062821272,
+      "analogy": 0.22840281591299338,
+      "definition": 0.0
+    }
+  },
+  "12": {
+    "logic": {
+      "logic": 0.0,
+      "causality": 0.1340970372445517,
+      "analogy": 0.1413092671694437,
+      "definition": 0.19210535346698632
+    },
+    "causality": {
+      "logic": 0.1340970372445517,
+      "causality": 0.0,
+      "analogy": 0.18867763010769834,
+      "definition": 0.17581017810719168
+    },
+    "analogy": {
+      "logic": 0.1413092671694437,
+      "causality": 0.18867763010769834,
+      "analogy": 2.220446049250313e-16,
+      "definition": 0.22657430143067592
+    },
+    "definition": {
+      "logic": 0.19210535346698632,
+      "causality": 0.17581017810719168,
+      "analogy": 0.22657430143067592,
+      "definition": 2.220446049250313e-16
+    }
+  },
+  "16": {
+    "logic": {
+      "logic": 0.0,
+      "causality": 0.1464797947611719,
+      "analogy": 0.17625987218473305,
+      "definition": 0.23403009425947685
+    },
+    "causality": {
+      "logic": 0.1464797947611719,
+      "causality": 0.0,
+      "analogy": 0.2275833999019128,
+      "definition": 0.18471729118331037
+    },
+    "analogy": {
+      "logic": 0.17625987218473305,
+      "causality": 0.2275833999019128,
+      "analogy": -2.220446049250313e-16,
+      "definition": 0.27502537847354214
+    },
+    "definition": {
+      "logic": 0.23403009425947685,
+      "causality": 0.18471729118331037,
+      "analogy": 0.27502537847354214,
+      "definition": 0.0
+    }
+  },
+  "20": {
+    "logic": {
+      "logic": -2.220446049250313e-16,
+      "causality": 0.11786305896446425,
+      "analogy": 0.16540982947191518,
+      "definition": 0.20832614292485052
+    },
+    "causality": {
+      "logic": 0.11786305896446425,
+      "causality": 0.0,
+      "analogy": 0.19368969884347975,
+      "definition": 0.1337934062269952
+    },
+    "analogy": {
+      "logic": 0.16540982947191518,
+      "causality": 0.19368969884347975,
+      "analogy": 0.0,
+      "definition": 0.24597038387257197
+    },
+    "definition": {
+      "logic": 0.20832614292485052,
+      "causality": 0.1337934062269952,
+      "analogy": 0.24597038387257197,
+      "definition": 0.0
+    }
+  },
+  "24": {
+    "logic": {
+      "logic": 2.220446049250313e-16,
+      "causality": 0.07668389400506581,
+      "analogy": 0.12023749210118029,
+      "definition": 0.12096347675563379
+    },
+    "causality": {
+      "logic": 0.07668389400506581,
+      "causality": -2.220446049250313e-16,
+      "analogy": 0.14500170909053844,
+      "definition": 0.06795733274721116
+    },
+    "analogy": {
+      "logic": 0.12023749210118029,
+      "causality": 0.14500170909053844,
+      "analogy": 1.1102230246251565e-16,
+      "definition": 0.1800523411427567
+    },
+    "definition": {
+      "logic": 0.12096347675563379,
+      "causality": 0.06795733274721116,
+      "analogy": 0.1800523411427567,
+      "definition": 0.0
+    }
+  },
+  "28": {
+    "logic": {
+      "logic": 0.0,
+      "causality": 0.05715371681944814,
+      "analogy": 0.0835329905124017,
+      "definition": 0.06336946687235978
+    },
+    "causality": {
+      "logic": 0.05715371681944814,
+      "causality": 1.1102230246251565e-16,
+      "analogy": 0.1298806541677342,
+      "definition": 0.05462253125741612
+    },
+    "analogy": {
+      "logic": 0.0835329905124017,
+      "causality": 0.1298806541677342,
+      "analogy": 0.0,
+      "definition": 0.10593586991545734
+    },
+    "definition": {
+      "logic": 0.06336946687235978,
+      "causality": 0.05462253125741612,
+      "analogy": 0.10593586991545734,
+      "definition": 1.1102230246251565e-16
+    }
+  }
+}

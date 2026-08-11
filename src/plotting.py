@@ -21,3 +21,18 @@ def plot_pca_2d(coords, labels, output_path: str, title: str) -> None:
     figure.tight_layout()
     figure.savefig(output)
     plt.close(figure)
+
+
+def plot_layer_metric(layers, values, output_path: str, ylabel: str, title: str) -> None:
+    """Save a line plot for a metric measured across layers."""
+    output = Path(output_path)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    figure, axis = plt.subplots(figsize=(9, 6))
+    axis.plot(layers, values, marker="o")
+    axis.set_xlabel("Layer")
+    axis.set_ylabel(ylabel)
+    axis.set_title(title)
+    axis.set_xticks(layers)
+    figure.tight_layout()
+    figure.savefig(output)
+    plt.close(figure)
