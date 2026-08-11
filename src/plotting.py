@@ -36,3 +36,20 @@ def plot_layer_metric(layers, values, output_path: str, ylabel: str, title: str)
     figure.tight_layout()
     figure.savefig(output)
     plt.close(figure)
+
+
+def plot_line_series(x_values, series, output_path: str, xlabel: str, ylabel: str, title: str) -> None:
+    """Save multiple named line series using matplotlib's default colors."""
+    output = Path(output_path)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    figure, axis = plt.subplots(figsize=(9, 6))
+    for label, values in series.items():
+        axis.plot(x_values, values, marker="o", label=label)
+    axis.set_xlabel(xlabel)
+    axis.set_ylabel(ylabel)
+    axis.set_title(title)
+    axis.set_xticks(x_values)
+    axis.legend()
+    figure.tight_layout()
+    figure.savefig(output)
+    plt.close(figure)

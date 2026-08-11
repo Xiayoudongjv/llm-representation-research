@@ -1,0 +1,20 @@
+{
+  "model_name": "Qwen/Qwen3-1.7B",
+  "layer": 16,
+  "source_group": "logic",
+  "target_group": "causality",
+  "hidden_size": 2048,
+  "vector_norm_before_normalization": 105.02935898996124,
+  "alphas": [
+    -2.0,
+    -1.0,
+    -0.5,
+    0.0,
+    0.5,
+    1.0,
+    2.0
+  ],
+  "prompt_count": 24,
+  "source_prompt_count": 6,
+  "note": "This is representation-level steering, not generation-time intervention."
+}
