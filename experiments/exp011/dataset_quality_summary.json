@@ -1,0 +1,61 @@
+{
+  "total_items": 80,
+  "group_counts": {
+    "analogy": 20,
+    "causality": 20,
+    "definition": 20,
+    "logic": 20
+  },
+  "quality_label_counts": {
+    "acceptable": 10,
+    "good": 50,
+    "revise": 20
+  },
+  "ambiguity_risk_counts": {
+    "low": 8,
+    "medium": 12,
+    "none": 60
+  },
+  "scoring_risk_counts": {
+    "none": 80
+  },
+  "difficulty_counts": {
+    "easy": 61,
+    "medium": 19
+  },
+  "group_difficulty_counts": {
+    "analogy": {
+      "easy": 13,
+      "medium": 7,
+      "hard": 0
+    },
+    "causality": {
+      "easy": 17,
+      "medium": 3,
+      "hard": 0
+    },
+    "definition": {
+      "easy": 15,
+      "medium": 5,
+      "hard": 0
+    },
+    "logic": {
+      "easy": 16,
+      "medium": 4,
+      "hard": 0
+    }
+  },
+  "items_revised": 20,
+  "items_rejected": 0,
+  "items_with_multiple_plausible_answers": 0,
+  "items_with_ambiguous_analogy_relation": 0,
+  "items_with_scoring_substring_risk": 0,
+  "revised_for_multiple_plausible_answers": 10,
+  "exact_duplicate_questions": 0,
+  "largest_near_template_cluster": 17,
+  "warnings": [
+    "Repeated cause-effect phrasing is controlled but creates a near-template cluster."
+  ],
+  "dataset_ready_for_model_evaluation": true,
+  "readiness_reason": "The dataset has no remaining flagged ambiguity, duplicate, or raw-substring risks under boundary-aware scoring."
+}

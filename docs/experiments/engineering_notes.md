@@ -38,3 +38,10 @@ Added `src/experiment_plots.py` to centralize common matplotlib plotting
 patterns for line plots, bar charts, scatter plots, and heatmaps. Existing
 experiment scripts have not yet been refactored. Future work should migrate
 EXP-005 through EXP-010 plots gradually.
+
+## Answer Scoring Utilities
+
+Added `src/answer_scoring.py` to centralize conservative answer normalization
+and boundary-aware matching. It keeps legacy substring matching only for
+reproducibility because raw containment can create false positives for short
+answers. Existing EXP-009 scoring has not been changed.

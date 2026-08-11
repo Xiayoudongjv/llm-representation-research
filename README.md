@@ -195,7 +195,15 @@ python experiments/exp011/validate_dataset.py
 ```
 
 EXP-011 adds 80 deterministic short-answer items across logic, causality,
-analogy, and definition. It is dataset design only; Qwen evaluation is deferred.
+analogy, and definition. Run its static quality audit with:
+
+```bash
+python experiments/exp011/audit_dataset_quality.py
+```
+
+It is dataset design only; Qwen evaluation is deferred. Its configured
+boundary-aware answer scoring has been validated against short-answer
+substring false positives.
 
 ## Project Status
 
