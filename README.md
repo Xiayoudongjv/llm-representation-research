@@ -4,7 +4,7 @@ Research on representation geometry, task-conditioned transformations and relati
 
 Current Stage:
 
-EXP-010
+EXP-010 complete; Paper Draft v0.3 prepared
 
 ## Current Milestone: EXP-000B Hidden State Extraction
 
@@ -185,6 +185,13 @@ python experiments/exp010/representation_behavior_link.py
 
 EXP-010 computes four-group Pearson correlations for exploratory comparison.
 It is non-causal, underpowered, and does not rerun Qwen.
+
+## Project Status
+
+Experiments are complete through EXP-010. Paper Draft v0.3 and the associated
+status, results, and claims documents are available under `docs/paper`.
+Engineering utilities for IO, representation extraction, and plotting are
+covered by local tests.
 
 ## Developer Checks
 

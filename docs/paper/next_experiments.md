@@ -1,5 +1,26 @@
 # Recommended Next Experiments
 
+## Updated Recommendation: EXP-011 Expanded Answer-level Dataset
+
+EXP-010 remains inconclusive because its correlation analysis has only four
+groups, and the answer-level dataset contains only six questions per group.
+Before any intervention experiment, the behavioral evaluation should be made
+larger, balanced, and less dependent on brittle answer matching.
+
+EXP-011 should:
+
+- expand each group from 6 to approximately 20-30 questions
+- keep a deterministic short-answer format
+- improve acceptable-answer lists and scoring documentation
+- preserve balanced group sizes
+- produce both group-level and item-level accuracy
+- optionally include conservative audit labels and a human annotation sample
+
+No EXP-011 implementation is proposed here yet.
+
+The previous exploratory options are retained below as historical planning
+context; this recommendation supersedes their priority ordering.
+
 ## Option A: EXP-008 Generation-time Intervention Probe
 
 - **Goal:** Apply a carefully instrumented intervention during generation at a selected layer and beta.
