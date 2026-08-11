@@ -1,0 +1,24 @@
+{
+  "strict_accuracy": 0.625,
+  "audited_upper_bound_accuracy": 0.625,
+  "counts_by_audit_label": {
+    "strict_correct": 15,
+    "likely_correct_scoring_miss": 0,
+    "partially_correct": 2,
+    "likely_wrong": 3,
+    "ambiguous": 4
+  },
+  "group_strict_accuracy": {
+    "logic": 0.8333333333333334,
+    "causality": 0.6666666666666666,
+    "analogy": 0.3333333333333333,
+    "definition": 0.6666666666666666
+  },
+  "group_audited_upper_bound_accuracy": {
+    "logic": 0.8333333333333334,
+    "causality": 0.6666666666666666,
+    "analogy": 0.3333333333333333,
+    "definition": 0.6666666666666666
+  },
+  "note": "Conservative heuristic auditing only; this is not human evaluation and does not use an LLM judge."
+}

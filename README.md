@@ -4,7 +4,7 @@ Research on representation geometry, task-conditioned transformations and relati
 
 Current Stage:
 
-EXP-009
+EXP-009B
 
 ## Current Milestone: EXP-000B Hidden State Extraction
 
@@ -161,6 +161,18 @@ python experiments/exp009/run_answer_eval.py --model_name Qwen/Qwen3-1.7B
 EXP-009 evaluates concise answers on 24 deterministic prompts across logic,
 causality, analogy, and definition. It does not apply activation steering or
 save full hidden-state tensors.
+
+## Current Milestone: EXP-009B Scoring Audit and Answer Normalization
+
+Run the conservative audit over existing EXP-009 outputs:
+
+```bash
+python experiments/exp009b/audit_scoring.py
+```
+
+EXP-009B compares strict accuracy with an audited upper bound and labels
+scoring misses, partial answers, ambiguous cases, and likely wrong answers. It
+does not rerun Qwen or use an LLM judge.
 
 Environment Setup
 
