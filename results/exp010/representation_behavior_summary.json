@@ -1,0 +1,25 @@
+{
+  "number_of_groups": 4,
+  "strict_accuracy_by_group": {
+    "logic": 0.8333333333333334,
+    "causality": 0.6666666666666666,
+    "analogy": 0.3333333333333333,
+    "definition": 0.6666666666666666
+  },
+  "audited_accuracy_by_group": {
+    "logic": 0.8333333333333334,
+    "causality": 0.6666666666666666,
+    "analogy": 0.3333333333333333,
+    "definition": 0.6666666666666666
+  },
+  "strongest_positive_correlation_metric": {
+    "metric": "mean_incoming_final_ivs",
+    "pearson_r": 0.21994624492052722
+  },
+  "strongest_negative_correlation_metric": {
+    "metric": "layer16_within_similarity",
+    "pearson_r": -0.9122331848901485
+  },
+  "warning": "n=4 is too small for reliable inference.",
+  "note": "Exploratory, non-causal group-level correlation analysis; representation metrics do not explain behavior by themselves."
+}

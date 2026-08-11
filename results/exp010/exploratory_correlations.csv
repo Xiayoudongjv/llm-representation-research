@@ -1,0 +1,17 @@
+metric,pearson_r_with_strict_accuracy,pearson_r_with_audited_accuracy,note
+layer16_within_similarity,-0.9122331848901485,-0.9122331848901485,n=4 groups; exploratory only; correlation is non-causal and underpowered
+layer16_separation_score,,,n=4 groups; exploratory only; correlation is non-causal and underpowered
+layer16_silhouette_score,,,n=4 groups; exploratory only; correlation is non-causal and underpowered
+layer16_paraphrase_retention_score,,,n=4 groups; exploratory only; correlation is non-causal and underpowered
+mean_incoming_delta_norm,-0.787432908084145,-0.787432908084145,n=4 groups; exploratory only; correlation is non-causal and underpowered
+mean_outgoing_delta_norm,-0.787432908084145,-0.787432908084145,n=4 groups; exploratory only; correlation is non-causal and underpowered
+mean_incoming_final_target_assignment_rate,,,n=4 groups; exploratory only; correlation is non-causal and underpowered
+mean_outgoing_final_target_assignment_rate,,,n=4 groups; exploratory only; correlation is non-causal and underpowered
+mean_incoming_target_minus_source_similarity,-0.5026322731083132,-0.5026322731083132,n=4 groups; exploratory only; correlation is non-causal and underpowered
+mean_outgoing_target_minus_source_similarity,-0.8700115358925803,-0.8700115358925803,n=4 groups; exploratory only; correlation is non-causal and underpowered
+mean_outgoing_final_ivs,0.019206597694379827,0.019206597694379827,n=4 groups; exploratory only; correlation is non-causal and underpowered
+mean_incoming_final_ivs,0.21994624492052722,0.21994624492052722,n=4 groups; exploratory only; correlation is non-causal and underpowered
+mean_outgoing_final_rsm_pearson,-0.01920659769438021,-0.01920659769438021,n=4 groups; exploratory only; correlation is non-causal and underpowered
+mean_incoming_final_rsm_pearson,-0.21994624492052478,-0.21994624492052478,n=4 groups; exploratory only; correlation is non-causal and underpowered
+mean_outgoing_final_relative_perturbation_norm,-0.5002252499112062,-0.5002252499112062,n=4 groups; exploratory only; correlation is non-causal and underpowered
+mean_incoming_final_relative_perturbation_norm,-0.8119612090984718,-0.8119612090984718,n=4 groups; exploratory only; correlation is non-causal and underpowered

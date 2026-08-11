@@ -4,7 +4,7 @@ Research on representation geometry, task-conditioned transformations and relati
 
 Current Stage:
 
-EXP-009B
+EXP-010
 
 ## Current Milestone: EXP-000B Hidden State Extraction
 
@@ -173,6 +173,18 @@ python experiments/exp009b/audit_scoring.py
 EXP-009B compares strict accuracy with an audited upper bound and labels
 scoring misses, partial answers, ambiguous cases, and likely wrong answers. It
 does not rerun Qwen or use an LLM judge.
+
+## Current Milestone: EXP-010 Representation Validity vs Answer Difficulty
+
+Run the exploratory group-level analysis over existing representation and
+answer-level results:
+
+```bash
+python experiments/exp010/representation_behavior_link.py
+```
+
+EXP-010 computes four-group Pearson correlations for exploratory comparison.
+It is non-causal, underpowered, and does not rerun Qwen.
 
 Environment Setup
 
