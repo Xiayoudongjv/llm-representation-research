@@ -4,7 +4,7 @@ Research on representation geometry, task-conditioned transformations and relati
 
 Current Stage:
 
-EXP-004
+EXP-004B
 
 ## Current Milestone: EXP-000B Hidden State Extraction
 
@@ -88,6 +88,18 @@ python experiments/exp004/static_steering.py --model_name Qwen/Qwen3-1.7B --laye
 EXP-004 applies a normalized centroid-difference vector to source-group
 representations. It is not generation-time steering and does not save full
 hidden-state tensors.
+
+## Current Milestone: EXP-004B Calibrated Static Steering
+
+Run the calibrated representation-level steering baseline:
+
+```bash
+python experiments/exp004b/calibrated_steering.py --model_name Qwen/Qwen3-1.7B --layer 16 --source_group logic --target_group causality
+```
+
+EXP-004B scales the raw centroid-difference vector by beta and reports
+similarity movement, centroid assignments, and relative perturbation size. It
+is not generation-time steering and does not save full hidden-state tensors.
 
 Environment Setup
 

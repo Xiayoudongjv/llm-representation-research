@@ -1,0 +1,22 @@
+{
+  "model_name": "Qwen/Qwen3-1.7B",
+  "layer": 16,
+  "source_group": "logic",
+  "target_group": "causality",
+  "hidden_size": 2048,
+  "delta_norm": 105.02935898996124,
+  "betas": [
+    -1.0,
+    -0.5,
+    0.0,
+    0.25,
+    0.5,
+    0.75,
+    1.0,
+    1.5,
+    2.0
+  ],
+  "prompt_count": 24,
+  "source_prompt_count": 6,
+  "note": "This is representation-level calibrated centroid steering, not generation-time intervention."
+}
