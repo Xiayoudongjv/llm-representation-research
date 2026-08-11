@@ -24,3 +24,10 @@ outputs.
 3. Unify plotting utilities.
 4. Add smoke tests.
 5. Standardize CSV schemas.
+
+## Shared Extraction Utilities
+
+Added `src/extraction.py` to centralize layer validation, device-safe
+tokenized-input handling, and last-token hidden-state extraction. Existing
+experiments have not yet been refactored. Future work should migrate EXP-001
+through EXP-006 gradually after the shared behavior is validated.
