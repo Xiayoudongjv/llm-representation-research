@@ -44,3 +44,11 @@ Use the frozen bands: short 1–5 tokens, medium 6–12 tokens, and limited-long
 15 limited-long items. Record self-contained, naturalness, label quality, and
 lexical-giveaway judgments only after an actual human review. Only `clear`
 items can enter the primary final set.
+
+## AI-Assisted Retrieval and Grammar Checking
+
+AI may retrieve approved sources, create compact source cards without final
+response wording, and perform grammar-only checks on human-written responses.
+AI may not author primary `response_text`, fabricate provenance, or make the
+final inclusion decision. Record assistance in `notes` as `none`,
+`ai_retrieval_only`, `ai_retrieval_and_grammar`, or `grammar_only`.
