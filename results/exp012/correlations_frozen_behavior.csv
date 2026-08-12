@@ -1,0 +1,12 @@
+metric,pearson_r,spearman_rho,n_groups,loo_min_r,loo_max_r,loo_sign_consistent,note
+layer16_within_similarity,-0.7453135001469463,-0.39999999999999997,4,-0.9817510198521503,0.7900394126190868,False,n=4 groups; exploratory only; no inferential claim
+mean_incoming_delta_norm,-0.7493004607762289,-0.39999999999999997,4,-0.9980743989383016,0.3592692064554444,False,n=4 groups; exploratory only; no inferential claim
+mean_outgoing_delta_norm,-0.7493004607762289,-0.39999999999999997,4,-0.9980743989383016,0.3592692064554444,False,n=4 groups; exploratory only; no inferential claim
+mean_incoming_target_minus_source_similarity,-0.9056384568813726,-0.7999999999999999,4,-0.9695552022119635,-0.7589330716840009,True,n=4 groups; exploratory only; no inferential claim
+mean_outgoing_target_minus_source_similarity,-0.6547624917164143,-0.39999999999999997,4,-0.9867477095482554,0.7771535365542412,False,n=4 groups; exploratory only; no inferential claim
+mean_incoming_final_ivs,-0.29126119398250383,-0.6000000000000001,4,-0.5018699125223504,-0.05888864955474459,True,n=4 groups; exploratory only; no inferential claim
+mean_outgoing_final_ivs,0.3984801499007273,0.6000000000000001,4,0.3150872639983291,0.5695521953888748,True,n=4 groups; exploratory only; no inferential claim
+mean_incoming_final_rsm_pearson,0.2912611939824998,0.6000000000000001,4,0.05888864955473586,0.5018699125223466,True,n=4 groups; exploratory only; no inferential claim
+mean_outgoing_final_rsm_pearson,-0.39848014990072683,-0.6000000000000001,4,-0.5695521953888752,-0.3150872639983277,True,n=4 groups; exploratory only; no inferential claim
+mean_incoming_final_relative_perturbation_norm,-0.5368194210896782,-0.39999999999999997,4,-0.9885756552766404,0.7886829108416771,False,n=4 groups; exploratory only; no inferential claim
+mean_outgoing_final_relative_perturbation_norm,-0.8983990807194786,-0.7999999999999999,4,-0.9708172787264565,-0.735093373534386,True,n=4 groups; exploratory only; no inferential claim

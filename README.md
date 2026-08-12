@@ -235,6 +235,18 @@ rescored the existing outputs offline. The provisionally frozen baseline is
 60/80 (0.750): causality 0.950, definition 0.850, logic 0.750, and analogy
 0.450. No model answers were regenerated.
 
+## Current Milestone: EXP-012 Frozen Behavioral Link Reanalysis
+
+Run the offline reanalysis with frozen EXP-011D group accuracy:
+
+```bash
+python experiments/exp012/frozen_behavior_link.py
+```
+
+EXP-012 replaces EXP-010's preliminary behavioral baseline and shows that
+some descriptive correlations are benchmark-sensitive. It remains an n=4,
+non-causal analysis and does not explain behavioral differences.
+
 ## Project Status
 
 Experiments are complete through EXP-010. Paper Draft v0.3 and the associated

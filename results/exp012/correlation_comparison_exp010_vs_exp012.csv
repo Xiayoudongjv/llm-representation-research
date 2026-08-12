@@ -1,0 +1,12 @@
+metric,exp010_pearson_r_old_behavior,exp012_pearson_r_frozen_behavior,absolute_change,sign_changed,ranking_or_interpretation_note
+layer16_within_similarity,-0.9122331848901485,-0.7453135001469463,0.16691968474320218,False,directionally similar only if signs match
+mean_incoming_delta_norm,-0.787432908084145,-0.7493004607762289,0.038132447307916095,False,directionally similar only if signs match
+mean_outgoing_delta_norm,-0.787432908084145,-0.7493004607762289,0.038132447307916095,False,directionally similar only if signs match
+mean_incoming_target_minus_source_similarity,-0.5026322731083132,-0.9056384568813726,0.4030061837730594,False,large descriptive change
+mean_outgoing_target_minus_source_similarity,-0.8700115358925803,-0.6547624917164143,0.21524904417616597,False,directionally similar only if signs match
+mean_incoming_final_ivs,0.21994624492052722,-0.29126119398250383,0.511207438903031,True,sign reversal; benchmark-sensitive descriptive association
+mean_outgoing_final_ivs,0.019206597694379827,0.3984801499007273,0.37927355220634745,False,large descriptive change
+mean_incoming_final_rsm_pearson,-0.21994624492052478,0.2912611939824998,0.5112074389030246,True,sign reversal; benchmark-sensitive descriptive association
+mean_outgoing_final_rsm_pearson,-0.01920659769438021,-0.39848014990072683,0.3792735522063466,False,large descriptive change
+mean_incoming_final_relative_perturbation_norm,-0.8119612090984718,-0.5368194210896782,0.27514178800879363,False,directionally similar only if signs match
+mean_outgoing_final_relative_perturbation_norm,-0.5002252499112062,-0.8983990807194786,0.3981738308082724,False,large descriptive change

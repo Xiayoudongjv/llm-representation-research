@@ -1,0 +1,59 @@
+{
+  "number_of_groups": 4,
+  "old_behavior_accuracy_by_group": {
+    "logic": 0.8333333333333334,
+    "causality": 0.6666666666666666,
+    "analogy": 0.3333333333333333,
+    "definition": 0.6666666666666666
+  },
+  "frozen_behavior_accuracy_by_group": {
+    "logic": 0.75,
+    "causality": 0.95,
+    "analogy": 0.45,
+    "definition": 0.85
+  },
+  "old_group_ranking": [
+    "logic",
+    "causality",
+    "definition",
+    "analogy"
+  ],
+  "frozen_group_ranking": [
+    "causality",
+    "definition",
+    "logic",
+    "analogy"
+  ],
+  "strongest_positive_pearson_metric": {
+    "metric": "mean_outgoing_final_ivs",
+    "pearson_r": 0.3984801499007273,
+    "spearman_rho": 0.6000000000000001
+  },
+  "strongest_negative_pearson_metric": {
+    "metric": "mean_incoming_target_minus_source_similarity",
+    "pearson_r": -0.9056384568813726,
+    "spearman_rho": -0.7999999999999999
+  },
+  "metrics_with_sign_change_vs_exp010": [
+    "mean_incoming_final_ivs",
+    "mean_incoming_final_rsm_pearson"
+  ],
+  "largest_absolute_correlation_change": {
+    "metric": "mean_incoming_final_ivs",
+    "exp010_pearson_r_old_behavior": 0.21994624492052722,
+    "exp012_pearson_r_frozen_behavior": -0.29126119398250383,
+    "absolute_change": 0.511207438903031,
+    "sign_changed": true,
+    "ranking_or_interpretation_note": "sign reversal; benchmark-sensitive descriptive association"
+  },
+  "metrics_with_loo_sign_consistency": [
+    "mean_incoming_target_minus_source_similarity",
+    "mean_incoming_final_ivs",
+    "mean_outgoing_final_ivs",
+    "mean_incoming_final_rsm_pearson",
+    "mean_outgoing_final_rsm_pearson",
+    "mean_outgoing_final_relative_perturbation_norm"
+  ],
+  "warning": "n=4 groups is too small for reliable representation-behavior inference.",
+  "interpretation": "EXP-010 descriptive correlations are benchmark-sensitive when behavior is replaced with EXP-011D. Any apparent association remains descriptive only; representation metrics do not explain behavior by themselves."
+}

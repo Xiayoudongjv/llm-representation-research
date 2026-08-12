@@ -29,10 +29,15 @@ EXP-011D applied exactly those eight approved additions and reproduced 0.750
 through offline rescoring. The expanded behavioral baseline is provisionally
 frozen pending independent annotation or new evidence.
 
+EXP-012 replaced EXP-010's preliminary behavior with the frozen benchmark and
+found benchmark-sensitive descriptive correlations, including two sign changes.
+With only four groups, it does not justify further representation-behavior
+interpretation.
+
 Future work:
 
-1. Prepare Paper Draft v0.4.
-2. Optionally replicate the frozen benchmark on a second model.
+1. Replicate the frozen benchmark on a second model.
+2. Add an independent human-annotation sample for scoring reliability.
 3. Consider generation-time intervention only after those baseline steps.
 
 The previous exploratory options are retained below as historical planning
