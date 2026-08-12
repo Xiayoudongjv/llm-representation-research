@@ -19,6 +19,21 @@ until separately authorized:
 python experiments/exp018/independent_validation.py --run
 ```
 
+Before an authorized run, the technical offline preflight can verify config,
+tokenizer, and weights for every frozen model without a forward pass:
+
+```powershell
+python experiments/exp018/independent_validation.py --preflight
+```
+
+`--preflight` and `--run` resolve the cache root from `--cache-dir` when given,
+otherwise from `HF_HOME`. They fail before model loading when no valid root is
+available, select only an already present per-model cache location, and enforce
+`local_files_only=True`; network fallback is not permitted. An authorized run
+performs this preflight for all models before scientific computation, then
+stages all six output files in a temporary sibling directory and publishes
+`results/exp018/` only after the complete run succeeds.
+
 The runner reads its models, layers, splits, betas, probe settings, random seed,
 and controls only from `validation_conditions.json`. It validates that every
 fit/evaluation split is disjoint before fitting centroids, the scaler, or the

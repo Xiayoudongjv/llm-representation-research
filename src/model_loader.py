@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer
 
 
 def get_torch_dtype(dtype: str) -> torch.dtype:
@@ -19,13 +21,37 @@ def check_cuda_or_raise() -> None:
         raise RuntimeError("CUDA is required for this experiment, but torch.cuda.is_available() is False.")
 
 
-def load_tokenizer(model_name: str):
-    return AutoTokenizer.from_pretrained(model_name)
+def _load_kwargs(cache_dir: str | Path | None, local_files_only: bool) -> dict:
+    """Build optional Hugging Face loading arguments without changing defaults."""
+    kwargs = {}
+    if cache_dir is not None:
+        kwargs["cache_dir"] = str(cache_dir)
+    if local_files_only:
+        kwargs["local_files_only"] = True
+    return kwargs
 
 
-def load_causal_lm(model_name: str, dtype: str = "float16", device_map: str = "auto"):
+def load_model_config(model_name: str, cache_dir: str | Path | None = None, local_files_only: bool = False):
+    """Load a model configuration with optional explicit cache and offline mode."""
+    return AutoConfig.from_pretrained(model_name, **_load_kwargs(cache_dir, local_files_only))
+
+
+def load_tokenizer(model_name: str, cache_dir: str | Path | None = None, local_files_only: bool = False):
+    """Load a tokenizer while preserving the previous default resolution behavior."""
+    return AutoTokenizer.from_pretrained(model_name, **_load_kwargs(cache_dir, local_files_only))
+
+
+def load_causal_lm(
+    model_name: str,
+    dtype: str = "float16",
+    device_map: str = "auto",
+    cache_dir: str | Path | None = None,
+    local_files_only: bool = False,
+):
+    """Load a causal LM with optional explicit cache and fail-closed offline mode."""
     return AutoModelForCausalLM.from_pretrained(
-        model_name, dtype=get_torch_dtype(dtype), device_map=device_map
+        model_name, dtype=get_torch_dtype(dtype), device_map=device_map,
+        **_load_kwargs(cache_dir, local_files_only),
     )
 
 

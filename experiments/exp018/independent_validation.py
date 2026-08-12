@@ -9,8 +9,11 @@ forwards and writes the preregistered result schemas.
 from __future__ import annotations
 
 import argparse
+import gc
 import inspect
+import os
 import sys
+import uuid
 from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
@@ -76,14 +79,36 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--dry-run", action="store_true", help="Validate configuration only; do not load a model.")
+    mode.add_argument("--preflight", action="store_true", help="Load all local model resources without forwards or scientific outputs.")
     mode.add_argument("--run", action="store_true", help="Run the official model-forward validation.")
     parser.add_argument("--dtype", default="float16", help="Runtime model dtype for --run only.")
+    parser.add_argument("--cache-dir", type=Path, default=None, help="External Hugging Face cache root for offline --preflight/--run.")
     return parser.parse_args()
 
 
 def load_frozen_config(path: Path = CONFIG_PATH) -> dict[str, Any]:
     """Load the single frozen EXP-018 configuration source."""
     return load_json(path)
+
+
+def resolve_cache_root(explicit_cache_dir: Path | None = None) -> Path:
+    """Resolve an external cache root without silently selecting a network path."""
+    candidate = explicit_cache_dir or (Path(os.environ["HF_HOME"]) if os.environ.get("HF_HOME") else None)
+    if candidate is None:
+        raise RuntimeError("EXP-018 offline loading requires --cache-dir or the HF_HOME environment variable.")
+    resolved = candidate.expanduser().resolve()
+    if not resolved.is_dir():
+        raise RuntimeError(f"EXP-018 offline cache root does not exist or is not a directory: {resolved}")
+    return resolved
+
+
+def resolve_model_cache_dir(model_name: str, cache_root: Path) -> Path:
+    """Find the existing model repository under a root or its standard hub child."""
+    repository_dir = "models--" + model_name.replace("/", "--")
+    for candidate in (cache_root, cache_root / "hub"):
+        if (candidate / repository_dir).is_dir():
+            return candidate
+    raise RuntimeError(f"EXP-018 offline cache does not contain {model_name!r} beneath {cache_root} or {cache_root / 'hub'}.")
 
 
 def _flatten_ids(ids_by_group: dict[str, list[str]]) -> list[str]:
@@ -352,7 +377,7 @@ def aggregate_mean_metrics(records: list[dict[str, float]]) -> dict[str, float]:
     return {field: float(np.mean([record[field] for record in records])) for field in fields}
 
 
-def _collect_model_representations(model_name: str, layers: list[int], prompts: list[dict[str, Any]], dtype: str) -> dict[int, dict[str, np.ndarray]]:
+def _collect_model_representations(model_name: str, layers: list[int], prompts: list[dict[str, Any]], dtype: str, cache_dir: Path) -> dict[int, dict[str, np.ndarray]]:
     """Load a model only during explicit --run and collect no persisted raw states."""
     import torch
 
@@ -360,8 +385,8 @@ def _collect_model_representations(model_name: str, layers: list[int], prompts: 
     from src.model_loader import check_cuda_or_raise, load_causal_lm, load_tokenizer
 
     check_cuda_or_raise()
-    tokenizer = load_tokenizer(model_name)
-    model = load_causal_lm(model_name, dtype=dtype)
+    tokenizer = load_tokenizer(model_name, cache_dir=cache_dir, local_files_only=True)
+    model = load_causal_lm(model_name, dtype=dtype, cache_dir=cache_dir, local_files_only=True)
     device = get_model_input_device(model)
     collected = {layer: {} for layer in layers}
     model.eval()
@@ -377,11 +402,57 @@ def _collect_model_representations(model_name: str, layers: list[int], prompts: 
     return collected
 
 
+def preflight_model_resources(config: dict[str, Any], cache_root: Path, dtype: str) -> dict[str, Path]:
+    """Verify every required config, tokenizer, and weight file offline before science."""
+    import torch
+
+    from src.model_loader import check_cuda_or_raise, load_causal_lm, load_model_config, load_tokenizer
+
+    check_cuda_or_raise()
+    cache_dirs: dict[str, Path] = {}
+    for model_spec in config["models"]:
+        model_name = model_spec["name"]
+        cache_dir = resolve_model_cache_dir(model_name, cache_root)
+        load_model_config(model_name, cache_dir=cache_dir, local_files_only=True)
+        load_tokenizer(model_name, cache_dir=cache_dir, local_files_only=True)
+        model = load_causal_lm(model_name, dtype=dtype, cache_dir=cache_dir, local_files_only=True)
+        del model
+        gc.collect()
+        torch.cuda.empty_cache()
+        cache_dirs[model_name] = cache_dir
+    return cache_dirs
+
+
 def _stack(items: list[dict[str, Any]], representations: dict[str, np.ndarray]) -> np.ndarray:
     return np.stack([representations[item["id"]] for item in items]).astype(float)
 
 
-def run_validation(config: dict[str, Any], prompts: list[dict[str, Any]], dtype: str) -> None:
+def publish_outputs_atomically(
+    transition_rows: list[dict[str, Any]], probe_rows: list[dict[str, Any]], invariant_rows: list[dict[str, Any]],
+    pair_rows: list[dict[str, Any]], config: dict[str, Any], output_dir: Path = OUTPUT_DIR,
+) -> None:
+    """Write all six outputs to a staging directory, then publish one complete set."""
+    if output_dir.exists():
+        raise FileExistsError(f"Refusing to overwrite existing official EXP-018 results: {output_dir}")
+    staging_dir = output_dir.with_name(f"{output_dir.name}_tmp_{uuid.uuid4().hex}")
+    write_csv(staging_dir / "transition_metrics.csv", TRANSITION_FIELDS, aggregate_result_rows(TRANSITION_FIELDS, transition_rows))
+    write_csv(staging_dir / "probe_metrics.csv", PROBE_FIELDS, aggregate_result_rows(PROBE_FIELDS, probe_rows))
+    write_csv(staging_dir / "invariant_metrics.csv", INVARIANT_FIELDS, aggregate_result_rows(INVARIANT_FIELDS, invariant_rows))
+    write_csv(staging_dir / "pair_summary.csv", PAIR_SUMMARY_FIELDS, aggregate_result_rows(PAIR_SUMMARY_FIELDS, pair_rows))
+    save_json({"config_path": str(CONFIG_PATH.relative_to(ROOT)), "planned_counts": expected_condition_counts(config)}, staging_dir / "validation_summary.json")
+    save_json({"splits": config["splits"], "input_dataset": config["input_dataset"]}, staging_dir / "split_metadata.json")
+    staging_dir.replace(output_dir)
+
+
+def execute_official_validation(
+    config: dict[str, Any], prompts: list[dict[str, Any]], dtype: str, cache_root: Path, output_dir: Path = OUTPUT_DIR,
+) -> None:
+    """Preflight every resource before allowing the scientific computation to start."""
+    cache_dirs = preflight_model_resources(config, cache_root, dtype)
+    run_validation(config, prompts, dtype, cache_dirs, output_dir)
+
+
+def run_validation(config: dict[str, Any], prompts: list[dict[str, Any]], dtype: str, cache_dirs: dict[str, Path], output_dir: Path = OUTPUT_DIR) -> None:
     """Run the official frozen validation and write only aggregate result files."""
     validate_config(config, prompts)
     transition_rows: list[dict[str, Any]] = []
@@ -391,7 +462,7 @@ def run_validation(config: dict[str, Any], prompts: list[dict[str, Any]], dtype:
     groups = list(config["groups"])
     for model_spec in config["models"]:
         layers = model_spec["primary_layers"] + model_spec["secondary_layers"]
-        representations_by_layer = _collect_model_representations(model_spec["name"], layers, prompts, dtype)
+        representations_by_layer = _collect_model_representations(model_spec["name"], layers, prompts, dtype, cache_dirs[model_spec["name"]])
         for layer in layers:
             representations = representations_by_layer[layer]
             for split in config["splits"]:
@@ -441,12 +512,7 @@ def run_validation(config: dict[str, Any], prompts: list[dict[str, Any]], dtype:
                                 "rsm_pearson": rsm[f"rsm_pearson_{key}"], "invariant_violation_score": rsm[f"ivs_{key}"],
                                 "rsm_frobenius_distance": rsm[f"rsm_frobenius_{key}"], "ivs_advantage_vs_random": rsm["ivs_advantage_vs_random"],
                             })
-    write_csv(OUTPUT_DIR / "transition_metrics.csv", TRANSITION_FIELDS, aggregate_result_rows(TRANSITION_FIELDS, transition_rows))
-    write_csv(OUTPUT_DIR / "probe_metrics.csv", PROBE_FIELDS, aggregate_result_rows(PROBE_FIELDS, probe_rows))
-    write_csv(OUTPUT_DIR / "invariant_metrics.csv", INVARIANT_FIELDS, aggregate_result_rows(INVARIANT_FIELDS, invariant_rows))
-    write_csv(OUTPUT_DIR / "pair_summary.csv", PAIR_SUMMARY_FIELDS, aggregate_result_rows(PAIR_SUMMARY_FIELDS, pair_rows))
-    save_json({"config_path": str(CONFIG_PATH.relative_to(ROOT)), "planned_counts": expected_condition_counts(config)}, OUTPUT_DIR / "validation_summary.json")
-    save_json({"splits": config["splits"], "input_dataset": config["input_dataset"]}, OUTPUT_DIR / "split_metadata.json")
+    publish_outputs_atomically(transition_rows, probe_rows, invariant_rows, pair_rows, config, output_dir)
 
 
 def main() -> None:
@@ -461,7 +527,14 @@ def main() -> None:
         for name, count in counts.items():
             print(f"{name}: {count}")
         return
-    run_validation(config, prompts, args.dtype)
+    cache_root = resolve_cache_root(args.cache_dir)
+    if args.preflight:
+        cache_dirs = preflight_model_resources(config, cache_root, args.dtype)
+        print(f"EXP-018 offline preflight passed; cache_root: {cache_root}")
+        for model_name, cache_dir in cache_dirs.items():
+            print(f"{model_name}: {cache_dir}")
+        return
+    execute_official_validation(config, prompts, args.dtype, cache_root)
     print(f"EXP-018 completed: {OUTPUT_DIR}")
 
 
