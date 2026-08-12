@@ -1,5 +1,12 @@
 # Recommended Next Experiments
 
+## EXP-019 Target-Sensitive Behavioral Evaluation
+
+EXP-019 is intended to distinguish representation-level target movement from
+target-sensitive behavioral movement. It does not attribute the negative
+EXP-017 source-accuracy result to a weak metric; that is an unresolved
+possibility requiring an independently frozen evaluator.
+
 ## Updated Recommendation: EXP-011 Expanded Answer-level Dataset
 
 EXP-010 remains inconclusive because its correlation analysis has only four

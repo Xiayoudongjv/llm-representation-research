@@ -1,0 +1,47 @@
+{
+  "experiment": "EXP-019 Independent Target-Sensitive Behavioral Evaluator",
+  "status": "preregistered_design_only",
+  "task_classes": ["logic", "causality", "analogy", "definition"],
+  "independence_prohibitions": [
+    "EXP-017 TASK_REAL outputs",
+    "EXP-017 MATCHED_RANDOM outputs",
+    "EXP-017 OPPOSITE outputs",
+    "intervention condition labels",
+    "EXP-017 correctness differences",
+    "hidden-state vectors",
+    "steering vectors"
+  ],
+  "primary_evaluator": {
+    "family": "TF-IDF plus multinomial LogisticRegression",
+    "features": ["word_tfidf", "character_tfidf"],
+    "selection_note": "Chosen before EXP-017 output evaluation for transparency and auditability."
+  },
+  "training_data": {
+    "source": "separate non-steered response corpus with provenance metadata",
+    "minimum_examples_per_class": 190,
+    "split_counts_per_class": {"train": 120, "validation": 30, "test": 40},
+    "response_prompt_and_near_duplicate_disjoint": true,
+    "split_manifest_seed": 20260812
+  },
+  "acceptance_criteria": {
+    "final_test_balanced_accuracy_min": 0.7,
+    "final_test_macro_f1_min": 0.7,
+    "per_class_recall_min": 0.6,
+    "held_out_paraphrase_balanced_accuracy_min": 0.6,
+    "lexical_challenge_balanced_accuracy_min": 0.55,
+    "lexical_challenge_accuracy_drop_max": 0.15,
+    "require_top_feature_audit": true,
+    "require_confusion_matrix": true
+  },
+  "future_metrics": [
+    "P(target_task | output)",
+    "P(source_task | output)",
+    "target_minus_source_behavior_probability",
+    "delta_target_behavior_probability_vs_NO_INTERVENTION"
+  ],
+  "comparisons": {
+    "primary": "TASK_REAL versus MATCHED_RANDOM",
+    "secondary": "TASK_REAL versus OPPOSITE"
+  },
+  "interpretation_boundary": "A class flip alone is not successful task conversion. Source-task correctness remains separate from behavioral targetness."
+}
