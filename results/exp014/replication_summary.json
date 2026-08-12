@@ -1,0 +1,84 @@
+{
+  "model": "google/gemma-3-1b-it",
+  "layer": 26,
+  "number_of_pairs": 12,
+  "betas": [
+    -1.0,
+    -0.5,
+    0.0,
+    0.25,
+    0.5,
+    0.75,
+    1.0,
+    1.5,
+    2.0
+  ],
+  "pairs_reaching_assignment_ge_0_5": 12,
+  "pairs_reaching_assignment_eq_1": 12,
+  "mean_assignment_by_beta": {
+    "-1.0": 0.0,
+    "-0.5": 0.0,
+    "0.0": 0.0,
+    "0.25": 0.1111111111111111,
+    "0.5": 0.5555555555555557,
+    "0.75": 0.875,
+    "1.0": 0.9722222222222223,
+    "1.5": 1.0,
+    "2.0": 1.0
+  },
+  "mean_ivs_by_beta": {
+    "-1.0": 0.012859880733465529,
+    "-0.5": 0.0050404130963290035,
+    "0.0": 8.326672684688674e-17,
+    "0.25": 0.002007569557424214,
+    "0.5": 0.008296093093592952,
+    "0.75": 0.017970202555123105,
+    "1.0": 0.028976570740200307,
+    "1.5": 0.047851920751286275,
+    "2.0": 0.058671219312060624
+  },
+  "mean_rsm_pearson_by_beta": {
+    "-1.0": 0.9871401192665346,
+    "-0.5": 0.994959586903671,
+    "0.0": 1.0,
+    "0.25": 0.9979924304425758,
+    "0.5": 0.9917039069064071,
+    "0.75": 0.9820297974448767,
+    "1.0": 0.9710234292597996,
+    "1.5": 0.9521480792487137,
+    "2.0": 0.9413287806879395
+  },
+  "mean_relative_perturbation_by_beta": {
+    "-1.0": 0.5531953026851019,
+    "-0.5": 0.27659765134255093,
+    "0.0": 0.0,
+    "0.25": 0.13829882567127547,
+    "0.5": 0.27659765134255093,
+    "0.75": 0.41489648322264355,
+    "1.0": 0.5531953026851019,
+    "1.5": 0.8297929664452871,
+    "2.0": 1.1063906053702037
+  },
+  "median_first_beta_assignment_ge_0_5": 0.5,
+  "median_first_beta_assignment_eq_1": 0.875,
+  "best_exploratory_beta_by_rule": {
+    "beta": 1.0,
+    "rule": "lowest mean IVS among betas with mean assignment >= 0.9"
+  },
+  "replication_status": {
+    "calibrated_transition_success": "replicated",
+    "multi_pair_transition_success": "replicated",
+    "transition_perturbation_tradeoff": "replicated",
+    "relational_preservation_tradeoff": "replicated",
+    "qwen_beta_075_frontier": "partially_replicated",
+    "diagnostic_correlations_nonnegative_betas": {
+      "target_movement_vs_beta": 0.9935676746762411,
+      "relative_perturbation_vs_beta": 0.9999999999999999,
+      "ivs_vs_beta": 0.9911435269580785,
+      "rsm_pearson_vs_beta": -0.9911435269580785
+    },
+    "qwen_mean_assignment_at_beta_0_75": 1.0,
+    "qwen_mean_ivs_at_beta_0_75": 0.0028496942764711375
+  },
+  "warning": "Representation-level centroid steering and RSM preservation do not establish reasoning improvement or logical invariance."
+}

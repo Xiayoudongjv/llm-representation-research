@@ -42,13 +42,20 @@ silhouette occurred at normalized depth 0.62. This supports a cautious
 second-model representation-level steering probe, not a general claim about
 universal layer locations or behavioral effects.
 
+EXP-014 completed that fixed Gemma steering probe at the model-specific layer
+26. All 12 ordered transitions reached full target assignment, and increasing
+beta increased both target-directed movement and relational distortion. Gemma's
+predeclared exploratory operating point was beta 1.0: beta 0.75 reached mean
+assignment 0.875 with mean IVS 0.017970, unlike Qwen's 1.0 and 0.002850. The
+cross-model evidence therefore supports model-dependent operating points, not a
+universal beta.
+
 Future work:
 
-1. Run a controlled Gemma representation-level steering replication using the
-   observed Gemma geometry rather than assuming Qwen's nominal layer 16.
-2. Replicate the frozen behavioral benchmark on Gemma.
-3. Add an independent human-annotation sample for scoring reliability.
-4. Consider generation-time intervention only after the model-specific
+1. Replicate the frozen behavioral benchmark on Gemma using normal generation
+   and the existing quality-controlled scoring protocol.
+2. Add an independent human-annotation sample for scoring reliability.
+3. Consider generation-time intervention only after the model-specific
    representation and behavioral baselines are established.
 
 The previous exploratory options are retained below as historical planning

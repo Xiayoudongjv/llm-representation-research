@@ -261,9 +261,22 @@ task-associated geometry and paraphrase-controlled signal in Gemma, while the
 strongest separation occurred at Gemma's final layer rather than a mid-depth
 layer. Only aggregate metrics and plots are saved.
 
+## Current Milestone: EXP-014 Gemma Steering and Relational Preservation
+
+Run the local-cache representation-level replication with:
+
+```bash
+python experiments/exp014/gemma_steering_replication.py
+```
+
+EXP-014 applies fixed centroid-difference steering at Gemma layer 26 across all
+12 ordered group transitions. All transitions reached full target assignment,
+but Gemma's exploratory operating point was beta 1.0 rather than Qwen's beta
+0.75. This is not generation-time intervention and does not assess reasoning.
+
 ## Project Status
 
-Experiments are complete through EXP-013. Paper Draft v0.3 and the associated
+Experiments are complete through EXP-014. Paper Draft v0.3 and the associated
 status, results, and claims documents are available under `docs/paper`.
 Engineering utilities for IO, representation extraction, and plotting are
 covered by local tests.
