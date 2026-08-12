@@ -59,15 +59,23 @@ predeclared materiality threshold of 0.01. This pilot supports a broader
 model-specific layer-validity study rather than immediate generation-time
 intervention.
 
+EXP-016 completed that preregistered expansion across seven sampled layers and
+six beta values per model. Qwen's encoding/control layer was 16, while its
+lowest-IVS threshold-eligible safe-control setting was layer 4 at beta 1.0.
+Gemma's encoding peak was final layer 26, while its control and safe-control
+setting was layer 16 at beta 0.75. The sampled role structure is therefore
+interpretable and model-specific: encoding depth differs, control depth is
+similar, and safe-control depth differs. The study did not identify causal
+modules, but it did provide pre-behavioral control/safety selections.
+
 Future work:
 
-1. Expand the layer-validity analysis with a preregistered, denser
-   model-specific layer sweep and the same controlled prompts and metrics.
+1. Design a preregistered generation-time intervention pilot using the
+   model-specific control/safe-control choices from EXP-016, explicit sham and
+   no-intervention controls, and the frozen behavioral evaluation protocol.
 2. Replicate the frozen behavioral benchmark on Gemma using normal generation
    and the existing quality-controlled scoring protocol.
 3. Add an independent human-annotation sample for scoring reliability.
-4. Consider generation-time intervention only after layer selection and the
-   model-specific representation and behavioral baselines are established.
 
 The previous exploratory options are retained below as historical planning
 context; this recommendation supersedes their priority ordering.

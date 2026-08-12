@@ -288,9 +288,22 @@ layer was 28; Gemma's encoding layer was 26 while its control/safe-control
 layer was 16. The pilot therefore recommends expanding layer-validity study
 before any generation-time intervention.
 
+## Current Milestone: EXP-016 Full Layer-Strength Validity Study
+
+Run the fixed two-model layer-strength grid with:
+
+```bash
+python experiments/exp016/full_layer_validity_study.py
+```
+
+EXP-016 sampled seven layers and six beta values per model. Qwen selected L16
+for encoding/control and L4 for safe control; Gemma selected L26 for encoding
+and L16 for control/safe control. The fixed grid supports model-specific,
+pre-behavioral layer selection for a future generation-time intervention pilot.
+
 ## Project Status
 
-Experiments are complete through EXP-015. Paper Draft v0.5 and the associated
+Experiments are complete through EXP-016. Paper Draft v0.5 and the associated
 status, results, and claims documents are available under `docs/paper`.
 Engineering utilities for IO, representation extraction, and plotting are
 covered by local tests.

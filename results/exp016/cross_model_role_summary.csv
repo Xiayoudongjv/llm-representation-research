@@ -1,0 +1,7 @@
+comparison,value
+encoding_peak_depth_similar,False
+control_peak_depth_similar,True
+safe_control_peak_depth_similar,False
+final_layer_geometry_corresponds_to_safe_control_qwen,False
+final_layer_geometry_corresponds_to_safe_control_gemma,False
+layer_role_separation,supported
