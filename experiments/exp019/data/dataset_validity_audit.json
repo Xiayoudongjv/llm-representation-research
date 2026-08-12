@@ -1,0 +1,1515 @@
+{
+  "status_terminology": "STRUCTURALLY_VALID / SCIENTIFIC_VALIDITY_UNDER_AUDIT",
+  "decision": "REQUIRES_DIVERSITY_REMEDIATION",
+  "protocol_compliance": {
+    "multiple_provenance_categories": "FAIL",
+    "no_single_provenance_domination": "FAIL",
+    "class_balanced_provenance": "PASS_WITHIN_SINGLE_SOURCE",
+    "template_source_diversity": "PARTIAL",
+    "family_balance_and_split_isolation": "PASS",
+    "length_band_balance": "PASS",
+    "lexical_challenge_count": "PASS",
+    "clear_labels": "PASS"
+  },
+  "dataset_counts": {
+    "rows": 760,
+    "classes": {
+      "logic": 190,
+      "causality": 190,
+      "analogy": 190,
+      "definition": 190
+    },
+    "families": 190,
+    "split_families": {
+      "train": 120,
+      "validation": 30,
+      "test": 40
+    }
+  },
+  "provenance_by_class": {
+    "logic": {
+      "rule_composed": 190
+    },
+    "causality": {
+      "rule_composed": 190
+    },
+    "analogy": {
+      "rule_composed": 190
+    },
+    "definition": {
+      "rule_composed": 190
+    }
+  },
+  "lexical_audit": {
+    "logic": {
+      "top_unigrams": [
+        [
+          "the",
+          229
+        ],
+        [
+          "condition",
+          153
+        ],
+        [
+          "holds",
+          127
+        ],
+        [
+          "rule",
+          102
+        ],
+        [
+          "follows",
+          64
+        ],
+        [
+          "when",
+          63
+        ],
+        [
+          "stated",
+          63
+        ],
+        [
+          "requires",
+          63
+        ],
+        [
+          "as",
+          63
+        ],
+        [
+          "its",
+          63
+        ],
+        [
+          "conclusion",
+          63
+        ],
+        [
+          "entails",
+          63
+        ]
+      ],
+      "top_bigrams": [
+        {
+          "bigram": "condition holds",
+          "count": 127
+        },
+        {
+          "bigram": "when the",
+          "count": 63
+        },
+        {
+          "bigram": "holds the",
+          "count": 63
+        },
+        {
+          "bigram": "the stated",
+          "count": 63
+        },
+        {
+          "bigram": "stated rule",
+          "count": 63
+        },
+        {
+          "bigram": "rule requires",
+          "count": 63
+        },
+        {
+          "bigram": "as its",
+          "count": 63
+        },
+        {
+          "bigram": "its conclusion",
+          "count": 63
+        }
+      ]
+    },
+    "causality": {
+      "top_unigrams": [
+        [
+          "the",
+          190
+        ],
+        [
+          "mechanism",
+          127
+        ],
+        [
+          "a",
+          102
+        ],
+        [
+          "condition",
+          102
+        ],
+        [
+          "through",
+          102
+        ],
+        [
+          "ordinary",
+          82
+        ],
+        [
+          "change",
+          63
+        ],
+        [
+          "in",
+          63
+        ],
+        [
+          "leads",
+          63
+        ],
+        [
+          "to",
+          63
+        ],
+        [
+          "system's",
+          63
+        ],
+        [
+          "simple",
+          58
+        ]
+      ],
+      "top_bigrams": [
+        {
+          "bigram": "a change",
+          "count": 63
+        },
+        {
+          "bigram": "change in",
+          "count": 63
+        },
+        {
+          "bigram": "in the",
+          "count": 63
+        },
+        {
+          "bigram": "condition leads",
+          "count": 63
+        },
+        {
+          "bigram": "leads to",
+          "count": 63
+        },
+        {
+          "bigram": "through the",
+          "count": 63
+        },
+        {
+          "bigram": "the system's",
+          "count": 63
+        },
+        {
+          "bigram": "system's ordinary",
+          "count": 63
+        }
+      ]
+    },
+    "analogy": {
+      "top_unigrams": [
+        [
+          "the",
+          254
+        ],
+        [
+          "relation",
+          230
+        ],
+        [
+          "condition",
+          88
+        ],
+        [
+          "outcome",
+          88
+        ],
+        [
+          "a",
+          70
+        ],
+        [
+          "corresponds",
+          63
+        ],
+        [
+          "to",
+          63
+        ],
+        [
+          "both",
+          63
+        ],
+        [
+          "connect",
+          63
+        ],
+        [
+          "with",
+          63
+        ],
+        [
+          "an",
+          63
+        ],
+        [
+          "because",
+          56
+        ]
+      ],
+      "top_bigrams": [
+        {
+          "bigram": "relation corresponds",
+          "count": 63
+        },
+        {
+          "bigram": "corresponds to",
+          "count": 63
+        },
+        {
+          "bigram": "to the",
+          "count": 63
+        },
+        {
+          "bigram": "both connect",
+          "count": 63
+        },
+        {
+          "bigram": "connect a",
+          "count": 63
+        },
+        {
+          "bigram": "a condition",
+          "count": 63
+        },
+        {
+          "bigram": "condition with",
+          "count": 63
+        },
+        {
+          "bigram": "with an",
+          "count": 63
+        }
+      ]
+    },
+    "definition": {
+      "top_unigrams": [
+        [
+          "a",
+          329
+        ],
+        [
+          "is",
+          165
+        ],
+        [
+          "object",
+          127
+        ],
+        [
+          "practical",
+          121
+        ],
+        [
+          "role",
+          102
+        ],
+        [
+          "purpose",
+          88
+        ],
+        [
+          "familiar",
+          82
+        ],
+        [
+          "an",
+          64
+        ],
+        [
+          "whose",
+          63
+        ],
+        [
+          "described",
+          63
+        ],
+        [
+          "by",
+          63
+        ],
+        [
+          "its",
+          63
+        ]
+      ],
+      "top_bigrams": [
+        {
+          "bigram": "a familiar",
+          "count": 77
+        },
+        {
+          "bigram": "an object",
+          "count": 64
+        },
+        {
+          "bigram": "is a",
+          "count": 63
+        },
+        {
+          "bigram": "familiar object",
+          "count": 63
+        },
+        {
+          "bigram": "object whose",
+          "count": 63
+        },
+        {
+          "bigram": "whose role",
+          "count": 63
+        },
+        {
+          "bigram": "role is",
+          "count": 63
+        },
+        {
+          "bigram": "is described",
+          "count": 63
+        }
+      ]
+    },
+    "strong_class_concentration": [
+      {
+        "term": "relation",
+        "count": 230,
+        "concentration": 1.0,
+        "class": "analogy",
+        "counts_by_class": {
+          "logic": 0,
+          "causality": 0,
+          "analogy": 230,
+          "definition": 0
+        }
+      },
+      {
+        "term": "is",
+        "count": 165,
+        "concentration": 1.0,
+        "class": "definition",
+        "counts_by_class": {
+          "logic": 0,
+          "causality": 0,
+          "analogy": 0,
+          "definition": 165
+        }
+      },
+      {
+        "term": "holds",
+        "count": 127,
+        "concentration": 1.0,
+        "class": "logic",
+        "counts_by_class": {
+          "logic": 127,
+          "causality": 0,
+          "analogy": 0,
+          "definition": 0
+        }
+      },
+      {
+        "term": "mechanism",
+        "count": 127,
+        "concentration": 1.0,
+        "class": "causality",
+        "counts_by_class": {
+          "logic": 0,
+          "causality": 127,
+          "analogy": 0,
+          "definition": 0
+        }
+      },
+      {
+        "term": "object",
+        "count": 127,
+        "concentration": 1.0,
+        "class": "definition",
+        "counts_by_class": {
+          "logic": 0,
+          "causality": 0,
+          "analogy": 0,
+          "definition": 127
+        }
+      },
+      {
+        "term": "role",
+        "count": 102,
+        "concentration": 1.0,
+        "class": "definition",
+        "counts_by_class": {
+          "logic": 0,
+          "causality": 0,
+          "analogy": 0,
+          "definition": 102
+        }
+      },
+      {
+        "term": "rule",
+        "count": 102,
+        "concentration": 1.0,
+        "class": "logic",
+        "counts_by_class": {
+          "logic": 102,
+          "causality": 0,
+          "analogy": 0,
+          "definition": 0
+        }
+      },
+      {
+        "term": "through",
+        "count": 102,
+        "concentration": 1.0,
+        "class": "causality",
+        "counts_by_class": {
+          "logic": 0,
+          "causality": 102,
+          "analogy": 0,
+          "definition": 0
+        }
+      },
+      {
+        "term": "purpose",
+        "count": 88,
+        "concentration": 1.0,
+        "class": "definition",
+        "counts_by_class": {
+          "logic": 0,
+          "causality": 0,
+          "analogy": 0,
+          "definition": 88
+        }
+      },
+      {
+        "term": "both",
+        "count": 63,
+        "concentration": 1.0,
+        "class": "analogy",
+        "counts_by_class": {
+          "logic": 0,
+          "causality": 0,
+          "analogy": 63,
+          "definition": 0
+        }
+      },
+      {
+        "term": "by",
+        "count": 63,
+        "concentration": 1.0,
+        "class": "definition",
+        "counts_by_class": {
+          "logic": 0,
+          "causality": 0,
+          "analogy": 0,
+          "definition": 63
+        }
+      },
+      {
+        "term": "change",
+        "count": 63,
+        "concentration": 1.0,
+        "class": "causality",
+        "counts_by_class": {
+          "logic": 0,
+          "causality": 63,
+          "analogy": 0,
+          "definition": 0
+        }
+      },
+      {
+        "term": "conclusion",
+        "count": 63,
+        "concentration": 1.0,
+        "class": "logic",
+        "counts_by_class": {
+          "logic": 63,
+          "causality": 0,
+          "analogy": 0,
+          "definition": 0
+        }
+      },
+      {
+        "term": "connect",
+        "count": 63,
+        "concentration": 1.0,
+        "class": "analogy",
+        "counts_by_class": {
+          "logic": 0,
+          "causality": 0,
+          "analogy": 63,
+          "definition": 0
+        }
+      },
+      {
+        "term": "corresponds",
+        "count": 63,
+        "concentration": 1.0,
+        "class": "analogy",
+        "counts_by_class": {
+          "logic": 0,
+          "causality": 0,
+          "analogy": 63,
+          "definition": 0
+        }
+      },
+      {
+        "term": "described",
+        "count": 63,
+        "concentration": 1.0,
+        "class": "definition",
+        "counts_by_class": {
+          "logic": 0,
+          "causality": 0,
+          "analogy": 0,
+          "definition": 63
+        }
+      },
+      {
+        "term": "entails",
+        "count": 63,
+        "concentration": 1.0,
+        "class": "logic",
+        "counts_by_class": {
+          "logic": 63,
+          "causality": 0,
+          "analogy": 0,
+          "definition": 0
+        }
+      },
+      {
+        "term": "leads",
+        "count": 63,
+        "concentration": 1.0,
+        "class": "causality",
+        "counts_by_class": {
+          "logic": 0,
+          "causality": 63,
+          "analogy": 0,
+          "definition": 0
+        }
+      },
+      {
+        "term": "requires",
+        "count": 63,
+        "concentration": 1.0,
+        "class": "logic",
+        "counts_by_class": {
+          "logic": 63,
+          "causality": 0,
+          "analogy": 0,
+          "definition": 0
+        }
+      },
+      {
+        "term": "system",
+        "count": 63,
+        "concentration": 1.0,
+        "class": "definition",
+        "counts_by_class": {
+          "logic": 0,
+          "causality": 0,
+          "analogy": 0,
+          "definition": 63
+        }
+      },
+      {
+        "term": "system's",
+        "count": 63,
+        "concentration": 1.0,
+        "class": "causality",
+        "counts_by_class": {
+          "logic": 0,
+          "causality": 63,
+          "analogy": 0,
+          "definition": 0
+        }
+      },
+      {
+        "term": "use",
+        "count": 63,
+        "concentration": 1.0,
+        "class": "definition",
+        "counts_by_class": {
+          "logic": 0,
+          "causality": 0,
+          "analogy": 0,
+          "definition": 63
+        }
+      },
+      {
+        "term": "whose",
+        "count": 63,
+        "concentration": 1.0,
+        "class": "definition",
+        "counts_by_class": {
+          "logic": 0,
+          "causality": 0,
+          "analogy": 0,
+          "definition": 63
+        }
+      },
+      {
+        "term": "because",
+        "count": 56,
+        "concentration": 1.0,
+        "class": "analogy",
+        "counts_by_class": {
+          "logic": 0,
+          "causality": 0,
+          "analogy": 56,
+          "definition": 0
+        }
+      },
+      {
+        "term": "if",
+        "count": 39,
+        "concentration": 1.0,
+        "class": "logic",
+        "counts_by_class": {
+          "logic": 39,
+          "causality": 0,
+          "analogy": 0,
+          "definition": 0
+        }
+      },
+      {
+        "term": "matches",
+        "count": 39,
+        "concentration": 1.0,
+        "class": "analogy",
+        "counts_by_class": {
+          "logic": 0,
+          "causality": 0,
+          "analogy": 39,
+          "definition": 0
+        }
+      },
+      {
+        "term": "produces",
+        "count": 39,
+        "concentration": 1.0,
+        "class": "causality",
+        "counts_by_class": {
+          "logic": 0,
+          "causality": 39,
+          "analogy": 0,
+          "definition": 0
+        }
+      },
+      {
+        "term": "structure",
+        "count": 39,
+        "concentration": 1.0,
+        "class": "analogy",
+        "counts_by_class": {
+          "logic": 0,
+          "causality": 0,
+          "analogy": 39,
+          "definition": 0
+        }
+      },
+      {
+        "term": "under",
+        "count": 39,
+        "concentration": 1.0,
+        "class": "logic",
+        "counts_by_class": {
+          "logic": 39,
+          "causality": 0,
+          "analogy": 0,
+          "definition": 0
+        }
+      },
+      {
+        "term": "has",
+        "count": 37,
+        "concentration": 1.0,
+        "class": "definition",
+        "counts_by_class": {
+          "logic": 0,
+          "causality": 0,
+          "analogy": 0,
+          "definition": 37
+        }
+      }
+    ]
+  },
+  "simple_rule_baseline": {
+    "validation": {
+      "marker_dictionary": {
+        "logic": [
+          "holds",
+          "rule",
+          "requires"
+        ],
+        "causality": [
+          "mechanism",
+          "through",
+          "system's"
+        ],
+        "analogy": [
+          "relation",
+          "corresponds",
+          "connect"
+        ],
+        "definition": [
+          "is",
+          "object",
+          "role"
+        ]
+      },
+      "balanced_accuracy": 0.8417,
+      "per_class_recall": {
+        "logic": 1.0,
+        "causality": 0.7667,
+        "analogy": 0.8333,
+        "definition": 0.7667
+      },
+      "confusion": {
+        "logic": {
+          "logic": 30
+        },
+        "causality": {
+          "causality": 23,
+          "logic": 7
+        },
+        "analogy": {
+          "analogy": 25,
+          "logic": 5
+        },
+        "definition": {
+          "definition": 23,
+          "logic": 7
+        }
+      }
+    },
+    "test": {
+      "marker_dictionary": {
+        "logic": [
+          "holds",
+          "rule",
+          "requires"
+        ],
+        "causality": [
+          "mechanism",
+          "through",
+          "system's"
+        ],
+        "analogy": [
+          "relation",
+          "corresponds",
+          "connect"
+        ],
+        "definition": [
+          "is",
+          "object",
+          "role"
+        ]
+      },
+      "balanced_accuracy": 0.7,
+      "per_class_recall": {
+        "logic": 1.0,
+        "causality": 0.6,
+        "analogy": 0.6,
+        "definition": 0.6
+      },
+      "confusion": {
+        "logic": {
+          "logic": 40
+        },
+        "causality": {
+          "causality": 24,
+          "logic": 16
+        },
+        "analogy": {
+          "analogy": 24,
+          "logic": 16
+        },
+        "definition": {
+          "definition": 24,
+          "logic": 16
+        }
+      }
+    }
+  },
+  "content_vocabulary_overlap": {
+    "mean_shared_vocab_union_fraction": 0.1083,
+    "median_shared_vocab_union_fraction": 0.0769,
+    "mean_class_specific_vocab_union_fraction": 0.1917,
+    "families_with_nonzero_shared_vocab": 190
+  },
+  "length_risk": {
+    "1-5": {
+      "count": 252,
+      "marker_risk": "high"
+    },
+    "6-12": {
+      "count": 256,
+      "marker_risk": "high"
+    },
+    "13-20": {
+      "count": 252,
+      "marker_risk": "high"
+    }
+  },
+  "template_audit": {
+    "template_family_count": 60,
+    "families_in_all_three_splits": 44,
+    "families_in_two_splits": 16,
+    "families_in_one_split": 0,
+    "detail": {
+      "analogy_limited_long_0": {
+        "classes": {
+          "analogy": 13
+        },
+        "splits": {
+          "train": 10,
+          "validation": 3
+        }
+      },
+      "analogy_limited_long_1": {
+        "classes": {
+          "analogy": 12
+        },
+        "splits": {
+          "test": 2,
+          "train": 8,
+          "validation": 2
+        }
+      },
+      "analogy_limited_long_2": {
+        "classes": {
+          "analogy": 13
+        },
+        "splits": {
+          "train": 6,
+          "test": 6,
+          "validation": 1
+        }
+      },
+      "analogy_limited_long_3": {
+        "classes": {
+          "analogy": 13
+        },
+        "splits": {
+          "train": 10,
+          "validation": 3
+        }
+      },
+      "analogy_limited_long_4": {
+        "classes": {
+          "analogy": 12
+        },
+        "splits": {
+          "test": 3,
+          "validation": 3,
+          "train": 6
+        }
+      },
+      "analogy_medium_0": {
+        "classes": {
+          "analogy": 13
+        },
+        "splits": {
+          "train": 11,
+          "test": 1,
+          "validation": 1
+        }
+      },
+      "analogy_medium_1": {
+        "classes": {
+          "analogy": 13
+        },
+        "splits": {
+          "train": 7,
+          "validation": 1,
+          "test": 5
+        }
+      },
+      "analogy_medium_2": {
+        "classes": {
+          "analogy": 13
+        },
+        "splits": {
+          "train": 6,
+          "test": 3,
+          "validation": 4
+        }
+      },
+      "analogy_medium_3": {
+        "classes": {
+          "analogy": 12
+        },
+        "splits": {
+          "validation": 2,
+          "train": 9,
+          "test": 1
+        }
+      },
+      "analogy_medium_4": {
+        "classes": {
+          "analogy": 13
+        },
+        "splits": {
+          "validation": 3,
+          "train": 7,
+          "test": 3
+        }
+      },
+      "analogy_short_0": {
+        "classes": {
+          "analogy": 12
+        },
+        "splits": {
+          "train": 7,
+          "test": 5
+        }
+      },
+      "analogy_short_1": {
+        "classes": {
+          "analogy": 13
+        },
+        "splits": {
+          "train": 10,
+          "validation": 1,
+          "test": 2
+        }
+      },
+      "analogy_short_2": {
+        "classes": {
+          "analogy": 12
+        },
+        "splits": {
+          "test": 2,
+          "train": 10
+        }
+      },
+      "analogy_short_3": {
+        "classes": {
+          "analogy": 13
+        },
+        "splits": {
+          "train": 5,
+          "test": 4,
+          "validation": 4
+        }
+      },
+      "analogy_short_4": {
+        "classes": {
+          "analogy": 13
+        },
+        "splits": {
+          "train": 8,
+          "test": 3,
+          "validation": 2
+        }
+      },
+      "causality_limited_long_0": {
+        "classes": {
+          "causality": 13
+        },
+        "splits": {
+          "train": 10,
+          "validation": 3
+        }
+      },
+      "causality_limited_long_1": {
+        "classes": {
+          "causality": 12
+        },
+        "splits": {
+          "test": 2,
+          "train": 8,
+          "validation": 2
+        }
+      },
+      "causality_limited_long_2": {
+        "classes": {
+          "causality": 13
+        },
+        "splits": {
+          "train": 6,
+          "test": 6,
+          "validation": 1
+        }
+      },
+      "causality_limited_long_3": {
+        "classes": {
+          "causality": 13
+        },
+        "splits": {
+          "train": 10,
+          "validation": 3
+        }
+      },
+      "causality_limited_long_4": {
+        "classes": {
+          "causality": 12
+        },
+        "splits": {
+          "test": 3,
+          "validation": 3,
+          "train": 6
+        }
+      },
+      "causality_medium_0": {
+        "classes": {
+          "causality": 13
+        },
+        "splits": {
+          "train": 11,
+          "test": 1,
+          "validation": 1
+        }
+      },
+      "causality_medium_1": {
+        "classes": {
+          "causality": 13
+        },
+        "splits": {
+          "train": 7,
+          "validation": 1,
+          "test": 5
+        }
+      },
+      "causality_medium_2": {
+        "classes": {
+          "causality": 13
+        },
+        "splits": {
+          "train": 6,
+          "test": 3,
+          "validation": 4
+        }
+      },
+      "causality_medium_3": {
+        "classes": {
+          "causality": 12
+        },
+        "splits": {
+          "validation": 2,
+          "train": 9,
+          "test": 1
+        }
+      },
+      "causality_medium_4": {
+        "classes": {
+          "causality": 13
+        },
+        "splits": {
+          "validation": 3,
+          "train": 7,
+          "test": 3
+        }
+      },
+      "causality_short_0": {
+        "classes": {
+          "causality": 12
+        },
+        "splits": {
+          "train": 7,
+          "test": 5
+        }
+      },
+      "causality_short_1": {
+        "classes": {
+          "causality": 13
+        },
+        "splits": {
+          "train": 10,
+          "validation": 1,
+          "test": 2
+        }
+      },
+      "causality_short_2": {
+        "classes": {
+          "causality": 12
+        },
+        "splits": {
+          "test": 2,
+          "train": 10
+        }
+      },
+      "causality_short_3": {
+        "classes": {
+          "causality": 13
+        },
+        "splits": {
+          "train": 5,
+          "test": 4,
+          "validation": 4
+        }
+      },
+      "causality_short_4": {
+        "classes": {
+          "causality": 13
+        },
+        "splits": {
+          "train": 8,
+          "test": 3,
+          "validation": 2
+        }
+      },
+      "definition_limited_long_0": {
+        "classes": {
+          "definition": 13
+        },
+        "splits": {
+          "train": 10,
+          "validation": 3
+        }
+      },
+      "definition_limited_long_1": {
+        "classes": {
+          "definition": 12
+        },
+        "splits": {
+          "test": 2,
+          "train": 8,
+          "validation": 2
+        }
+      },
+      "definition_limited_long_2": {
+        "classes": {
+          "definition": 13
+        },
+        "splits": {
+          "train": 6,
+          "test": 6,
+          "validation": 1
+        }
+      },
+      "definition_limited_long_3": {
+        "classes": {
+          "definition": 13
+        },
+        "splits": {
+          "train": 10,
+          "validation": 3
+        }
+      },
+      "definition_limited_long_4": {
+        "classes": {
+          "definition": 12
+        },
+        "splits": {
+          "test": 3,
+          "validation": 3,
+          "train": 6
+        }
+      },
+      "definition_medium_0": {
+        "classes": {
+          "definition": 13
+        },
+        "splits": {
+          "train": 11,
+          "test": 1,
+          "validation": 1
+        }
+      },
+      "definition_medium_1": {
+        "classes": {
+          "definition": 13
+        },
+        "splits": {
+          "train": 7,
+          "validation": 1,
+          "test": 5
+        }
+      },
+      "definition_medium_2": {
+        "classes": {
+          "definition": 13
+        },
+        "splits": {
+          "train": 6,
+          "test": 3,
+          "validation": 4
+        }
+      },
+      "definition_medium_3": {
+        "classes": {
+          "definition": 12
+        },
+        "splits": {
+          "validation": 2,
+          "train": 9,
+          "test": 1
+        }
+      },
+      "definition_medium_4": {
+        "classes": {
+          "definition": 13
+        },
+        "splits": {
+          "validation": 3,
+          "train": 7,
+          "test": 3
+        }
+      },
+      "definition_short_0": {
+        "classes": {
+          "definition": 12
+        },
+        "splits": {
+          "train": 7,
+          "test": 5
+        }
+      },
+      "definition_short_1": {
+        "classes": {
+          "definition": 13
+        },
+        "splits": {
+          "train": 10,
+          "validation": 1,
+          "test": 2
+        }
+      },
+      "definition_short_2": {
+        "classes": {
+          "definition": 12
+        },
+        "splits": {
+          "test": 2,
+          "train": 10
+        }
+      },
+      "definition_short_3": {
+        "classes": {
+          "definition": 13
+        },
+        "splits": {
+          "train": 5,
+          "test": 4,
+          "validation": 4
+        }
+      },
+      "definition_short_4": {
+        "classes": {
+          "definition": 13
+        },
+        "splits": {
+          "train": 8,
+          "test": 3,
+          "validation": 2
+        }
+      },
+      "logic_limited_long_0": {
+        "classes": {
+          "logic": 13
+        },
+        "splits": {
+          "train": 10,
+          "validation": 3
+        }
+      },
+      "logic_limited_long_1": {
+        "classes": {
+          "logic": 12
+        },
+        "splits": {
+          "test": 2,
+          "train": 8,
+          "validation": 2
+        }
+      },
+      "logic_limited_long_2": {
+        "classes": {
+          "logic": 13
+        },
+        "splits": {
+          "train": 6,
+          "test": 6,
+          "validation": 1
+        }
+      },
+      "logic_limited_long_3": {
+        "classes": {
+          "logic": 13
+        },
+        "splits": {
+          "train": 10,
+          "validation": 3
+        }
+      },
+      "logic_limited_long_4": {
+        "classes": {
+          "logic": 12
+        },
+        "splits": {
+          "test": 3,
+          "validation": 3,
+          "train": 6
+        }
+      },
+      "logic_medium_0": {
+        "classes": {
+          "logic": 13
+        },
+        "splits": {
+          "train": 11,
+          "test": 1,
+          "validation": 1
+        }
+      },
+      "logic_medium_1": {
+        "classes": {
+          "logic": 13
+        },
+        "splits": {
+          "train": 7,
+          "validation": 1,
+          "test": 5
+        }
+      },
+      "logic_medium_2": {
+        "classes": {
+          "logic": 13
+        },
+        "splits": {
+          "train": 6,
+          "test": 3,
+          "validation": 4
+        }
+      },
+      "logic_medium_3": {
+        "classes": {
+          "logic": 12
+        },
+        "splits": {
+          "validation": 2,
+          "train": 9,
+          "test": 1
+        }
+      },
+      "logic_medium_4": {
+        "classes": {
+          "logic": 13
+        },
+        "splits": {
+          "validation": 3,
+          "train": 7,
+          "test": 3
+        }
+      },
+      "logic_short_0": {
+        "classes": {
+          "logic": 12
+        },
+        "splits": {
+          "train": 7,
+          "test": 5
+        }
+      },
+      "logic_short_1": {
+        "classes": {
+          "logic": 13
+        },
+        "splits": {
+          "train": 10,
+          "validation": 1,
+          "test": 2
+        }
+      },
+      "logic_short_2": {
+        "classes": {
+          "logic": 12
+        },
+        "splits": {
+          "test": 2,
+          "train": 10
+        }
+      },
+      "logic_short_3": {
+        "classes": {
+          "logic": 13
+        },
+        "splits": {
+          "train": 5,
+          "test": 4,
+          "validation": 4
+        }
+      },
+      "logic_short_4": {
+        "classes": {
+          "logic": 13
+        },
+        "splits": {
+          "train": 8,
+          "test": 3,
+          "validation": 2
+        }
+      }
+    }
+  },
+  "punctuation_and_marker_patterns": {
+    "logic": {
+      "period": 190,
+      "colon": 0,
+      "arrow": 0,
+      "because": 0,
+      "copular_is": 0
+    },
+    "causality": {
+      "period": 190,
+      "colon": 0,
+      "arrow": 0,
+      "because": 0,
+      "copular_is": 0
+    },
+    "analogy": {
+      "period": 190,
+      "colon": 0,
+      "arrow": 0,
+      "because": 56,
+      "copular_is": 0
+    },
+    "definition": {
+      "period": 190,
+      "colon": 0,
+      "arrow": 0,
+      "because": 0,
+      "copular_is": 102
+    }
+  },
+  "lexical_challenge_direct_marker_violations": 0,
+  "naturalness_audit": {
+    "repeated_boilerplate_prefixes": "flagged",
+    "class_specific_skeletons": "flagged",
+    "malformed_grammar_rule_count": "0 confirmed, manual review still required",
+    "exact_phrase_frame_reuse": "flagged"
+  },
+  "manual_audit_review_sheet": {
+    "source": "manual_audit_sample.csv",
+    "rows": 76,
+    "human_judgment_fields_blank": true
+  },
+  "remediation_options": {
+    "preferred": "Option A",
+    "option_a": "retain current 760 as procedural development corpus and add independently authored or sourced evaluation set",
+    "option_b": "replace predeclared fraction of families with independent authorship",
+    "option_c": "use current data for training only and require independent natural-language final test"
+  },
+  "constraints_confirmed": {
+    "no_model_run": true,
+    "no_evaluator_training": true,
+    "exp017_outputs_read": false,
+    "primary_dataset_modified": false
+  }
+}

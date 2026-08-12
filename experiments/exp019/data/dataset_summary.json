@@ -1,0 +1,127 @@
+{
+  "total_examples": 760,
+  "examples_per_class": {
+    "logic": 190,
+    "causality": 190,
+    "analogy": 190,
+    "definition": 190
+  },
+  "examples_per_split": {
+    "train": 480,
+    "validation": 120,
+    "test": 160
+  },
+  "content_family_count": 190,
+  "families_per_split": {
+    "train": 120,
+    "validation": 30,
+    "test": 40
+  },
+  "length_band_by_class": {
+    "logic": {
+      "medium": 64,
+      "limited_long": 63,
+      "short": 63
+    },
+    "causality": {
+      "medium": 64,
+      "limited_long": 63,
+      "short": 63
+    },
+    "analogy": {
+      "medium": 64,
+      "limited_long": 63,
+      "short": 63
+    },
+    "definition": {
+      "medium": 64,
+      "limited_long": 63,
+      "short": 63
+    }
+  },
+  "provenance_by_class": {
+    "logic": {
+      "rule_composed": 190
+    },
+    "causality": {
+      "rule_composed": 190
+    },
+    "analogy": {
+      "rule_composed": 190
+    },
+    "definition": {
+      "rule_composed": 190
+    }
+  },
+  "template_family_counts": {
+    "logic_medium_1": 13,
+    "causality_medium_1": 13,
+    "analogy_medium_1": 13,
+    "definition_medium_1": 13,
+    "logic_limited_long_2": 13,
+    "causality_limited_long_2": 13,
+    "analogy_limited_long_2": 13,
+    "definition_limited_long_2": 13,
+    "logic_short_3": 13,
+    "causality_short_3": 13,
+    "analogy_short_3": 13,
+    "definition_short_3": 13,
+    "logic_medium_4": 13,
+    "causality_medium_4": 13,
+    "analogy_medium_4": 13,
+    "definition_medium_4": 13,
+    "logic_limited_long_0": 13,
+    "causality_limited_long_0": 13,
+    "analogy_limited_long_0": 13,
+    "definition_limited_long_0": 13,
+    "logic_short_1": 13,
+    "causality_short_1": 13,
+    "analogy_short_1": 13,
+    "definition_short_1": 13,
+    "logic_medium_2": 13,
+    "causality_medium_2": 13,
+    "analogy_medium_2": 13,
+    "definition_medium_2": 13,
+    "logic_limited_long_3": 13,
+    "causality_limited_long_3": 13,
+    "analogy_limited_long_3": 13,
+    "definition_limited_long_3": 13,
+    "logic_short_4": 13,
+    "causality_short_4": 13,
+    "analogy_short_4": 13,
+    "definition_short_4": 13,
+    "logic_medium_0": 13,
+    "causality_medium_0": 13,
+    "analogy_medium_0": 13,
+    "definition_medium_0": 13,
+    "logic_limited_long_1": 12,
+    "causality_limited_long_1": 12,
+    "analogy_limited_long_1": 12,
+    "definition_limited_long_1": 12,
+    "logic_short_2": 12,
+    "causality_short_2": 12,
+    "analogy_short_2": 12,
+    "definition_short_2": 12,
+    "logic_medium_3": 12,
+    "causality_medium_3": 12,
+    "analogy_medium_3": 12,
+    "definition_medium_3": 12,
+    "logic_limited_long_4": 12,
+    "causality_limited_long_4": 12,
+    "analogy_limited_long_4": 12,
+    "definition_limited_long_4": 12,
+    "logic_short_0": 12,
+    "causality_short_0": 12,
+    "analogy_short_0": 12,
+    "definition_short_0": 12
+  },
+  "lexical_challenge_counts": {
+    "logic": 20,
+    "causality": 20,
+    "analogy": 20,
+    "definition": 20
+  },
+  "rejected_candidate_count": 0,
+  "construction": "deterministic rule_composed templates; no Qwen, Gemma, steering output, model generation, or classifier training",
+  "seed": 20260812
+}

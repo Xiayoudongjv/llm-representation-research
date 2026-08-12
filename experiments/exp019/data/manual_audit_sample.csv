@@ -1,0 +1,77 @@
+example_id,task_class,response_text,length_band,provenance
+exp019_analogy_143,analogy,The daily compass relation corresponds to the vane relation because both connect a condition with an outcome.,limited_long,rule_composed
+exp019_logic_062,logic,"When the ordinary filter condition holds, the stated rule requires behind as its conclusion.",limited_long,rule_composed
+exp019_definition_152,definition,A daily cube is a familiar object whose role is described by its practical use in a system.,limited_long,rule_composed
+exp019_causality_174,causality,Practical light triggers shines.,short,rule_composed
+exp019_analogy_147,analogy,Daily sharpener parallels grater.,short,rule_composed
+exp019_definition_091,definition,The shared thermos refers to an object used for a purpose.,medium,rule_composed
+exp019_analogy_083,analogy,The shared signal relation corresponds to the bell relation because both connect a condition with an outcome.,limited_long,rule_composed
+exp019_logic_098,logic,"When the familiar light condition holds, the stated rule requires shines as its conclusion.",limited_long,rule_composed
+exp019_definition_129,definition,A simple thermos has purpose.,short,rule_composed
+exp019_causality_087,causality,Shared ruler triggers read.,short,rule_composed
+exp019_causality_159,causality,Local signal triggers proceed.,short,rule_composed
+exp019_definition_061,definition,The ordinary thermometer refers to an object used for a purpose.,medium,rule_composed
+exp019_definition_041,definition,A observed light is a familiar object whose role is described by its practical use in a system.,limited_long,rule_composed
+exp019_definition_134,definition,A daily timer is a familiar object whose role is described by its practical use in a system.,limited_long,rule_composed
+exp019_definition_078,definition,Shared gauge denotes purpose.,short,rule_composed
+exp019_analogy_127,analogy,The simple panel relation matches the windmill relation in structure.,medium,rule_composed
+exp019_causality_036,causality,Nearby pulley state yields outcome.,short,rule_composed
+exp019_definition_095,definition,A shared cube is a familiar object whose role is described by its practical use in a system.,limited_long,rule_composed
+exp019_logic_090,logic,Shared sharpener entails removed.,short,rule_composed
+exp019_logic_097,logic,"If the familiar gauge condition holds, rises follows under the rule.",medium,rule_composed
+exp019_analogy_074,analogy,The ordinary pulley relation corresponds to the lever relation because both connect a condition with an outcome.,limited_long,rule_composed
+exp019_analogy_006,analogy,Routine tray mirrors sponge's relation.,short,rule_composed
+exp019_causality_160,causality,The local refrigerator condition produces heat through a simple mechanism.,medium,rule_composed
+exp019_analogy_087,analogy,Shared ruler parallels cup.,short,rule_composed
+exp019_analogy_056,analogy,The observed magnet relation corresponds to the vacuum relation because both connect a condition with an outcome.,limited_long,rule_composed
+exp019_analogy_122,analogy,The simple refrigerator relation corresponds to the bottle relation because both connect a condition with an outcome.,limited_long,rule_composed
+exp019_logic_005,logic,"When the routine filter condition holds, the stated rule requires behind as its conclusion.",limited_long,rule_composed
+exp019_definition_028,definition,The nearby lock refers to an object used for a purpose.,medium,rule_composed
+exp019_analogy_030,analogy,Nearby ruler parallels cup.,short,rule_composed
+exp019_definition_083,definition,A shared signal is a familiar object whose role is described by its practical use in a system.,limited_long,rule_composed
+exp019_definition_013,definition,The routine panel refers to an object used for a purpose.,medium,rule_composed
+exp019_definition_070,definition,A ordinary panel is an object with a stated practical role.,medium,rule_composed
+exp019_causality_177,causality,Practical tray triggers sprout.,short,rule_composed
+exp019_analogy_091,analogy,"Like the coat, the shared thermos connects condition and outcome.",medium,rule_composed
+exp019_definition_097,definition,A familiar gauge is an object with a stated practical role.,medium,rule_composed
+exp019_logic_130,logic,"If the simple calendar condition holds, changes follows under the rule.",medium,rule_composed
+exp019_analogy_007,analogy,The routine signal relation matches the bell relation in structure.,medium,rule_composed
+exp019_definition_112,definition,A familiar pulley is an object with a stated practical role.,medium,rule_composed
+exp019_definition_124,definition,A simple compass is an object with a stated practical role.,medium,rule_composed
+exp019_logic_063,logic,Ordinary tray condition entails sprout.,short,rule_composed
+exp019_analogy_144,analogy,Daily ruler parallels cup.,short,rule_composed
+exp019_definition_072,definition,A ordinary thermos has purpose.,short,rule_composed
+exp019_causality_029,causality,A change in the nearby compass condition leads to direction through the system's ordinary mechanism.,limited_long,rule_composed
+exp019_analogy_034,analogy,The nearby thermos relation matches the coat relation in structure.,medium,rule_composed
+exp019_analogy_031,analogy,"Like the dispenser, the nearby can connects condition and outcome.",medium,rule_composed
+exp019_causality_122,causality,A change in the simple refrigerator condition leads to heat through the system's ordinary mechanism.,limited_long,rule_composed
+exp019_definition_059,definition,A ordinary gauge is a familiar object whose role is described by its practical use in a system.,limited_long,rule_composed
+exp019_definition_030,definition,A nearby ruler has purpose.,short,rule_composed
+exp019_definition_184,definition,A practical panel is an object with a stated practical role.,medium,rule_composed
+exp019_logic_179,logic,"When the practical refrigerator condition holds, the stated rule requires heat as its conclusion.",limited_long,rule_composed
+exp019_definition_130,definition,A simple calendar is an object with a stated practical role.,medium,rule_composed
+exp019_analogy_160,analogy,The local refrigerator relation matches the bottle relation in structure.,medium,rule_composed
+exp019_causality_074,causality,A change in the ordinary pulley condition leads to rises through the system's ordinary mechanism.,limited_long,rule_composed
+exp019_analogy_059,analogy,The ordinary gauge relation corresponds to the gauge relation because both connect a condition with an outcome.,limited_long,rule_composed
+exp019_analogy_163,analogy,"Like the cup, the local ruler connects condition and outcome.",medium,rule_composed
+exp019_analogy_148,analogy,"Like the coat, the daily thermos connects condition and outcome.",medium,rule_composed
+exp019_causality_125,causality,A change in the simple ruler condition leads to read through the system's ordinary mechanism.,limited_long,rule_composed
+exp019_definition_140,definition,A daily signal is a familiar object whose role is described by its practical use in a system.,limited_long,rule_composed
+exp019_causality_049,causality,The observed ruler condition produces read through a simple mechanism.,medium,rule_composed
+exp019_logic_152,logic,"When the daily cube condition holds, the stated rule requires melts as its conclusion.",limited_long,rule_composed
+exp019_logic_050,logic,"When the observed can condition holds, the stated rule requires moist as its conclusion.",limited_long,rule_composed
+exp019_analogy_029,analogy,The nearby compass relation corresponds to the vane relation because both connect a condition with an outcome.,limited_long,rule_composed
+exp019_analogy_004,analogy,The routine thermometer relation matches the speedometer relation in structure.,medium,rule_composed
+exp019_logic_113,logic,"When the familiar magnet condition holds, the stated rule requires closer as its conclusion.",limited_long,rule_composed
+exp019_definition_153,definition,Local timer denotes purpose.,short,rule_composed
+exp019_causality_044,causality,A change in the observed tray condition leads to sprout through the system's ordinary mechanism.,limited_long,rule_composed
+exp019_causality_133,causality,Melts follows when the simple cube mechanism activates.,medium,rule_composed
+exp019_definition_044,definition,A observed tray is a familiar object whose role is described by its practical use in a system.,limited_long,rule_composed
+exp019_logic_017,logic,"When the routine pulley condition holds, the stated rule requires rises as its conclusion.",limited_long,rule_composed
+exp019_analogy_154,analogy,The local gauge relation matches the gauge relation in structure.,medium,rule_composed
+exp019_causality_140,causality,A change in the daily signal condition leads to proceed through the system's ordinary mechanism.,limited_long,rule_composed
+exp019_logic_167,logic,"When the local thermos condition holds, the stated rule requires slowly as its conclusion.",limited_long,rule_composed
+exp019_causality_166,causality,Removed follows when the local sharpener mechanism activates.,medium,rule_composed
+exp019_analogy_186,analogy,Practical thermos mirrors coat's relation.,short,rule_composed
+exp019_definition_002,definition,A routine gauge is a familiar object whose role is described by its practical use in a system.,limited_long,rule_composed
+exp019_causality_084,causality,Shared refrigerator triggers heat.,short,rule_composed
