@@ -60,22 +60,40 @@ model-specific layer-validity study rather than immediate generation-time
 intervention.
 
 EXP-016 completed that preregistered expansion across seven sampled layers and
-six beta values per model. Qwen's encoding/control layer was 16, while its
-lowest-IVS threshold-eligible safe-control setting was layer 4 at beta 1.0.
-Gemma's encoding peak was final layer 26, while its control and safe-control
-setting was layer 16 at beta 0.75. The sampled role structure is therefore
-interpretable and model-specific: encoding depth differs, control depth is
-similar, and safe-control depth differs. The study did not identify causal
-modules, but it did provide pre-behavioral control/safety selections.
+six beta values per model. Qwen's operational encoding/control selection was
+layer 16, while its lowest-mean-IVS threshold-eligible setting was layer 4 at
+beta 1.0. Gemma's operational encoding selection was final layer 26, while its
+control and lowest-mean-IVS selection was layer 16 at beta 0.75. These are
+sampled-grid operational labels, not causal layer roles. In particular, Qwen
+L4 at beta 1.0 had mean assignment 0.917 but minimum pair assignment 0.667,
+so it is mean-constrained rather than pairwise-robust safe control.
+
+Research Audit v1 found a critical construction-evaluation coupling in the
+historical centroid-steering results: the source/target centroids and deltas
+were fitted on representations that were also evaluated by nearest-centroid
+assignment. It also found that absolute low IVS is not task-specific evidence
+without matched-norm random common-translation controls. Consequently,
+EXP-017 remains limited to a future hook-semantics diagnostic, not a full
+behavioral-effect interpretation.
+
+EXP-018 now freezes the required independent representation validation before
+any behavioral study. It uses complementary three-per-group fit/evaluation
+splits of the unchanged EXP-003 controlled prompts, fit-only centroids, a
+fit-only multinomial linear probe, matched-norm random and opposite-direction
+controls, and an explicit task-versus-random IVS comparison. It does not create
+a runner or run either model at preregistration time.
 
 Future work:
 
-1. Design a preregistered generation-time intervention pilot using the
-   model-specific control/safe-control choices from EXP-016, explicit sham and
-   no-intervention controls, and the frozen behavioral evaluation protocol.
-2. Replicate the frozen behavioral benchmark on Gemma using normal generation
+1. Implement EXP-018 exactly as preregistered, without new layer or beta
+   search, and inspect held-out task-versus-random outcomes.
+2. Implement only a tiny Qwen KV-cache hook diagnostic for the frozen EXP-017
+   semantics, then stop for inspection before behavioral generation.
+3. Do not interpret or expand EXP-017 behavioral effects unless EXP-018
+   resolves the construction-independence gate.
+4. Replicate the frozen behavioral benchmark on Gemma using normal generation
    and the existing quality-controlled scoring protocol.
-3. Add an independent human-annotation sample for scoring reliability.
+5. Add an independent human-annotation sample for scoring reliability.
 
 The previous exploratory options are retained below as historical planning
 context; this recommendation supersedes their priority ordering.

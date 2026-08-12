@@ -1,0 +1,127 @@
+{
+  "experiment": "EXP-018 Independent Validation of Centroid Steering and RSM Preservation",
+  "status": "preregistered_design_only",
+  "models": [
+    {
+      "name": "Qwen/Qwen3-1.7B",
+      "model_index": 0,
+      "primary_layers": [16],
+      "secondary_layers": []
+    },
+    {
+      "name": "google/gemma-3-1b-it",
+      "model_index": 1,
+      "primary_layers": [16],
+      "secondary_layers": [26]
+    }
+  ],
+  "input_dataset": "experiments/exp003/prompts_controlled.json",
+  "groups": ["logic", "causality", "analogy", "definition"],
+  "group_index": {
+    "logic": 0,
+    "causality": 1,
+    "analogy": 2,
+    "definition": 3
+  },
+  "representation": "last_token_hidden_state",
+  "betas": [0.5, 0.75, 1.0],
+  "splits": [
+    {
+      "id": "A_original_fit_paraphrase_eval",
+      "split_index": 0,
+      "fit_ids": {
+        "logic": ["logic_orig_01", "logic_orig_02", "logic_orig_03"],
+        "causality": ["causality_orig_01", "causality_orig_02", "causality_orig_03"],
+        "analogy": ["analogy_orig_01", "analogy_orig_02", "analogy_orig_03"],
+        "definition": ["definition_orig_01", "definition_orig_02", "definition_orig_03"]
+      },
+      "evaluation_ids": {
+        "logic": ["logic_para_01", "logic_para_02", "logic_para_03"],
+        "causality": ["causality_para_01", "causality_para_02", "causality_para_03"],
+        "analogy": ["analogy_para_01", "analogy_para_02", "analogy_para_03"],
+        "definition": ["definition_para_01", "definition_para_02", "definition_para_03"]
+      }
+    },
+    {
+      "id": "B_paraphrase_fit_original_eval",
+      "split_index": 1,
+      "fit_ids": {
+        "logic": ["logic_para_01", "logic_para_02", "logic_para_03"],
+        "causality": ["causality_para_01", "causality_para_02", "causality_para_03"],
+        "analogy": ["analogy_para_01", "analogy_para_02", "analogy_para_03"],
+        "definition": ["definition_para_01", "definition_para_02", "definition_para_03"]
+      },
+      "evaluation_ids": {
+        "logic": ["logic_orig_01", "logic_orig_02", "logic_orig_03"],
+        "causality": ["causality_orig_01", "causality_orig_02", "causality_orig_03"],
+        "analogy": ["analogy_orig_01", "analogy_orig_02", "analogy_orig_03"],
+        "definition": ["definition_orig_01", "definition_orig_02", "definition_orig_03"]
+      }
+    }
+  ],
+  "direction": {
+    "definition": "delta_task = centroid_target_fit - centroid_source_fit",
+    "fit_data_only": true,
+    "application": "Apply only to held-out source representations: h_prime = h + beta * delta."
+  },
+  "ordered_transitions": [
+    ["logic", "causality"], ["logic", "analogy"], ["logic", "definition"],
+    ["causality", "logic"], ["causality", "analogy"], ["causality", "definition"],
+    ["analogy", "logic"], ["analogy", "causality"], ["analogy", "definition"],
+    ["definition", "logic"], ["definition", "causality"], ["definition", "analogy"]
+  ],
+  "conditions": ["task_directed", "matched_norm_random", "opposite_task_direction"],
+  "random_control": {
+    "base_seed": 20260319,
+    "seed_sequence": "[base_seed, model_index, layer, split_index, source_group_index, target_group_index]",
+    "distribution": "standard_normal",
+    "norm_rule": "Scale once so L2(delta_random) equals L2(delta_task), then reuse for all held-out source items and betas in that comparison."
+  },
+  "held_out_centroid_evaluator": {
+    "centroids": "All class centroids are fit-only.",
+    "metric": "cosine similarity",
+    "records": ["predicted_class", "source_assignment", "target_assignment", "similarity_to_source", "similarity_to_target", "target_minus_source_similarity"],
+    "role": "secondary_centroid_related_held_out_evaluator"
+  },
+  "linear_probe": {
+    "role": "primary_independent_transition_evaluator",
+    "fit_data_only": true,
+    "preprocessing": {"class": "StandardScaler", "with_mean": true, "with_std": true},
+    "classifier": {
+      "class": "LogisticRegression",
+      "solver": "lbfgs",
+      "penalty": "l2",
+      "C": 1.0,
+      "multi_class": "multinomial",
+      "max_iter": 1000,
+      "class_weight": null,
+      "random_state": 20260319,
+      "class_order": ["logic", "causality", "analogy", "definition"]
+    },
+    "records": ["predicted_class", "source_probability", "target_probability", "target_minus_source_probability", "target_prediction_rate"]
+  },
+  "relational_evaluator": {
+    "data": "held-out source representations only",
+    "metrics": ["rsm_pearson", "invariant_violation_score", "rsm_frobenius_distance"],
+    "primary_comparison": "IVS_task < IVS_matched_norm_random at matched model/layer/split/transition/beta",
+    "absolute_low_ivs_is_success": false
+  },
+  "success_criteria": {
+    "transition_upgrade_requires": [
+      "held-out centroid target-directed movement",
+      "held-out linear-probe target probability and target prediction rate increase",
+      "task steering differs meaningfully from matched-norm random steering with pair-level consistency"
+    ],
+    "relational_upgrade_requires": "Task steering is systematically lower-IVS than matched-norm random steering; report task-better, random-better, and tied finite pair-level counts.",
+    "p_value_requirement": "none; report pair-level consistency"
+  },
+  "negative_result_policy": [
+    "If held-out effects disappear, downgrade centroid transition claims.",
+    "If the linear probe does not differ from matched random, do not call the intervention task-directed.",
+    "If task IVS does not outperform matched random, treat IVS as a generic perturbation diagnostic.",
+    "Do not redesign metrics or splits after results."
+  ],
+  "generation_allowed": false,
+  "runner_present": false,
+  "raw_hidden_state_persistence_allowed": false
+}

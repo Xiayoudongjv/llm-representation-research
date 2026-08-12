@@ -1,0 +1,72 @@
+{
+  "experiment": "EXP-017 Generation-Time Intervention Pilot",
+  "status": "preregistered_design_only",
+  "model": "Qwen/Qwen3-1.7B",
+  "dtype": "float16",
+  "dataset": {
+    "path": "experiments/exp011/expanded_answer_prompts.json",
+    "frozen_behavior_reference": "results/exp011d/final_behavior_summary.json",
+    "item_count": 80,
+    "groups": ["logic", "causality", "analogy", "definition"],
+    "scoring_rule": "boundary_aware",
+    "dataset_modification_allowed": false
+  },
+  "generation": {
+    "do_sample": false,
+    "max_new_tokens": 32,
+    "prompt_template": "Answer the following question with only the short answer, without explanation.\nQuestion: {question}\nAnswer:",
+    "chat_template_policy": "match_exp011b"
+  },
+  "direction_estimation": {
+    "source_dataset": "experiments/exp003/prompts_controlled.json",
+    "prompt_format": "raw_plain_text_no_chat_template",
+    "representation": "last_token_hidden_state",
+    "definition": "delta[source,target] = centroid_target - centroid_source",
+    "normalization": "none_raw_centroid_difference",
+    "transitions": {"logic": "causality", "causality": "logic", "analogy": "definition", "definition": "analogy"}
+  },
+  "conditions": [
+    {"id": "NO_INTERVENTION", "kind": "baseline", "layer": null, "beta": 0.0},
+    {"id": "CONTROL_LAYER_REAL", "kind": "task_directed", "layer": 16, "beta": 0.75, "label_note": "EXP-016 control operating point"},
+    {"id": "MEAN_SAFE_LAYER_REAL", "kind": "task_directed", "layer": 4, "beta": 1.0, "label_note": "lowest mean IVS among threshold-eligible settings; minimum pair assignment was 0.667"},
+    {"id": "VALIDITY_LAYER_REAL", "kind": "task_directed", "layer": 28, "beta": 1.0, "label_note": "EXP-016 exploratory validity/efficiency operating point"},
+    {"id": "CONTROL_LAYER_RANDOM", "kind": "matched_norm_random", "layer": 16, "beta": 0.75},
+    {"id": "MEAN_SAFE_LAYER_RANDOM", "kind": "matched_norm_random", "layer": 4, "beta": 1.0},
+    {"id": "VALIDITY_LAYER_RANDOM", "kind": "matched_norm_random", "layer": 28, "beta": 1.0}
+  ],
+  "random_control": {
+    "base_seed": 20260317,
+    "construction": "For each layer and directed source-target pair, sample a standard-normal vector using the deterministic seed sequence [base_seed, layer, source_group_index, target_group_index], then scale it to exactly the L2 norm of the matching raw centroid delta.",
+    "source_group_index": {"logic": 0, "causality": 1, "analogy": 2, "definition": 3},
+    "reuse_policy": "Reuse the same generated random vector for every behavioral item with the same condition and directed pair."
+  },
+  "opposite_direction_subset": {
+    "enabled": true,
+    "conditions": ["CONTROL_LAYER_OPPOSITE"],
+    "layer": 16,
+    "beta": 0.75,
+    "vector": "negative of the matching task-directed raw centroid delta",
+    "item_ids": [
+      "exp011_logic_001", "exp011_logic_002", "exp011_logic_003", "exp011_logic_004", "exp011_logic_005",
+      "exp011_causality_001", "exp011_causality_002", "exp011_causality_003", "exp011_causality_004", "exp011_causality_005",
+      "exp011_analogy_001", "exp011_analogy_002", "exp011_analogy_003", "exp011_analogy_004", "exp011_analogy_005",
+      "exp011_definition_001", "exp011_definition_002", "exp011_definition_003", "exp011_definition_004", "exp011_definition_005"
+    ]
+  },
+  "hook_semantics": {
+    "module": "model.model.layers[layer]",
+    "location": "post_block_output_before_next_transformer_block",
+    "operation": "Add beta * selected_vector only to hidden_states[:, -1, :] of the block output tensor.",
+    "prefill": "Apply once to the final prompt-token block output used to predict the first generated token.",
+    "cached_generation": "On every later cached decode forward, apply to the sole newly processed last-token block output used to predict the next token.",
+    "cache_policy": "Do not alter previously stored KV-cache entries or retroactively alter previous token states.",
+    "implementation_gate": "Before behavioral evaluation, a separate tiny diagnostic must verify this exact hook location and call pattern under KV cache."
+  },
+  "outcomes": {
+    "primary": "source_group_accuracy and accuracy_change_vs_NO_INTERVENTION",
+    "collateral": ["output_token_count", "empty_answer_rate", "consecutive_exact_repetition_rate", "malformed_or_non_short_answer_rate"],
+    "malformed_or_non_short_answer_heuristic": "An answer is flagged when it is empty after stripping, contains a newline, exceeds 12 whitespace-delimited tokens, or exceeds 160 characters.",
+    "repetition_heuristic": "Within a condition and source group in frozen dataset order, count adjacent outputs whose normalized answer strings are exactly equal; report the fraction over adjacent pairs."
+  },
+  "stop_rule": "Do not automatically expand. Pause after the pilot unless hooks are verified, effects are not obvious artifacts, and either real steering differs meaningfully from its matched-norm random control or the representation-derived conditions show interpretable behavioral differences. If all interventions resemble random perturbation, record the negative result and pause."
+}
