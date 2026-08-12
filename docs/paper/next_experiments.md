@@ -50,13 +50,24 @@ assignment 0.875 with mean IVS 0.017970, unlike Qwen's 1.0 and 0.002850. The
 cross-model evidence therefore supports model-dependent operating points, not a
 universal beta.
 
+EXP-015 tested fixed low, mid, and final indices in both models without
+changing prompts, layers, or beta values after observation. Qwen's encoding and
+control layer were both 16, but its safe-control layer was 28. Gemma's encoding
+layer was 26, while both its control and safe-control layer were 16. Gemma's
+beta-0.75 IVS range across tested layers was 0.017768, exceeding the
+predeclared materiality threshold of 0.01. This pilot supports a broader
+model-specific layer-validity study rather than immediate generation-time
+intervention.
+
 Future work:
 
-1. Replicate the frozen behavioral benchmark on Gemma using normal generation
+1. Expand the layer-validity analysis with a preregistered, denser
+   model-specific layer sweep and the same controlled prompts and metrics.
+2. Replicate the frozen behavioral benchmark on Gemma using normal generation
    and the existing quality-controlled scoring protocol.
-2. Add an independent human-annotation sample for scoring reliability.
-3. Consider generation-time intervention only after the model-specific
-   representation and behavioral baselines are established.
+3. Add an independent human-annotation sample for scoring reliability.
+4. Consider generation-time intervention only after layer selection and the
+   model-specific representation and behavioral baselines are established.
 
 The previous exploratory options are retained below as historical planning
 context; this recommendation supersedes their priority ordering.

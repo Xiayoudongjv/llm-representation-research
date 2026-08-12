@@ -274,9 +274,23 @@ EXP-014 applies fixed centroid-difference steering at Gemma layer 26 across all
 but Gemma's exploratory operating point was beta 1.0 rather than Qwen's beta
 0.75. This is not generation-time intervention and does not assess reasoning.
 
+## Current Milestone: EXP-015 Layer-Validity Pilot
+
+Run the fixed two-model layer pilot with:
+
+```bash
+python experiments/exp015/layer_validity_pilot.py
+```
+
+EXP-015 compares fixed low, mid, and final hidden-state indices at beta 0.50,
+0.75, and 1.00. Qwen's encoding/control layer was 16 while its safe-control
+layer was 28; Gemma's encoding layer was 26 while its control/safe-control
+layer was 16. The pilot therefore recommends expanding layer-validity study
+before any generation-time intervention.
+
 ## Project Status
 
-Experiments are complete through EXP-014. Paper Draft v0.3 and the associated
+Experiments are complete through EXP-015. Paper Draft v0.5 and the associated
 status, results, and claims documents are available under `docs/paper`.
 Engineering utilities for IO, representation extraction, and plotting are
 covered by local tests.

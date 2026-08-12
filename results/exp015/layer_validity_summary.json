@@ -1,0 +1,89 @@
+{
+  "models": [
+    {
+      "model": "Qwen/Qwen3-1.7B",
+      "encoding_layer": 16,
+      "encoding_separation": 0.07301505094151728,
+      "control_layer_beta_075": 16,
+      "control_assignment_beta_075": 1.0,
+      "safe_control_layer": 28,
+      "safe_control_beta": 0.75,
+      "safe_control_assignment": 0.8750000000000001,
+      "safe_control_ivs": 0.0009076374836303932,
+      "safe_control_relative_perturbation": 0.19821858406066895,
+      "safe_control_used_fallback": false,
+      "best_efficiency_layer_beta": "layer_28_beta_0.75",
+      "encoding_equals_control": true,
+      "encoding_equals_safe_control": false,
+      "control_equals_safe_control": false,
+      "beta_075_assignment_range": 0.12499999999999989,
+      "beta_075_ivs_range": 0.0019420567928407442,
+      "material_layer_effect_predeclared": false
+    },
+    {
+      "model": "google/gemma-3-1b-it",
+      "encoding_layer": 26,
+      "encoding_separation": 0.09329384068628999,
+      "control_layer_beta_075": 16,
+      "control_assignment_beta_075": 1.0,
+      "safe_control_layer": 16,
+      "safe_control_beta": 0.75,
+      "safe_control_assignment": 1.0,
+      "safe_control_ivs": 0.00020178971579528268,
+      "safe_control_relative_perturbation": 0.10413556918501854,
+      "safe_control_used_fallback": false,
+      "best_efficiency_layer_beta": "layer_8_beta_0.75",
+      "encoding_equals_control": false,
+      "encoding_equals_safe_control": false,
+      "control_equals_safe_control": true,
+      "beta_075_assignment_range": 0.19444444444444453,
+      "beta_075_ivs_range": 0.017768412839327823,
+      "material_layer_effect_predeclared": true
+    }
+  ],
+  "model_metadata": {
+    "Qwen/Qwen3-1.7B": {
+      "model": "Qwen/Qwen3-1.7B",
+      "model_class": "Qwen3ForCausalLM",
+      "config_class": "Qwen3Config",
+      "model_type": "qwen3",
+      "hidden_size": 2048,
+      "hidden_state_count": 29,
+      "runtime_dtype": "torch.float16",
+      "runtime_device": "cuda:0",
+      "gpu_memory_before_load_bytes": 0,
+      "gpu_memory_after_load_bytes": 3442213888,
+      "gpu_memory_after_final_forward_bytes": 3481679360,
+      "min_token_count": 9,
+      "max_token_count": 18
+    },
+    "google/gemma-3-1b-it": {
+      "model": "google/gemma-3-1b-it",
+      "model_class": "Gemma3ForCausalLM",
+      "config_class": "Gemma3TextConfig",
+      "model_type": "gemma3_text",
+      "hidden_size": 1152,
+      "hidden_state_count": 27,
+      "runtime_dtype": "torch.float16",
+      "runtime_device": "cuda:0",
+      "gpu_memory_before_load_bytes": 33554432,
+      "gpu_memory_after_load_bytes": 2034207744,
+      "gpu_memory_after_final_forward_bytes": 2041576448,
+      "min_token_count": 9,
+      "max_token_count": 19
+    }
+  },
+  "tested_betas": [
+    0.5,
+    0.75,
+    1.0
+  ],
+  "predeclared_materiality": {
+    "assignment_range_at_beta_075": 0.2,
+    "ivs_range_at_beta_075": 0.01
+  },
+  "pilot_supports_layer_role_separation": true,
+  "reason": "At least one model showed predeclared role separation or a material beta-0.75 layer effect.",
+  "gate_decision": "EXPAND_LAYER_VALIDITY_STUDY",
+  "warning": "This three-layer, three-beta representation-level pilot does not identify causal functional layer roles or generation-time effects."
+}
