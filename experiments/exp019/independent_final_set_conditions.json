@@ -1,0 +1,83 @@
+{
+  "experiment": "EXP-019 independent natural final evaluation set",
+  "status": "preregistered_design_only",
+  "role_separation": {
+    "procedural_corpus_role": "development_training_validation_only",
+    "independent_final_set_role": "decisive_evaluator_acceptance",
+    "datasets_must_not_be_merged": true,
+    "classifier_hyperparameters_frozen_before_final_results": true
+  },
+  "task_classes": ["logic", "causality", "analogy", "definition"],
+  "primary_counts": {
+    "total": 200,
+    "per_class": {"logic": 50, "causality": 50, "analogy": 50, "definition": 50},
+    "minimum_total": 200
+  },
+  "provenance": {
+    "minimum_distinct_categories": 2,
+    "preferred_categories": ["human_authored", "independent_educational_source"],
+    "optional_category": "manually_adapted_external",
+    "maximum_fraction_per_source": 0.7,
+    "no_class_unique_to_one_provenance": true,
+    "forbidden_sole_sources": ["rule_composed_generator", "current_templates", "one_llm_generator", "one_website_or_source_family"]
+  },
+  "independence": {
+    "independent_of": ["procedural_templates", "current_content_family_generator", "current_marker_vocabulary", "classifier_predictions", "EXP-017 steering outputs"],
+    "do_not_use_qwen_or_gemma_generation": true,
+    "do_not_use_construct_dataset_py": true
+  },
+  "output_only": {
+    "classifier_input": ["response_text"],
+    "self_contained_required": true,
+    "reject_bare_yes_no": true,
+    "reject_isolated_nouns": true,
+    "reject_prompt_dependent_fragments": true
+  },
+  "length_bands": {
+    "short": [1, 5],
+    "medium": [6, 12],
+    "limited_long": [13, 20],
+    "target_fraction_by_class": {"short": [0.25, 0.35], "medium": [0.30, 0.40], "limited_long": [0.25, 0.35]},
+    "maximum_between_class_band_difference": 0.15,
+    "naturalness_priority_over_exact_balance": true
+  },
+  "lexical_audit": {
+    "diagnostic_markers": {
+      "logic": ["holds", "rule", "entails"],
+      "causality": ["mechanism", "through", "leads"],
+      "analogy": ["relation", "corresponds", "connect"],
+      "definition": ["is", "object", "role"]
+    },
+    "explicit_challenge_markers": ["logic", "logical", "therefore", "because", "cause", "causes", "analogy", "analogous", "define", "definition", "means"],
+    "markers_are_reported_not_globally_forbidden": true,
+    "no_deliberate_marker_based_writing": true
+  },
+  "template_independence_audit": {
+    "procedural_template_reuse_forbidden": true,
+    "checks": ["exact_duplicate", "normalized_duplicate", "repeated_three_word_prefix", "character_ngram_similarity", "tfidf_nearest_neighbor_similarity"],
+    "thresholds_frozen_before_final_classifier_results": true
+  },
+  "labeling": {
+    "required_fields": ["intended_task_class", "label_quality"],
+    "allowed_label_quality": ["clear", "borderline", "exclude"],
+    "primary_includes_only": "clear"
+  },
+  "human_audit": {
+    "minimum_primary_fraction": 0.2,
+    "minimum_examples": 40,
+    "preferred_examples": 200,
+    "review_fields": ["task_label_agreement", "naturalness", "lexical_giveaway", "self_contained", "ambiguity"],
+    "predictions_and_EXP017_outputs_hidden": true
+  },
+  "acceptance": {
+    "tier_1_procedural_metrics_remain_descriptive": true,
+    "tier_2_independent_final_is_decisive": true,
+    "balanced_accuracy_min": 0.7,
+    "macro_f1_min": 0.7,
+    "per_class_recall_min": 0.6,
+    "primary_evaluation_count": 1,
+    "no_hyperparameter_tuning_on_final_set": true,
+    "failure_status": "FAILED_INDEPENDENT_GENERALIZATION",
+    "success_status": "ACCEPTED_FOR_EXP017_TARGETNESS_EVALUATION"
+  }
+}
