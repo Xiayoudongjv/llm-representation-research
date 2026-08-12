@@ -1,0 +1,83 @@
+{
+  "experiment": "EXP-017 Generation-Time Intervention Pilot",
+  "status": "post_audit_preregistration_amendment_v1",
+  "amends": {
+    "historical_preregistration": "docs/experiments/EXP-017-PREREGISTRATION.md",
+    "historical_conditions": "experiments/exp017/intervention_conditions.json",
+    "historical_files_modified": false,
+    "reason": "Research Audit v1 identified centroid/nearest-centroid construction coupling and an RSM common-translation specificity problem; EXP-018 independently passed transition validation but failed relational validation."
+  },
+  "model": "Qwen/Qwen3-1.7B",
+  "dtype": "float16",
+  "dataset": {
+    "path": "experiments/exp011/expanded_answer_prompts.json",
+    "frozen_behavior_reference": "results/exp011d/final_behavior_summary.json",
+    "item_count": 80,
+    "groups": ["logic", "causality", "analogy", "definition"],
+    "scoring_rule": "boundary_aware",
+    "dataset_modification_allowed": false,
+    "delta_fit_prohibited": true
+  },
+  "generation": {
+    "do_sample": false,
+    "max_new_tokens": 32,
+    "prompt_template": "Answer the following question with only the short answer, without explanation.\nQuestion: {question}\nAnswer:",
+    "chat_template_policy": "match_exp011b"
+  },
+  "direction_estimation": {
+    "fit_dataset": "experiments/exp003/prompts_controlled.json",
+    "fit_item_count": 24,
+    "fit_items_per_group": 6,
+    "fit_item_variants": ["original_style", "paraphrase"],
+    "prompt_format": "raw_plain_text_no_chat_template",
+    "representation": "last_token_hidden_state",
+    "layer": 16,
+    "centroid_procedure": "For each group, collect the Qwen L16 last-token representation for every one of that group's six EXP-003 controlled prompts and take their arithmetic mean. For a directed transition source->target, delta_task = centroid_target - centroid_source. No EXP-011D behavioral prompt, answer, output, score, or label contributes to this fit.",
+    "normalization": "none_raw_centroid_difference",
+    "transitions": {
+      "logic": "causality",
+      "causality": "logic",
+      "analogy": "definition",
+      "definition": "analogy"
+    }
+  },
+  "conditions": [
+    {"id": "NO_INTERVENTION", "kind": "baseline", "layer": null, "beta": 0.0},
+    {"id": "TASK_REAL", "kind": "task_directed", "layer": 16, "beta": 0.75, "vector": "delta_task"},
+    {"id": "MATCHED_RANDOM", "kind": "matched_norm_random", "layer": 16, "beta": 0.75, "vector": "deterministic random direction L2-scaled to the matching delta_task"},
+    {"id": "OPPOSITE", "kind": "opposite_task_direction", "layer": 16, "beta": 0.75, "vector": "-delta_task"}
+  ],
+  "random_control": {
+    "base_seed": 20260317,
+    "construction": "For each directed source-target pair, sample one standard-normal vector using deterministic seed sequence [base_seed, 16, source_group_index, target_group_index], then scale it to exactly the L2 norm of that pair's delta_task.",
+    "source_group_index": {"logic": 0, "causality": 1, "analogy": 2, "definition": 3},
+    "reuse_policy": "Reuse the same pair-specific random vector for every relevant behavioral item and every generation step. Do not resample per question or token."
+  },
+  "hook_semantics": {
+    "module": "model.model.layers[16]",
+    "location": "post_block_output_before_next_transformer_block",
+    "operation": "Add beta * selected_vector only to hidden_states[:, -1, :] of the rank-3 block-output tensor.",
+    "prefill": "Apply once to the final prompt-token block output used for the first next-token prediction.",
+    "cached_generation": "Apply once on every later cached decode forward to the sole current new-token block output.",
+    "cache_policy": "Do not alter previously stored KV-cache entries or retroactively alter prior token states.",
+    "technical_validation": "Task 042 HOOK_DIAGNOSTIC_PASS"
+  },
+  "outcomes": {
+    "primary": "source_task_answer_accuracy, reported per condition and source group with change versus NO_INTERVENTION",
+    "primary_causal_comparison": "TASK_REAL versus MATCHED_RANDOM",
+    "secondary_comparisons": ["TASK_REAL versus OPPOSITE", "TASK_REAL versus NO_INTERVENTION"],
+    "collateral": ["output_token_count", "empty_answer_rate", "consecutive_exact_repetition_rate", "malformed_or_non_short_answer_rate"],
+    "malformed_or_non_short_answer_heuristic": "An answer is flagged when it is empty after stripping, contains a newline, exceeds 12 whitespace-delimited tokens, or exceeds 160 characters.",
+    "repetition_heuristic": "Within a condition and source group in frozen dataset order, count adjacent outputs whose normalized answer strings are exactly equal; report the fraction over adjacent pairs."
+  },
+  "deferred_conditions": [
+    {"layer": 4, "beta": 1.0, "former_label": "mean-safe", "status": "deferred", "reason": "The label is not supported by independent RSM validation."},
+    {"layer": 28, "beta": 1.0, "former_label": "validity-layer", "status": "deferred", "reason": "The label is exploratory and not independently validated."}
+  ],
+  "claim_boundary": {
+    "allowed_if_task_differs_from_matched_random": "Generation behavior is causally sensitive to the independently validated task-associated steering direction.",
+    "not_allowed": ["task representation was converted", "reasoning improved", "the model became causal/logical", "safe steering validated"],
+    "target_conversion_requirement": "A separate target-sensitive behavioral metric is required."
+  },
+  "stop_rule": "Proceed only if the hook remains technically valid, TASK_REAL differs meaningfully from MATCHED_RANDOM, and any effect is not dominated by malformed outputs or generic degradation. If TASK_REAL behaves like MATCHED_RANDOM, record the negative result and pause. Do not automatically add layers or betas."
+}
