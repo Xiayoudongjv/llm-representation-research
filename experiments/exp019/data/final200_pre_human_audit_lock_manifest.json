@@ -1,0 +1,26 @@
+{
+  "dataset_size": 200,
+  "class_counts": {
+    "logic": 50,
+    "causality": 50,
+    "definition": 50,
+    "analogy": 50
+  },
+  "length_min": 4,
+  "length_max": 20,
+  "length_violations": 0,
+  "number_surface_compressed": 11,
+  "number_replaced": 0,
+  "human_audit_completed": false,
+  "evaluator_trained": false,
+  "EXP017_outputs_accessed": false,
+  "random_seed": 20260812,
+  "source_candidate_file": "final200_candidate_pool_pre_human_audit.csv",
+  "provenance_counts": {
+    "not_recorded": 72,
+    "rule_composed": 43,
+    "independent_external": 43,
+    "ai_assisted_surface_normalized": 42
+  },
+  "external_source_count": 20
+}

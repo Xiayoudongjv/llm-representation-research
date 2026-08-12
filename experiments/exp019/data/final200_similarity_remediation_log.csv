@@ -1,0 +1,6 @@
+removed_candidate_id,retained_counterpart_id,task_class,removed_response_text,human_reason,remediation_status
+GAP-DEF-025,SRC-DEF-002,definition,Evaporation is the change of liquid water into vapor.,Near-duplicate definition of evaporation; only wording differs.,REPLACE
+GAP-CAU-014,SRC-CAU-006,causality,Photosynthesis stores solar energy in carbohydrates.,Near-duplicate photosynthesis energy-storage statement; only wording differs.,REPLACE
+GAP-CAU-023,SRC-CAU-009,causality,Closing plant stomata reduces water loss.,Near-duplicate stomata and water-loss statement; only wording differs.,REPLACE
+GAP-DEF-012,SRC-DEF-009,definition,A force is an interaction that can change motion.,Near-duplicate definition of force; only wording differs.,REPLACE
+GAP-LOG-033,GAP-CAU-017,logic,"If an unbalanced force acts, an object's velocity can change.","Semantic content is nearly identical and the cross-class task-function contrast is too weak; this was a human redundancy decision, not a classifier-driven decision.",REPLACE

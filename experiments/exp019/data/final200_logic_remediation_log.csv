@@ -1,0 +1,4 @@
+removed_candidate_id,task_class,response_text,human_audit_source,human_reason,remediation_status
+GAP-LOG-036,logic,Gravity and pressure can drive groundwater downward or sideways.,Random-40 audit,HUMAN_LABEL_FUNCTION_MISMATCH,REPLACE
+GAP-LOG-005,logic,A square has four equal sides.,Random-40 audit,HUMAN_LABEL_FUNCTION_MISMATCH,REPLACE
+GAP-LOG-003,logic,A red traffic light signals that cars should stop.,Logic-only spot-check,HUMAN_LABEL_FUNCTION_MISMATCH,REPLACE

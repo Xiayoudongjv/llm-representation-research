@@ -1,0 +1,56 @@
+{
+  "total_cards": 100,
+  "cards_per_class": {
+    "logic": 25,
+    "causality": 25,
+    "analogy": 25,
+    "definition": 25
+  },
+  "cards_per_topic_group": {
+    "logic:category_inference": 5,
+    "logic:conditional_inference": 5,
+    "logic:exclusion_or_contradiction": 5,
+    "logic:comparison_or_transitivity": 5,
+    "logic:simple_rule_application": 5,
+    "causality:physics": 5,
+    "causality:biology": 5,
+    "causality:earth_environment": 5,
+    "causality:everyday_processes": 5,
+    "causality:technology_mechanisms": 5,
+    "analogy:tool_function": 5,
+    "analogy:part_whole": 5,
+    "analogy:support_structure": 5,
+    "analogy:location_or_container": 5,
+    "analogy:functional_correspondence": 5,
+    "definition:science_concepts": 5,
+    "definition:mathematics_concepts": 5,
+    "definition:everyday_objects": 5,
+    "definition:technology_concepts": 5,
+    "definition:general_education_concepts": 5
+  },
+  "source_resource_counts": {
+    "https://openstax.org/books/concepts-biology/pages/5-1-overview-of-photosynthesis": 11,
+    "https://www.usgs.gov/water-science-school/science/aquifers-and-groundwater": 15,
+    "https://naturalhistory.si.edu/education/teaching-resources/life-science/explore-animal-adaptations": 15,
+    "https://gpm.nasa.gov/education/articles/nasa-earth-science-water-cycle": 10,
+    "https://openstax.org/books/college-physics/pages/8-3-conservation-of-momentum": 12,
+    "https://www.jpl.nasa.gov/edu/resources/project/make-a-cloud-in-a-bottle/": 8,
+    "https://www.nesdis.noaa.gov/about/k-12-education/oceans-coasts/what-causes-tides": 8,
+    "https://www.usgs.gov/water-science-school/science/infiltration-and-water-cycle": 4,
+    "https://openstax.org/books/physics/pages/4-1-force": 8,
+    "https://www.khanacademy.org/science/ap-biology/cell-structure-and-function/photosynthesis-ap/a/photosynthesis-overview": 3,
+    "https://prod-01-alb-www-noaa.woc.noaa.gov/jetstream/ocean/tides": 3,
+    "https://nigms.nih.gov/biobeat/2023/12/what-is-the-immune-system": 3
+  },
+  "source_domain_counts": {
+    "NASA": 18,
+    "OpenStax": 31,
+    "NOAA": 11,
+    "USGS": 19,
+    "Smithsonian": 15,
+    "Khan": 3,
+    "NIH": 3
+  },
+  "human_response_filled": 0,
+  "pending_count": 100
+}

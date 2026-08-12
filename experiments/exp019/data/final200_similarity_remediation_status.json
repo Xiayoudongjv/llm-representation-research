@@ -1,0 +1,15 @@
+{
+  "status": "FINAL200_FROZEN",
+  "stop_rule": "All five replacements Y plus no exact/normalized duplicates -> READY_TO_FREEZE_PENDING_FINAL_VALIDATION; any N/? -> replace only that item.",
+  "replacement_review_completed": true,
+  "evaluator_unchanged": true,
+  "final200_predictions_accessed": false,
+  "exp017_outputs_accessed": false,
+  "replacement5_decisions": {
+    "REMED2-DEF-001": "Y",
+    "REMED2-DEF-002": "Y",
+    "REMED2-CAU-001": "Y",
+    "REMED2-CAU-002": "Y",
+    "REMED2-LOG-001": "Y"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "dataset_size": 200,
+  "class_counts": {
+    "logic": 50,
+    "causality": 50,
+    "definition": 50,
+    "analogy": 50
+  },
+  "length_min": 4,
+  "length_max": 20,
+  "exact_duplicates": 0,
+  "normalized_duplicates": 0,
+  "repeated_three_word_prefix_group_count": 8,
+  "high_similarity_pair_count": 8,
+  "maximum_nearest_neighbor_similarity": 0.7687,
+  "similarity_review_status": "SIMILARITY_REVIEW_PENDING",
+  "evaluator_predictions_accessed": false,
+  "exp017_outputs_accessed": false
+}

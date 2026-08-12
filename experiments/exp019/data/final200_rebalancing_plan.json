@@ -1,0 +1,797 @@
+{
+  "source_of_truth": {
+    "response_text": "C:\\Users\\Xiayo\\Desktop\\新建 Microsoft Word 文档 (2).docx",
+    "aligned_metadata": "D:\\Research\\llm-representation-research\\experiments\\exp019\\data\\source_cards_100_simple.csv",
+    "mapping_rule": "The 100 nonempty Word paragraphs map in order to the 100 source-card rows; no files were merged."
+  },
+  "target_total": 200,
+  "target_per_class": 50,
+  "current_retained_total": 28,
+  "remaining_total": 172,
+  "audit_status_counts": {
+    "ACCEPT_AS_IS": 19,
+    "ACCEPT_SURFACE_NORMALIZED": 9,
+    "HUMAN_REVIEW": 20,
+    "REJECT": 52
+  },
+  "classes": {
+    "logic": {
+      "current_candidates": 25,
+      "accepted_as_is": 6,
+      "accepted_surface_normalized": 2,
+      "human_review": 15,
+      "rejected": 2,
+      "retained_total": 8,
+      "remaining_to_50": 42,
+      "candidate_topic_distribution": {
+        "biology": 5,
+        "earth_science": 13,
+        "general_science": 1,
+        "physics": 6
+      },
+      "topic_distribution": {
+        "biology": 2,
+        "earth_science": 3,
+        "physics": 3
+      },
+      "length_distribution": {
+        "limited_long": 1,
+        "medium": 6,
+        "short": 1
+      },
+      "provenance_distribution": {
+        "not_recorded": 8
+      },
+      "source_distribution": {
+        "https://naturalhistory.si.edu/education/teaching-resources/life-science/explore-animal-adaptations": 1,
+        "https://openstax.org/books/college-physics/pages/8-3-conservation-of-momentum": 3,
+        "https://prod-01-alb-www-noaa.woc.noaa.gov/jetstream/ocean/tides": 1,
+        "https://www.khanacademy.org/science/ap-biology/cell-structure-and-function/photosynthesis-ap/a/photosynthesis-overview": 1,
+        "https://www.nesdis.noaa.gov/about/k-12-education/oceans-coasts/what-causes-tides": 1,
+        "https://www.usgs.gov/water-science-school/science/aquifers-and-groundwater": 1
+      },
+      "source_concentration": 0.375,
+      "lexical_risks": {
+        "top_unigrams": [
+          [
+            "water",
+            8
+          ],
+          [
+            "not",
+            6
+          ],
+          [
+            "groundwater",
+            3
+          ],
+          [
+            "adaptability",
+            3
+          ],
+          [
+            "into",
+            3
+          ],
+          [
+            "tides",
+            3
+          ],
+          [
+            "energy",
+            3
+          ],
+          [
+            "mass",
+            2
+          ],
+          [
+            "speed",
+            2
+          ],
+          [
+            "momentum",
+            2
+          ]
+        ],
+        "top_bigrams": [
+          [
+            "water vapor",
+            2
+          ],
+          [
+            "energy not",
+            2
+          ],
+          [
+            "algae photosynthetic",
+            1
+          ],
+          [
+            "photosynthetic organisms",
+            1
+          ],
+          [
+            "groundwater water",
+            1
+          ],
+          [
+            "water saturated",
+            1
+          ],
+          [
+            "saturated aquifers",
+            1
+          ],
+          [
+            "camouflage behavior",
+            1
+          ],
+          [
+            "behavior does",
+            1
+          ],
+          [
+            "does not",
+            1
+          ]
+        ],
+        "highly_class_concentrated_words": [
+          "not",
+          "without"
+        ],
+        "repeated_three_word_prefixes": [],
+        "repeated_syntactic_frame_proxies": [
+          {
+            "frame": "algae photosynthetic organisms",
+            "count": 1
+          },
+          {
+            "frame": "groundwater water saturated",
+            "count": 1
+          },
+          {
+            "frame": "camouflage behavior does",
+            "count": 1
+          },
+          {
+            "frame": "mass speed also",
+            "count": 1
+          },
+          {
+            "frame": "isolated systems conserve",
+            "count": 1
+          }
+        ],
+        "high_character_ngram_similarity_pairs": [
+          {
+            "left": "SRC-LOG-002",
+            "right": "SRC-LOG-009",
+            "character_ngram_cosine": 0.3689
+          }
+        ]
+      },
+      "priority_gaps": [
+        "Add everyday-life, language, and quantitative rule-application responses; retained material is concentrated in physics, earth science, and biology.",
+        "Prefer explicit conditional, exclusion, comparison, or deduction functions over bare factual statements.",
+        "Use more medium-length responses and avoid repeated short 'X is not Y' skeletons.",
+        "Record provenance and broaden sources beyond the current small source-card set."
+      ],
+      "recommended_future_quota": {
+        "count": 42,
+        "principle": "Fill only with candidates that meet task clarity, naturalness, semantic validity, and documented diversity requirements; do not optimize for evaluator performance.",
+        "recommendations": [
+          "Add everyday-life, language, and quantitative rule-application responses; retained material is concentrated in physics, earth science, and biology.",
+          "Prefer explicit conditional, exclusion, comparison, or deduction functions over bare factual statements.",
+          "Use more medium-length responses and avoid repeated short 'X is not Y' skeletons.",
+          "Record provenance and broaden sources beyond the current small source-card set."
+        ]
+      }
+    },
+    "causality": {
+      "current_candidates": 25,
+      "accepted_as_is": 13,
+      "accepted_surface_normalized": 7,
+      "human_review": 5,
+      "rejected": 0,
+      "retained_total": 20,
+      "remaining_to_50": 30,
+      "candidate_topic_distribution": {
+        "biology": 6,
+        "earth_science": 8,
+        "general_science": 1,
+        "physics": 8,
+        "technology": 2
+      },
+      "topic_distribution": {
+        "biology": 5,
+        "earth_science": 7,
+        "general_science": 1,
+        "physics": 5,
+        "technology": 2
+      },
+      "length_distribution": {
+        "limited_long": 3,
+        "medium": 16,
+        "short": 1
+      },
+      "provenance_distribution": {
+        "not_recorded": 20
+      },
+      "source_distribution": {
+        "https://gpm.nasa.gov/education/articles/nasa-earth-science-water-cycle": 2,
+        "https://naturalhistory.si.edu/education/teaching-resources/life-science/explore-animal-adaptations": 2,
+        "https://openstax.org/books/college-physics/pages/8-3-conservation-of-momentum": 2,
+        "https://openstax.org/books/concepts-biology/pages/5-1-overview-of-photosynthesis": 3,
+        "https://openstax.org/books/physics/pages/4-1-force": 1,
+        "https://prod-01-alb-www-noaa.woc.noaa.gov/jetstream/ocean/tides": 1,
+        "https://www.jpl.nasa.gov/edu/resources/project/make-a-cloud-in-a-bottle/": 3,
+        "https://www.khanacademy.org/science/ap-biology/cell-structure-and-function/photosynthesis-ap/a/photosynthesis-overview": 1,
+        "https://www.nesdis.noaa.gov/about/k-12-education/oceans-coasts/what-causes-tides": 1,
+        "https://www.usgs.gov/water-science-school/science/aquifers-and-groundwater": 3,
+        "https://www.usgs.gov/water-science-school/science/infiltration-and-water-cycle": 1
+      },
+      "source_concentration": 0.15,
+      "lexical_risks": {
+        "top_unigrams": [
+          [
+            "water",
+            9
+          ],
+          [
+            "causes",
+            4
+          ],
+          [
+            "changes",
+            4
+          ],
+          [
+            "momentum",
+            4
+          ],
+          [
+            "force",
+            3
+          ],
+          [
+            "change",
+            3
+          ],
+          [
+            "photosynthesis",
+            3
+          ],
+          [
+            "vapor",
+            3
+          ],
+          [
+            "infiltration",
+            3
+          ],
+          [
+            "groundwater",
+            3
+          ]
+        ],
+        "top_bigrams": [
+          [
+            "water vapor",
+            3
+          ],
+          [
+            "surface water",
+            2
+          ],
+          [
+            "net force",
+            1
+          ],
+          [
+            "force causes",
+            1
+          ],
+          [
+            "causes changes",
+            1
+          ],
+          [
+            "changes motion",
+            1
+          ],
+          [
+            "motion object",
+            1
+          ],
+          [
+            "longer duration",
+            1
+          ],
+          [
+            "duration force",
+            1
+          ],
+          [
+            "force action",
+            1
+          ]
+        ],
+        "highly_class_concentrated_words": [
+          "infiltration",
+          "forces",
+          "cause",
+          "enabling"
+        ],
+        "repeated_three_word_prefixes": [],
+        "repeated_syntactic_frame_proxies": [
+          {
+            "frame": "net force causes",
+            "count": 1
+          },
+          {
+            "frame": "longer duration force",
+            "count": 1
+          },
+          {
+            "frame": "elastic collisions transfer",
+            "count": 1
+          },
+          {
+            "frame": "external forces cause",
+            "count": 1
+          },
+          {
+            "frame": "changes velocity change",
+            "count": 1
+          }
+        ],
+        "high_character_ngram_similarity_pairs": [
+          {
+            "left": "SRC-CAU-014",
+            "right": "SRC-CAU-015",
+            "character_ngram_cosine": 0.4711
+          },
+          {
+            "left": "SRC-CAU-015",
+            "right": "SRC-CAU-017",
+            "character_ngram_cosine": 0.4336
+          },
+          {
+            "left": "SRC-CAU-001",
+            "right": "SRC-CAU-013",
+            "character_ngram_cosine": 0.3991
+          },
+          {
+            "left": "SRC-CAU-011",
+            "right": "SRC-CAU-019",
+            "character_ngram_cosine": 0.3959
+          },
+          {
+            "left": "SRC-CAU-014",
+            "right": "SRC-CAU-017",
+            "character_ngram_cosine": 0.3799
+          },
+          {
+            "left": "SRC-CAU-012",
+            "right": "SRC-CAU-016",
+            "character_ngram_cosine": 0.356
+          }
+        ]
+      },
+      "priority_gaps": [
+        "Retain the broad physics/biology/earth/technology coverage, but add non-science everyday and social/general mechanisms with documented sources.",
+        "Reduce repeated water-vapor, groundwater, and tidal phrasing; use different causal structures and outcome statements.",
+        "Add medium-length mechanisms while retaining some concise causal answers.",
+        "Record provenance for every new example and avoid a single source dominating a class."
+      ],
+      "recommended_future_quota": {
+        "count": 30,
+        "principle": "Fill only with candidates that meet task clarity, naturalness, semantic validity, and documented diversity requirements; do not optimize for evaluator performance.",
+        "recommendations": [
+          "Retain the broad physics/biology/earth/technology coverage, but add non-science everyday and social/general mechanisms with documented sources.",
+          "Reduce repeated water-vapor, groundwater, and tidal phrasing; use different causal structures and outcome statements.",
+          "Add medium-length mechanisms while retaining some concise causal answers.",
+          "Record provenance for every new example and avoid a single source dominating a class."
+        ]
+      }
+    },
+    "analogy": {
+      "current_candidates": 25,
+      "accepted_as_is": 0,
+      "accepted_surface_normalized": 0,
+      "human_review": 0,
+      "rejected": 25,
+      "retained_total": 0,
+      "remaining_to_50": 50,
+      "candidate_topic_distribution": {
+        "biology": 7,
+        "earth_science": 6,
+        "general_science": 1,
+        "physics": 5,
+        "technology": 6
+      },
+      "topic_distribution": {},
+      "length_distribution": {},
+      "provenance_distribution": {},
+      "source_distribution": {},
+      "source_concentration": null,
+      "lexical_risks": {
+        "top_unigrams": [
+          [
+            "water",
+            15
+          ],
+          [
+            "physical",
+            6
+          ],
+          [
+            "groundwater",
+            4
+          ],
+          [
+            "system",
+            3
+          ],
+          [
+            "change",
+            3
+          ],
+          [
+            "light",
+            3
+          ],
+          [
+            "quantity",
+            3
+          ],
+          [
+            "structure",
+            3
+          ],
+          [
+            "animal",
+            3
+          ],
+          [
+            "helps",
+            3
+          ]
+        ],
+        "top_bigrams": [
+          [
+            "physical quantity",
+            3
+          ],
+          [
+            "water cycle",
+            2
+          ],
+          [
+            "quantity describes",
+            2
+          ],
+          [
+            "water pass",
+            2
+          ],
+          [
+            "pass through",
+            2
+          ],
+          [
+            "cycle process",
+            1
+          ],
+          [
+            "process continuous",
+            1
+          ],
+          [
+            "continuous movement",
+            1
+          ],
+          [
+            "movement water",
+            1
+          ],
+          [
+            "water between",
+            1
+          ]
+        ],
+        "highly_class_concentrated_words": [
+          "quantity",
+          "structure",
+          "helps",
+          "process",
+          "describes",
+          "retains",
+          "sensor",
+          "instrument",
+          "detects",
+          "mechanism"
+        ],
+        "repeated_three_word_prefixes": [],
+        "repeated_syntactic_frame_proxies": [
+          {
+            "frame": "water cycle process",
+            "count": 1
+          },
+          {
+            "frame": "evaporation phase change",
+            "count": 1
+          },
+          {
+            "frame": "photosynthesis biological energy",
+            "count": 1
+          },
+          {
+            "frame": "tidal force gravitational",
+            "count": 1
+          },
+          {
+            "frame": "groundwater underground water",
+            "count": 1
+          }
+        ],
+        "high_character_ngram_similarity_pairs": [
+          {
+            "left": "SRC-ANA-007",
+            "right": "SRC-ANA-010",
+            "character_ngram_cosine": 0.5235
+          },
+          {
+            "left": "SRC-ANA-006",
+            "right": "SRC-ANA-010",
+            "character_ngram_cosine": 0.4758
+          },
+          {
+            "left": "SRC-ANA-006",
+            "right": "SRC-ANA-007",
+            "character_ngram_cosine": 0.4397
+          },
+          {
+            "left": "SRC-ANA-001",
+            "right": "SRC-ANA-024",
+            "character_ngram_cosine": 0.4364
+          },
+          {
+            "left": "SRC-ANA-008",
+            "right": "SRC-ANA-010",
+            "character_ngram_cosine": 0.4217
+          },
+          {
+            "left": "SRC-ANA-009",
+            "right": "SRC-ANA-010",
+            "character_ngram_cosine": 0.4147
+          },
+          {
+            "left": "SRC-ANA-017",
+            "right": "SRC-ANA-024",
+            "character_ngram_cosine": 0.4126
+          },
+          {
+            "left": "SRC-ANA-008",
+            "right": "SRC-ANA-009",
+            "character_ngram_cosine": 0.3908
+          },
+          {
+            "left": "SRC-ANA-011",
+            "right": "SRC-ANA-017",
+            "character_ngram_cosine": 0.3906
+          },
+          {
+            "left": "SRC-ANA-014",
+            "right": "SRC-ANA-020",
+            "character_ngram_cosine": 0.3807
+          }
+        ]
+      },
+      "priority_gaps": [
+        "Collect 50 new, self-contained two-relation correspondences; no current item can be retained under the frozen analogy label.",
+        "Cover everyday tools, language, technology, mathematics, biology, and earth science rather than single-concept descriptions.",
+        "Use varied correspondence phrasing and documented, diverse sources/provenance."
+      ],
+      "recommended_future_quota": {
+        "count": 50,
+        "principle": "Fill only with candidates that meet task clarity, naturalness, semantic validity, and documented diversity requirements; do not optimize for evaluator performance.",
+        "recommendations": [
+          "Collect 50 new, self-contained two-relation correspondences; no current item can be retained under the frozen analogy label.",
+          "Cover everyday tools, language, technology, mathematics, biology, and earth science rather than single-concept descriptions.",
+          "Use varied correspondence phrasing and documented, diverse sources/provenance."
+        ]
+      }
+    },
+    "definition": {
+      "current_candidates": 25,
+      "accepted_as_is": 0,
+      "accepted_surface_normalized": 0,
+      "human_review": 0,
+      "rejected": 25,
+      "retained_total": 0,
+      "remaining_to_50": 50,
+      "candidate_topic_distribution": {
+        "biology": 9,
+        "earth_science": 8,
+        "general_science": 1,
+        "physics": 3,
+        "technology": 4
+      },
+      "topic_distribution": {},
+      "length_distribution": {},
+      "provenance_distribution": {},
+      "source_distribution": {},
+      "source_concentration": null,
+      "lexical_risks": {
+        "top_unigrams": [
+          [
+            "water",
+            17
+          ],
+          [
+            "system",
+            6
+          ],
+          [
+            "groundwater",
+            5
+          ],
+          [
+            "tidal",
+            4
+          ],
+          [
+            "like",
+            3
+          ],
+          [
+            "limbs",
+            3
+          ],
+          [
+            "energy",
+            3
+          ],
+          [
+            "photosynthesis",
+            3
+          ],
+          [
+            "chloroplasts",
+            3
+          ],
+          [
+            "part",
+            3
+          ]
+        ],
+        "top_bigrams": [
+          [
+            "tidal bulges",
+            3
+          ],
+          [
+            "fin like",
+            2
+          ],
+          [
+            "like limbs",
+            2
+          ],
+          [
+            "part plant",
+            2
+          ],
+          [
+            "water droplets",
+            2
+          ],
+          [
+            "its own",
+            2
+          ],
+          [
+            "gravitational pull",
+            2
+          ],
+          [
+            "immune system",
+            2
+          ],
+          [
+            "surface water",
+            2
+          ],
+          [
+            "into atmosphere",
+            2
+          ]
+        ],
+        "highly_class_concentrated_words": [
+          "like",
+          "limbs",
+          "chloroplasts",
+          "part",
+          "plant",
+          "cells",
+          "bulges",
+          "responsible",
+          "contain",
+          "fin"
+        ],
+        "repeated_three_word_prefixes": [
+          {
+            "prefix": "fin like limbs",
+            "count": 2
+          }
+        ],
+        "repeated_syntactic_frame_proxies": [
+          {
+            "frame": "fin like limbs",
+            "count": 2
+          },
+          {
+            "frame": "well pump lift",
+            "count": 1
+          },
+          {
+            "frame": "satellite sensors observe",
+            "count": 1
+          },
+          {
+            "frame": "chlorophyll absorbs light",
+            "count": 1
+          },
+          {
+            "frame": "microscopes make tiny",
+            "count": 1
+          }
+        ],
+        "high_character_ngram_similarity_pairs": [
+          {
+            "left": "SRC-DEF-007",
+            "right": "SRC-DEF-016",
+            "character_ngram_cosine": 0.4563
+          },
+          {
+            "left": "SRC-DEF-009",
+            "right": "SRC-DEF-013",
+            "character_ngram_cosine": 0.3744
+          },
+          {
+            "left": "SRC-DEF-009",
+            "right": "SRC-DEF-018",
+            "character_ngram_cosine": 0.3696
+          },
+          {
+            "left": "SRC-DEF-012",
+            "right": "SRC-DEF-017",
+            "character_ngram_cosine": 0.3565
+          }
+        ]
+      },
+      "priority_gaps": [
+        "Collect 50 new, self-contained single-concept definitions; no current relation-comparison item can be retained under the frozen definition label.",
+        "Cover non-science and non-water concepts alongside science, with varied definitional properties and length bands.",
+        "Use documented, diverse sources/provenance and avoid repeated 'both' comparison frames."
+      ],
+      "recommended_future_quota": {
+        "count": 50,
+        "principle": "Fill only with candidates that meet task clarity, naturalness, semantic validity, and documented diversity requirements; do not optimize for evaluator performance.",
+        "recommendations": [
+          "Collect 50 new, self-contained single-concept definitions; no current relation-comparison item can be retained under the frozen definition label.",
+          "Cover non-science and non-water concepts alongside science, with varied definitional properties and length bands.",
+          "Use documented, diverse sources/provenance and avoid repeated 'both' comparison frames."
+        ]
+      }
+    }
+  },
+  "overall_notes": [
+    "This is a candidate retained pool, not a frozen final dataset.",
+    "Topic labels are descriptive and never change task_class.",
+    "Provenance was not recorded in the source cards and is therefore reported as not_recorded rather than inferred.",
+    "Rebalancing occurred before evaluator training and without accessing EXP-017 steering outputs."
+  ]
+}

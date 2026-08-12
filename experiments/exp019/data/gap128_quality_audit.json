@@ -1,0 +1,159 @@
+{
+  "raw_count": 128,
+  "class_counts": {
+    "logic": 42,
+    "causality": 30,
+    "analogy": 26,
+    "definition": 30
+  },
+  "provenance_counts": {
+    "rule_composed": 43,
+    "independent_external": 43,
+    "ai_assisted_surface_normalized": 42
+  },
+  "source_counts": {
+    "rule_composed://deterministic-construction": 63,
+    "https://openstax.org/books/concepts-biology/pages/5-1-overview-of-photosynthesis": 8,
+    "https://openstax.org/books/biology-2e/pages/46-2-energy-flow-through-ecosystems": 6,
+    "https://www.nasa.gov/learning-resources/for-kids-and-students/what-is-earth-grades-k-4/": 9,
+    "https://www.khanacademy.org/math/probability/introduction-to-probability": 3,
+    "https://www.khanacademy.org/science/physics/forces-newtons-laws/introduction-to-newtons-laws/a/newtons-laws-of-motion": 7,
+    "https://www.usgs.gov/water-science-school/science/groundwater-flow-and-water-cycle": 6,
+    "https://oceanservice.noaa.gov/education/literacy.html": 4,
+    "https://nigms.nih.gov/biobeat/2023/12/what-is-the-immune-system": 5,
+    "https://www.ncbi.nlm.nih.gov/books/NBK27092/": 5,
+    "https://naturalhistory.si.edu/education/teaching-resources/life-science/explore-animal-adaptations": 3,
+    "https://www.usgs.gov/educational-resources/water-world": 9
+  },
+  "topic_counts": {
+    "logic": {
+      "everyday_life": 8,
+      "mathematics": 11,
+      "spatial_reasoning": 6,
+      "technology": 1,
+      "language": 1,
+      "biology": 6,
+      "earth_science": 7,
+      "physics": 2
+    },
+    "causality": {
+      "physics": 5,
+      "everyday_life": 6,
+      "technology": 6,
+      "earth_science": 6,
+      "biology": 6,
+      "spatial_reasoning": 1
+    },
+    "analogy": {
+      "technology": 9,
+      "everyday_life": 1,
+      "language": 2,
+      "biology": 8,
+      "earth_science": 4,
+      "physics": 2
+    },
+    "definition": {
+      "everyday_life": 2,
+      "technology": 3,
+      "mathematics": 4,
+      "biology": 8,
+      "physics": 3,
+      "geography": 1,
+      "earth_science": 9
+    }
+  },
+  "normalization_counts": {
+    "PASS": 128
+  },
+  "acceptance_counts": {
+    "ACCEPT_CANDIDATE": 128
+  },
+  "length_counts": {
+    "logic": {
+      "limited_long": 10,
+      "medium": 32
+    },
+    "causality": {
+      "medium": 27,
+      "short": 3
+    },
+    "analogy": {
+      "limited_long": 5,
+      "medium": 21
+    },
+    "definition": {
+      "limited_long": 4,
+      "medium": 26
+    }
+  },
+  "exact_duplicate_texts": {},
+  "repeated_three_word_prefixes": {
+    "friction slows a": 2,
+    "earth's tilt changes": 2,
+    "a thermostat regulates": 2,
+    "a food web": 2
+  },
+  "tfidf_char_similarity_pairs_at_least_0_55": [
+    {
+      "left": "GAP-LOG-027",
+      "right": "GAP-CAU-014",
+      "tfidf_char_cosine": 0.5849
+    },
+    {
+      "left": "GAP-LOG-033",
+      "right": "GAP-CAU-017",
+      "tfidf_char_cosine": 0.7547
+    },
+    {
+      "left": "GAP-CAU-012",
+      "right": "GAP-ANA-015",
+      "tfidf_char_cosine": 0.6264
+    },
+    {
+      "left": "GAP-ANA-005",
+      "right": "GAP-ANA-024",
+      "tfidf_char_cosine": 0.6536
+    },
+    {
+      "left": "GAP-DEF-025",
+      "right": "GAP-DEF-026",
+      "tfidf_char_cosine": 0.5644
+    }
+  ],
+  "lexical_marker_counts": {
+    "logic": {
+      "therefore": 0,
+      "so": 0,
+      "implies": 0,
+      "entails": 0,
+      "must": 0
+    },
+    "causality": {
+      "because": 0,
+      "causes": 0,
+      "leads": 0,
+      "results": 0,
+      "due": 0
+    },
+    "analogy": {
+      "like": 0,
+      "as": 0,
+      "similar": 0,
+      "corresponds": 0,
+      "relation": 0
+    },
+    "definition": {
+      "is": 27,
+      "means": 0,
+      "refers": 0,
+      "defined": 0,
+      "describes": 0
+    }
+  },
+  "normalizer_input_fields": [
+    "candidate_id",
+    "raw_response"
+  ],
+  "classifier_used": false,
+  "model_run": false
+}

@@ -1,0 +1,10 @@
+{
+  "class_order": [
+    "logic",
+    "causality",
+    "analogy",
+    "definition"
+  ],
+  "sklearn_version": "1.9.0",
+  "artifact": "evaluator_tfidf_logreg.joblib"
+}

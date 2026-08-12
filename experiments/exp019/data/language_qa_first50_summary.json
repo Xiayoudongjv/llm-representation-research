@@ -1,0 +1,12 @@
+{
+  "total_rows": 50,
+  "pass_count": 19,
+  "minor_grammar_fix_count": 7,
+  "minor_naturalness_fix_count": 8,
+  "human_rewrite_required_count": 16,
+  "human_approved_count": 0,
+  "segmentation_issue_count": 0,
+  "semantic_guard_failures": 0,
+  "source_document": "新建 Microsoft Word 文档 (2).docx",
+  "extraction_note": "50 nonempty Word paragraphs; no visual-line-wrap split or clearly concatenated independent sentence found."
+}

@@ -1,0 +1,42 @@
+{
+  "total": 40,
+  "Y": 38,
+  "N": 2,
+  "uncertain": 0,
+  "overall_pass_rate": 0.95,
+  "by_class": {
+    "logic": {
+      "audited": 7,
+      "Y": 5,
+      "N": 2,
+      "uncertain": 0
+    },
+    "causality": {
+      "audited": 11,
+      "Y": 11,
+      "N": 0,
+      "uncertain": 0
+    },
+    "analogy": {
+      "audited": 10,
+      "Y": 10,
+      "N": 0,
+      "uncertain": 0
+    },
+    "definition": {
+      "audited": 12,
+      "Y": 12,
+      "N": 0,
+      "uncertain": 0
+    }
+  },
+  "freeze_status": "MINOR_REMEDIATION_REQUIRED",
+  "freeze_reason": "Two isolated human-identified label-function mismatches were found, both within the logic class.",
+  "logic_failures": [
+    "GAP-LOG-005",
+    "GAP-LOG-036"
+  ],
+  "evaluator_predictions_accessed": false,
+  "exp017_outputs_accessed": false,
+  "timestamp_utc": "2026-08-12T16:32:34.177182+00:00"
+}

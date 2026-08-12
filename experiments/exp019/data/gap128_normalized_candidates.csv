@@ -1,0 +1,129 @@
+candidate_id,raw_response,normalized_response,normalization_status,semantic_guard,normalization_notes
+GAP-LOG-001,"If the key is inside the drawer, opening the drawer can reveal it.","If the key is inside the drawer, opening the drawer can reveal it.",PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-002,A sealed envelope hides its contents until someone opens it.,A sealed envelope hides its contents until someone opens it.,PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-003,A red traffic light signals that cars should stop.,A red traffic light signals that cars should stop.,PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-004,Dividing an even number by two leaves no remainder.,Dividing an even number by two leaves no remainder.,PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-005,A square has four equal sides.,A square has four equal sides.,PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-006,A cat is not a reptile.,A cat is not a reptile.,PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-007,A book on the left is not on the right of the cup.,A book on the left is not on the right of the cup.,PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-008,Schedules with no shared time do not overlap.,Schedules with no shared time do not overlap.,PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-009,Three coins plus two coins make five coins.,Three coins plus two coins make five coins.,PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-010,A password shorter than the required length fails the check.,A password shorter than the required length fails the check.,PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-011,"If the train arrives after the bus, the train is later.","If the train arrives after the bus, the train is later.",PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-012,An item outside a box is not inside that box.,An item outside a box is not inside that box.,PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-013,"If every class member has an ID, Maya has an ID as a class member.","If every class member has an ID, Maya has an ID as a class member.",PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-014,Dividing a whole into equal parts makes each part smaller than the whole.,Dividing a whole into equal parts makes each part smaller than the whole.,PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-015,Sets with exactly the same elements have the same size.,Sets with exactly the same elements have the same size.,PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-016,A route with no connecting road cannot reach its destination by that route.,A route with no connecting road cannot reach its destination by that route.,PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-017,A book north of a lamp is not south of the lamp in the same layout.,A book north of a lamp is not south of the lamp in the same layout.,PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-018,A number divisible by ten ends in zero.,A number divisible by ten ends in zero.,PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-019,A square is a rectangle with equal sides.,A square is a rectangle with equal sides.,PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-020,An object inside a smaller box is also inside a larger box around it.,An object inside a smaller box is also inside a larger box around it.,PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-021,A ticket dated tomorrow is later than a ticket dated today.,A ticket dated tomorrow is later than a ticket dated today.,PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-022,"If every seat is occupied, no seat is available.","If every seat is occupied, no seat is available.",PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-023,A triangle with three sides is a polygon.,A triangle with three sides is a polygon.,PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-024,"If two routes share no connecting segment, one cannot continue along the other.","If two routes share no connecting segment, one cannot continue along the other.",PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-025,A larger whole divided into equal pieces gives smaller pieces.,A larger whole divided into equal pieces gives smaller pieces.,PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-026,"If an organism has chloroplasts, it can use light energy in photosynthesis.","If an organism has chloroplasts, it can use light energy in photosynthesis.",PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-027,"If photosynthesis stores energy in carbohydrates, those molecules contain captured energy.","If photosynthesis stores energy in carbohydrates, those molecules contain captured energy.",PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-028,"If consumers eat producers, energy moves from producers to consumers.","If consumers eat producers, energy moves from producers to consumers.",PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-029,A hemisphere tilted toward the Sun receives more direct sunlight.,A hemisphere tilted toward the Sun receives more direct sunlight.,PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-030,"If the Northern Hemisphere tilts toward the Sun, it experiences summer.","If the Northern Hemisphere tilts toward the Sun, it experiences summer.",PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-031,A fair six-sided die gives each face equal probability.,A fair six-sided die gives each face equal probability.,PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-032,Two equally likely coin outcomes give heads a probability of one half.,Two equally likely coin outcomes give heads a probability of one half.,PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-033,"If an unbalanced force acts, an object's velocity can change.","If an unbalanced force acts, an object's velocity can change.",PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-034,"Without an unbalanced force, constant velocity continues.","Without an unbalanced force, constant velocity continues.",PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-035,"If groundwater moves through rock spaces, connected spaces can permit flow.","If groundwater moves through rock spaces, connected spaces can permit flow.",PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-036,Gravity and pressure can drive groundwater downward or sideways.,Gravity and pressure can drive groundwater downward or sideways.,PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-037,Ocean conditions can influence weather patterns.,Ocean conditions can influence weather patterns.,PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-038,"If Earth's land, air, water, and life interact, change in one part can affect another.","If Earth's land, air, water, and life interact, change in one part can affect another.",PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-039,"If immune defenses work together, protection involves more than one body component.","If immune defenses work together, protection involves more than one body component.",PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-040,"If macrophages are phagocytes, they can engulf particles.","If macrophages are phagocytes, they can engulf particles.",PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-041,"If a feature improves an animal's survival, it may function as an adaptation.","If a feature improves an animal's survival, it may function as an adaptation.",PASS,UNCHANGED,No surface normalization required.
+GAP-LOG-042,"If water moves through reservoirs and pathways, groundwater participates in a cycle.","If water moves through reservoirs and pathways, groundwater participates in a cycle.",PASS,UNCHANGED,No surface normalization required.
+GAP-CAU-001,Friction slows a rolling ball on the floor.,Friction slows a rolling ball on the floor.,PASS,UNCHANGED,No surface normalization required.
+GAP-CAU-002,Adding ice cools a drink.,Adding ice cools a drink.,PASS,UNCHANGED,No surface normalization required.
+GAP-CAU-003,Opening a window can lower room temperature.,Opening a window can lower room temperature.,PASS,UNCHANGED,No surface normalization required.
+GAP-CAU-004,Pressing a bicycle brake reduces its speed.,Pressing a bicycle brake reduces its speed.,PASS,UNCHANGED,No surface normalization required.
+GAP-CAU-005,Covering a hot pot reduces heat loss.,Covering a hot pot reduces heat loss.,PASS,UNCHANGED,No surface normalization required.
+GAP-CAU-006,Moving air speeds evaporation from wet clothes.,Moving air speeds evaporation from wet clothes.,PASS,UNCHANGED,No surface normalization required.
+GAP-CAU-007,Sharpening a pencil produces a narrower point.,Sharpening a pencil produces a narrower point.,PASS,UNCHANGED,No surface normalization required.
+GAP-CAU-008,Stretching a rubber band stores elastic energy.,Stretching a rubber band stores elastic energy.,PASS,UNCHANGED,No surface normalization required.
+GAP-CAU-009,Removing the batteries stops a flashlight.,Removing the batteries stops a flashlight.,PASS,UNCHANGED,No surface normalization required.
+GAP-CAU-010,Blocking a light sensor prevents it from detecting light.,Blocking a light sensor prevents it from detecting light.,PASS,UNCHANGED,No surface normalization required.
+GAP-CAU-011,Sunlight warms a dark surface.,Sunlight warms a dark surface.,PASS,UNCHANGED,No surface normalization required.
+GAP-CAU-012,Earth's tilt changes seasonal sunlight exposure.,Earth's tilt changes seasonal sunlight exposure.,PASS,UNCHANGED,No surface normalization required.
+GAP-CAU-013,Evaporation can cool a wet surface.,Evaporation can cool a wet surface.,PASS,UNCHANGED,No surface normalization required.
+GAP-CAU-014,Photosynthesis stores solar energy in carbohydrates.,Photosynthesis stores solar energy in carbohydrates.,PASS,UNCHANGED,No surface normalization required.
+GAP-CAU-015,Cellular respiration releases usable energy from food.,Cellular respiration releases usable energy from food.,PASS,UNCHANGED,No surface normalization required.
+GAP-CAU-016,Consumers receive energy by eating food.,Consumers receive energy by eating food.,PASS,UNCHANGED,No surface normalization required.
+GAP-CAU-017,An unbalanced force changes an object's velocity.,An unbalanced force changes an object's velocity.,PASS,UNCHANGED,No surface normalization required.
+GAP-CAU-018,Groundwater movement follows gravity and pressure.,Groundwater movement follows gravity and pressure.,PASS,UNCHANGED,No surface normalization required.
+GAP-CAU-019,"Immune defenses block, detect, and remove harmful agents.","Immune defenses block, detect, and remove harmful agents.",PASS,UNCHANGED,No surface normalization required.
+GAP-CAU-020,Macrophages engulf foreign material.,Macrophages engulf foreign material.,PASS,UNCHANGED,No surface normalization required.
+GAP-CAU-021,Cooling air turns water vapor into droplets.,Cooling air turns water vapor into droplets.,PASS,UNCHANGED,No surface normalization required.
+GAP-CAU-022,Longer sunlight exposure heats a surface more.,Longer sunlight exposure heats a surface more.,PASS,UNCHANGED,No surface normalization required.
+GAP-CAU-023,Closing plant stomata reduces water loss.,Closing plant stomata reduces water loss.,PASS,UNCHANGED,No surface normalization required.
+GAP-CAU-024,A cold container produces droplets from warm vapor.,A cold container produces droplets from warm vapor.,PASS,UNCHANGED,No surface normalization required.
+GAP-CAU-025,Pumping water upward requires energy input.,Pumping water upward requires energy input.,PASS,UNCHANGED,No surface normalization required.
+GAP-CAU-026,A barrier on a route prevents a traveler from reaching the destination.,A barrier on a route prevents a traveler from reaching the destination.,PASS,UNCHANGED,No surface normalization required.
+GAP-CAU-027,A loose bicycle chain reduces power transfer.,A loose bicycle chain reduces power transfer.,PASS,UNCHANGED,No surface normalization required.
+GAP-CAU-028,A heavier load makes a cart harder to accelerate.,A heavier load makes a cart harder to accelerate.,PASS,UNCHANGED,No surface normalization required.
+GAP-CAU-029,A wider opening lets more air pass through.,A wider opening lets more air pass through.,PASS,UNCHANGED,No surface normalization required.
+GAP-CAU-030,A missing key prevents a lock from opening.,A missing key prevents a lock from opening.,PASS,UNCHANGED,No surface normalization required.
+GAP-ANA-001,"A key opens a lock, and a password opens access to an account.","A key opens a lock, and a password opens access to an account.",PASS,UNCHANGED,No surface normalization required.
+GAP-ANA-002,"A lid covers a container, and a roof covers a building.","A lid covers a container, and a roof covers a building.",PASS,UNCHANGED,No surface normalization required.
+GAP-ANA-003,"A map guides a traveler, and a diagram guides a learner.","A map guides a traveler, and a diagram guides a learner.",PASS,UNCHANGED,No surface normalization required.
+GAP-ANA-004,"A filter retains particles, and a sieve retains grains.","A filter retains particles, and a sieve retains grains.",PASS,UNCHANGED,No surface normalization required.
+GAP-ANA-005,"A thermostat regulates temperature, and a traffic signal regulates movement.","A thermostat regulates temperature, and a traffic signal regulates movement.",PASS,UNCHANGED,No surface normalization required.
+GAP-ANA-006,"A pump moves water, and a conveyor moves packages.","A pump moves water, and a conveyor moves packages.",PASS,UNCHANGED,No surface normalization required.
+GAP-ANA-007,"A folder stores files, and a shelf stores books.","A folder stores files, and a shelf stores books.",PASS,UNCHANGED,No surface normalization required.
+GAP-ANA-008,"A recipe guides cooking, and an algorithm guides computation.","A recipe guides cooking, and an algorithm guides computation.",PASS,UNCHANGED,No surface normalization required.
+GAP-ANA-009,"A bridge connects two banks, and a link connects two webpages.","A bridge connects two banks, and a link connects two webpages.",PASS,UNCHANGED,No surface normalization required.
+GAP-ANA-010,"A plant stores light energy in carbohydrates, and a battery stores electrical energy for later use.","A plant stores light energy in carbohydrates, and a battery stores electrical energy for later use.",PASS,UNCHANGED,No surface normalization required.
+GAP-ANA-011,"A seed protects an embryo, and a case protects a delicate instrument.","A seed protects an embryo, and a case protects a delicate instrument.",PASS,UNCHANGED,No surface normalization required.
+GAP-ANA-012,"Pore spaces hold groundwater, and a reservoir holds surface water.","Pore spaces hold groundwater, and a reservoir holds surface water.",PASS,UNCHANGED,No surface normalization required.
+GAP-ANA-013,"An immune barrier blocks harmful agents, and a fence blocks unwanted entry.","An immune barrier blocks harmful agents, and a fence blocks unwanted entry.",PASS,UNCHANGED,No surface normalization required.
+GAP-ANA-014,"A force changes motion, and heat changes the state of water.","A force changes motion, and heat changes the state of water.",PASS,UNCHANGED,No surface normalization required.
+GAP-ANA-015,"Earth's tilt changes seasonal sunlight, and a dimmer changes lamp brightness.","Earth's tilt changes seasonal sunlight, and a dimmer changes lamp brightness.",PASS,UNCHANGED,No surface normalization required.
+GAP-ANA-016,"A river carries water downhill, and a conveyor carries goods forward.","A river carries water downhill, and a conveyor carries goods forward.",PASS,UNCHANGED,No surface normalization required.
+GAP-ANA-017,"A well pump lifts groundwater, and a heart pumps blood through vessels.","A well pump lifts groundwater, and a heart pumps blood through vessels.",PASS,UNCHANGED,No surface normalization required.
+GAP-ANA-018,"A food web links feeding relationships, and a transit map links travel routes.","A food web links feeding relationships, and a transit map links travel routes.",PASS,UNCHANGED,No surface normalization required.
+GAP-ANA-019,"A macrophage removes foreign material, and a filter removes particles from water.","A macrophage removes foreign material, and a filter removes particles from water.",PASS,UNCHANGED,No surface normalization required.
+GAP-ANA-020,"A cloud stores condensed water, and a tank stores liquid water.","A cloud stores condensed water, and a tank stores liquid water.",PASS,UNCHANGED,No surface normalization required.
+GAP-ANA-021,"A camera records light, and a thermometer records temperature.","A camera records light, and a thermometer records temperature.",PASS,UNCHANGED,No surface normalization required.
+GAP-ANA-022,"A root anchors a plant, and an anchor holds a boat.","A root anchors a plant, and an anchor holds a boat.",PASS,UNCHANGED,No surface normalization required.
+GAP-ANA-023,"Friction slows a wheel, and a brake slows a bicycle.","Friction slows a wheel, and a brake slows a bicycle.",PASS,UNCHANGED,No surface normalization required.
+GAP-ANA-024,"A thermostat regulates room temperature, and a metronome regulates timing.","A thermostat regulates room temperature, and a metronome regulates timing.",PASS,UNCHANGED,No surface normalization required.
+GAP-ANA-025,"A sieve lets water pass while retaining solids, and a firewall lets approved data pass while blocking threats.","A sieve lets water pass while retaining solids, and a firewall lets approved data pass while blocking threats.",PASS,UNCHANGED,No surface normalization required.
+GAP-ANA-026,"An ecosystem transfers energy among organisms, and a circuit transfers energy among components.","An ecosystem transfers energy among organisms, and a circuit transfers energy among components.",PASS,UNCHANGED,No surface normalization required.
+GAP-DEF-001,A queue is an ordered line of people or tasks waiting for service.,A queue is an ordered line of people or tasks waiting for service.,PASS,UNCHANGED,No surface normalization required.
+GAP-DEF-002,A compass is a tool that indicates direction.,A compass is a tool that indicates direction.,PASS,UNCHANGED,No surface normalization required.
+GAP-DEF-003,A fraction represents part of a whole.,A fraction represents part of a whole.,PASS,UNCHANGED,No surface normalization required.
+GAP-DEF-004,A polygon is a closed shape made of straight sides.,A polygon is a closed shape made of straight sides.,PASS,UNCHANGED,No surface normalization required.
+GAP-DEF-005,A password is secret text used to verify access.,A password is secret text used to verify access.,PASS,UNCHANGED,No surface normalization required.
+GAP-DEF-006,A habitat is the place where an organism lives.,A habitat is the place where an organism lives.,PASS,UNCHANGED,No surface normalization required.
+GAP-DEF-007,A schedule is a plan that assigns times to activities.,A schedule is a plan that assigns times to activities.,PASS,UNCHANGED,No surface normalization required.
+GAP-DEF-008,A lever is a rigid bar that turns around a pivot.,A lever is a rigid bar that turns around a pivot.,PASS,UNCHANGED,No surface normalization required.
+GAP-DEF-009,A variable is a quantity that can change.,A variable is a quantity that can change.,PASS,UNCHANGED,No surface normalization required.
+GAP-DEF-010,A map is a representation of places and their relationships.,A map is a representation of places and their relationships.,PASS,UNCHANGED,No surface normalization required.
+GAP-DEF-011,Probability is a measure of how likely an event is.,Probability is a measure of how likely an event is.,PASS,UNCHANGED,No surface normalization required.
+GAP-DEF-012,A force is an interaction that can change motion.,A force is an interaction that can change motion.,PASS,UNCHANGED,No surface normalization required.
+GAP-DEF-013,Inertia is resistance to a change in motion.,Inertia is resistance to a change in motion.,PASS,UNCHANGED,No surface normalization required.
+GAP-DEF-014,Photosynthesis is a process that converts light energy into chemical energy.,Photosynthesis is a process that converts light energy into chemical energy.,PASS,UNCHANGED,No surface normalization required.
+GAP-DEF-015,An ecosystem includes organisms and their physical environment.,An ecosystem includes organisms and their physical environment.,PASS,UNCHANGED,No surface normalization required.
+GAP-DEF-016,A food web represents feeding relationships in an ecosystem.,A food web represents feeding relationships in an ecosystem.,PASS,UNCHANGED,No surface normalization required.
+GAP-DEF-017,An aquifer is a water-bearing formation that can store and transmit groundwater.,An aquifer is a water-bearing formation that can store and transmit groundwater.,PASS,UNCHANGED,No surface normalization required.
+GAP-DEF-018,Groundwater is water stored below the land surface.,Groundwater is water stored below the land surface.,PASS,UNCHANGED,No surface normalization required.
+GAP-DEF-019,"The immune system is a group of cells, tissues, and organs that protects the body.","The immune system is a group of cells, tissues, and organs that protects the body.",PASS,UNCHANGED,No surface normalization required.
+GAP-DEF-020,A macrophage is an immune cell that engulfs particles.,A macrophage is an immune cell that engulfs particles.,PASS,UNCHANGED,No surface normalization required.
+GAP-DEF-021,A season is a recurring part of a year with characteristic conditions.,A season is a recurring part of a year with characteristic conditions.,PASS,UNCHANGED,No surface normalization required.
+GAP-DEF-022,Climate is the long-term pattern of weather in a region.,Climate is the long-term pattern of weather in a region.,PASS,UNCHANGED,No surface normalization required.
+GAP-DEF-023,An ocean current is directed movement of seawater.,An ocean current is directed movement of seawater.,PASS,UNCHANGED,No surface normalization required.
+GAP-DEF-024,A cloud is a visible collection of water droplets or ice crystals.,A cloud is a visible collection of water droplets or ice crystals.,PASS,UNCHANGED,No surface normalization required.
+GAP-DEF-025,Evaporation is the change of liquid water into vapor.,Evaporation is the change of liquid water into vapor.,PASS,UNCHANGED,No surface normalization required.
+GAP-DEF-026,Condensation is the change of vapor into a liquid.,Condensation is the change of vapor into a liquid.,PASS,UNCHANGED,No surface normalization required.
+GAP-DEF-027,A watershed is land that drains to a common body of water.,A watershed is land that drains to a common body of water.,PASS,UNCHANGED,No surface normalization required.
+GAP-DEF-028,A chloroplast is a plant-cell organelle where photosynthesis occurs.,A chloroplast is a plant-cell organelle where photosynthesis occurs.,PASS,UNCHANGED,No surface normalization required.
+GAP-DEF-029,A vaccine is a preparation that trains an immune response to a target.,A vaccine is a preparation that trains an immune response to a target.,PASS,UNCHANGED,No surface normalization required.
+GAP-DEF-030,An algorithm is a step-by-step procedure for completing a task.,An algorithm is a step-by-step procedure for completing a task.,PASS,UNCHANGED,No surface normalization required.

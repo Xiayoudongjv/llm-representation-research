@@ -1,0 +1,32 @@
+{
+  "dataset_size": 200,
+  "class_counts": {
+    "logic": 50,
+    "causality": 50,
+    "analogy": 50,
+    "definition": 50
+  },
+  "length_min": 4,
+  "length_max": 20,
+  "exact_duplicates": 0,
+  "normalized_duplicates": 0,
+  "random40_human_audit_completed": true,
+  "logic_spotcheck_completed": true,
+  "logic_remediation_completed": true,
+  "similarity_human_review_completed": true,
+  "similarity_remediation_completed": true,
+  "replacement5_review_completed": true,
+  "remaining_repeated_prefix_groups": 7,
+  "remaining_char_tfidf_pairs_ge_0_55": 2,
+  "remaining_similarity_flags_are_descriptive": true,
+  "freeze_decision": "READY_TO_FREEZE",
+  "evaluator_frozen_before_final200_test": true,
+  "evaluator_retrained_after_freeze": false,
+  "final200_predictions_seen_before_freeze": false,
+  "EXP017_outputs_accessed_before_freeze": false,
+  "random_seed": 20260812,
+  "evaluator_artifact_sha256": "DF06E7683627F308330E77E8A50D35766F3CA50F5C8DE873E077092DEAEB2BDD",
+  "evaluator_config_sha256": "EB673B63CB0C407C04F55F9B5F8FB687C7BD680FC5B53DDD4CC18A2BCC906744",
+  "frozen_dataset_sha256": "48E05DB992185661DF41C102C32CD4685944E50D0CD7454A195AB63C7B638765",
+  "timestamp_utc": "2026-08-12T17:20:12.871451+00:00"
+}

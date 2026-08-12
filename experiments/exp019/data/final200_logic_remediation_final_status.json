@@ -1,0 +1,12 @@
+{
+  "logic_remediation_status": "COMPLETE",
+  "replacement_decisions": {
+    "REMED-LOG-001": "Y",
+    "REMED-LOG-002": "Y",
+    "REMED-LOG-003": "Y"
+  },
+  "REVIEW_CRITERION_CLARIFICATION": "Initial rejection used an overly narrow premise-conclusion criterion. The frozen operational definition also includes exclusion and contradiction, so this item is valid under the preregistered Logic definition.",
+  "similarity_review_status": "SIMILARITY_REVIEW_PENDING",
+  "evaluator_predictions_accessed": false,
+  "exp017_outputs_accessed": false
+}

@@ -1,0 +1,36 @@
+{
+  "seed": 20260812,
+  "source_locked_file": "final200_pre_human_audit_locked.csv",
+  "reviewed_logic_ids_excluded": [
+    "GAP-LOG-004",
+    "GAP-LOG-005",
+    "GAP-LOG-007",
+    "GAP-LOG-016",
+    "GAP-LOG-020",
+    "GAP-LOG-034",
+    "GAP-LOG-036"
+  ],
+  "explicit_failures_excluded": [
+    "GAP-LOG-005",
+    "GAP-LOG-036"
+  ],
+  "eligible_unreviewed_logic_count": 43,
+  "selected_candidate_ids": [
+    "GAP-LOG-006",
+    "GAP-LOG-008",
+    "GAP-LOG-025",
+    "SRC-LOG-014",
+    "GAP-LOG-032",
+    "SRC-LOG-012",
+    "SRC-LOG-015",
+    "GAP-LOG-021",
+    "GAP-LOG-003",
+    "GAP-LOG-038"
+  ],
+  "interpretation_rule": {
+    "0_N": "ISOLATED_LOGIC_ERRORS_SUPPORTED",
+    "1_N": "LIKELY_ISOLATED_WITH_MINOR_RISK",
+    "2plus_N": "LOGIC_CLASS_REVIEW_REQUIRED",
+    "2plus_total_N_or_uncertain": "LOGIC_CLASS_REVIEW_REQUIRED"
+  }
+}

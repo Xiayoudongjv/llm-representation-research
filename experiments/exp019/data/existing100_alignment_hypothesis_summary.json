@@ -1,0 +1,73 @@
+{
+  "decision": "BLOCK_ORDER_MISMATCH_CONFIRMED",
+  "source_files": {
+    "word_responses": "C:\\Users\\Xiayo\\Desktop\\新建 Microsoft Word 文档 (2).docx",
+    "metadata_cards": "D:\\Research\\llm-representation-research\\experiments\\exp019\\data\\source_cards_100_simple.csv",
+    "earlier_derived_cards": "D:\\Research\\llm-representation-research\\experiments\\exp019\\data\\source_cards_100_for_human.csv",
+    "existing_reaudit": "D:\\Research\\llm-representation-research\\experiments\\exp019\\data\\existing100_audited_pool.csv"
+  },
+  "metadata_block_order": [
+    {
+      "positions": "1-25",
+      "task_class": "logic"
+    },
+    {
+      "positions": "26-50",
+      "task_class": "causality"
+    },
+    {
+      "positions": "51-75",
+      "task_class": "analogy"
+    },
+    {
+      "positions": "76-100",
+      "task_class": "definition"
+    }
+  ],
+  "word_apparent_block_structure": [
+    {
+      "positions": "1-25",
+      "structure": "logic-oriented premise/rule/exclusion/comparison answers"
+    },
+    {
+      "positions": "26-50",
+      "structure": "causal mechanism answers"
+    },
+    {
+      "positions": "51-75",
+      "structure": "single-concept definition answers matching definition-card concepts"
+    },
+    {
+      "positions": "76-100",
+      "structure": "two-relation correspondence answers matching analogy-card pairs"
+    }
+  ],
+  "hypotheses": {
+    "H0_current_positional_mapping": {
+      "STRONG_MATCH": 46,
+      "PARTIAL_MATCH": 3,
+      "NO_MATCH": 51
+    },
+    "H1_swap_blocks_51_75_and_76_100": {
+      "STRONG_MATCH": 96,
+      "PARTIAL_MATCH": 3,
+      "NO_MATCH": 1
+    },
+    "small_offset_tests": "Not evaluated: H1 provides a complete one-to-one fit for positions 51-100 and leaves no residual boundary pattern requiring an offset hypothesis."
+  },
+  "diagnostic": {
+    "positions_1_50_current_strong_match": 46,
+    "positions_1_50_current_partial_match": 3,
+    "positions_1_50_current_no_match": 1,
+    "positions_51_100_current_no_match": 50,
+    "positions_51_100_swapped_strong_match": 50
+  },
+  "correction_boundary": "The correction map is a proposal only. It is not applied to source cards, the Word document, or existing reaudit outputs in this task.",
+  "existing_reaudit_status": "INVALIDATED_BY_ALIGNMENT_ERROR",
+  "final200_gap_estimate_status": "INVALIDATED_BY_ALIGNMENT_ERROR",
+  "prohibited_inputs": [
+    "EXP-017 outputs",
+    "evaluator predictions",
+    "model runs"
+  ]
+}

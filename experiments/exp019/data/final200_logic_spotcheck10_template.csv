@@ -1,0 +1,11 @@
+review_index,candidate_id,response_text,human_decision,human_reason
+1,GAP-LOG-006,A cat is not a reptile.,,
+2,GAP-LOG-008,Schedules with no shared time do not overlap.,,
+3,GAP-LOG-025,A larger whole divided into equal pieces gives smaller pieces.,,
+4,SRC-LOG-014,Low water levels are not high tide.,,
+5,GAP-LOG-032,Two equally likely coin outcomes give heads a probability of one half.,,
+6,SRC-LOG-012,Processes without light energy are not photosynthesis.,,
+7,SRC-LOG-015,Features without survival functions are not adaptations.,,
+8,GAP-LOG-021,A ticket dated tomorrow is later than a ticket dated today.,,
+9,GAP-LOG-003,A red traffic light signals that cars should stop.,,
+10,GAP-LOG-038,"If Earth's land, air, water, and life interact, change in one part can affect another.",,

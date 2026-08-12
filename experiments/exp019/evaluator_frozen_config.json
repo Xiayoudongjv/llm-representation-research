@@ -1,0 +1,109 @@
+{
+  "class_order": [
+    "logic",
+    "causality",
+    "analogy",
+    "definition"
+  ],
+  "sklearn_model_class_order": [
+    "analogy",
+    "causality",
+    "definition",
+    "logic"
+  ],
+  "evaluator_family": "word + character TF-IDF + multinomial LogisticRegression",
+  "word_tfidf": {
+    "ngram_range": [
+      1,
+      1
+    ],
+    "min_df": 2,
+    "sublinear_tf": true,
+    "lowercase": true
+  },
+  "char_tfidf": {
+    "analyzer": "char_wb",
+    "ngram_range": [
+      3,
+      5
+    ],
+    "min_df": 2,
+    "sublinear_tf": true,
+    "lowercase": true
+  },
+  "logistic_regression": {
+    "C": 0.1,
+    "class_weight": null,
+    "random_state": 20260812,
+    "max_iter": 2000,
+    "solver": "lbfgs",
+    "multi_class": "multinomial (automatic lbfgs behavior in sklearn 1.9)"
+  },
+  "preprocessing": "raw response_text only; no labels, IDs, provenance, topics, prompts, or length metadata",
+  "random_seed": 20260812,
+  "train_split_identity_hash": "1ba836813662d26cf6ce85ab21180f774b88b44b41bcbf81cbe39a9e93a489fa",
+  "validation_split_identity_hash": "54f76913198f7d7d9608cb268c71fdd17541b4e367a270982ef1c9d13cc8d845",
+  "selection_metric": "balanced_accuracy, then macro_F1, minimum per-class recall, and simpler configuration within 0.005 balanced accuracy",
+  "selected_validation_metrics": {
+    "balanced_accuracy": 1.0,
+    "macro_f1": 1.0,
+    "accuracy": 1.0,
+    "per_class": {
+      "logic": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 30
+      },
+      "causality": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 30
+      },
+      "analogy": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 30
+      },
+      "definition": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 30
+      }
+    },
+    "confusion_matrix": [
+      [
+        30,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        30,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        30,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        30
+      ]
+    ]
+  },
+  "timestamp_utc": "2026-08-12T15:18:28.026998+00:00",
+  "final200_accessed_for_selection": false,
+  "exp017_accessed_for_selection": false,
+  "test_evaluated_at_selection": false,
+  "sklearn_version": "1.9.0"
+}

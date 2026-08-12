@@ -1,0 +1,397 @@
+{
+  "target_total": 200,
+  "target_per_class": 50,
+  "corrected_retained_total": 72,
+  "remaining_total": 128,
+  "potential_remaining_total_if_all_human_review_accepted": 102,
+  "classes": {
+    "logic": {
+      "current_candidates": 25,
+      "accepted_as_is": 6,
+      "accepted_surface_normalized": 2,
+      "human_review": 15,
+      "rejected": 2,
+      "retained_total": 8,
+      "remaining_to_50": 42,
+      "potential_remaining_if_all_human_review_accepted": 27,
+      "topic_distribution": {
+        "biology": 2,
+        "earth_science": 3,
+        "physics": 3
+      },
+      "length_distribution": {
+        "limited_long": 1,
+        "medium": 6,
+        "short": 1
+      },
+      "source_distribution": {
+        "https://naturalhistory.si.edu/education/teaching-resources/life-science/explore-animal-adaptations": 1,
+        "https://openstax.org/books/college-physics/pages/8-3-conservation-of-momentum": 3,
+        "https://prod-01-alb-www-noaa.woc.noaa.gov/jetstream/ocean/tides": 1,
+        "https://www.khanacademy.org/science/ap-biology/cell-structure-and-function/photosynthesis-ap/a/photosynthesis-overview": 1,
+        "https://www.nesdis.noaa.gov/about/k-12-education/oceans-coasts/what-causes-tides": 1,
+        "https://www.usgs.gov/water-science-school/science/aquifers-and-groundwater": 1
+      },
+      "lexical_risks": {
+        "class_specificity_descriptor": "descriptive only; no classifier fitted",
+        "top_unigrams": [
+          [
+            "not",
+            5
+          ],
+          [
+            "momentum",
+            2
+          ],
+          [
+            "collisions",
+            2
+          ],
+          [
+            "energy",
+            2
+          ],
+          [
+            "without",
+            2
+          ],
+          [
+            "isolated",
+            1
+          ],
+          [
+            "systems",
+            1
+          ],
+          [
+            "conserve",
+            1
+          ],
+          [
+            "lose",
+            1
+          ],
+          [
+            "kinetic",
+            1
+          ]
+        ],
+        "repeated_three_word_prefixes": [],
+        "high_redundancy_items": [],
+        "medium_redundancy_items": []
+      },
+      "priority_gaps": [
+        "Add everyday, language, and quantitative rule applications; retain conditional/exclusion clarity while diversifying beyond earth science and physics."
+      ],
+      "recommended_future_quota": {
+        "count": 42,
+        "recommendations": [
+          "Add everyday, language, and quantitative rule applications; retain conditional/exclusion clarity while diversifying beyond earth science and physics."
+        ]
+      }
+    },
+    "causality": {
+      "current_candidates": 25,
+      "accepted_as_is": 13,
+      "accepted_surface_normalized": 7,
+      "human_review": 5,
+      "rejected": 0,
+      "retained_total": 20,
+      "remaining_to_50": 30,
+      "potential_remaining_if_all_human_review_accepted": 25,
+      "topic_distribution": {
+        "biology": 5,
+        "earth_science": 7,
+        "general_science": 1,
+        "physics": 5,
+        "technology": 2
+      },
+      "length_distribution": {
+        "limited_long": 3,
+        "medium": 16,
+        "short": 1
+      },
+      "source_distribution": {
+        "https://gpm.nasa.gov/education/articles/nasa-earth-science-water-cycle": 2,
+        "https://naturalhistory.si.edu/education/teaching-resources/life-science/explore-animal-adaptations": 2,
+        "https://openstax.org/books/college-physics/pages/8-3-conservation-of-momentum": 2,
+        "https://openstax.org/books/concepts-biology/pages/5-1-overview-of-photosynthesis": 3,
+        "https://openstax.org/books/physics/pages/4-1-force": 1,
+        "https://prod-01-alb-www-noaa.woc.noaa.gov/jetstream/ocean/tides": 1,
+        "https://www.jpl.nasa.gov/edu/resources/project/make-a-cloud-in-a-bottle/": 3,
+        "https://www.khanacademy.org/science/ap-biology/cell-structure-and-function/photosynthesis-ap/a/photosynthesis-overview": 1,
+        "https://www.nesdis.noaa.gov/about/k-12-education/oceans-coasts/what-causes-tides": 1,
+        "https://www.usgs.gov/water-science-school/science/aquifers-and-groundwater": 3,
+        "https://www.usgs.gov/water-science-school/science/infiltration-and-water-cycle": 1
+      },
+      "lexical_risks": {
+        "class_specificity_descriptor": "descriptive only; no classifier fitted",
+        "top_unigrams": [
+          [
+            "water",
+            8
+          ],
+          [
+            "causes",
+            4
+          ],
+          [
+            "photosynthesis",
+            3
+          ],
+          [
+            "vapor",
+            3
+          ],
+          [
+            "groundwater",
+            3
+          ],
+          [
+            "changes",
+            2
+          ],
+          [
+            "momentum",
+            2
+          ],
+          [
+            "forces",
+            2
+          ],
+          [
+            "cause",
+            2
+          ],
+          [
+            "system",
+            2
+          ]
+        ],
+        "repeated_three_word_prefixes": [],
+        "high_redundancy_items": [],
+        "medium_redundancy_items": [
+          "SRC-CAU-001",
+          "SRC-CAU-011",
+          "SRC-CAU-012",
+          "SRC-CAU-013",
+          "SRC-CAU-014",
+          "SRC-CAU-015",
+          "SRC-CAU-016",
+          "SRC-CAU-019"
+        ]
+      },
+      "priority_gaps": [
+        "Add everyday and general mechanisms, reduce repeated water/groundwater/tide wording, and broaden documented sources."
+      ],
+      "recommended_future_quota": {
+        "count": 30,
+        "recommendations": [
+          "Add everyday and general mechanisms, reduce repeated water/groundwater/tide wording, and broaden documented sources."
+        ]
+      }
+    },
+    "analogy": {
+      "current_candidates": 25,
+      "accepted_as_is": 24,
+      "accepted_surface_normalized": 0,
+      "human_review": 1,
+      "rejected": 0,
+      "retained_total": 24,
+      "remaining_to_50": 26,
+      "potential_remaining_if_all_human_review_accepted": 25,
+      "topic_distribution": {
+        "biology": 8,
+        "earth_science": 8,
+        "general_science": 1,
+        "physics": 3,
+        "technology": 4
+      },
+      "length_distribution": {
+        "limited_long": 24
+      },
+      "source_distribution": {
+        "https://gpm.nasa.gov/education/articles/nasa-earth-science-water-cycle": 2,
+        "https://naturalhistory.si.edu/education/teaching-resources/life-science/explore-animal-adaptations": 3,
+        "https://nigms.nih.gov/biobeat/2023/12/what-is-the-immune-system": 2,
+        "https://openstax.org/books/college-physics/pages/8-3-conservation-of-momentum": 2,
+        "https://openstax.org/books/concepts-biology/pages/5-1-overview-of-photosynthesis": 4,
+        "https://openstax.org/books/physics/pages/4-1-force": 1,
+        "https://www.jpl.nasa.gov/edu/resources/project/make-a-cloud-in-a-bottle/": 1,
+        "https://www.khanacademy.org/science/ap-biology/cell-structure-and-function/photosynthesis-ap/a/photosynthesis-overview": 1,
+        "https://www.nesdis.noaa.gov/about/k-12-education/oceans-coasts/what-causes-tides": 3,
+        "https://www.usgs.gov/water-science-school/science/aquifers-and-groundwater": 5
+      },
+      "lexical_risks": {
+        "class_specificity_descriptor": "descriptive only; no classifier fitted",
+        "top_unigrams": [
+          [
+            "water",
+            16
+          ],
+          [
+            "system",
+            6
+          ],
+          [
+            "groundwater",
+            5
+          ],
+          [
+            "tidal",
+            4
+          ],
+          [
+            "limbs",
+            3
+          ],
+          [
+            "energy",
+            3
+          ],
+          [
+            "photosynthesis",
+            3
+          ],
+          [
+            "chloroplasts",
+            3
+          ],
+          [
+            "part",
+            3
+          ],
+          [
+            "plant",
+            3
+          ]
+        ],
+        "repeated_three_word_prefixes": [
+          {
+            "prefix": "fin like limbs",
+            "count": 2
+          }
+        ],
+        "high_redundancy_items": [],
+        "medium_redundancy_items": [
+          "SRC-ANA-007",
+          "SRC-ANA-009",
+          "SRC-ANA-012",
+          "SRC-ANA-013",
+          "SRC-ANA-016",
+          "SRC-ANA-017",
+          "SRC-ANA-018"
+        ]
+      },
+      "priority_gaps": [
+        "Add 26 new two-relation correspondences across everyday, technology, mathematics, biology, and earth-science domains."
+      ],
+      "recommended_future_quota": {
+        "count": 26,
+        "recommendations": [
+          "Add 26 new two-relation correspondences across everyday, technology, mathematics, biology, and earth-science domains."
+        ]
+      }
+    },
+    "definition": {
+      "current_candidates": 25,
+      "accepted_as_is": 20,
+      "accepted_surface_normalized": 0,
+      "human_review": 5,
+      "rejected": 0,
+      "retained_total": 20,
+      "remaining_to_50": 30,
+      "potential_remaining_if_all_human_review_accepted": 25,
+      "topic_distribution": {
+        "biology": 6,
+        "earth_science": 4,
+        "general_science": 1,
+        "physics": 3,
+        "technology": 6
+      },
+      "length_distribution": {
+        "limited_long": 13,
+        "medium": 7
+      },
+      "source_distribution": {
+        "https://gpm.nasa.gov/education/articles/nasa-earth-science-water-cycle": 2,
+        "https://naturalhistory.si.edu/education/teaching-resources/life-science/explore-animal-adaptations": 4,
+        "https://nigms.nih.gov/biobeat/2023/12/what-is-the-immune-system": 1,
+        "https://openstax.org/books/college-physics/pages/8-3-conservation-of-momentum": 2,
+        "https://openstax.org/books/concepts-biology/pages/5-1-overview-of-photosynthesis": 3,
+        "https://openstax.org/books/physics/pages/4-1-force": 2,
+        "https://prod-01-alb-www-noaa.woc.noaa.gov/jetstream/ocean/tides": 1,
+        "https://www.jpl.nasa.gov/edu/resources/project/make-a-cloud-in-a-bottle/": 1,
+        "https://www.usgs.gov/water-science-school/science/aquifers-and-groundwater": 4
+      },
+      "lexical_risks": {
+        "class_specificity_descriptor": "descriptive only; no classifier fitted",
+        "top_unigrams": [
+          [
+            "water",
+            11
+          ],
+          [
+            "physical",
+            5
+          ],
+          [
+            "groundwater",
+            4
+          ],
+          [
+            "system",
+            3
+          ],
+          [
+            "change",
+            3
+          ],
+          [
+            "light",
+            3
+          ],
+          [
+            "animal",
+            3
+          ],
+          [
+            "helps",
+            3
+          ],
+          [
+            "process",
+            2
+          ],
+          [
+            "photosynthesis",
+            2
+          ]
+        ],
+        "repeated_three_word_prefixes": [],
+        "high_redundancy_items": [],
+        "medium_redundancy_items": [
+          "SRC-DEF-001",
+          "SRC-DEF-006",
+          "SRC-DEF-008",
+          "SRC-DEF-009",
+          "SRC-DEF-010",
+          "SRC-DEF-011",
+          "SRC-DEF-017",
+          "SRC-DEF-020"
+        ]
+      },
+      "priority_gaps": [
+        "Add 30 new self-contained single-concept definitions across non-water science, everyday, language, mathematics, and technology domains."
+      ],
+      "recommended_future_quota": {
+        "count": 30,
+        "recommendations": [
+          "Add 30 new self-contained single-concept definitions across non-water science, everyday, language, mathematics, and technology domains."
+        ]
+      }
+    }
+  },
+  "historical_status": "Previous 28-retained / 172-gap result is INVALIDATED_BY_ALIGNMENT_ERROR.",
+  "scientific_independence": "Reaudit performed before evaluator training and without inspecting EXP-017 outputs."
+}

@@ -1,0 +1,201 @@
+candidate_id,task_class,response_text,provenance,source_reference,topic_domain,length_tokens,length_band
+SRC-LOG-006,logic,Isolated systems conserve momentum.,not_recorded,https://openstax.org/books/college-physics/pages/8-3-conservation-of-momentum,physics,4,short
+SRC-LOG-011,logic,Collisions that lose kinetic energy are not elastic collisions.,not_recorded,https://openstax.org/books/college-physics/pages/8-3-conservation-of-momentum,physics,9,medium
+SRC-LOG-012,logic,Processes without light energy are not photosynthesis.,not_recorded,https://www.khanacademy.org/science/ap-biology/cell-structure-and-function/photosynthesis-ap/a/photosynthesis-overview,biology,7,medium
+SRC-LOG-013,logic,Dry pores do not store groundwater.,not_recorded,https://www.usgs.gov/water-science-school/science/aquifers-and-groundwater,earth_science,6,medium
+SRC-LOG-014,logic,Low water levels are not high tide.,not_recorded,https://prod-01-alb-www-noaa.woc.noaa.gov/jetstream/ocean/tides,earth_science,7,medium
+SRC-LOG-015,logic,Features without survival functions are not adaptations.,not_recorded,https://naturalhistory.si.edu/education/teaching-resources/life-science/explore-animal-adaptations,biology,7,medium
+SRC-LOG-018,logic,The moon has a greater influence on tides than the sun.,not_recorded,https://www.nesdis.noaa.gov/about/k-12-education/oceans-coasts/what-causes-tides,earth_science,11,medium
+SRC-LOG-021,logic,The momentum of a vehicle is equal to the product of its mass and velocity.,not_recorded,https://openstax.org/books/college-physics/pages/8-3-conservation-of-momentum,physics,15,limited_long
+SRC-CAU-001,causality,Net force causes changes in the motion of an object.,not_recorded,https://openstax.org/books/physics/pages/4-1-force,physics,10,medium
+SRC-CAU-003,causality,Elastic collisions transfer momentum between vehicles of equal mass.,not_recorded,https://openstax.org/books/college-physics/pages/8-3-conservation-of-momentum,physics,9,medium
+SRC-CAU-004,causality,External forces cause a change in the total momentum of a system.,not_recorded,https://openstax.org/books/college-physics/pages/8-3-conservation-of-momentum,physics,12,medium
+SRC-CAU-006,causality,Photosynthesis absorbs solar energy and can store chemical energy in carbohydrates.,not_recorded,https://openstax.org/books/concepts-biology/pages/5-1-overview-of-photosynthesis,biology,11,medium
+SRC-CAU-007,causality,Photosynthesis uses water and carbon dioxide to produce sugar and oxygen.,not_recorded,https://openstax.org/books/concepts-biology/pages/5-1-overview-of-photosynthesis,biology,11,medium
+SRC-CAU-008,causality,Chlorophyll absorbs light for photosynthesis.,not_recorded,https://www.khanacademy.org/science/ap-biology/cell-structure-and-function/photosynthesis-ap/a/photosynthesis-overview,biology,8,medium
+SRC-CAU-009,causality,Closing stomata reduces water loss in plants.,not_recorded,https://openstax.org/books/concepts-biology/pages/5-1-overview-of-photosynthesis,biology,7,medium
+SRC-CAU-010,causality,"The pattern of feathers blends with the environment, enabling owls to hide through camouflage.",not_recorded,https://naturalhistory.si.edu/education/teaching-resources/life-science/explore-animal-adaptations,biology,14,limited_long
+SRC-CAU-011,causality,"Sunlight heats surface water, causing liquid water to evaporate.",not_recorded,https://gpm.nasa.gov/education/articles/nasa-earth-science-water-cycle,physics,9,medium
+SRC-CAU-012,causality,Water vapor rises into cooler air and condenses to form cloud droplets.,not_recorded,https://www.jpl.nasa.gov/edu/resources/project/make-a-cloud-in-a-bottle/,earth_science,11,medium
+SRC-CAU-013,causality,"Changes in the Moon's gravitational pull create tidal forces, causing the ocean to bulge.",not_recorded,https://www.nesdis.noaa.gov/about/k-12-education/oceans-coasts/what-causes-tides,physics,16,limited_long
+SRC-CAU-014,causality,Infiltration of precipitation can replenish groundwater.,not_recorded,https://www.usgs.gov/water-science-school/science/infiltration-and-water-cycle,earth_science,5,short
+SRC-CAU-015,causality,Groundwater extraction faster than infiltration causes the groundwater level to drop.,not_recorded,https://www.usgs.gov/water-science-school/science/aquifers-and-groundwater,earth_science,10,medium
+SRC-CAU-016,causality,"When warm water vapor contacts a cold container, it condenses into liquid droplets.",not_recorded,https://www.jpl.nasa.gov/edu/resources/project/make-a-cloud-in-a-bottle/,earth_science,12,medium
+SRC-CAU-019,causality,Gravity causes surface water to flow downward to lower areas.,not_recorded,https://www.usgs.gov/water-science-school/science/aquifers-and-groundwater,earth_science,10,medium
+SRC-CAU-020,causality,A long tail can improve balance.,not_recorded,https://naturalhistory.si.edu/education/teaching-resources/life-science/explore-animal-adaptations,general_science,6,medium
+SRC-CAU-021,causality,Satellite measurement of precipitation enables scientists to monitor large-scale rainfall.,not_recorded,https://gpm.nasa.gov/education/articles/nasa-earth-science-water-cycle,technology,11,medium
+SRC-CAU-022,causality,Wells reaching aquifers can extract groundwater.,not_recorded,https://www.usgs.gov/water-science-school/science/aquifers-and-groundwater,technology,6,medium
+SRC-CAU-023,causality,Cooling water vapor forms visible clouds.,not_recorded,https://www.jpl.nasa.gov/edu/resources/project/make-a-cloud-in-a-bottle/,earth_science,6,medium
+SRC-CAU-025,causality,A measuring system tracking the tide level can record high and low tides for prediction.,not_recorded,https://prod-01-alb-www-noaa.woc.noaa.gov/jetstream/ocean/tides,earth_science,15,limited_long
+SRC-DEF-001,definition,"The water cycle is the process of continuous movement of water between land, ocean and atmosphere in the Earth system.",not_recorded,https://gpm.nasa.gov/education/articles/nasa-earth-science-water-cycle,earth_science,20,limited_long
+SRC-DEF-002,definition,Evaporation is the phase change that turns liquid water into water vapor.,not_recorded,https://www.jpl.nasa.gov/edu/resources/project/make-a-cloud-in-a-bottle/,earth_science,12,medium
+SRC-DEF-003,definition,Photosynthesis is a biological energy process that uses light energy to help synthesize carbohydrates.,not_recorded,https://openstax.org/books/concepts-biology/pages/5-1-overview-of-photosynthesis,biology,14,limited_long
+SRC-DEF-005,definition,Groundwater is the underground water resource that fills underground pores or fissures.,not_recorded,https://www.usgs.gov/water-science-school/science/aquifers-and-groundwater,earth_science,12,medium
+SRC-DEF-006,definition,Momentum is a physical quantity that is the product of mass and velocity.,not_recorded,https://openstax.org/books/college-physics/pages/8-3-conservation-of-momentum,physics,13,limited_long
+SRC-DEF-008,definition,Conservation is the physical principle that physical quantities remain unchanged under specific conditions.,not_recorded,https://openstax.org/books/college-physics/pages/8-3-conservation-of-momentum,general_science,13,limited_long
+SRC-DEF-009,definition,Force is the physical interaction that can change motion.,not_recorded,https://openstax.org/books/physics/pages/4-1-force,physics,9,medium
+SRC-DEF-010,definition,Acceleration is the physical quantity that describes the change in velocity over time.,not_recorded,https://openstax.org/books/physics/pages/4-1-force,physics,13,limited_long
+SRC-DEF-011,definition,Well is a water extraction structure that reaches groundwater for extraction.,not_recorded,https://www.usgs.gov/water-science-school/science/aquifers-and-groundwater,technology,11,medium
+SRC-DEF-013,definition,Flippers are the animal body structure that helps whales turn in water.,not_recorded,https://naturalhistory.si.edu/education/teaching-resources/life-science/explore-animal-adaptations,biology,12,medium
+SRC-DEF-015,definition,Feather camouflage is the animal adaptation that blends the animal with the surrounding environment.,not_recorded,https://naturalhistory.si.edu/education/teaching-resources/life-science/explore-animal-adaptations,biology,14,limited_long
+SRC-DEF-016,definition,Satellite precipitation sensor is a remote sensing instrument that measures precipitation information from orbit.,not_recorded,https://gpm.nasa.gov/education/articles/nasa-earth-science-water-cycle,technology,14,limited_long
+SRC-DEF-017,definition,Well pump is a water transportation device that lifts groundwater to the surface.,not_recorded,https://www.usgs.gov/water-science-school/science/aquifers-and-groundwater,technology,13,limited_long
+SRC-DEF-018,definition,Tide gauge is an environmental measurement instrument that records changes in water level.,not_recorded,https://prod-01-alb-www-noaa.woc.noaa.gov/jetstream/ocean/tides,technology,13,limited_long
+SRC-DEF-019,definition,Chlorophyll sensor is a light-sensitive measuring tool that detects or studies light absorption.,not_recorded,https://openstax.org/books/concepts-biology/pages/5-1-overview-of-photosynthesis,technology,14,limited_long
+SRC-DEF-020,definition,Filter surface is a separation mechanism that allows water to pass through and retains particles.,not_recorded,https://naturalhistory.si.edu/education/teaching-resources/life-science/explore-animal-adaptations,technology,15,limited_long
+SRC-DEF-021,definition,Adaptability is the biological characteristic that helps organisms survive in their environment.,not_recorded,https://naturalhistory.si.edu/education/teaching-resources/life-science/explore-animal-adaptations,biology,12,medium
+SRC-DEF-022,definition,Immune system is the body defense system that detects and helps remove harmful substances.,not_recorded,https://nigms.nih.gov/biobeat/2023/12/what-is-the-immune-system,biology,14,limited_long
+SRC-DEF-023,definition,Aquifer is the water-bearing geological layer that stores and transmits available groundwater.,not_recorded,https://www.usgs.gov/water-science-school/science/aquifers-and-groundwater,earth_science,13,limited_long
+SRC-DEF-025,definition,Chloroplast is the cellular organelle of plants that contains the photosynthesis mechanism.,not_recorded,https://openstax.org/books/concepts-biology/pages/5-1-overview-of-photosynthesis,biology,12,medium
+SRC-ANA-001,analogy,"Whale flippers help turning in water, while human arms help control body movement.",not_recorded,https://naturalhistory.si.edu/education/teaching-resources/life-science/explore-animal-adaptations,biology,13,limited_long
+SRC-ANA-002,analogy,"The well pump can lift groundwater, while the irrigation pump delivers water to plants; both are transporting water.",not_recorded,https://www.usgs.gov/water-science-school/science/aquifers-and-groundwater,technology,18,limited_long
+SRC-ANA-003,analogy,"Satellite sensors observe rainfall, while tide gauges record shore water levels; both monitor water.",not_recorded,https://gpm.nasa.gov/education/articles/nasa-earth-science-water-cycle,technology,14,limited_long
+SRC-ANA-004,analogy,"Chlorophyll absorbs light energy for photosynthesis, while solar panels receive sunlight to generate electricity; the principles are similar.",not_recorded,https://openstax.org/books/concepts-biology/pages/5-1-overview-of-photosynthesis,technology,18,limited_long
+SRC-ANA-005,analogy,"Microscopes make tiny structures clearer, while telescopes bring distant objects closer; both expand vision.",not_recorded,https://www.khanacademy.org/science/ap-biology/cell-structure-and-function/photosynthesis-ap/a/photosynthesis-overview,technology,14,limited_long
+SRC-ANA-006,analogy,"Chloroplasts are parts of plant cells, and leaves are parts of plants; both belong to plant composition.",not_recorded,https://openstax.org/books/concepts-biology/pages/5-1-overview-of-photosynthesis,biology,17,limited_long
+SRC-ANA-007,analogy,"Water droplets gather to form clouds, and clouds participate in the water cycle; one layer contains another.",not_recorded,https://www.jpl.nasa.gov/edu/resources/project/make-a-cloud-in-a-bottle/,earth_science,17,limited_long
+SRC-ANA-008,analogy,"The water level belongs to the aquifer system, and the aquifer belongs to the groundwater storage system.",not_recorded,https://www.usgs.gov/water-science-school/science/aquifers-and-groundwater,earth_science,17,limited_long
+SRC-ANA-009,analogy,"Tidal bulges are manifestations of the tidal phenomenon, and the ocean is part of the Earth system.",not_recorded,https://www.nesdis.noaa.gov/about/k-12-education/oceans-coasts/what-causes-tides,earth_science,17,limited_long
+SRC-ANA-010,analogy,"Fin-like limbs are long on whales, and wings are long on owls; both are animal limbs.",not_recorded,https://naturalhistory.si.edu/education/teaching-resources/life-science/explore-animal-adaptations,biology,17,limited_long
+SRC-ANA-011,analogy,"Permeable rocks allow groundwater to flow, and porous soil allows rainwater to infiltrate; both have permeability.",not_recorded,https://www.usgs.gov/water-science-school/science/aquifers-and-groundwater,earth_science,16,limited_long
+SRC-ANA-012,analogy,"Chloroplasts support photosynthesis, and mesophyll supports gas exchange; both support leaf function.",not_recorded,https://openstax.org/books/concepts-biology/pages/5-1-overview-of-photosynthesis,biology,12,medium
+SRC-ANA-013,analogy,"Moon gravity mainly forms tidal bulges, while Sun gravity strengthens or weakens them.",not_recorded,https://www.nesdis.noaa.gov/about/k-12-education/oceans-coasts/what-causes-tides,earth_science,13,limited_long
+SRC-ANA-014,analogy,"Zero net external force conserves momentum, and isolation keeps total momentum unchanged; the conditions are equivalent.",not_recorded,https://openstax.org/books/college-physics/pages/8-3-conservation-of-momentum,physics,16,limited_long
+SRC-ANA-016,analogy,"The aquifer contains groundwater, and clouds contain condensed water droplets; both are containers of water.",not_recorded,https://www.usgs.gov/water-science-school/science/aquifers-and-groundwater,earth_science,15,limited_long
+SRC-ANA-017,analogy,"Chloroplasts contain the machinery for photosynthesis, and leaves contain mesophyll cells; each has its own content.",not_recorded,https://openstax.org/books/concepts-biology/pages/5-1-overview-of-photosynthesis,biology,16,limited_long
+SRC-ANA-018,analogy,"Tidal bulges occur in the ocean, and water vapor is floating in the atmosphere; both are fluid distributions on Earth.",not_recorded,https://www.nesdis.noaa.gov/about/k-12-education/oceans-coasts/what-causes-tides,earth_science,20,limited_long
+SRC-ANA-019,analogy,"Bone marrow supplies immune cells, and lymphatic vessels transport them; together they serve immunity.",not_recorded,https://nigms.nih.gov/biobeat/2023/12/what-is-the-immune-system,biology,14,limited_long
+SRC-ANA-020,analogy,"Rock pores can store groundwater, and reservoirs can store surface water; both can store water.",not_recorded,https://www.usgs.gov/water-science-school/science/aquifers-and-groundwater,earth_science,15,limited_long
+SRC-ANA-021,analogy,"Evaporation moves surface water into air, and transpiration moves plant water into air; both have the same result.",not_recorded,https://gpm.nasa.gov/education/articles/nasa-earth-science-water-cycle,biology,18,limited_long
+SRC-ANA-022,analogy,"Force changes an object's motion, and heat changes water's solid, liquid, or gas state.",not_recorded,https://openstax.org/books/physics/pages/4-1-force,physics,14,limited_long
+SRC-ANA-023,analogy,"Biological adaptation can enhance survival rates, tool design can improve operational efficiency, both are optimization methods.",not_recorded,https://naturalhistory.si.edu/education/teaching-resources/life-science/explore-animal-adaptations,general_science,16,limited_long
+SRC-ANA-024,analogy,"Momentum conservation limits post-collision velocities, while energy conservation limits energy distribution before and after conversion.",not_recorded,https://openstax.org/books/college-physics/pages/8-3-conservation-of-momentum,physics,16,limited_long
+SRC-ANA-025,analogy,"The immune system forms barriers against bacteria, while fences block foreign substances; both protect against intrusion.",not_recorded,https://nigms.nih.gov/biobeat/2023/12/what-is-the-immune-system,biology,16,limited_long
+GAP-LOG-001,logic,"If the key is inside the drawer, opening the drawer can reveal it.",rule_composed,rule_composed://deterministic-construction,everyday_life,13,limited_long
+GAP-LOG-002,logic,A sealed envelope hides its contents until someone opens it.,independent_external,rule_composed://deterministic-construction,everyday_life,10,medium
+GAP-LOG-004,logic,Dividing an even number by two leaves no remainder.,rule_composed,rule_composed://deterministic-construction,mathematics,9,medium
+GAP-LOG-006,logic,A cat is not a reptile.,ai_assisted_surface_normalized,rule_composed://deterministic-construction,everyday_life,6,medium
+GAP-LOG-007,logic,A book on the left is not on the right of the cup.,rule_composed,rule_composed://deterministic-construction,spatial_reasoning,13,limited_long
+GAP-LOG-008,logic,Schedules with no shared time do not overlap.,independent_external,rule_composed://deterministic-construction,everyday_life,8,medium
+GAP-LOG-009,logic,Three coins plus two coins make five coins.,ai_assisted_surface_normalized,rule_composed://deterministic-construction,mathematics,8,medium
+GAP-LOG-010,logic,A password shorter than the required length fails the check.,rule_composed,rule_composed://deterministic-construction,technology,10,medium
+GAP-LOG-011,logic,"If the train arrives after the bus, the train is later.",independent_external,rule_composed://deterministic-construction,everyday_life,11,medium
+GAP-LOG-012,logic,An item outside a box is not inside that box.,ai_assisted_surface_normalized,rule_composed://deterministic-construction,spatial_reasoning,10,medium
+GAP-LOG-013,logic,"If every class member has an ID, Maya has an ID as a class member.",rule_composed,rule_composed://deterministic-construction,language,15,limited_long
+GAP-LOG-014,logic,Dividing a whole into equal parts makes each part smaller than the whole.,independent_external,rule_composed://deterministic-construction,mathematics,13,limited_long
+GAP-LOG-015,logic,Sets with exactly the same elements have the same size.,ai_assisted_surface_normalized,rule_composed://deterministic-construction,mathematics,10,medium
+GAP-LOG-016,logic,A route with no connecting road cannot reach its destination by that route.,rule_composed,rule_composed://deterministic-construction,spatial_reasoning,13,limited_long
+GAP-LOG-017,logic,A book north of a lamp is not south of the lamp in the same layout.,independent_external,rule_composed://deterministic-construction,spatial_reasoning,16,limited_long
+GAP-LOG-018,logic,A number divisible by ten ends in zero.,ai_assisted_surface_normalized,rule_composed://deterministic-construction,mathematics,8,medium
+GAP-LOG-019,logic,A square is a rectangle with equal sides.,rule_composed,rule_composed://deterministic-construction,mathematics,8,medium
+GAP-LOG-020,logic,An object inside a smaller box is also inside a larger box around it.,independent_external,rule_composed://deterministic-construction,spatial_reasoning,14,limited_long
+GAP-LOG-021,logic,A ticket dated tomorrow is later than a ticket dated today.,ai_assisted_surface_normalized,rule_composed://deterministic-construction,everyday_life,11,medium
+GAP-LOG-022,logic,"If every seat is occupied, no seat is available.",rule_composed,rule_composed://deterministic-construction,everyday_life,9,medium
+GAP-LOG-023,logic,A triangle with three sides is a polygon.,independent_external,rule_composed://deterministic-construction,mathematics,8,medium
+GAP-LOG-024,logic,"If two routes share no connecting segment, one cannot continue along the other.",ai_assisted_surface_normalized,rule_composed://deterministic-construction,spatial_reasoning,13,limited_long
+GAP-LOG-025,logic,A larger whole divided into equal pieces gives smaller pieces.,rule_composed,rule_composed://deterministic-construction,mathematics,10,medium
+GAP-LOG-026,logic,"If an organism has chloroplasts, it can use light energy in photosynthesis.",independent_external,https://openstax.org/books/concepts-biology/pages/5-1-overview-of-photosynthesis,biology,12,medium
+GAP-LOG-027,logic,"If photosynthesis stores energy in carbohydrates, those molecules contain captured energy.",ai_assisted_surface_normalized,https://openstax.org/books/concepts-biology/pages/5-1-overview-of-photosynthesis,biology,11,medium
+GAP-LOG-028,logic,"If consumers eat producers, energy moves from producers to consumers.",rule_composed,https://openstax.org/books/biology-2e/pages/46-2-energy-flow-through-ecosystems,biology,10,medium
+GAP-LOG-029,logic,A hemisphere tilted toward the Sun receives more direct sunlight.,independent_external,https://www.nasa.gov/learning-resources/for-kids-and-students/what-is-earth-grades-k-4/,earth_science,10,medium
+GAP-LOG-030,logic,"If the Northern Hemisphere tilts toward the Sun, it experiences summer.",ai_assisted_surface_normalized,https://www.nasa.gov/learning-resources/for-kids-and-students/what-is-earth-grades-k-4/,earth_science,11,medium
+GAP-LOG-031,logic,A fair six-sided die gives each face equal probability.,rule_composed,https://www.khanacademy.org/math/probability/introduction-to-probability,mathematics,10,medium
+GAP-LOG-032,logic,Two equally likely coin outcomes give heads a probability of one half.,independent_external,https://www.khanacademy.org/math/probability/introduction-to-probability,mathematics,12,medium
+GAP-LOG-034,logic,"Without an unbalanced force, constant velocity continues.",rule_composed,https://www.khanacademy.org/science/physics/forces-newtons-laws/introduction-to-newtons-laws/a/newtons-laws-of-motion,physics,7,medium
+GAP-LOG-035,logic,"If groundwater moves through rock spaces, connected spaces can permit flow.",independent_external,https://www.usgs.gov/water-science-school/science/groundwater-flow-and-water-cycle,earth_science,11,medium
+GAP-LOG-037,logic,Ocean conditions can influence weather patterns.,rule_composed,https://oceanservice.noaa.gov/education/literacy.html,earth_science,6,medium
+GAP-LOG-038,logic,"If Earth's land, air, water, and life interact, change in one part can affect another.",independent_external,https://www.nasa.gov/learning-resources/for-kids-and-students/what-is-earth-grades-k-4/,earth_science,15,limited_long
+GAP-LOG-039,logic,"If immune defenses work together, protection involves more than one body component.",ai_assisted_surface_normalized,https://nigms.nih.gov/biobeat/2023/12/what-is-the-immune-system,biology,12,medium
+GAP-LOG-040,logic,"If macrophages are phagocytes, they can engulf particles.",rule_composed,https://www.ncbi.nlm.nih.gov/books/NBK27092/,biology,8,medium
+GAP-LOG-041,logic,"If a feature improves an animal's survival, it may function as an adaptation.",independent_external,https://naturalhistory.si.edu/education/teaching-resources/life-science/explore-animal-adaptations,biology,13,limited_long
+GAP-LOG-042,logic,"If water moves through reservoirs and pathways, groundwater participates in a cycle.",ai_assisted_surface_normalized,https://www.usgs.gov/educational-resources/water-world,earth_science,12,medium
+GAP-CAU-001,causality,Friction slows a rolling ball on the floor.,rule_composed,rule_composed://deterministic-construction,physics,8,medium
+GAP-CAU-002,causality,Adding ice cools a drink.,independent_external,rule_composed://deterministic-construction,everyday_life,5,short
+GAP-CAU-003,causality,Opening a window can lower room temperature.,ai_assisted_surface_normalized,rule_composed://deterministic-construction,everyday_life,7,medium
+GAP-CAU-004,causality,Pressing a bicycle brake reduces its speed.,rule_composed,rule_composed://deterministic-construction,technology,7,medium
+GAP-CAU-005,causality,Covering a hot pot reduces heat loss.,independent_external,rule_composed://deterministic-construction,everyday_life,7,medium
+GAP-CAU-006,causality,Moving air speeds evaporation from wet clothes.,ai_assisted_surface_normalized,rule_composed://deterministic-construction,everyday_life,7,medium
+GAP-CAU-007,causality,Sharpening a pencil produces a narrower point.,rule_composed,rule_composed://deterministic-construction,everyday_life,7,medium
+GAP-CAU-008,causality,Stretching a rubber band stores elastic energy.,independent_external,rule_composed://deterministic-construction,physics,7,medium
+GAP-CAU-009,causality,Removing the batteries stops a flashlight.,ai_assisted_surface_normalized,rule_composed://deterministic-construction,technology,6,medium
+GAP-CAU-010,causality,Blocking a light sensor prevents it from detecting light.,rule_composed,rule_composed://deterministic-construction,technology,9,medium
+GAP-CAU-011,causality,Sunlight warms a dark surface.,independent_external,https://www.nasa.gov/learning-resources/for-kids-and-students/what-is-earth-grades-k-4/,earth_science,5,short
+GAP-CAU-012,causality,Earth's tilt changes seasonal sunlight exposure.,ai_assisted_surface_normalized,https://www.nasa.gov/learning-resources/for-kids-and-students/what-is-earth-grades-k-4/,earth_science,6,medium
+GAP-CAU-013,causality,Evaporation can cool a wet surface.,rule_composed,https://www.usgs.gov/educational-resources/water-world,earth_science,6,medium
+GAP-CAU-015,causality,Cellular respiration releases usable energy from food.,ai_assisted_surface_normalized,https://openstax.org/books/concepts-biology/pages/5-1-overview-of-photosynthesis,biology,7,medium
+GAP-CAU-016,causality,Consumers receive energy by eating food.,rule_composed,https://openstax.org/books/biology-2e/pages/46-2-energy-flow-through-ecosystems,biology,6,medium
+GAP-CAU-017,causality,An unbalanced force changes an object's velocity.,independent_external,https://www.khanacademy.org/science/physics/forces-newtons-laws/introduction-to-newtons-laws/a/newtons-laws-of-motion,physics,7,medium
+GAP-CAU-018,causality,Groundwater movement follows gravity and pressure.,ai_assisted_surface_normalized,https://www.usgs.gov/water-science-school/science/groundwater-flow-and-water-cycle,earth_science,6,medium
+GAP-CAU-019,causality,"Immune defenses block, detect, and remove harmful agents.",rule_composed,https://nigms.nih.gov/biobeat/2023/12/what-is-the-immune-system,biology,8,medium
+GAP-CAU-020,causality,Macrophages engulf foreign material.,independent_external,https://www.ncbi.nlm.nih.gov/books/NBK27092/,biology,4,short
+GAP-CAU-021,causality,Cooling air turns water vapor into droplets.,ai_assisted_surface_normalized,https://www.usgs.gov/educational-resources/water-world,earth_science,7,medium
+GAP-CAU-022,causality,Longer sunlight exposure heats a surface more.,rule_composed,https://www.nasa.gov/learning-resources/for-kids-and-students/what-is-earth-grades-k-4/,earth_science,7,medium
+GAP-CAU-024,causality,A cold container produces droplets from warm vapor.,ai_assisted_surface_normalized,https://www.usgs.gov/educational-resources/water-world,physics,8,medium
+GAP-CAU-025,causality,Pumping water upward requires energy input.,rule_composed,https://www.usgs.gov/water-science-school/science/groundwater-flow-and-water-cycle,technology,6,medium
+GAP-CAU-026,causality,A barrier on a route prevents a traveler from reaching the destination.,independent_external,rule_composed://deterministic-construction,spatial_reasoning,12,medium
+GAP-CAU-027,causality,A loose bicycle chain reduces power transfer.,ai_assisted_surface_normalized,rule_composed://deterministic-construction,technology,7,medium
+GAP-CAU-028,causality,A heavier load makes a cart harder to accelerate.,rule_composed,rule_composed://deterministic-construction,physics,9,medium
+GAP-CAU-029,causality,A wider opening lets more air pass through.,independent_external,rule_composed://deterministic-construction,everyday_life,8,medium
+GAP-CAU-030,causality,A missing key prevents a lock from opening.,ai_assisted_surface_normalized,rule_composed://deterministic-construction,technology,8,medium
+GAP-ANA-001,analogy,"A key opens a lock, and a password opens access to an account.",rule_composed,rule_composed://deterministic-construction,technology,13,limited_long
+GAP-ANA-002,analogy,"A lid covers a container, and a roof covers a building.",independent_external,rule_composed://deterministic-construction,everyday_life,11,medium
+GAP-ANA-003,analogy,"A map guides a traveler, and a diagram guides a learner.",ai_assisted_surface_normalized,rule_composed://deterministic-construction,language,11,medium
+GAP-ANA-004,analogy,"A filter retains particles, and a sieve retains grains.",rule_composed,rule_composed://deterministic-construction,technology,9,medium
+GAP-ANA-005,analogy,"A thermostat regulates temperature, and a traffic signal regulates movement.",independent_external,rule_composed://deterministic-construction,technology,10,medium
+GAP-ANA-006,analogy,"A pump moves water, and a conveyor moves packages.",ai_assisted_surface_normalized,rule_composed://deterministic-construction,technology,9,medium
+GAP-ANA-007,analogy,"A folder stores files, and a shelf stores books.",rule_composed,rule_composed://deterministic-construction,technology,9,medium
+GAP-ANA-008,analogy,"A recipe guides cooking, and an algorithm guides computation.",independent_external,rule_composed://deterministic-construction,language,9,medium
+GAP-ANA-009,analogy,"A bridge connects two banks, and a link connects two webpages.",ai_assisted_surface_normalized,rule_composed://deterministic-construction,technology,11,medium
+GAP-ANA-010,analogy,"A plant stores light energy in carbohydrates, and a battery stores electrical energy for later use.",rule_composed,https://openstax.org/books/concepts-biology/pages/5-1-overview-of-photosynthesis,biology,16,limited_long
+GAP-ANA-011,analogy,"A seed protects an embryo, and a case protects a delicate instrument.",independent_external,https://naturalhistory.si.edu/education/teaching-resources/life-science/explore-animal-adaptations,biology,12,medium
+GAP-ANA-012,analogy,"Pore spaces hold groundwater, and a reservoir holds surface water.",ai_assisted_surface_normalized,https://www.usgs.gov/water-science-school/science/groundwater-flow-and-water-cycle,earth_science,10,medium
+GAP-ANA-013,analogy,"An immune barrier blocks harmful agents, and a fence blocks unwanted entry.",rule_composed,https://nigms.nih.gov/biobeat/2023/12/what-is-the-immune-system,biology,12,medium
+GAP-ANA-014,analogy,"A force changes motion, and heat changes the state of water.",independent_external,https://www.khanacademy.org/science/physics/forces-newtons-laws/introduction-to-newtons-laws/a/newtons-laws-of-motion,physics,11,medium
+GAP-ANA-015,analogy,"Earth's tilt changes seasonal sunlight, and a dimmer changes lamp brightness.",ai_assisted_surface_normalized,https://www.nasa.gov/learning-resources/for-kids-and-students/what-is-earth-grades-k-4/,earth_science,11,medium
+GAP-ANA-016,analogy,"A river carries water downhill, and a conveyor carries goods forward.",rule_composed,https://www.usgs.gov/educational-resources/water-world,earth_science,11,medium
+GAP-ANA-017,analogy,"A well pump lifts groundwater, and a heart pumps blood through vessels.",independent_external,https://www.ncbi.nlm.nih.gov/books/NBK27092/,biology,12,medium
+GAP-ANA-018,analogy,"A food web links feeding relationships, and a transit map links travel routes.",ai_assisted_surface_normalized,https://openstax.org/books/biology-2e/pages/46-2-energy-flow-through-ecosystems,biology,13,limited_long
+GAP-ANA-019,analogy,"A macrophage removes foreign material, and a filter removes particles from water.",rule_composed,https://www.ncbi.nlm.nih.gov/books/NBK27092/,biology,12,medium
+GAP-ANA-020,analogy,"A cloud stores condensed water, and a tank stores liquid water.",independent_external,https://www.usgs.gov/educational-resources/water-world,earth_science,11,medium
+GAP-ANA-021,analogy,"A camera records light, and a thermometer records temperature.",ai_assisted_surface_normalized,rule_composed://deterministic-construction,technology,9,medium
+GAP-ANA-022,analogy,"A root anchors a plant, and an anchor holds a boat.",rule_composed,https://naturalhistory.si.edu/education/teaching-resources/life-science/explore-animal-adaptations,biology,11,medium
+GAP-ANA-023,analogy,"Friction slows a wheel, and a brake slows a bicycle.",independent_external,https://www.khanacademy.org/science/physics/forces-newtons-laws/introduction-to-newtons-laws/a/newtons-laws-of-motion,physics,10,medium
+GAP-ANA-024,analogy,"A thermostat regulates room temperature, and a metronome regulates timing.",ai_assisted_surface_normalized,rule_composed://deterministic-construction,technology,10,medium
+GAP-ANA-025,analogy,"A sieve lets water pass while retaining solids, and a firewall lets approved data pass while blocking threats.",rule_composed,rule_composed://deterministic-construction,technology,18,limited_long
+GAP-ANA-026,analogy,"An ecosystem transfers energy among organisms, and a circuit transfers energy among components.",independent_external,https://openstax.org/books/biology-2e/pages/46-2-energy-flow-through-ecosystems,biology,13,limited_long
+GAP-DEF-001,definition,A queue is an ordered line of people or tasks waiting for service.,ai_assisted_surface_normalized,rule_composed://deterministic-construction,everyday_life,13,limited_long
+GAP-DEF-002,definition,A compass is a tool that indicates direction.,rule_composed,rule_composed://deterministic-construction,technology,8,medium
+GAP-DEF-003,definition,A fraction represents part of a whole.,independent_external,rule_composed://deterministic-construction,mathematics,7,medium
+GAP-DEF-004,definition,A polygon is a closed shape made of straight sides.,ai_assisted_surface_normalized,rule_composed://deterministic-construction,mathematics,10,medium
+GAP-DEF-005,definition,A password is secret text used to verify access.,rule_composed,rule_composed://deterministic-construction,technology,9,medium
+GAP-DEF-006,definition,A habitat is the place where an organism lives.,independent_external,rule_composed://deterministic-construction,biology,9,medium
+GAP-DEF-007,definition,A schedule is a plan that assigns times to activities.,ai_assisted_surface_normalized,rule_composed://deterministic-construction,everyday_life,10,medium
+GAP-DEF-008,definition,A lever is a rigid bar that turns around a pivot.,rule_composed,rule_composed://deterministic-construction,physics,11,medium
+GAP-DEF-009,definition,A variable is a quantity that can change.,independent_external,rule_composed://deterministic-construction,mathematics,8,medium
+GAP-DEF-010,definition,A map is a representation of places and their relationships.,ai_assisted_surface_normalized,rule_composed://deterministic-construction,geography,10,medium
+GAP-DEF-011,definition,Probability is a measure of how likely an event is.,rule_composed,https://www.khanacademy.org/math/probability/introduction-to-probability,mathematics,10,medium
+GAP-DEF-013,definition,Inertia is resistance to a change in motion.,ai_assisted_surface_normalized,https://www.khanacademy.org/science/physics/forces-newtons-laws/introduction-to-newtons-laws/a/newtons-laws-of-motion,physics,8,medium
+GAP-DEF-014,definition,Photosynthesis is a process that converts light energy into chemical energy.,rule_composed,https://openstax.org/books/concepts-biology/pages/5-1-overview-of-photosynthesis,biology,11,medium
+GAP-DEF-015,definition,An ecosystem includes organisms and their physical environment.,independent_external,https://openstax.org/books/biology-2e/pages/46-2-energy-flow-through-ecosystems,biology,8,medium
+GAP-DEF-016,definition,A food web represents feeding relationships in an ecosystem.,ai_assisted_surface_normalized,https://openstax.org/books/biology-2e/pages/46-2-energy-flow-through-ecosystems,biology,9,medium
+GAP-DEF-017,definition,An aquifer is a water-bearing formation that can store and transmit groundwater.,rule_composed,https://www.usgs.gov/water-science-school/science/groundwater-flow-and-water-cycle,earth_science,13,limited_long
+GAP-DEF-018,definition,Groundwater is water stored below the land surface.,independent_external,https://www.usgs.gov/educational-resources/water-world,earth_science,8,medium
+GAP-DEF-019,definition,"The immune system is a group of cells, tissues, and organs that protects the body.",ai_assisted_surface_normalized,https://nigms.nih.gov/biobeat/2023/12/what-is-the-immune-system,biology,15,limited_long
+GAP-DEF-020,definition,A macrophage is an immune cell that engulfs particles.,rule_composed,https://www.ncbi.nlm.nih.gov/books/NBK27092/,biology,9,medium
+GAP-DEF-021,definition,A season is a recurring part of a year with characteristic conditions.,independent_external,https://www.nasa.gov/learning-resources/for-kids-and-students/what-is-earth-grades-k-4/,earth_science,12,medium
+GAP-DEF-022,definition,Climate is the long-term pattern of weather in a region.,ai_assisted_surface_normalized,https://oceanservice.noaa.gov/education/literacy.html,earth_science,11,medium
+GAP-DEF-023,definition,An ocean current is directed movement of seawater.,rule_composed,https://oceanservice.noaa.gov/education/literacy.html,earth_science,8,medium
+GAP-DEF-024,definition,A cloud is a visible collection of water droplets or ice crystals.,independent_external,https://www.nasa.gov/learning-resources/for-kids-and-students/what-is-earth-grades-k-4/,earth_science,12,medium
+GAP-DEF-026,definition,Condensation is the change of vapor into a liquid.,rule_composed,https://www.usgs.gov/educational-resources/water-world,earth_science,9,medium
+GAP-DEF-027,definition,A watershed is land that drains to a common body of water.,independent_external,https://www.usgs.gov/educational-resources/water-world,earth_science,12,medium
+GAP-DEF-028,definition,A chloroplast is a plant-cell organelle where photosynthesis occurs.,ai_assisted_surface_normalized,https://openstax.org/books/concepts-biology/pages/5-1-overview-of-photosynthesis,biology,10,medium
+GAP-DEF-029,definition,A vaccine is a preparation that trains an immune response to a target.,rule_composed,https://nigms.nih.gov/biobeat/2023/12/what-is-the-immune-system,biology,13,limited_long
+GAP-DEF-030,definition,An algorithm is a step-by-step procedure for completing a task.,independent_external,rule_composed://deterministic-construction,technology,12,medium
+REMED-LOG-001,logic,"If a number is divisible by four, it is even.",rule_composed,rule_composed://human-audit-remediation,mathematics,10,medium
+REMED-LOG-002,logic,Nothing can be entirely north and entirely south of the same point.,rule_composed,rule_composed://human-audit-remediation,spatial_reasoning,12,medium
+REMED-LOG-003,logic,"If twelve equal shares are divided among three people, each person gets four shares.",rule_composed,rule_composed://human-audit-remediation,mathematics,14,limited_long
+REMED2-DEF-001,definition,A catalyst is a substance that speeds a chemical reaction without being consumed.,rule_composed,rule_composed://similarity-remediation,chemistry,13,limited_long
+REMED2-DEF-002,definition,An eclipse is an event in which one celestial body blocks light from another.,rule_composed,rule_composed://similarity-remediation,astronomy,14,limited_long
+REMED2-CAU-001,causality,Wind erodes bare soil by carrying loose particles away.,rule_composed,rule_composed://similarity-remediation,earth_science,9,medium
+REMED2-CAU-002,causality,Cooling magma causes it to solidify into igneous rock.,rule_composed,rule_composed://similarity-remediation,earth_science,9,medium
+REMED2-LOG-001,logic,"If a quantity is greater than seven, it cannot be less than five.",rule_composed,rule_composed://similarity-remediation,quantitative_reasoning,13,limited_long

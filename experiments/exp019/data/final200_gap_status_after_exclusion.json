@@ -1,0 +1,19 @@
+{
+  "retained_total": 72,
+  "excluded_human_review": 26,
+  "rejected": 2,
+  "remaining_total": 128,
+  "retained_by_class": {
+    "logic": 8,
+    "causality": 20,
+    "definition": 20,
+    "analogy": 24
+  },
+  "remaining_by_class": {
+    "logic": 42,
+    "causality": 30,
+    "analogy": 26,
+    "definition": 30
+  },
+  "human_review_status": "EXCLUDED_FROM_PRIMARY_POOL_FOR_EFFICIENCY_AND_AMBIGUITY"
+}

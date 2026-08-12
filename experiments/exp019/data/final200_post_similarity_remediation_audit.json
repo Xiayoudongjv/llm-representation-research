@@ -1,0 +1,21 @@
+{
+  "dataset_size": 200,
+  "class_counts": {
+    "logic": 50,
+    "causality": 50,
+    "definition": 50,
+    "analogy": 50
+  },
+  "length_min": 4,
+  "length_max": 20,
+  "exact_duplicates": 0,
+  "normalized_duplicates": 0,
+  "repeated_three_word_prefix_group_count": 7,
+  "high_similarity_pair_count": 2,
+  "maximum_nearest_neighbor_similarity": 0.6588,
+  "evaluator_artifact_sha256": "DF06E7683627F308330E77E8A50D35766F3CA50F5C8DE873E077092DEAEB2BDD",
+  "evaluator_config_sha256": "EB673B63CB0C407C04F55F9B5F8FB687C7BD680FC5B53DDD4CC18A2BCC906744",
+  "evaluator_unchanged": true,
+  "final200_predictions_accessed": false,
+  "exp017_outputs_accessed": false
+}
