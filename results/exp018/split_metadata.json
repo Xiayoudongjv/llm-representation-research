@@ -1,0 +1,101 @@
+{
+  "splits": [
+    {
+      "id": "A_original_fit_paraphrase_eval",
+      "split_index": 0,
+      "fit_ids": {
+        "logic": [
+          "logic_orig_01",
+          "logic_orig_02",
+          "logic_orig_03"
+        ],
+        "causality": [
+          "causality_orig_01",
+          "causality_orig_02",
+          "causality_orig_03"
+        ],
+        "analogy": [
+          "analogy_orig_01",
+          "analogy_orig_02",
+          "analogy_orig_03"
+        ],
+        "definition": [
+          "definition_orig_01",
+          "definition_orig_02",
+          "definition_orig_03"
+        ]
+      },
+      "evaluation_ids": {
+        "logic": [
+          "logic_para_01",
+          "logic_para_02",
+          "logic_para_03"
+        ],
+        "causality": [
+          "causality_para_01",
+          "causality_para_02",
+          "causality_para_03"
+        ],
+        "analogy": [
+          "analogy_para_01",
+          "analogy_para_02",
+          "analogy_para_03"
+        ],
+        "definition": [
+          "definition_para_01",
+          "definition_para_02",
+          "definition_para_03"
+        ]
+      }
+    },
+    {
+      "id": "B_paraphrase_fit_original_eval",
+      "split_index": 1,
+      "fit_ids": {
+        "logic": [
+          "logic_para_01",
+          "logic_para_02",
+          "logic_para_03"
+        ],
+        "causality": [
+          "causality_para_01",
+          "causality_para_02",
+          "causality_para_03"
+        ],
+        "analogy": [
+          "analogy_para_01",
+          "analogy_para_02",
+          "analogy_para_03"
+        ],
+        "definition": [
+          "definition_para_01",
+          "definition_para_02",
+          "definition_para_03"
+        ]
+      },
+      "evaluation_ids": {
+        "logic": [
+          "logic_orig_01",
+          "logic_orig_02",
+          "logic_orig_03"
+        ],
+        "causality": [
+          "causality_orig_01",
+          "causality_orig_02",
+          "causality_orig_03"
+        ],
+        "analogy": [
+          "analogy_orig_01",
+          "analogy_orig_02",
+          "analogy_orig_03"
+        ],
+        "definition": [
+          "definition_orig_01",
+          "definition_orig_02",
+          "definition_orig_03"
+        ]
+      }
+    }
+  ],
+  "input_dataset": "experiments/exp003/prompts_controlled.json"
+}

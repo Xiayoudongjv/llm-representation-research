@@ -1,0 +1,16 @@
+{
+  "config_path": "experiments\\exp018\\validation_conditions.json",
+  "planned_counts": {
+    "model_layer_configurations": 3,
+    "splits": 2,
+    "ordered_transitions": 12,
+    "betas": 3,
+    "intervention_types": 3,
+    "held_out_source_items_per_transition": 3,
+    "condition_evaluations": 648,
+    "per_item_transition_rows": 1944,
+    "per_item_probe_rows": 1944,
+    "invariant_rows": 648,
+    "pair_summary_rows": 72
+  }
+}
