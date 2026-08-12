@@ -1,0 +1,18 @@
+{
+  "dataset_sha256": "48E05DB992185661DF41C102C32CD4685944E50D0CD7454A195AB63C7B638765",
+  "artifact_sha256": "DF06E7683627F308330E77E8A50D35766F3CA50F5C8DE873E077092DEAEB2BDD",
+  "config_sha256": "EB673B63CB0C407C04F55F9B5F8FB687C7BD680FC5B53DDD4CC18A2BCC906744",
+  "dataset_size": 200,
+  "class_counts": {
+    "logic": 50,
+    "causality": 50,
+    "definition": 50,
+    "analogy": 50
+  },
+  "run_timestamp_utc": "2026-08-12T17:33:13.716873+00:00",
+  "one_shot": true,
+  "prediction_call_count": 1,
+  "evaluator_refit": false,
+  "hyperparameters_modified": false,
+  "EXP017_accessed": false
+}

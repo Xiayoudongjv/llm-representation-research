@@ -1,0 +1,274 @@
+{
+  "balanced_accuracy": 0.48500000000000004,
+  "macro_f1": 0.4579887205588029,
+  "accuracy": 0.485,
+  "per_class": {
+    "logic": {
+      "precision": 0.5909090909090909,
+      "recall": 0.26,
+      "f1": 0.3611111111111111,
+      "support": 50
+    },
+    "causality": {
+      "precision": 0.3939393939393939,
+      "recall": 0.26,
+      "f1": 0.3132530120481928,
+      "support": 50
+    },
+    "analogy": {
+      "precision": 0.44680851063829785,
+      "recall": 0.84,
+      "f1": 0.5833333333333334,
+      "support": 50
+    },
+    "definition": {
+      "precision": 0.5686274509803921,
+      "recall": 0.58,
+      "f1": 0.5742574257425742,
+      "support": 50
+    }
+  },
+  "confusion_matrix": [
+    [
+      13,
+      7,
+      15,
+      15
+    ],
+    [
+      7,
+      13,
+      25,
+      5
+    ],
+    [
+      1,
+      5,
+      42,
+      2
+    ],
+    [
+      1,
+      8,
+      12,
+      29
+    ]
+  ],
+  "acceptance_thresholds": {
+    "balanced_accuracy_min": 0.7,
+    "macro_f1_min": 0.7,
+    "per_class_recall_min": 0.6
+  },
+  "acceptance_decision": "FAILED_INDEPENDENT_GENERALIZATION",
+  "exp017_targetness_unlocked": false,
+  "error_count": 103,
+  "confidence_summary": {
+    "mean_max_probability": 0.3462423278531552,
+    "median_max_probability": 0.3338684181976969,
+    "mean_max_probability_correct": 0.36253745164303086,
+    "mean_max_probability_incorrect": 0.3308964345753111,
+    "low_confidence_cases": [
+      {
+        "candidate_id": "SRC-CAU-023",
+        "true_task_class": "causality",
+        "predicted_task_class": "causality",
+        "max_probability": 0.2640032303772988
+      },
+      {
+        "candidate_id": "GAP-CAU-010",
+        "true_task_class": "causality",
+        "predicted_task_class": "analogy",
+        "max_probability": 0.2654831911338481
+      },
+      {
+        "candidate_id": "SRC-CAU-008",
+        "true_task_class": "causality",
+        "predicted_task_class": "definition",
+        "max_probability": 0.26726945208043157
+      },
+      {
+        "candidate_id": "SRC-LOG-006",
+        "true_task_class": "logic",
+        "predicted_task_class": "causality",
+        "max_probability": 0.26906029115914515
+      },
+      {
+        "candidate_id": "GAP-CAU-016",
+        "true_task_class": "causality",
+        "predicted_task_class": "definition",
+        "max_probability": 0.26945136184952123
+      },
+      {
+        "candidate_id": "GAP-CAU-030",
+        "true_task_class": "causality",
+        "predicted_task_class": "analogy",
+        "max_probability": 0.2694541180296172
+      },
+      {
+        "candidate_id": "GAP-CAU-011",
+        "true_task_class": "causality",
+        "predicted_task_class": "analogy",
+        "max_probability": 0.2695070853947094
+      },
+      {
+        "candidate_id": "SRC-CAU-022",
+        "true_task_class": "causality",
+        "predicted_task_class": "analogy",
+        "max_probability": 0.2695813496736158
+      },
+      {
+        "candidate_id": "GAP-CAU-002",
+        "true_task_class": "causality",
+        "predicted_task_class": "analogy",
+        "max_probability": 0.26999763314119835
+      },
+      {
+        "candidate_id": "GAP-CAU-022",
+        "true_task_class": "causality",
+        "predicted_task_class": "analogy",
+        "max_probability": 0.2721117644151433
+      }
+    ]
+  },
+  "descriptive_performance": {
+    "task_class": {
+      "analogy": {
+        "count": 50,
+        "accuracy": 0.84,
+        "balanced_accuracy": 0.84
+      },
+      "causality": {
+        "count": 50,
+        "accuracy": 0.26,
+        "balanced_accuracy": 0.26
+      },
+      "definition": {
+        "count": 50,
+        "accuracy": 0.58,
+        "balanced_accuracy": 0.58
+      },
+      "logic": {
+        "count": 50,
+        "accuracy": 0.26,
+        "balanced_accuracy": 0.26
+      }
+    },
+    "provenance": {
+      "ai_assisted_surface_normalized": {
+        "count": 38,
+        "accuracy": 0.47368421052631576,
+        "balanced_accuracy": 0.49229797979797985
+      },
+      "independent_external": {
+        "count": 39,
+        "accuracy": 0.46153846153846156,
+        "balanced_accuracy": 0.48130341880341876
+      },
+      "not_recorded": {
+        "count": 72,
+        "accuracy": 0.5,
+        "balanced_accuracy": 0.42500000000000004
+      },
+      "rule_composed": {
+        "count": 51,
+        "accuracy": 0.49019607843137253,
+        "balanced_accuracy": 0.5416666666666666
+      }
+    },
+    "topic_domain": {
+      "astronomy": {
+        "count": 1,
+        "accuracy": 1.0,
+        "balanced_accuracy": 1.0
+      },
+      "biology": {
+        "count": 47,
+        "accuracy": 0.5531914893617021,
+        "balanced_accuracy": 0.5109126984126984
+      },
+      "chemistry": {
+        "count": 1,
+        "accuracy": 1.0,
+        "balanced_accuracy": 1.0
+      },
+      "earth_science": {
+        "count": 48,
+        "accuracy": 0.4583333333333333,
+        "balanced_accuracy": 0.45972222222222225
+      },
+      "everyday_life": {
+        "count": 16,
+        "accuracy": 0.5625,
+        "balanced_accuracy": 0.7321428571428571
+      },
+      "general_science": {
+        "count": 3,
+        "accuracy": 0.3333333333333333,
+        "balanced_accuracy": 0.3333333333333333
+      },
+      "geography": {
+        "count": 1,
+        "accuracy": 0.0,
+        "balanced_accuracy": 0.0
+      },
+      "language": {
+        "count": 3,
+        "accuracy": 0.6666666666666666,
+        "balanced_accuracy": 0.5
+      },
+      "mathematics": {
+        "count": 16,
+        "accuracy": 0.1875,
+        "balanced_accuracy": 0.2916666666666667
+      },
+      "physics": {
+        "count": 24,
+        "accuracy": 0.4166666666666667,
+        "balanced_accuracy": 0.4125
+      },
+      "quantitative_reasoning": {
+        "count": 1,
+        "accuracy": 0.0,
+        "balanced_accuracy": 0.0
+      },
+      "spatial_reasoning": {
+        "count": 8,
+        "accuracy": 0.125,
+        "balanced_accuracy": 0.07142857142857142
+      },
+      "technology": {
+        "count": 31,
+        "accuracy": 0.6774193548387096,
+        "balanced_accuracy": 0.6979166666666666
+      }
+    },
+    "length_band": {
+      "limited_long": {
+        "count": 63,
+        "accuracy": 0.6349206349206349,
+        "balanced_accuracy": 0.5894544052438788
+      },
+      "medium": {
+        "count": 132,
+        "accuracy": 0.4318181818181818,
+        "balanced_accuracy": 0.4842247493691605
+      },
+      "short": {
+        "count": 5,
+        "accuracy": 0.0,
+        "balanced_accuracy": 0.0
+      }
+    }
+  },
+  "procedural_reference": {
+    "balanced_accuracy": 1.0,
+    "macro_f1": 1.0,
+    "accuracy": 1.0,
+    "three_word_marker_validation_balanced_accuracy": 0.8417,
+    "three_word_marker_test_balanced_accuracy": 0.7
+  },
+  "one_shot": true,
+  "evaluator_refit": false,
+  "hyperparameters_modified": false,
+  "EXP017_accessed": false
+}
