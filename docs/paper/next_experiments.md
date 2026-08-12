@@ -34,11 +34,22 @@ found benchmark-sensitive descriptive correlations, including two sign changes.
 With only four groups, it does not justify further representation-behavior
 interpretation.
 
+EXP-013 then replicated the controlled 24-prompt geometry analysis on
+`google/gemma-3-1b-it` using raw plain-text prompts and normalized depth. Both
+task-associated geometry and paraphrase-controlled signal replicated, but the
+largest Gemma separation occurred at its final layer while its largest
+silhouette occurred at normalized depth 0.62. This supports a cautious
+second-model representation-level steering probe, not a general claim about
+universal layer locations or behavioral effects.
+
 Future work:
 
-1. Replicate the frozen benchmark on a second model.
-2. Add an independent human-annotation sample for scoring reliability.
-3. Consider generation-time intervention only after those baseline steps.
+1. Run a controlled Gemma representation-level steering replication using the
+   observed Gemma geometry rather than assuming Qwen's nominal layer 16.
+2. Replicate the frozen behavioral benchmark on Gemma.
+3. Add an independent human-annotation sample for scoring reliability.
+4. Consider generation-time intervention only after the model-specific
+   representation and behavioral baselines are established.
 
 The previous exploratory options are retained below as historical planning
 context; this recommendation supersedes their priority ordering.

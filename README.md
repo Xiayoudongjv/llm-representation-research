@@ -247,9 +247,23 @@ EXP-012 replaces EXP-010's preliminary behavioral baseline and shows that
 some descriptive correlations are benchmark-sensitive. It remains an n=4,
 non-causal analysis and does not explain behavioral differences.
 
+## Current Milestone: EXP-013 Gemma Cross-Model Geometry Replication
+
+Run the local-cache Gemma replication with:
+
+```bash
+python experiments/exp013/gemma_geometry_replication.py
+```
+
+EXP-013 reuses EXP-003's 24 controlled prompts with raw plain-text input and
+compares normalized layer depth across Qwen and Gemma. It found replicated
+task-associated geometry and paraphrase-controlled signal in Gemma, while the
+strongest separation occurred at Gemma's final layer rather than a mid-depth
+layer. Only aggregate metrics and plots are saved.
+
 ## Project Status
 
-Experiments are complete through EXP-010. Paper Draft v0.3 and the associated
+Experiments are complete through EXP-013. Paper Draft v0.3 and the associated
 status, results, and claims documents are available under `docs/paper`.
 Engineering utilities for IO, representation extraction, and plotting are
 covered by local tests.

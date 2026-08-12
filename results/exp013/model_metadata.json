@@ -1,0 +1,32 @@
+{
+  "model": "google/gemma-3-1b-it",
+  "model_class": "Gemma3ForCausalLM",
+  "config_class": "Gemma3TextConfig",
+  "tokenizer_class": "GemmaTokenizer",
+  "model_type": "gemma3_text",
+  "parameter_count": 999885952,
+  "num_hidden_layers": 26,
+  "hidden_size": 1152,
+  "declared_torch_dtype": "torch.bfloat16",
+  "runtime_dtype": "torch.float16",
+  "runtime_device": "cuda:0",
+  "hidden_state_count": 27,
+  "selected_layers": [
+    0,
+    4,
+    8,
+    12,
+    16,
+    20,
+    23,
+    26
+  ],
+  "prompt_format": "raw_plain_text_no_chat_template",
+  "batch_size": 1,
+  "min_token_count": 9,
+  "max_token_count": 19,
+  "gpu_memory_before_load_bytes": 0,
+  "gpu_memory_after_load_bytes": 1999801344,
+  "gpu_memory_after_final_forward_bytes": 2040725504,
+  "zero_variance_layers": []
+}

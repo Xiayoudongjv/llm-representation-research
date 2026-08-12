@@ -1,0 +1,66 @@
+{
+  "model": "google/gemma-3-1b-it",
+  "number_of_prompts": 24,
+  "number_of_groups": 4,
+  "layers": [
+    0,
+    4,
+    8,
+    12,
+    16,
+    20,
+    23,
+    26
+  ],
+  "normalized_depths": [
+    0.0,
+    0.15384615384615385,
+    0.3076923076923077,
+    0.46153846153846156,
+    0.6153846153846154,
+    0.7692307692307693,
+    0.8846153846153846,
+    1.0
+  ],
+  "best_separation_layer": 26,
+  "best_separation_normalized_depth": 1.0,
+  "best_separation_score": 0.09329384068628999,
+  "best_silhouette_layer": 16,
+  "best_silhouette_score": 0.13971808552742004,
+  "best_paraphrase_retention_layer": 26,
+  "best_paraphrase_retention_score": 0.07140084249691714,
+  "positive_separation_layers": [
+    8,
+    12,
+    16,
+    20,
+    23,
+    26
+  ],
+  "positive_silhouette_layers": [
+    8,
+    12,
+    16,
+    20,
+    23,
+    26
+  ],
+  "positive_paraphrase_retention_layers": [
+    12,
+    16,
+    20,
+    23,
+    26
+  ],
+  "qwen_best_controlled_layer": 16,
+  "qwen_best_separation_score": 0.07301505094151728,
+  "qwen_best_paraphrase_retention_score": 0.03642390536000273,
+  "replication_assessment": {
+    "task_associated_geometry": "replicated",
+    "paraphrase_controlled_signal": "replicated",
+    "non_monotonic_layerwise_geometry": "replicated",
+    "mid_or_middeep_peak": "not_replicated"
+  },
+  "gate_decision": "PROCEED_TO_STEERING",
+  "warning": "Two models and 24 hand-designed prompts do not establish universal geometry or behavioral relevance."
+}
