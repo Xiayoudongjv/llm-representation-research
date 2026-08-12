@@ -7,6 +7,10 @@ target-sensitive behavioral movement. It does not attribute the negative
 EXP-017 source-accuracy result to a weak metric; that is an unresolved
 possibility requiring an independently frozen evaluator.
 
+The next gate is controlled EXP-019 evaluator-dataset construction and its
+leakage audit. The evaluator is not yet valid, and no EXP-017 output may inform
+dataset design, feature design, or evaluator acceptance.
+
 ## Updated Recommendation: EXP-011 Expanded Answer-level Dataset
 
 EXP-010 remains inconclusive because its correlation analysis has only four

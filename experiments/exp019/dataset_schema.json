@@ -1,0 +1,23 @@
+{
+  "schema_name": "EXP-019 independent behavioral evaluator dataset",
+  "status": "empty_manifest_protocol_only",
+  "record_fields": [
+    {"name": "example_id", "type": "string", "required": true, "description": "Stable response-only record ID with no task information encoded."},
+    {"name": "content_family_id", "type": "string", "required": true, "description": "Family-level split unit shared by matched semantic content."},
+    {"name": "task_class", "type": "enum", "required": true, "allowed_values": ["logic", "causality", "analogy", "definition"]},
+    {"name": "response_text", "type": "string", "required": true, "description": "Only field supplied to the future classifier."},
+    {"name": "split", "type": "enum", "required": true, "allowed_values": ["train", "validation", "test"]},
+    {"name": "provenance", "type": "enum", "required": true, "allowed_values": ["human_authored", "deterministic_procedural", "independent_educational_source", "other_documented_independent"]},
+    {"name": "length_tokens", "type": "integer", "required": true, "minimum": 1},
+    {"name": "length_band", "type": "enum", "required": true, "allowed_values": ["short", "medium", "limited_long"]},
+    {"name": "template_family", "type": "string", "required": true},
+    {"name": "paraphrase_family_id", "type": "string", "required": true},
+    {"name": "lexical_challenge", "type": "boolean", "required": true},
+    {"name": "notes", "type": "string", "required": true}
+  ],
+  "forbidden_fields": ["original_prompt", "source_task_label", "intervention_condition", "correctness_label", "hidden_states", "steering_vector"],
+  "length_bands": {"short": [1, 5], "medium": [6, 12], "limited_long": [13, 20]},
+  "split_policy": {"unit": "content_family_id", "seed": 20260812, "family_disjoint": true, "paraphrase_family_disjoint": true, "template_family_cross_split_audit_required": true},
+  "minimum_counts": {"per_class": 190, "total": 760, "per_class_by_split": {"train": 120, "validation": 30, "test": 40}, "preferred_fully_balanced_content_families": 190},
+  "dataset_content_created": false
+}
