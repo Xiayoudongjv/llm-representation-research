@@ -5,8 +5,24 @@ to Research Audit v1 by separating fit prompts from evaluation prompts and by
 comparing task steering with matched-norm random and opposite-direction
 controls.
 
-There is intentionally no runner in this directory. Do not load a model or
-generate output as part of this preregistration.
+`independent_validation.py` implements the frozen protocol. It has an explicit
+dry-run mode that loads no model and writes no result files:
+
+```powershell
+python experiments/exp018/independent_validation.py --dry-run
+```
+
+The official model-forward run is deliberately opt-in and must not be used
+until separately authorized:
+
+```powershell
+python experiments/exp018/independent_validation.py --run
+```
+
+The runner reads its models, layers, splits, betas, probe settings, random seed,
+and controls only from `validation_conditions.json`. It validates that every
+fit/evaluation split is disjoint before fitting centroids, the scaler, or the
+probe. No raw hidden-state tensors are persisted.
 
 The frozen design is documented in
 [`docs/experiments/EXP-018-PREREGISTRATION.md`](../../docs/experiments/EXP-018-PREREGISTRATION.md).
@@ -24,5 +40,9 @@ Primary configuration:
 - Primary independent evaluator: fit-only multinomial logistic-regression
   probe
 
-No historical experiment, paper draft, or EXP-017 preregistration is changed
-by this directory.
+Future official output schemas are `transition_metrics.csv`, `probe_metrics.csv`,
+`invariant_metrics.csv`, `pair_summary.csv`, `validation_summary.json`, and
+`split_metadata.json` under `results/exp018/`. Dry-run never creates them.
+
+No historical experiment, paper draft, or EXP-017 preregistration is changed by
+this directory.
