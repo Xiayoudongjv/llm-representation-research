@@ -1,9 +1,18 @@
-# EXP-017 Generation-Time Intervention Pilot Preregistration
+# EXP-017 Generation-Time Intervention Pilot
 
-This directory freezes the behavioral intervention design only. It intentionally
-contains no runner or generation hook implementation.
+The historical preregistration remains in
+[`intervention_conditions.json`](intervention_conditions.json). The first
+official behavioral run is governed by the post-audit amendment in
+[`intervention_conditions_v2.json`](intervention_conditions_v2.json) and
+[`EXP-017-AMENDMENT-V1.md`](../../docs/experiments/EXP-017-AMENDMENT-V1.md).
 
-The frozen conditions and exact hook semantics are in
-[`intervention_conditions.json`](intervention_conditions.json). Before any
-behavioral run, a separate implementation task must validate the stated hook
-semantics on a tiny KV-cache diagnostic.
+Validate the frozen runner without loading a model or writing results:
+
+```bash
+python experiments/exp017/behavioral_pilot.py --dry-run
+```
+
+`--run` is reserved for the separately authorized 320-generation official
+pilot. It uses EXP-003 prompts only for steering-vector fitting, EXP-011D only
+for behavioral evaluation, and atomically publishes five compact result files
+only after the run succeeds. It never saves hidden states or steering vectors.
