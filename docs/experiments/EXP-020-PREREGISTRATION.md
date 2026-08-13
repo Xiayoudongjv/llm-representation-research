@@ -57,3 +57,14 @@ not a confirmatory behavioral metric.
 ## Status
 
 No formal EXP-020 results are produced by this preregistration.
+
+## Hardware Qualification Status Clarification
+
+The historical qualification record was initially labeled
+`HARDWARE_INFEASIBLE`, but the run stopped before model configuration loading.
+Its corrected interpretation is `hardware_feasibility = UNTESTED`,
+`model_access_status = BLOCKED`, and
+`qualification_stage_reached = BEFORE_MODEL_CONFIG_LOAD`. The cause was D:
+cache/network availability, not GPU OOM or a model runtime failure. EXP-020
+scientific results remain `NOT_STARTED`; the frozen layer and beta protocol is
+unchanged.

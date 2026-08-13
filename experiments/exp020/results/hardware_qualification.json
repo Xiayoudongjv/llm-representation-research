@@ -1,9 +1,24 @@
 {
   "requested_model_id": "Qwen/Qwen3-4B",
   "qualification_status": "HARDWARE_INFEASIBLE",
+  "hardware_feasibility": "UNTESTED",
+  "model_access_status": "BLOCKED",
+  "qualification_stage_reached": "BEFORE_MODEL_CONFIG_LOAD",
   "timestamp_utc": "2026-08-13T01:35:37.541574+00:00",
   "diagnostic_prompt": "This is a neutral hardware diagnostic.",
   "cache_dir": "D:\\AI_Cache\\huggingface",
+  "cache_configuration": {
+    "HF_HOME": "D:\\AI_Cache\\huggingface",
+    "HF_HUB_CACHE": "D:\\AI_Cache\\huggingface\\hub",
+    "TRANSFORMERS_CACHE": "D:\\AI_Cache\\huggingface\\transformers",
+    "planned_download_cache_dir": "D:\\AI_Cache\\huggingface",
+    "free_disk_gib": 185.77
+  },
+  "local_snapshot_path": null,
+  "local_only_config_tokenizer_check": {
+    "performed": false,
+    "reason": "No complete Qwen/Qwen3-4B snapshot is present in the configured D: cache."
+  },
   "gpu": {
     "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
     "total_memory_gib": 7.9595,
@@ -21,5 +36,7 @@
     "error": "OSError: We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
     "oom": false
   },
-  "stop_reason": "Model configuration was neither cached nor reachable. Qualification stopped before MODE_A to avoid repeated network downloads."
+  "stop_reason": "Model configuration was neither cached nor reachable. Qualification stopped before MODE_A to avoid repeated network downloads.",
+  "status_clarification": "This historical HARDWARE_INFEASIBLE result is an infrastructure access stop, not a GPU OOM or runtime failure. Hardware feasibility remains UNTESTED and EXP-020 scientific results remain NOT_STARTED.",
+  "network_diagnostic_classification": "GENERAL_NETWORK_BLOCK"
 }

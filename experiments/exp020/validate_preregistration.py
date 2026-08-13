@@ -42,6 +42,11 @@ def main() -> None:
     else:
         require(record.get("attempts") == [], "an access-blocked qualification must not attempt a loading mode")
         require(bool(record.get("access_error", {}).get("error")), "hardware-infeasible result lacks the access error")
+        require(record.get("hardware_feasibility") == "UNTESTED", "access failure must not be labeled as a hardware test")
+        require(record.get("model_access_status") == "BLOCKED", "access failure must record blocked model access")
+        require(record.get("qualification_stage_reached") == "BEFORE_MODEL_CONFIG_LOAD", "access failure stage is inaccurate")
+        require(record.get("cache_configuration", {}).get("planned_download_cache_dir") == r"D:\AI_Cache\huggingface", "planned cache location changed")
+        require(record.get("network_diagnostic_classification") == "GENERAL_NETWORK_BLOCK", "network failure classification is missing")
     source = RUNNER.read_text(encoding="utf-8")
     require("neutral hardware diagnostic" in source.casefold(), "neutral diagnostic text missing")
     require("exp017" in source.casefold() and "formal" in source.casefold(), "boundary guard language missing")

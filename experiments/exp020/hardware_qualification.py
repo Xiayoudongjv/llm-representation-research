@@ -10,6 +10,7 @@ import gc
 import json
 import os
 import platform
+import shutil
 import time
 import traceback
 from datetime import datetime, timezone
@@ -191,9 +192,19 @@ def main() -> None:
     base = {
         "requested_model_id": MODEL_ID,
         "qualification_status": "HARDWARE_INFEASIBLE",
+        "hardware_feasibility": "UNTESTED",
+        "model_access_status": "BLOCKED",
+        "qualification_stage_reached": "BEFORE_MODEL_CONFIG_LOAD",
         "timestamp_utc": datetime.now(timezone.utc).isoformat(),
         "diagnostic_prompt": PROMPT,
         "cache_dir": str(CACHE_DIR),
+        "cache_configuration": {
+            "HF_HOME": os.environ.get("HF_HOME"),
+            "HF_HUB_CACHE": os.environ.get("HF_HUB_CACHE"),
+            "TRANSFORMERS_CACHE": os.environ.get("TRANSFORMERS_CACHE"),
+            "planned_download_cache_dir": str(CACHE_DIR),
+            "free_disk_gib": round(shutil.disk_usage(CACHE_DIR.drive + "\\").free / 1024 ** 3, 2),
+        },
         "gpu": {"name": torch.cuda.get_device_name(0), "total_memory_gib": round(torch.cuda.get_device_properties(0).total_memory / 1024 ** 3, 4), "bf16_supported": torch.cuda.is_bf16_supported()},
         "mode_order": ["MODE_A_NATIVE", "MODE_B_CPU_OFFLOAD", "MODE_C_4BIT"],
         "formal_exp020_results_created": False,
@@ -206,10 +217,14 @@ def main() -> None:
         base["model_metadata"] = metadata(config, tokenizer)
     except Exception as exc:
         base["access_error"] = error_record(exc)
+        base["stop_reason"] = "Model configuration was unavailable from both the D: cache and Hugging Face access; no hardware inference mode was attempted."
         RESULT.write_text(json.dumps(base, ensure_ascii=False, indent=2, default=json_value) + "\n", encoding="utf-8")
         print("HARDWARE_INFEASIBLE")
         return
     native = attempt_mode("MODE_A_NATIVE", config, tokenizer, dtype)
+    base["hardware_feasibility"] = "TESTED"
+    base["model_access_status"] = "AVAILABLE"
+    base["qualification_stage_reached"] = "MODEL_MODE_DIAGNOSTICS"
     base["attempts"].append(native)
     selected = native if native.get("success") else None
     if selected is None and native.get("oom"):
