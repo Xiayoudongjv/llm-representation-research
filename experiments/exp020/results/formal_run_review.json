@@ -1,0 +1,62 @@
+{
+  "task": "082B",
+  "review_only": true,
+  "formal_run_authorized": false,
+  "formal_fit_eval_inference_performed": false,
+  "formal_scientific_results_created": false,
+  "exp020_scientific_status": "NOT_STARTED",
+  "evidence_changed": false,
+  "scientific_conclusion_changed": false,
+  "runner_modified": false,
+  "authority_files_modified": false,
+  "formal_data_access_level": "LEVEL_1",
+  "entry_head": "0f03d65ec8328691f46405538cc8d7b9a3ecd83d",
+  "entry_branch": "main...origin/main",
+  "entry_worktree_clean": true,
+  "required_ancestors_verified": true,
+  "authority_hashes_verified": true,
+  "preregistration_validator_passed": true,
+  "implementation_spec_validator_passed": true,
+  "implementation_ready_flags": {
+    "PRIMARY_READY": true,
+    "SECONDARY_READY": true,
+    "FULL_READY": true,
+    "status": "READY_FOR_EXP020_RUNNER_IMPLEMENTATION"
+  },
+  "runner_syntax_validation_passed": true,
+  "runner_tests_passed": true,
+  "runner_test_count": 49,
+  "authorization_boundary_fail_closed": false,
+  "authorization_tested_missing_blocks": true,
+  "authorization_tested_malformed_stops_before_later_formal_actions": true,
+  "authorization_tested_mismatch_blocks": true,
+  "computation_semantics_match": false,
+  "bootstrap_semantics_match": true,
+  "atomic_publication_assured": false,
+  "formal_inputs_integrity_verified": true,
+  "model_integrity_verified": true,
+  "preexisting_authorization_or_formal_result": false,
+  "static_preflight_rerun": false,
+  "neutral_model_preflight_rerun": false,
+  "critical_findings": [
+    {
+      "id": "authorization_not_bound_to_frozen_authority_hash_set",
+      "impact": "The formal path can open formal inputs without first verifying the frozen config, prompt, source-condition, and split/transition hashes or rerunning equivalent validators."
+    },
+    {
+      "id": "formal_publication_contract_mismatch",
+      "impact": "The pre-inference formal-result guard names differ from the files published by the runner; published output lacks required validation/provenance metadata and accepts empty result sections."
+    }
+  ],
+  "noncritical_findings": [
+    {
+      "id": "preflight_cli_overwrites_committed_evidence",
+      "impact": "Static and neutral CLI modes unconditionally write runner_preflight.json, so they were not rerun in this immutable review."
+    },
+    {
+      "id": "malformed_authorization_error_type",
+      "impact": "Malformed JSON stops before formal action but surfaces as JSONDecodeError rather than the standard authorization message."
+    }
+  ],
+  "final_status": "FORMAL_RUN_REVIEW_BLOCKED_RUNNER_SEMANTIC_MISMATCH"
+}
