@@ -1,0 +1,314 @@
+{
+  "audit_timestamp_utc": "2026-08-13T04:00:35.599835+00:00",
+  "requested_model_id": "Qwen/Qwen3-4B",
+  "canonical_model_path": "D:\\Qwen3-4B-transfer",
+  "local_files_only": true,
+  "source_revision_from_download_metadata": "1cfa9a7208912126459214e8b04321603b3df60c",
+  "candidate_model_storage_bytes": 8829009551,
+  "candidate_weight_storage_bytes": 8044982000,
+  "apparent_model_storage_bytes": 14308617456,
+  "large_model_files": [
+    {
+      "absolute_path": "D:\\Qwen3-4B-transfer\\model-00001-of-00003.safetensors",
+      "filename": "model-00001-of-00003.safetensors",
+      "size_bytes": 3957900840,
+      "extension": ".safetensors",
+      "sha256": "328a91d3122359d5547f9d79521205bc0a46e1f79a792dfe650e99fc2d651223",
+      "st_nlink": 1,
+      "is_symlink": false
+    },
+    {
+      "absolute_path": "D:\\Qwen3-4B-transfer\\model-00002-of-00003.safetensors",
+      "filename": "model-00002-of-00003.safetensors",
+      "size_bytes": 3987450520,
+      "extension": ".safetensors",
+      "sha256": "6cd087b316306a68c562436b5492edbcf6e16c6dba3a1308279caa5a58e21ca5",
+      "st_nlink": 1,
+      "is_symlink": false
+    },
+    {
+      "absolute_path": "D:\\Qwen3-4B-transfer\\model-00003-of-00003.safetensors",
+      "filename": "model-00003-of-00003.safetensors",
+      "size_bytes": 99630640,
+      "extension": ".safetensors",
+      "sha256": "e4bf436957184f4eeb86a80e9db394503f1f56446b2e6b7edeac5b81470f4ca1",
+      "st_nlink": 1,
+      "is_symlink": false
+    },
+    {
+      "absolute_path": "D:\\AI_Cache\\huggingface\\hub\\models--Qwen--Qwen3-1.7B\\snapshots\\70d244cc86ccca08cf5af4e1e306ecf908b1ad5e\\model-00001-of-00002.safetensors",
+      "filename": "model-00001-of-00002.safetensors",
+      "size_bytes": 3441185608,
+      "extension": ".safetensors",
+      "sha256": "169ad53ec313c3a34b06c0809216e4fc072cce444a5d4ff2b59690d064130ed5",
+      "st_nlink": 1,
+      "is_symlink": false
+    },
+    {
+      "absolute_path": "D:\\AI_Cache\\huggingface\\hub\\models--Qwen--Qwen3-1.7B\\snapshots\\70d244cc86ccca08cf5af4e1e306ecf908b1ad5e\\model-00002-of-00002.safetensors",
+      "filename": "model-00002-of-00002.safetensors",
+      "size_bytes": 622329984,
+      "extension": ".safetensors",
+      "sha256": "912becff8d60672aa8628ef08c05898d9adf17c2ad4ae3caf99b065622fdeff9",
+      "st_nlink": 1,
+      "is_symlink": false
+    },
+    {
+      "absolute_path": "D:\\AI_Cache\\huggingface\\hub\\models--TinyLlama--TinyLlama-1.1B-Chat-v1.0\\snapshots\\fe8a4ea1ffedaf415f4da2f062534de366a451e6\\model.safetensors",
+      "filename": "model.safetensors",
+      "size_bytes": 2200119864,
+      "extension": ".safetensors",
+      "sha256": "6e6001da2106d4757498752a021df6c2bdc332c650aae4bae6b0c004dcf14933",
+      "st_nlink": 1,
+      "is_symlink": false
+    }
+  ],
+  "exact_duplicate_large_file_groups": [],
+  "exact_duplicate_large_file_count": 0,
+  "exact_duplicate_bytes": 0,
+  "candidate_partial_download_residue_bytes": 768079002,
+  "total_partial_download_residue_bytes": 1572560137,
+  "potential_recoverable_storage_bytes": 1572560137,
+  "same_filename_different_hash_groups": [],
+  "incomplete_or_partial_files": [
+    {
+      "absolute_path": "D:\\Qwen3-4B-transfer\\.cache\\huggingface\\download\\D5-QTaCbl9VUFv9Wr0C28eFewRc=.6cd087b316306a68c562436b5492edbcf6e16c6dba3a1308279caa5a58e21ca5.122b282b.incomplete",
+      "filename": "D5-QTaCbl9VUFv9Wr0C28eFewRc=.6cd087b316306a68c562436b5492edbcf6e16c6dba3a1308279caa5a58e21ca5.122b282b.incomplete",
+      "size_bytes": 0,
+      "extension": ".incomplete",
+      "sha256": null,
+      "st_nlink": 1,
+      "is_symlink": false
+    },
+    {
+      "absolute_path": "D:\\Qwen3-4B-transfer\\.cache\\huggingface\\download\\D5-QTaCbl9VUFv9Wr0C28eFewRc=.6cd087b316306a68c562436b5492edbcf6e16c6dba3a1308279caa5a58e21ca5.b3e7d0ae.incomplete",
+      "filename": "D5-QTaCbl9VUFv9Wr0C28eFewRc=.6cd087b316306a68c562436b5492edbcf6e16c6dba3a1308279caa5a58e21ca5.b3e7d0ae.incomplete",
+      "size_bytes": 768000000,
+      "extension": ".incomplete",
+      "sha256": null,
+      "st_nlink": 1,
+      "is_symlink": false
+    },
+    {
+      "absolute_path": "D:\\Qwen3-4B-transfer\\.cache\\huggingface\\download\\Y6g195DXbsCiN_Ka1NwH6jyLkvc=.328a91d3122359d5547f9d79521205bc0a46e1f79a792dfe650e99fc2d651223.8fbb3272.incomplete",
+      "filename": "Y6g195DXbsCiN_Ka1NwH6jyLkvc=.328a91d3122359d5547f9d79521205bc0a46e1f79a792dfe650e99fc2d651223.8fbb3272.incomplete",
+      "size_bytes": 39501,
+      "extension": ".incomplete",
+      "sha256": null,
+      "st_nlink": 1,
+      "is_symlink": false
+    },
+    {
+      "absolute_path": "D:\\Qwen3-4B-transfer\\.cache\\huggingface\\download\\Y6g195DXbsCiN_Ka1NwH6jyLkvc=.328a91d3122359d5547f9d79521205bc0a46e1f79a792dfe650e99fc2d651223.c48bc927.incomplete",
+      "filename": "Y6g195DXbsCiN_Ka1NwH6jyLkvc=.328a91d3122359d5547f9d79521205bc0a46e1f79a792dfe650e99fc2d651223.c48bc927.incomplete",
+      "size_bytes": 39501,
+      "extension": ".incomplete",
+      "sha256": null,
+      "st_nlink": 1,
+      "is_symlink": false
+    },
+    {
+      "absolute_path": "D:\\AI_Cache\\huggingface\\hub\\models--Qwen--Qwen3-1.7B\\blobs\\169ad53ec313c3a34b06c0809216e4fc072cce444a5d4ff2b59690d064130ed5.4b64701c.incomplete",
+      "filename": "169ad53ec313c3a34b06c0809216e4fc072cce444a5d4ff2b59690d064130ed5.4b64701c.incomplete",
+      "size_bytes": 335208174,
+      "extension": ".incomplete",
+      "sha256": null,
+      "st_nlink": 1,
+      "is_symlink": false
+    },
+    {
+      "absolute_path": "D:\\AI_Cache\\huggingface\\hub\\models--Qwen--Qwen3-1.7B\\blobs\\912becff8d60672aa8628ef08c05898d9adf17c2ad4ae3caf99b065622fdeff9.330d01ee.incomplete",
+      "filename": "912becff8d60672aa8628ef08c05898d9adf17c2ad4ae3caf99b065622fdeff9.330d01ee.incomplete",
+      "size_bytes": 469272961,
+      "extension": ".incomplete",
+      "sha256": null,
+      "st_nlink": 1,
+      "is_symlink": false
+    },
+    {
+      "absolute_path": "D:\\AI_Cache\\huggingface\\hub\\models--TinyLlama--TinyLlama-1.1B-Chat-v1.0\\blobs\\6e6001da2106d4757498752a021df6c2bdc332c650aae4bae6b0c004dcf14933.42091533.incomplete",
+      "filename": "6e6001da2106d4757498752a021df6c2bdc332c650aae4bae6b0c004dcf14933.42091533.incomplete",
+      "size_bytes": 0,
+      "extension": ".incomplete",
+      "sha256": null,
+      "st_nlink": 1,
+      "is_symlink": false
+    }
+  ],
+  "lock_files": [
+    {
+      "absolute_path": "D:\\AI_Cache\\huggingface\\hub\\.locks\\models--TinyLlama--TinyLlama-1.1B-Chat-v1.0\\6e6001da2106d4757498752a021df6c2bdc332c650aae4bae6b0c004dcf14933.lock",
+      "filename": "6e6001da2106d4757498752a021df6c2bdc332c650aae4bae6b0c004dcf14933.lock",
+      "size_bytes": 0,
+      "extension": ".lock",
+      "sha256": null,
+      "st_nlink": 1,
+      "is_symlink": false
+    }
+  ],
+  "metadata_only_cache_files": [
+    {
+      "absolute_path": "D:\\Qwen3-4B-transfer\\.cache\\huggingface\\download\\.gitattributes.metadata",
+      "filename": ".gitattributes.metadata",
+      "size_bytes": 104,
+      "extension": ".metadata",
+      "sha256": null,
+      "st_nlink": 1,
+      "is_symlink": false
+    },
+    {
+      "absolute_path": "D:\\Qwen3-4B-transfer\\.cache\\huggingface\\download\\config.json.metadata",
+      "filename": "config.json.metadata",
+      "size_bytes": 104,
+      "extension": ".metadata",
+      "sha256": null,
+      "st_nlink": 1,
+      "is_symlink": false
+    },
+    {
+      "absolute_path": "D:\\Qwen3-4B-transfer\\.cache\\huggingface\\download\\generation_config.json.metadata",
+      "filename": "generation_config.json.metadata",
+      "size_bytes": 104,
+      "extension": ".metadata",
+      "sha256": null,
+      "st_nlink": 1,
+      "is_symlink": false
+    },
+    {
+      "absolute_path": "D:\\Qwen3-4B-transfer\\.cache\\huggingface\\download\\LICENSE.metadata",
+      "filename": "LICENSE.metadata",
+      "size_bytes": 104,
+      "extension": ".metadata",
+      "sha256": null,
+      "st_nlink": 1,
+      "is_symlink": false
+    },
+    {
+      "absolute_path": "D:\\Qwen3-4B-transfer\\.cache\\huggingface\\download\\merges.txt.metadata",
+      "filename": "merges.txt.metadata",
+      "size_bytes": 103,
+      "extension": ".metadata",
+      "sha256": null,
+      "st_nlink": 1,
+      "is_symlink": false
+    },
+    {
+      "absolute_path": "D:\\Qwen3-4B-transfer\\.cache\\huggingface\\download\\model-00001-of-00003.safetensors.metadata",
+      "filename": "model-00001-of-00003.safetensors.metadata",
+      "size_bytes": 127,
+      "extension": ".metadata",
+      "sha256": null,
+      "st_nlink": 1,
+      "is_symlink": false
+    },
+    {
+      "absolute_path": "D:\\Qwen3-4B-transfer\\.cache\\huggingface\\download\\model-00002-of-00003.safetensors.metadata",
+      "filename": "model-00002-of-00003.safetensors.metadata",
+      "size_bytes": 127,
+      "extension": ".metadata",
+      "sha256": null,
+      "st_nlink": 1,
+      "is_symlink": false
+    },
+    {
+      "absolute_path": "D:\\Qwen3-4B-transfer\\.cache\\huggingface\\download\\model-00003-of-00003.safetensors.metadata",
+      "filename": "model-00003-of-00003.safetensors.metadata",
+      "size_bytes": 128,
+      "extension": ".metadata",
+      "sha256": null,
+      "st_nlink": 1,
+      "is_symlink": false
+    },
+    {
+      "absolute_path": "D:\\Qwen3-4B-transfer\\.cache\\huggingface\\download\\model.safetensors.index.json.metadata",
+      "filename": "model.safetensors.index.json.metadata",
+      "size_bytes": 104,
+      "extension": ".metadata",
+      "sha256": null,
+      "st_nlink": 1,
+      "is_symlink": false
+    },
+    {
+      "absolute_path": "D:\\Qwen3-4B-transfer\\.cache\\huggingface\\download\\README.md.metadata",
+      "filename": "README.md.metadata",
+      "size_bytes": 104,
+      "extension": ".metadata",
+      "sha256": null,
+      "st_nlink": 1,
+      "is_symlink": false
+    },
+    {
+      "absolute_path": "D:\\Qwen3-4B-transfer\\.cache\\huggingface\\download\\tokenizer.json.metadata",
+      "filename": "tokenizer.json.metadata",
+      "size_bytes": 128,
+      "extension": ".metadata",
+      "sha256": null,
+      "st_nlink": 1,
+      "is_symlink": false
+    },
+    {
+      "absolute_path": "D:\\Qwen3-4B-transfer\\.cache\\huggingface\\download\\tokenizer_config.json.metadata",
+      "filename": "tokenizer_config.json.metadata",
+      "size_bytes": 104,
+      "extension": ".metadata",
+      "sha256": null,
+      "st_nlink": 1,
+      "is_symlink": false
+    },
+    {
+      "absolute_path": "D:\\Qwen3-4B-transfer\\.cache\\huggingface\\download\\vocab.json.metadata",
+      "filename": "vocab.json.metadata",
+      "size_bytes": 103,
+      "extension": ".metadata",
+      "sha256": null,
+      "st_nlink": 1,
+      "is_symlink": false
+    }
+  ],
+  "duplicate_cleanup_status": "SAFE_TO_KEEP_ALL",
+  "potential_duplicates_for_later_cleanup": [],
+  "required_file_presence": {
+    "config.json": true,
+    "tokenizer.json": true,
+    "tokenizer_config.json": true,
+    "model.safetensors.index.json": true
+  },
+  "generation_config_present": true,
+  "referenced_weight_shards": [
+    {
+      "filename": "model-00001-of-00003.safetensors",
+      "exists": true,
+      "size_bytes": 3957900840
+    },
+    {
+      "filename": "model-00002-of-00003.safetensors",
+      "exists": true,
+      "size_bytes": 3987450520
+    },
+    {
+      "filename": "model-00003-of-00003.safetensors",
+      "exists": true,
+      "size_bytes": 99630640
+    }
+  ],
+  "zero_byte_non_partial_files": [],
+  "identity": {
+    "identity_consistent_with_qwen3_4b": true,
+    "model_type": "qwen3",
+    "architectures": [
+      "Qwen3ForCausalLM"
+    ],
+    "hidden_size": 2560,
+    "num_hidden_layers": 36,
+    "vocab_size": 151936,
+    "torch_dtype": "torch.bfloat16",
+    "tokenizer_class": "Qwen2Tokenizer",
+    "tokenizer_local_only_success": true,
+    "neutral_token_count": 8,
+    "neutral_decoded_text": "The river passes quietly through the valley."
+  },
+  "integrity_status": "PASS",
+  "exp020_scientific_results_created": false,
+  "exp017_accessed": false,
+  "exp019_accessed": false
+}

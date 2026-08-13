@@ -1,0 +1,93 @@
+{
+  "timestamp_utc": "2026-08-13T03:57:08.541652+00:00",
+  "requested_model_id": "Qwen/Qwen3-4B",
+  "canonical_model_path": "D:\\Qwen3-4B-transfer",
+  "local_files_only": true,
+  "hardware_feasibility": "TESTED",
+  "model_access_status": "LOCAL_SNAPSHOT_AVAILABLE",
+  "qualification_stage_reached": "COMPLETE_NEUTRAL_DIAGNOSTICS",
+  "diagnostic_prompt": "This is a neutral hardware diagnostic.",
+  "mode_order": [
+    "MODE_A_NATIVE",
+    "MODE_B_CPU_OFFLOAD",
+    "MODE_C_4BIT"
+  ],
+  "model_metadata": {
+    "config_class": "Qwen3Config",
+    "architectures": [
+      "Qwen3ForCausalLM"
+    ],
+    "model_type": "qwen3",
+    "hidden_size": 2560,
+    "num_transformer_blocks": 36,
+    "vocab_size": 151936,
+    "config_torch_dtype": "torch.bfloat16",
+    "tokenizer_class": "Qwen2Tokenizer",
+    "transformers_version": "5.14.1",
+    "torch_version": "2.12.1+cu130",
+    "cuda_version": "13.0"
+  },
+  "gpu": {
+    "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+    "total_memory_gib": 7.9595,
+    "bf16_supported": true
+  },
+  "exp020_scientific_results_created": false,
+  "exp017_accessed": false,
+  "exp019_accessed": false,
+  "attempts": [
+    {
+      "mode": "MODE_A_NATIVE",
+      "dtype": "torch.bfloat16",
+      "quantization": {
+        "enabled": false
+      },
+      "device_map": {
+        "": "cuda:0"
+      },
+      "gpu_memory_after_load": {
+        "allocated_gib": 7.4984,
+        "reserved_gib": 7.5,
+        "peak_allocated_gib": 7.4984
+      },
+      "forward_seconds": 1.2065,
+      "generation_seconds": 0.3401,
+      "forward_peak_gpu_memory": {
+        "allocated_gib": 7.5297,
+        "reserved_gib": 7.5527,
+        "peak_allocated_gib": 7.5339
+      },
+      "generation_peak_gpu_memory": {
+        "allocated_gib": 7.5297,
+        "reserved_gib": 7.5527,
+        "peak_allocated_gib": 7.5322
+      },
+      "hidden_state_extraction_success": true,
+      "hidden_state_tensor_count": 37,
+      "hidden_state_shape": [
+        1,
+        7,
+        2560
+      ],
+      "selected_block_hooks_accessible": true,
+      "selected_layers": {
+        "primary_depth_0_50": 18,
+        "secondary_depth_0_75": 26
+      },
+      "short_generation_success": true,
+      "generated_token_count": 2,
+      "zero_hook_equivalence": {
+        "status": "ZERO_HOOK_EQUIVALENCE_PASS",
+        "rtol": 0.001,
+        "atol": 0.001,
+        "max_abs_logit_difference": 0.0
+      },
+      "practical_runtime": true,
+      "success": true,
+      "load_seconds": 8.1541
+    }
+  ],
+  "selected_execution_mode": "MODE_A_NATIVE",
+  "zero_hook_status": "ZERO_HOOK_EQUIVALENCE_PASS",
+  "qualification_status": "READY_FOR_EXP020_PREREGISTRATION_REVIEW"
+}

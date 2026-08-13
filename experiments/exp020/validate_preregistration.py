@@ -9,6 +9,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 EXP_DIR = Path(__file__).resolve().parent
 RESULT = EXP_DIR / "results" / "hardware_qualification.json"
+LOCAL_AUDIT = EXP_DIR / "results" / "qwen3_4b_local_integrity_and_duplicate_audit.json"
+LOCAL_QUALIFICATION = EXP_DIR / "results" / "qwen3_4b_hardware_qualification.json"
 DOCS = [
     ROOT / "docs" / "experiments" / "NEXT-PHASE-PREREGISTRATION.md",
     ROOT / "docs" / "experiments" / "EXP-020-PREREGISTRATION.md",
@@ -52,9 +54,26 @@ def main() -> None:
     require("exp017" in source.casefold() and "formal" in source.casefold(), "boundary guard language missing")
     results_dir = EXP_DIR / "results"
     require(not any((results_dir / name).exists() for name in FORBIDDEN_FORMAL_OUTPUTS), "formal EXP-020 outcome file exists")
+    if LOCAL_AUDIT.exists() or LOCAL_QUALIFICATION.exists():
+        require(LOCAL_AUDIT.exists() and LOCAL_QUALIFICATION.exists(), "local audit and local qualification records must be published together")
+        audit = json.loads(LOCAL_AUDIT.read_text(encoding="utf-8"))
+        local = json.loads(LOCAL_QUALIFICATION.read_text(encoding="utf-8"))
+        require(audit["integrity_status"] == "PASS", "local snapshot integrity audit did not pass")
+        require(audit["canonical_model_path"] == r"D:\Qwen3-4B-transfer" and audit["local_files_only"] is True, "canonical local path changed")
+        require(audit["exact_duplicate_bytes"] == 0, "unexpected duplicate model bytes found")
+        require(audit["identity"]["identity_consistent_with_qwen3_4b"] is True, "local model identity is inconsistent")
+        require(local["qualification_status"] in {"READY_FOR_EXP020_PREREGISTRATION_REVIEW", "QUANTIZED_MODE_REQUIRED"}, "local qualification did not reach an eligible review state")
+        require(local["local_files_only"] is True and local["exp020_scientific_results_created"] is False, "local qualification crossed the scientific boundary")
+        require(local["hardware_feasibility"] == "TESTED" and local["model_access_status"] == "LOCAL_SNAPSHOT_AVAILABLE", "local qualification status is incomplete")
+        selected = local["attempts"][0]
+        require(selected["hidden_state_extraction_success"] is True and selected["short_generation_success"] is True, "local qualification diagnostics failed")
+        require(selected["zero_hook_equivalence"]["status"] == "ZERO_HOOK_EQUIVALENCE_PASS", "zero-hook engineering check failed")
     print("NEXT_PHASE_PREREGISTRATION_VALIDATION_PASS")
     print("qualification_status:", record["qualification_status"])
     print("frozen_execution_mode:", record.get("frozen_execution_mode"))
+    if LOCAL_QUALIFICATION.exists():
+        print("local_qualification_status:", local["qualification_status"])
+        print("local_selected_execution_mode:", local["selected_execution_mode"])
 
 
 if __name__ == "__main__":
