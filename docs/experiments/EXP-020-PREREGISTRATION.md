@@ -1,70 +1,155 @@
-# EXP-020 Preregistration: Qwen3-4B Representation Replication
+# EXP-020A Preregistration: Qwen3-4B Representation Replication
 
-## Model and Hardware Qualification
+## Status and scope
 
-The exact model is `Qwen/Qwen3-4B`; no Qwen3.5, Instruct-2507, revision, or
-architecture substitution is permitted. Before formal execution, the hardware
-qualification record must freeze the revision, configuration, tokenizer
-configuration, Transformers/Torch/CUDA versions, block count, hidden size, and
-the first workable native/offloaded/4-bit mode.
+EXP-020A is a confirmatory representation-level replication. Its scientific
+status is `NOT_STARTED`. This document and
+[`exp020_frozen_config.json`](../../experiments/exp020/exp020_frozen_config.json)
+must be committed before any formal Qwen3-4B prompt is run. The protocol does
+not inspect EXP-017 or EXP-019, generate behavior results, persist raw hidden
+states, sweep layers or beta, change prompt semantics, or tune a probe after
+evaluation performance is seen.
 
-## Data and Split Freeze
+## Frozen model and execution environment
 
-The existing EXP-018 controlled task prompt design is reused where compatible.
-Before the formal run, exact fit/eval prompt IDs, task labels, transitions,
-split seed, prompt-file hashes, and any tokenizer/chat-format compatibility
-adjustment will be recorded. No semantic prompt revision or post-result prompt
-filtering is permitted.
+| Field | Frozen value |
+|---|---|
+| Model ID | `Qwen/Qwen3-4B` |
+| Revision | `1cfa9a7208912126459214e8b04321603b3df60c` |
+| Canonical path | `D:\Qwen3-4B-transfer` |
+| Local loading | `local_files_only=True` |
+| Config SHA-256 | `8ba006f74fecfaaeb392872a60f4a480e7ec9860153d2e1b769ec81f9a147f8a` |
+| Architecture | `Qwen3ForCausalLM` / `qwen3` |
+| Blocks / hidden size / vocabulary | 36 / 2560 / 151936 |
+| Execution | native BF16 on `cuda:0` (`MODE_A_NATIVE`) |
 
-## Frozen Conditions
+The neutral local hardware qualification passed: peak forward GPU allocation
+was 7.5339 GiB and the zero-intervention hook check passed with maximum logit
+difference 0.0. This is an engineering check, not EXP-020A evidence.
 
-Direction construction uses FIT prompts only; evaluation uses held-out EVAL
-prompts only. Conditions are `TASK`, `MATCHED_RANDOM`, and `OPPOSITE`.
-Primary outcomes are held-out target-probe probability change, TASK minus
-MATCHED_RANDOM, and TASK minus OPPOSITE. Centroid distance is not primary;
-RSM/IVS are descriptive only.
+## Explicit layer indexing
 
-## Layer and Beta
+`block_index` always means the 0-based index in `model.model.layers`. With 36
+blocks, the model returns 37 hidden-state entries: `hidden_states[0]` is the
+embedding output, and `hidden_states[k + 1]` is the output after transformer
+block `k`.
 
-After configuration loading, block indices are mapped deterministically as
-`round(fraction * (num_blocks - 1))`: primary depth 0.50 and secondary
-descriptive depth 0.75. The primary 0.50-depth block at beta 0.75 alone
-determines the representation gate. Beta 0.50 is optional descriptive only;
-no layer or beta search, beta 1.0, adaptive beta, or per-task optimization is
-allowed.
+The sole mapping rule is `round(depth_fraction * (num_blocks - 1))`.
 
-## Representation Gate
+| Role | Depth | Block index | Corresponding hidden-state index |
+|---|---:|---:|---:|
+| Primary intervention / gate | 0.50 | 18 | 19 |
+| Secondary descriptive robustness | 0.75 | 26 | 27 |
 
-Report paired mean and median differences, bootstrap 95% confidence intervals,
-and paired sign proportions using seed 20260812. The primary gate requires all
-of: clear-majority held-out TASK target-probability increases; positive mean
-TASK change; positive primary TASK-minus-MATCHED_RANDOM comparison; and
-positive primary TASK-minus-OPPOSITE comparison. The only labels are
-`REPRESENTATION_REPLICATION_SUPPORTED` and
-`REPRESENTATION_REPLICATION_NOT_SUPPORTED`; a secondary layer or beta cannot
-rescue failure.
+The future implementation must verify these indices against accessible module
+hooks. No later remapping is allowed. The secondary block cannot rescue the
+primary gate.
 
-## Behavior Stop Rule
+## Dataset and complementary split freeze
 
-Behavior runs only if the primary representation gate is supported. Otherwise
-record `BEHAVIOR_NOT_RUN_BY_PREREGISTERED_STOP_RULE`. If permitted, frozen
-conditions are `NO_INTERVENTION`, `TASK_REAL`, `MATCHED_RANDOM`, and
-`OPPOSITE`, at the same primary block and beta 0.75. Outcomes are frozen
-task-answer correctness where applicable, item-level disagreements, length,
-and malformed/empty/repetition diagnostics. The failed EXP-019 evaluator is
-not a confirmatory behavioral metric.
+The study reuses the unchanged controlled dataset
+`experiments/exp003/prompts_controlled.json` (SHA-256
+`72dab733e6a1639dfc80d186f3af1dbce5c6d70da4905e6d6d422cf47064c472`).
+The source split/transition conditions are
+`experiments/exp018/validation_conditions.json` (SHA-256
+`4ce4ebb1af318e7c25725980680c0dc62762e20790adcb7abf2026130f0d4169`);
+the canonical hash for its groups, splits, and transitions is
+`1aa1ae2aedb58e24c4c9672b60aaebdefaf9467fa4f0f18e2682bb956e583674`.
 
-## Status
+Groups are `logic`, `causality`, `analogy`, and `definition`. The two frozen
+complementary splits are:
 
-No formal EXP-020 results are produced by this preregistration.
+- A: original-style IDs 01–03 per group are FIT; paraphrase IDs 01–03 are
+  EVAL.
+- B: paraphrase IDs 01–03 per group are FIT; original-style IDs 01–03 are
+  EVAL.
 
-## Hardware Qualification Status Clarification
+Each split has 12 FIT and 12 EVAL examples, all explicitly listed in the JSON.
+FIT and EVAL IDs are disjoint within each split. The 12 ordered source-target
+transitions are exactly all ordered pairs of distinct groups. This yields 72
+paired held-out source evaluations across both splits (12 transitions × 3
+source EVAL examples × 2 splits). No prompt filtering based on Qwen3-4B
+outputs is allowed.
 
-The historical qualification record was initially labeled
-`HARDWARE_INFEASIBLE`, but the run stopped before model configuration loading.
-Its corrected interpretation is `hardware_feasibility = UNTESTED`,
-`model_access_status = BLOCKED`, and
-`qualification_stage_reached = BEFORE_MODEL_CONFIG_LOAD`. The cause was D:
-cache/network availability, not GPU OOM or a model runtime failure. EXP-020
-scientific results remain `NOT_STARTED`; the frozen layer and beta protocol is
-unchanged.
+## Direction construction and conditions
+
+At the primary block only, derive each direction from FIT representations:
+
+`delta = target_centroid_fit - source_centroid_fit`.
+
+No EVAL representation may influence a centroid, direction, scaler, or probe.
+For each held-out source representation, use exactly these conditions:
+`BASELINE`, `TASK`, `MATCHED_RANDOM`, and `OPPOSITE`.
+
+`MATCHED_RANDOM` uses the EXP-018 procedure: standard-normal vector with base
+seed 20260319 and `SeedSequence([20260319, 2, block_index, split_index,
+source_group_index, target_group_index])`, scaled once to the matching task
+direction's L2 norm and reused for all associated held-out source items.
+`OPPOSITE` is `-delta`.
+
+The primary beta is **0.75**. Beta 0.50 is secondary descriptive only; it
+cannot rescue the primary result. No beta search, beta 1.0, adaptive beta, or
+per-transition optimization is permitted.
+
+## Independent probe
+
+For each split, fit a model-specific measurement probe only on the 12 FIT
+representations. The frozen pipeline is:
+
+- `StandardScaler(with_mean=True, with_std=True)` fit on FIT features only;
+- multinomial `LogisticRegression(solver="lbfgs", penalty="l2", C=1.0,
+  max_iter=1000, class_weight=None, random_state=20260319)`; and
+- fixed class order: `logic`, `causality`, `analogy`, `definition`.
+
+The scaler and classifier are applied unchanged to all held-out conditions.
+The probe is a measurement instrument, not the intervention definition; its
+hyperparameters and preprocessing may not be tuned using EVAL performance.
+
+## Outcomes, statistics, and primary gate
+
+For paired held-out item `i`:
+
+```text
+task_effect_i     = P_target(TASK_i) - P_target(BASELINE_i)
+random_effect_i   = P_target(MATCHED_RANDOM_i) - P_target(BASELINE_i)
+opposite_effect_i = P_target(OPPOSITE_i) - P_target(BASELINE_i)
+D_random_i        = task_effect_i - random_effect_i
+D_opposite_i      = task_effect_i - opposite_effect_i
+```
+
+For `task_effect`, `D_random`, and `D_opposite`, report N, mean, median,
+standard deviation, bootstrap 95% CI, and proportion greater than zero.
+Bootstrap settings are frozen at seed 20260812 and 10,000 resamples. Aggregate
+primary results are reported first, followed descriptively by source task,
+target task, and transition pair; no favorable individual transition can
+redefine success.
+
+`REPRESENTATION_REPLICATION_SUPPORTED` applies only to primary block 18 at
+beta 0.75 and requires all of:
+
+1. mean `task_effect > 0`;
+2. its mean bootstrap 95% CI excludes zero on the positive side;
+3. mean `D_random > 0`;
+4. its mean bootstrap 95% CI excludes zero on the positive side; and
+5. mean `D_opposite > 0`.
+
+Otherwise the result is `REPRESENTATION_REPLICATION_NOT_SUPPORTED`. A
+technical validity failure before valid outcomes is
+`REPRESENTATION_REPLICATION_INVALID`, distinct from scientific failure. There
+is no historical 216/216 requirement and no secondary-layer rescue.
+
+## Sanity checks and behavior boundary
+
+Before a formal run, validate model revision, model config hash, prompt hash,
+split/transition hash, block/hidden-state mapping, zero-hook equivalence,
+beta, random seeds, and probe class order. Any mismatch stops the run.
+
+EXP-020A has no behavior component. Only a supported primary representation
+gate can authorize a separately preregistered EXP-020B. If the gate is not
+supported, `EXP-020B behavior = NOT_RUN_BY_STOP_RULE`.
+
+Even if supported, the allowable claim is limited to: “the held-out
+target-directed representation transition replicated in Qwen3-4B under the
+preregistered primary-layer protocol.” It does not support claims about scale
+invariance, universal replication, behavioral control, reasoning improvement,
+cognitive-space transformation, or true task manifolds.

@@ -1,0 +1,165 @@
+{
+  "experiment": "EXP-020A Qwen3-4B confirmatory representation replication",
+  "scientific_status": "NOT_STARTED",
+  "model": {
+    "model_id": "Qwen/Qwen3-4B",
+    "revision": "1cfa9a7208912126459214e8b04321603b3df60c",
+    "canonical_path": "D:\\Qwen3-4B-transfer",
+    "local_files_only": true,
+    "dtype": "bfloat16",
+    "device": "cuda:0",
+    "config_sha256": "8ba006f74fecfaaeb392872a60f4a480e7ec9860153d2e1b769ec81f9a147f8a",
+    "model_type": "qwen3",
+    "architecture": "Qwen3ForCausalLM",
+    "num_transformer_blocks": 36,
+    "hidden_size": 2560,
+    "vocab_size": 151936,
+    "execution_mode": "MODE_A_NATIVE"
+  },
+  "layer_indexing": {
+    "block_index_definition": "0-based transformer block index in model.model.layers",
+    "hidden_states_tuple_definition": "hidden_states[0] is the embedding output; hidden_states[k + 1] is the output after transformer block k",
+    "mapping_rule": "round(depth_fraction * (num_blocks - 1))",
+    "primary": {
+      "depth_fraction": 0.5,
+      "block_index": 18,
+      "hidden_states_index": 19
+    },
+    "secondary_descriptive": {
+      "depth_fraction": 0.75,
+      "block_index": 26,
+      "hidden_states_index": 27
+    },
+    "hook_validation_required": true
+  },
+  "dataset": {
+    "prompt_file": "experiments/exp003/prompts_controlled.json",
+    "prompt_file_sha256": "72dab733e6a1639dfc80d186f3af1dbce5c6d70da4905e6d6d422cf47064c472",
+    "source_conditions_file": "experiments/exp018/validation_conditions.json",
+    "source_conditions_sha256": "4ce4ebb1af318e7c25725980680c0dc62762e20790adcb7abf2026130f0d4169",
+    "split_transition_manifest_sha256": "1aa1ae2aedb58e24c4c9672b60aaebdefaf9467fa4f0f18e2682bb956e583674",
+    "groups": ["logic", "causality", "analogy", "definition"],
+    "representation": "last_token_hidden_state",
+    "splits": [
+      {
+        "id": "A_original_fit_paraphrase_eval",
+        "split_index": 0,
+        "fit_ids": {
+          "logic": ["logic_orig_01", "logic_orig_02", "logic_orig_03"],
+          "causality": ["causality_orig_01", "causality_orig_02", "causality_orig_03"],
+          "analogy": ["analogy_orig_01", "analogy_orig_02", "analogy_orig_03"],
+          "definition": ["definition_orig_01", "definition_orig_02", "definition_orig_03"]
+        },
+        "evaluation_ids": {
+          "logic": ["logic_para_01", "logic_para_02", "logic_para_03"],
+          "causality": ["causality_para_01", "causality_para_02", "causality_para_03"],
+          "analogy": ["analogy_para_01", "analogy_para_02", "analogy_para_03"],
+          "definition": ["definition_para_01", "definition_para_02", "definition_para_03"]
+        }
+      },
+      {
+        "id": "B_paraphrase_fit_original_eval",
+        "split_index": 1,
+        "fit_ids": {
+          "logic": ["logic_para_01", "logic_para_02", "logic_para_03"],
+          "causality": ["causality_para_01", "causality_para_02", "causality_para_03"],
+          "analogy": ["analogy_para_01", "analogy_para_02", "analogy_para_03"],
+          "definition": ["definition_para_01", "definition_para_02", "definition_para_03"]
+        },
+        "evaluation_ids": {
+          "logic": ["logic_orig_01", "logic_orig_02", "logic_orig_03"],
+          "causality": ["causality_orig_01", "causality_orig_02", "causality_orig_03"],
+          "analogy": ["analogy_orig_01", "analogy_orig_02", "analogy_orig_03"],
+          "definition": ["definition_orig_01", "definition_orig_02", "definition_orig_03"]
+        }
+      }
+    ],
+    "ordered_transitions": [
+      ["logic", "causality"], ["logic", "analogy"], ["logic", "definition"],
+      ["causality", "logic"], ["causality", "analogy"], ["causality", "definition"],
+      ["analogy", "logic"], ["analogy", "causality"], ["analogy", "definition"],
+      ["definition", "logic"], ["definition", "causality"], ["definition", "analogy"]
+    ],
+    "fit_count_per_split": 12,
+    "evaluation_count_per_split": 12,
+    "aggregate_paired_evaluation_count": 72
+  },
+  "direction_construction": {
+    "fit_data_only": true,
+    "delta": "centroid_target_fit - centroid_source_fit",
+    "application": "apply only to held-out source representations",
+    "random_control": {
+      "base_seed": 20260319,
+      "model_index": 2,
+      "seed_sequence": "[base_seed, model_index, block_index, split_index, source_group_index, target_group_index]",
+      "distribution": "standard_normal",
+      "norm_rule": "Scale one random vector so its L2 norm equals the matching task delta; reuse it for all held-out source items in that comparison."
+    },
+    "opposite_direction": "-delta"
+  },
+  "conditions": ["BASELINE", "TASK", "MATCHED_RANDOM", "OPPOSITE"],
+  "beta": {
+    "primary": 0.75,
+    "secondary_descriptive": [0.5],
+    "search_permitted": false,
+    "secondary_cannot_rescue_primary": true
+  },
+  "probe": {
+    "fit_data_only": true,
+    "preprocessing": {"class": "StandardScaler", "with_mean": true, "with_std": true},
+    "classifier": {
+      "class": "LogisticRegression",
+      "solver": "lbfgs",
+      "penalty": "l2",
+      "C": 1.0,
+      "multi_class": "multinomial",
+      "max_iter": 1000,
+      "class_weight": null,
+      "random_state": 20260319,
+      "class_order": ["logic", "causality", "analogy", "definition"]
+    },
+    "tuning_on_evaluation_permitted": false
+  },
+  "outcomes": {
+    "task_effect": "P_target(TASK_i) - P_target(BASELINE_i)",
+    "random_effect": "P_target(MATCHED_RANDOM_i) - P_target(BASELINE_i)",
+    "opposite_effect": "P_target(OPPOSITE_i) - P_target(BASELINE_i)",
+    "primary_specificity_contrast": "D_random_i = task_effect_i - random_effect_i",
+    "secondary_directional_contrast": "D_opposite_i = task_effect_i - opposite_effect_i"
+  },
+  "statistics": {
+    "report_for": ["task_effect", "D_random", "D_opposite"],
+    "primary_report_fields": ["N", "mean", "median", "standard_deviation", "bootstrap_95_percent_CI", "proportion_greater_than_zero"],
+    "bootstrap_seed": 20260812,
+    "bootstrap_resamples": 10000
+  },
+  "representation_gate": {
+    "supported_label": "REPRESENTATION_REPLICATION_SUPPORTED",
+    "not_supported_label": "REPRESENTATION_REPLICATION_NOT_SUPPORTED",
+    "invalid_label": "REPRESENTATION_REPLICATION_INVALID",
+    "applies_only_to": "primary block 18, beta 0.75, aggregate held-out evaluation",
+    "all_required": [
+      "mean(task_effect) > 0",
+      "bootstrap 95% CI for mean(task_effect) excludes 0 on the positive side",
+      "mean(D_random) > 0",
+      "bootstrap 95% CI for mean(D_random) excludes 0 on the positive side",
+      "mean(D_opposite) > 0"
+    ],
+    "secondary_layer_can_rescue": false
+  },
+  "behavior_boundary": {
+    "exp020a_behavior": "NOT_RUN",
+    "exp020b": "CONDITIONAL_SEPARATE_PREREGISTRATION_ONLY",
+    "if_primary_gate_not_supported": "EXP-020B behavior = NOT_RUN_BY_STOP_RULE"
+  },
+  "pre_run_sanity_checks": [
+    "model revision", "model config hash", "prompt file hash", "split/transition manifest hash",
+    "block and hidden-state mapping", "zero-hook equivalence", "beta", "random seeds", "probe class order"
+  ],
+  "boundaries": {
+    "formal_exp020_results_created": false,
+    "exp017_accessed": false,
+    "exp019_accessed": false,
+    "raw_hidden_state_persistence_allowed": false
+  }
+}
