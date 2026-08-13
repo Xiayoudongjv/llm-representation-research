@@ -1,0 +1,119 @@
+{
+  "task": "083D",
+  "task_083d_outcome_type": "ENGINEERING_DIAGNOSTIC_ONLY",
+  "diagnostic_status": "TARGETED_TENSOR_BOUNDARY_READS_PASS",
+  "prior_exp020a_attempt_status": "TECHNICALLY_INVALID",
+  "exp020_scientific_result_status": "UNOBSERVED",
+  "scope": {
+    "diagnostic_only": true,
+    "formal_runner_executed": false,
+    "formal_fit_eval_inference_performed": false,
+    "formal_scientific_results_created": false,
+    "gpu_tensor_loading_performed": false,
+    "formal_data_accessed": false,
+    "exp017_accessed": false
+  },
+  "snapshot": {
+    "root": "D:\\Qwen3-4B-transfer",
+    "revision": "1cfa9a7208912126459214e8b04321603b3df60c",
+    "config_sha256": "8ba006f74fecfaaeb392872a60f4a480e7ec9860153d2e1b769ec81f9a147f8a",
+    "index_sha256": "6dc0981b8829fead746441f68f38f24c5ca4a3a66351f652c26c6df0efc43ab2",
+    "model_type": "qwen3",
+    "architecture": "Qwen3ForCausalLM",
+    "torch_dtype": "bfloat16",
+    "num_hidden_layers": 36,
+    "hidden_size": 2560,
+    "index_weight_count": 398
+  },
+  "entry_integrity": {
+    "reviewed_commit": "90a5bf12e020bc84f87496bc60c24e23e531fec5",
+    "branch_tracking": "main...origin/main",
+    "staged_files_at_entry": [],
+    "runner_sha256_at_entry": "7958410af11ecf45b7520c568fe3f4af805bdc506acd5d7812d2bae4f211e564",
+    "runner_test_sha256_at_entry": "3b712a0dbdb804f69e6c6d3dee3e82a4560254f860a4d350fbfefc66b87afc98",
+    "formal_authorization_sha256": "070d2e2ccaf8857c2a3d439ea6c87420784f6029c9340ccf2d042399f7ecfd01",
+    "authorization_consumption_sha256": "0a39e6a214512ffac928620768100ac9a5c20e1a1fbd8c72c44f76413f6864cc"
+  },
+  "phase_1_structure": {
+    "stdlib_only_parser": true,
+    "index_header_validation_passed": true,
+    "missing_from_headers": [],
+    "unindexed_headers": [],
+    "incorrect_mappings": [],
+    "shards": [
+      {
+        "name": "model-00001-of-00003.safetensors",
+        "file_size": 3957900840,
+        "tensor_count": 174,
+        "declared_tensor_bytes": 3957880832,
+        "uncovered_data_ranges": 0,
+        "sha256": "328a91d3122359d5547f9d79521205bc0a46e1f79a792dfe650e99fc2d651223"
+      },
+      {
+        "name": "model-00002-of-00003.safetensors",
+        "file_size": 3987450520,
+        "tensor_count": 219,
+        "declared_tensor_bytes": 3987425280,
+        "uncovered_data_ranges": 0,
+        "sha256": "6cd087b316306a68c562436b5492edbcf6e16c6dba3a1308279caa5a58e21ca5"
+      },
+      {
+        "name": "model-00003-of-00003.safetensors",
+        "file_size": 99630640,
+        "tensor_count": 5,
+        "declared_tensor_bytes": 99630080,
+        "uncovered_data_ranges": 0,
+        "sha256": "e4bf436957184f4eeb86a80e9db394503f1f56446b2e6b7edeac5b81470f4ca1"
+      }
+    ],
+    "authoritative_hash_classification": "The Hugging Face cache independently matches the index and third shard. The first two shards have only zero-byte incomplete cache markers; no complete historical cache blob baseline was inferred. Direct snapshot hashes are descriptive integrity evidence."
+  },
+  "phase_1_progress_mapping": {
+    "transformers_loader_semantics": "core_model_loading.py naturally sorts checkpoint keys, builds param_name_to_load, and the Loading weights progress bar iterates that mapping.",
+    "meta_subprocess_exit_code": 0,
+    "model_class": "Qwen3ForCausalLM",
+    "device": "meta",
+    "checkpoint_key_count": 398,
+    "model_state_key_count": 399,
+    "param_name_to_load_count": 398,
+    "mapping_unique": true,
+    "all_checkpoint_keys_identity_mapped": true,
+    "conversion_patterns_used": 0,
+    "tied_model_only_key": "lm_head.weight",
+    "crash_window": [
+      {"position": 156, "tensor": "model.layers.14.input_layernorm.weight", "shard": "model-00001-of-00003.safetensors"},
+      {"position": 157, "tensor": "model.layers.14.mlp.down_proj.weight", "shard": "model-00001-of-00003.safetensors"},
+      {"position": 158, "tensor": "model.layers.14.mlp.gate_proj.weight", "shard": "model-00001-of-00003.safetensors"},
+      {"position": 159, "tensor": "model.layers.14.mlp.up_proj.weight", "shard": "model-00001-of-00003.safetensors"}
+    ],
+    "selected_shard_boundary": [
+      {"position": 166, "tensor": "model.layers.14.self_attn.v_proj.weight", "shard": "model-00001-of-00003.safetensors"},
+      {"position": 167, "tensor": "model.layers.15.input_layernorm.weight", "shard": "model-00002-of-00003.safetensors"}
+    ]
+  },
+  "phase_2_cpu_reads": {
+    "preflight_free_physical_gib": 4.625,
+    "largest_selected_tensor_bytes": 49807360,
+    "required_free_memory_gib": 1.093,
+    "safety_gate_passed": true,
+    "process_isolation": "one fresh CPU-only child process per tensor",
+    "torch_version": "2.12.1+cu130",
+    "safetensors_version": "0.8.0",
+    "all_reads_passed": true,
+    "reads": [
+      {"position": 156, "tensor": "model.layers.14.input_layernorm.weight", "shard": "model-00001-of-00003.safetensors", "dtype": "torch.bfloat16", "shape": [2560], "nbytes": 5120, "exit_code": 0},
+      {"position": 157, "tensor": "model.layers.14.mlp.down_proj.weight", "shard": "model-00001-of-00003.safetensors", "dtype": "torch.bfloat16", "shape": [2560, 9728], "nbytes": 49807360, "exit_code": 0},
+      {"position": 158, "tensor": "model.layers.14.mlp.gate_proj.weight", "shard": "model-00001-of-00003.safetensors", "dtype": "torch.bfloat16", "shape": [9728, 2560], "nbytes": 49807360, "exit_code": 0},
+      {"position": 159, "tensor": "model.layers.14.mlp.up_proj.weight", "shard": "model-00001-of-00003.safetensors", "dtype": "torch.bfloat16", "shape": [9728, 2560], "nbytes": 49807360, "exit_code": 0},
+      {"position": 166, "tensor": "model.layers.14.self_attn.v_proj.weight", "shard": "model-00001-of-00003.safetensors", "dtype": "torch.bfloat16", "shape": [1024, 2560], "nbytes": 5242880, "exit_code": 0},
+      {"position": 167, "tensor": "model.layers.15.input_layernorm.weight", "shard": "model-00002-of-00003.safetensors", "dtype": "torch.bfloat16", "shape": [2560], "nbytes": 5120, "exit_code": 0}
+    ]
+  },
+  "interpretation": "Structural integrity and bounded targeted CPU reads passed. This does not prove full native loading is safe and does not establish a single root cause for the prior torch_cpu.dll access violation.",
+  "new_formal_authorization_created": false,
+  "new_authorization_consumption_created": false,
+  "canonical_formal_result_exists": false,
+  "staging_result_exists": false,
+  "evidence_changed": false,
+  "scientific_conclusion_changed": false
+}

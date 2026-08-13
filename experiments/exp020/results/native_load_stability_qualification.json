@@ -1,0 +1,32 @@
+{
+  "task": "083B",
+  "diagnostic_only": true,
+  "formal_data_access_level": "LEVEL_0",
+  "incident_authorization_sha256": "070d2e2ccaf8857c2a3d439ea6c87420784f6029c9340ccf2d042399f7ecfd01",
+  "incident_consumption_record_sha256": "0a39e6a214512ffac928620768100ac9a5c20e1a1fbd8c72c44f76413f6864cc",
+  "incident_run_attempt_id": "0f2cff46-61c5-499f-af3c-8aef0701ee96",
+  "incident_status_preserved": true,
+  "loader_paths_equivalent": false,
+  "model_integrity_verified": true,
+  "formal_prompt_source_accessed": false,
+  "formal_inference_performed": false,
+  "scientific_results_created": false,
+  "neutral_sentence_exact": true,
+  "planned_cycle_count": 3,
+  "completed_cycle_count": 0,
+  "normal_exit_count": 0,
+  "native_crash_count": 0,
+  "cycles": [],
+  "system_findings": [
+    "Frozen model config hash and snapshot metadata matched.",
+    "GPU was visible with 0 MiB currently used.",
+    "Narrow Windows event-log queries contained no matching native-fault or resource-exhaustion event."
+  ],
+  "unresolved_root_cause_candidates": [
+    "The neutral loader explicitly sets low_cpu_mem_usage=True while the formal loader omits that argument.",
+    "Task 083A terminated during weight loading, before formal inference or publication.",
+    "Host-memory/pagefile pressure is possible but unproven."
+  ],
+  "qualified_for_new_authorization_review": false,
+  "final_status": "NATIVE_LOAD_QUALIFICATION_BLOCKED_LOADER_PATH_DIVERGENCE"
+}

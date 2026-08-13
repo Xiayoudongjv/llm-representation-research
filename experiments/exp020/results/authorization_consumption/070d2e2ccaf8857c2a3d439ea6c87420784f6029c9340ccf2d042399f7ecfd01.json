@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0.0",
+  "authorization_id": "65cbbff5-a0e7-461f-978d-274d8f2f238f",
+  "authorization_sha256": "070d2e2ccaf8857c2a3d439ea6c87420784f6029c9340ccf2d042399f7ecfd01",
+  "experiment": "EXP-020A",
+  "scope": [
+    "formal_fit_eval_inference",
+    "atomic_scientific_result_publication"
+  ],
+  "runner_commit": "90a5bf12e020bc84f87496bc60c24e23e531fec5",
+  "acquired_at_utc": "2026-08-13T15:26:24.209778+00:00",
+  "run_attempt_id": "0f2cff46-61c5-499f-af3c-8aef0701ee96",
+  "state": "consumed",
+  "canonical_result_path": "experiments/exp020/results/exp020a_results.json"
+}

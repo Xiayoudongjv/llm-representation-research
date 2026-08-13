@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0.0",
+  "experiment": "EXP-020A",
+  "formal_run_authorized": true,
+  "scope": [
+    "formal_fit_eval_inference",
+    "atomic_scientific_result_publication"
+  ],
+  "single_use": true,
+  "runner_commit": "90a5bf12e020bc84f87496bc60c24e23e531fec5",
+  "frozen_config_path": "experiments/exp020/exp020_frozen_config.json",
+  "frozen_config_sha256": "f760f781b4b744a10938eb4de032e0cc345a021706821ecf0ca8523f5d57e667",
+  "preregistration_path": "docs/experiments/EXP-020-PREREGISTRATION.md",
+  "preregistration_sha256": "0621ca1024cf333f463760a834ede3a4be0225048c0e738eff06b8d1d036191a",
+  "prompt_file": "experiments/exp003/prompts_controlled.json",
+  "prompt_file_sha256": "72dab733e6a1639dfc80d186f3af1dbce5c6d70da4905e6d6d422cf47064c472",
+  "source_conditions_file": "experiments/exp018/validation_conditions.json",
+  "source_conditions_sha256": "4ce4ebb1af318e7c25725980680c0dc62762e20790adcb7abf2026130f0d4169",
+  "split_transition_manifest_path": "experiments/exp018/validation_conditions.json",
+  "split_transition_manifest_sha256": "1aa1ae2aedb58e24c4c9672b60aaebdefaf9467fa4f0f18e2682bb956e583674",
+  "model_id": "Qwen/Qwen3-4B",
+  "model_revision": "1cfa9a7208912126459214e8b04321603b3df60c",
+  "model_canonical_path": "D:\\Qwen3-4B-transfer",
+  "model_config_path": "D:\\Qwen3-4B-transfer\\config.json",
+  "model_config_sha256": "8ba006f74fecfaaeb392872a60f4a480e7ec9860153d2e1b769ec81f9a147f8a",
+  "tokenizer_identity": "Qwen2Tokenizer",
+  "tokenizer_revision": "1cfa9a7208912126459214e8b04321603b3df60c",
+  "created_at": "2026-08-13T15:25:41.533977Z",
+  "authorization_id": "65cbbff5-a0e7-461f-978d-274d8f2f238f"
+}

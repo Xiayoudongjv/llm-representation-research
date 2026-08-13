@@ -1,0 +1,104 @@
+{
+  "task": "083E",
+  "diagnostic_only": true,
+  "task_083e_outcome_type": "ENGINEERING_DIAGNOSTIC_ONLY",
+  "prior_exp020a_attempt_status": "TECHNICALLY_INVALID",
+  "exp020_scientific_result_status": "UNOBSERVED",
+  "formal_data_access_level": "LEVEL_0",
+  "clean_restart_confirmed": false,
+  "clean_restart_status": "CLEAN_RESTART_NOT_CONFIRMED",
+  "task_083d_report_normalized": true,
+  "task_083d_normalization": [
+    "Replaced only the successful diagnostic status token in Markdown and JSON.",
+    "Added task_083d_outcome_type to JSON.",
+    "Added only the mandated backticks to the required Markdown clarification."
+  ],
+  "task_083d_old_hashes": {
+    "markdown": "937f7b6922cc78daf6aa57223b4fc5810b1b90d93d8fce392a2dbce95d358d4c",
+    "json": "e185f8d824f2b586da8fb27e3b4a45a22c68be75aa35f067bb9de53a0c055390"
+  },
+  "task_083d_new_hashes": {
+    "markdown": "28e5dcb0a778ce9b01713f6bfb6bd16432580b4af8fd518424bd064ae44a4738",
+    "json": "49503c6076b18d8074639d5d5c206227e131089309499bf1c7c274792262f8dc"
+  },
+  "total_progress_units": 398,
+  "total_raw_weight_bytes": 8044936192,
+  "position_157": {
+    "tensor": "model.layers.14.mlp.down_proj.weight",
+    "shard": "model-00001-of-00003.safetensors",
+    "dtype": "BF16",
+    "shape": [2560, 9728],
+    "raw_tensor_bytes": 49807360,
+    "cumulative_raw_bytes": 3653787648,
+    "cumulative_tensor_fraction": 0.3944723618090452,
+    "cumulative_weight_fraction": 0.4541723589595874,
+    "distance_to_nearest_shard_boundary": 1918986240,
+    "begins_progress_shard_boundary": false,
+    "ends_progress_shard_boundary": false
+  },
+  "position_158": {
+    "tensor": "model.layers.14.mlp.gate_proj.weight",
+    "shard": "model-00001-of-00003.safetensors",
+    "dtype": "BF16",
+    "shape": [9728, 2560],
+    "raw_tensor_bytes": 49807360,
+    "cumulative_raw_bytes": 3703595008,
+    "cumulative_tensor_fraction": 0.3969849246231156,
+    "cumulative_weight_fraction": 0.46036350315405955,
+    "distance_to_nearest_shard_boundary": 1869178880,
+    "begins_progress_shard_boundary": false,
+    "ends_progress_shard_boundary": false
+  },
+  "cpu_resource_baseline": {
+    "available_physical_bytes": 4189650944,
+    "available_commit_bytes": 9137666288,
+    "required_bytes": 10192419840,
+    "physical_gate_passed": false,
+    "commit_gate_passed": false,
+    "pagefile_allocated_mib": 14848,
+    "pagefile_current_usage_mib": 1583,
+    "pagefile_peak_usage_mib": 2562
+  },
+  "cpu_resource_gate_passed": false,
+  "cpu_complete_load_launched": false,
+  "cpu_complete_load_count": 0,
+  "cpu_complete_load_exit_code": null,
+  "cpu_complete_load_passed": false,
+  "cpu_native_crash_reproduced": false,
+  "gpu_resource_baseline": {
+    "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+    "driver_version": "610.62",
+    "total_dedicated_mib": 8151,
+    "free_dedicated_mib": 7899,
+    "used_dedicated_mib": 0
+  },
+  "gpu_resource_gate_passed": false,
+  "gpu_neutral_load_launched": false,
+  "gpu_neutral_load_count": 0,
+  "gpu_neutral_load_exit_code": null,
+  "gpu_neutral_forward_passed": false,
+  "gpu_native_crash_reproduced": false,
+  "windows_events": {
+    "new_task_083e_native_event": false,
+    "documented_prior_torch_cpu_access_violation_report_id": "a676528a-5782-4c06-ab51-47df4b270caf",
+    "display_nvlddmkm_or_whea_event_observed_for_task_083e": false
+  },
+  "supported_eliminations": [
+    "Task 083D found no safetensors structural or index corruption.",
+    "Task 083D successfully read six bounded CPU tensors around the incident window and one shard boundary."
+  ],
+  "remaining_candidates": [
+    "Current host physical-memory and commit headroom are below the complete-load diagnostic threshold.",
+    "Background-process state may affect available memory and commit headroom.",
+    "Cumulative native materialization remains untested in this task.",
+    "CPU-to-GPU dispatch and WDDM/GPU-path interaction remain untested in this task.",
+    "Virtual-memory/pagefile state or another intermittent native interaction remains possible."
+  ],
+  "formal_inference_performed": false,
+  "scientific_results_created": false,
+  "root_cause_proven": false,
+  "retry_performed": false,
+  "commit_performed": false,
+  "push_performed": false,
+  "final_status": "CUMULATIVE_LOAD_DIAGNOSTIC_BLOCKED_CPU_RESOURCE_GATE"
+}
