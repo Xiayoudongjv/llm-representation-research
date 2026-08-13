@@ -1,0 +1,54 @@
+{
+  "status": "STATIC_PREFLIGHT_PASS",
+  "formal_scientific_execution": "NOT_RUN",
+  "formal_fit_eval_inference": false,
+  "formal_scientific_results": false,
+  "authorization_artifact_present": false,
+  "formal_result_present": false,
+  "model": {
+    "id": "Qwen/Qwen3-4B",
+    "revision": "1cfa9a7208912126459214e8b04321603b3df60c",
+    "config_sha256": "8ba006f74fecfaaeb392872a60f4a480e7ec9860153d2e1b769ec81f9a147f8a"
+  },
+  "environment": {
+    "model_config_present": true,
+    "config_sha256_match": true,
+    "transformers": "5.14.1",
+    "torch": "2.12.1+cu130",
+    "cuda_available": true,
+    "bf16_supported": true
+  },
+  "planned": {
+    "primary": {
+      "block_index": 18,
+      "hidden_state_index": 19,
+      "beta": 0.75
+    },
+    "secondary": {
+      "block_index": 26,
+      "hidden_state_index": 27,
+      "beta": 0.5,
+      "descriptive_only": true
+    }
+  },
+  "neutral_model_preflight": {
+    "status": "NEUTRAL_MODEL_PREFLIGHT_PASS",
+    "neutral_sentence_only": true,
+    "model_class": "Qwen3ForCausalLM",
+    "tokenizer_class": "Qwen2Tokenizer",
+    "hidden_state_count": 37,
+    "primary_shape": [
+      2560
+    ],
+    "secondary_shape": [
+      2560
+    ],
+    "dtype": "torch.bfloat16",
+    "device": "cuda:0",
+    "elapsed_seconds": 17.1464
+  },
+  "EXP020_FORMAL_RUN_AUTHORIZED": false,
+  "EXP020_SCIENTIFIC_STATUS": "NOT_STARTED",
+  "FORMAL_FIT_EVAL_INFERENCE_PERFORMED": false,
+  "FORMAL_SCIENTIFIC_RESULTS_CREATED": false
+}
