@@ -1,0 +1,155 @@
+{
+  "specification_version": "081A-provenance-audit",
+  "authority_references": {
+    "frozen_config_path": "experiments/exp020/exp020_frozen_config.json",
+    "frozen_config_sha256": "f760f781b4b744a10938eb4de032e0cc345a021706821ecf0ca8523f5d57e667",
+    "preregistration_path": "docs/experiments/EXP-020-PREREGISTRATION.md",
+    "preregistration_sha256": "0621ca1024cf333f463760a834ede3a4be0225048c0e738eff06b8d1d036191a",
+    "preregistration_validator_path": "experiments/exp020/validate_exp020_preregistration.py",
+    "preregistration_validator_sha256": "df8b692f152037857fbc322348b27090c63d14ad55a56cfa5bc5f32d36bd653a",
+    "exp018_runner_path": "experiments/exp018/independent_validation.py",
+    "exp018_runner_commit": "5bb6c45a89daf3a9768266c411162330e08d5cc8"
+  },
+  "EXP020_FORMAL_RUN_AUTHORIZED": false,
+  "EXP020_SCIENTIFIC_STATUS": "NOT_STARTED",
+  "FORMAL_FIT_EVAL_INFERENCE_PERFORMED": false,
+  "FORMAL_SCIENTIFIC_RESULTS_CREATED": false,
+  "fixed_protocol": {
+    "model_id": "Qwen/Qwen3-4B",
+    "revision": "1cfa9a7208912126459214e8b04321603b3df60c",
+    "canonical_path": "D:\\Qwen3-4B-transfer",
+    "local_files_only": true,
+    "execution_mode": "MODE_A_NATIVE",
+    "dtype": "bfloat16",
+    "device": "cuda:0",
+    "config_sha256": "8ba006f74fecfaaeb392872a60f4a480e7ec9860153d2e1b769ec81f9a147f8a",
+    "primary": {"block_index": 18, "hidden_state_index": 19, "beta": 0.75},
+    "secondary": {"block_index": 26, "hidden_state_index": 27, "beta": 0.5, "descriptive_only": true},
+    "conditions": ["BASELINE", "TASK", "MATCHED_RANDOM", "OPPOSITE"],
+    "random_control": {
+      "distribution": "standard_normal",
+      "base_seed": 20260319,
+      "model_index": 2,
+      "seed_sequence_fields": ["base_seed", "model_index", "block_index", "split_index", "source_group_index", "target_group_index"]
+    },
+    "bootstrap": {
+      "seed": 20260812,
+      "resamples": 10000,
+      "value_classification": "USER_APPROVED_PRE_OUTCOME_IMPLEMENTATION_SPEC",
+      "cluster_key_fields": ["split_id", "held_out_source_item_id"],
+      "split_strata": 2,
+      "clusters_per_split": 12,
+      "transition_rows_per_cluster": 3,
+      "transition_rows_per_replicate": 72,
+      "ordering": "split_index ascending; frozen evaluation-ID traversal within split; replicate index ascending; draw first split before second split",
+      "shared_resample_plan": ["task_effect", "D_random", "D_opposite"],
+      "rng": {"constructor": "np.random.Generator(np.random.PCG64(20260812))", "bit_generator": "PCG64"},
+      "statistic": "arithmetic mean over 72 resampled transition-item values",
+      "ci": {"method": "percentile bootstrap", "quantiles": [0.025, 0.975], "numpy_method": "linear"},
+      "descriptive": {"mean": "arithmetic mean", "median": "np.median", "standard_deviation_ddof": 1, "proportion_positive": "mean(value > 0)"},
+      "degenerate_behavior": {"retain_degenerate_replicates": true, "all_identical_ci": "[c, c]", "zero_is_positive": false, "technical_invalidity": ["nonfinite observed value", "nonfinite bootstrap statistic", "fewer than two distinct source-item clusters in either split", "not exactly 12 clusters per split", "not exactly 3 transition rows per cluster"]},
+      "interpretation_boundary": "Cluster-resampling uncertainty for the frozen held-out source-item sample, stratified across two complementary splits. Directed task transitions are fixed design factors; the 72 transition-item observations are not 72 independent prompts and arise from 24 clusters."
+    }
+  },
+  "semantic_rules": {
+    "input_rendering": {
+      "value": "raw record text field; no chat template call",
+      "value_classification": "AUTHORITATIVE_RECOVERED_VALUE",
+      "provenance_tag": "RECOVERED_FROM_EXP018",
+      "status": "RESOLVED",
+      "evidence": "EXP-018 _collect_model_representations calls tokenizer(prompt['text'], return_tensors='pt')."
+    },
+    "tokenizer_invocation": {
+      "value": "tokenizer(text, return_tensors='pt')",
+      "value_classification": "AUTHORITATIVE_RECOVERED_VALUE",
+      "provenance_tag": "RECOVERED_FROM_EXP018",
+      "status": "RESOLVED"
+    },
+    "tokenizer_effective_defaults": {
+      "value": {"tokenizer_class": "Qwen2Tokenizer", "revision": "1cfa9a7208912126459214e8b04321603b3df60c", "canonical_path": "D:\\Qwen3-4B-transfer", "transformers_version": "5.14.1", "add_special_tokens": true, "padding": false, "truncation": "do_not_truncate", "max_length": null, "model_max_length": 131072, "return_attention_mask": true, "padding_side": "right", "truncation_side": "right", "bos_token_id": null, "eos_token_id": 151645, "pad_token_id": 151643, "add_bos_token": false, "add_eos_token": false, "single_record_padding": false, "single_record_special_tokens_added": 0, "final_position_is_tokenized_text_not_special": true},
+      "value_classification": "AUTHORITATIVE_RECOVERED_VALUE",
+      "provenance_tag": "RECOVERED_FROM_FROZEN_RUNTIME",
+      "status": "RESOLVED",
+      "evidence": "Local-only frozen-runtime inspection with only the permitted neutral diagnostic text; no formal prompt/source file was opened."
+    },
+    "representation": {
+      "value": "tensor_to_numpy_float32(outputs.hidden_states[tuple_index][0, -1, :])",
+      "value_classification": "AUTHORITATIVE_RECOVERED_VALUE",
+      "provenance_tag": "RECOVERED_FROM_EXP018",
+      "status": "RESOLVED"
+    },
+    "layer_mapping": {
+      "value": "hidden_states[block_index + 1]; primary 18->19; secondary 26->27",
+      "value_classification": "AUTHORITATIVE_RECOVERED_VALUE",
+      "provenance_tag": "ALREADY_FROZEN_EXP020",
+      "status": "RESOLVED"
+    },
+    "direction": {
+      "value": "FIT-only NumPy centroid mean(axis=0); target centroid minus source centroid",
+      "value_classification": "AUTHORITATIVE_RECOVERED_VALUE",
+      "provenance_tag": "RECOVERED_FROM_EXP018",
+      "status": "RESOLVED"
+    },
+    "intervention": {
+      "value": "offline held-out representation copy plus beta times delta; direct centroid/probe/RSM evaluation",
+      "value_classification": "AUTHORITATIVE_RECOVERED_VALUE",
+      "provenance_tag": "RECOVERED_FROM_EXP018",
+      "status": "RESOLVED"
+    },
+    "matched_random": {
+      "value": "np.random.default_rng(np.random.SeedSequence(seed_components)).standard_normal(shape), scaled to exact task-delta L2 norm",
+      "value_classification": "AUTHORITATIVE_RECOVERED_VALUE",
+      "provenance_tag": "RECOVERED_FROM_EXP018",
+      "status": "RESOLVED"
+    },
+    "opposite": {
+      "value": "-np.asarray(task_delta, dtype=float), before common beta multiplication",
+      "value_classification": "AUTHORITATIVE_RECOVERED_VALUE",
+      "provenance_tag": "RECOVERED_FROM_EXP018",
+      "status": "RESOLVED"
+    },
+    "probe": {
+      "value": "FIT-only StandardScaler then multinomial LogisticRegression; EVAL is transform/predict only",
+      "value_classification": "AUTHORITATIVE_RECOVERED_VALUE",
+      "provenance_tag": "ALREADY_FROZEN_EXP020",
+      "status": "RESOLVED"
+    },
+    "probability_mapping": {
+      "value": "map classifier.classes_ to frozen semantic class labels before selecting probability columns",
+      "value_classification": "IMPLEMENTATION_CORRECTNESS_REQUIREMENT",
+      "provenance_tag": "IMPLEMENTATION_CORRECTNESS_REQUIREMENT",
+      "status": "RESOLVED"
+    },
+    "effects": {
+      "value": "paired target-probability differences and frozen D_random/D_opposite contrasts",
+      "value_classification": "AUTHORITATIVE_RECOVERED_VALUE",
+      "provenance_tag": "ALREADY_FROZEN_EXP020",
+      "status": "RESOLVED"
+    },
+    "statistics_bootstrap": {
+      "value": "cluster bootstrap is specified in fixed_protocol.bootstrap",
+      "value_classification": "USER_APPROVED_PRE_OUTCOME_IMPLEMENTATION_SPEC",
+      "provenance_tag": "USER_APPROVED_PRE_OUTCOME_IMPLEMENTATION_SPEC",
+      "status": "RESOLVED"
+    },
+    "secondary_direction": {
+      "value": "independent secondary-block FIT centroids and delta",
+      "value_classification": "AUTHORITATIVE_RECOVERED_VALUE",
+      "provenance_tag": "RECOVERED_FROM_EXP018",
+      "status": "RESOLVED"
+    }
+  },
+  "unresolved_primary_critical": [],
+  "unresolved_secondary": [],
+  "protocol_conflicts": [],
+  "PRIMARY_READY": true,
+  "SECONDARY_READY": true,
+  "FULL_READY": true,
+  "environment_policy": {
+    "requirements": {"transformers": "5.14.1", "torch": "2.12.1+cu130"},
+    "qualified_execution": "MODE_A_NATIVE; bfloat16; cuda:0",
+    "material_drift_action": "STOP_BEFORE_FORMAL_RUN_REQUIRE_EXPLICIT_ENVIRONMENT_DRIFT_REVIEW"
+  },
+  "formal_access_boundary": "LEVEL_1_PROTOCOL_VALIDATION_ONLY",
+  "final_task_status": "READY_FOR_EXP020_RUNNER_IMPLEMENTATION"
+}
