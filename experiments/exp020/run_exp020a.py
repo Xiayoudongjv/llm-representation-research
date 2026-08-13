@@ -16,7 +16,7 @@ import subprocess
 import sys
 import time
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -38,6 +38,7 @@ PREFLIGHT_OUTPUT_PATH = EXP_DIR / "results" / "runner_preflight.json"
 PROMPT_PATH = ROOT / "experiments" / "exp003" / "prompts_controlled.json"
 NEUTRAL_TEXT = "This is a neutral hardware diagnostic."
 AUTHORIZATION_SCHEMA_VERSION = "1.0.0"
+CONSUMPTION_RECORD_SCHEMA_VERSION = "1.0.0"
 RESULT_SCHEMA_VERSION = "1.0.0"
 FORMAL_AUTHORIZATION_SCOPE = ["formal_fit_eval_inference", "atomic_scientific_result_publication"]
 LEGACY_FORMAL_RESULT_FILENAMES = (
@@ -72,6 +73,21 @@ def _canonical_result_path(root: Path = ROOT) -> Path:
     return root / "experiments" / "exp020" / "results" / "exp020a_results.json"
 
 
+def _authorization_consumption_path(
+    authorization_sha256: str,
+    root: Path = ROOT,
+) -> Path:
+    """Return the deterministic, single-use record path for an authorization."""
+    return (
+        root
+        / "experiments"
+        / "exp020"
+        / "results"
+        / "authorization_consumption"
+        / f"{authorization_sha256}.json"
+    )
+
+
 def _ambiguous_formal_result_paths(root: Path = ROOT) -> list[Path]:
     """Return legacy paths that could be mistaken for a formal scientific result."""
     paths: list[Path] = []
@@ -92,6 +108,73 @@ def _require_no_formal_results(root: Path = ROOT) -> None:
         raise RuntimeError(f"Formal output already exists: {canonical}")
     if paths := _ambiguous_formal_result_paths(root):
         raise RuntimeError(f"Ambiguous formal output already exists: {paths[0]}")
+
+
+def _acquire_authorization_consumption(
+    authorization_context: dict[str, Any],
+    root: Path = ROOT,
+) -> dict[str, str]:
+    """Durably consume authorization before any formal scientific work.
+
+    The full authorization SHA-256 determines the record name.  Exclusive
+    creation is the concurrency boundary: every pre-existing path, including a
+    malformed or partial file, is permanently treated as already consumed.  A
+    write failure also deliberately leaves the record in place, preventing a
+    failed attempt from being retried with the same authorization.
+    """
+    _require_no_formal_results(root)
+
+    authorization = authorization_context["authorization"]
+    authorization_sha256 = authorization_context["authorization_sha256"]
+    record_path = _authorization_consumption_path(authorization_sha256, root)
+    record_path.parent.mkdir(parents=True, exist_ok=True)
+    run_attempt_id = str(uuid.uuid4())
+    record = {
+        "schema_version": CONSUMPTION_RECORD_SCHEMA_VERSION,
+        "authorization_id": authorization["authorization_id"],
+        "authorization_sha256": authorization_sha256,
+        "experiment": authorization["experiment"],
+        "scope": authorization["scope"],
+        "runner_commit": authorization_context["runner_commit"],
+        "acquired_at_utc": datetime.now(timezone.utc).isoformat(),
+        "run_attempt_id": run_attempt_id,
+        "state": "consumed",
+        "canonical_result_path": _relative_path(_canonical_result_path(root), root),
+    }
+
+    try:
+        descriptor = os.open(
+            str(record_path),
+            os.O_WRONLY | os.O_CREAT | os.O_EXCL,
+            0o600,
+        )
+    except FileExistsError as exc:
+        raise PermissionError(
+            "FORMAL_RUN_BLOCKED_AUTHORIZATION_ALREADY_CONSUMED: "
+            f"{record_path}"
+        ) from exc
+    except OSError as exc:
+        raise RuntimeError(
+            "FORMAL_RUN_BLOCKED_AUTHORIZATION_CONSUMPTION_CREATE_FAILURE: "
+            f"{record_path}"
+        ) from exc
+
+    try:
+        with os.fdopen(descriptor, "w", encoding="utf-8", newline="\n") as handle:
+            json.dump(record, handle, indent=2, ensure_ascii=False)
+            handle.write("\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+    except Exception as exc:
+        raise RuntimeError(
+            "FORMAL_RUN_BLOCKED_AUTHORIZATION_CONSUMPTION_WRITE_FAILURE: "
+            f"{record_path}"
+        ) from exc
+
+    return {
+        "consumption_record_path": _relative_path(record_path, root),
+        "run_attempt_id": run_attempt_id,
+    }
 
 
 def _current_commit(root: Path = ROOT) -> str:
@@ -435,13 +518,23 @@ def _validate_formal_result(result: dict[str, Any], config: dict[str, Any], auth
         raise ValueError("Formal result run identity is invalid.") from exc
 
     auth = result["authorization"]
-    required_auth = {"authorization_id", "authorization_sha256", "authorized_runner_commit", "scope", "single_use"}
+    required_auth = {
+        "authorization_id",
+        "authorization_sha256",
+        "authorized_runner_commit",
+        "scope",
+        "single_use",
+        "consumption_record_path",
+        "run_attempt_id",
+    }
     if not isinstance(auth, dict) or set(auth) != required_auth:
         raise ValueError("Formal result authorization provenance is incomplete.")
     if auth["authorization_id"] != authorization["authorization_id"] or auth["authorization_sha256"] != authorization["authorization_sha256"]:
         raise ValueError("Formal result authorization provenance disagrees with authorization artifact.")
     if auth["authorized_runner_commit"] != authorization["runner_commit"] or auth["scope"] != FORMAL_AUTHORIZATION_SCOPE or auth["single_use"] is not True:
         raise ValueError("Formal result authorization provenance is invalid.")
+    if auth["consumption_record_path"] != authorization["consumption_record_path"] or auth["run_attempt_id"] != authorization["run_attempt_id"]:
+        raise ValueError("Formal result authorization consumption provenance is invalid.")
 
     bindings = result["frozen_authority_bindings"]
     required_bindings = {
@@ -547,8 +640,14 @@ def _validate_formal_result(result: dict[str, Any], config: dict[str, Any], auth
         raise ValueError("Formal result status is invalid.")
 
 
-def _atomic_publish(result: dict[str, Any], config: dict[str, Any], authorization: dict[str, Any], runner_commit: str, root: Path = ROOT) -> None:
-    """Validate one complete result and atomically publish it to the canonical path."""
+def _atomic_publish(result: dict[str, Any], config: dict[str, Any], authorization: dict[str, Any], runner_commit: str, root: Path = ROOT) -> dict[str, str]:
+    """Publish a complete result only if the canonical destination is absent.
+
+    ``os.link`` provides an atomic create-without-replace operation on the
+    repository filesystem.  Unlike a replacement rename, a concurrent winner
+    cannot be overwritten.  There is intentionally no fallback publication
+    method.
+    """
     output_path = _canonical_result_path(root)
     _require_no_formal_results(root)
     _validate_formal_result(result, config, authorization, runner_commit)
@@ -562,13 +661,22 @@ def _atomic_publish(result: dict[str, Any], config: dict[str, Any], authorizatio
             handle.write("\n")
             handle.flush()
             os.fsync(handle.fileno())
-        if output_path.exists():
-            raise FileExistsError("Canonical formal result already exists.")
-        os.replace(staging, output_path)
+        os.link(staging, output_path)
     except Exception:
         if staging.exists():
             staging.unlink()
         raise
+    try:
+        staging.unlink()
+    except OSError:
+        return {
+            "publication_status": "PUBLISHED_WITH_STAGING_CLEANUP_FAILURE",
+            "canonical_result_path": _relative_path(output_path, root),
+        }
+    return {
+        "publication_status": "PUBLISHED",
+        "canonical_result_path": _relative_path(output_path, root),
+    }
 
 
 def _result_section(rows: list[dict[str, Any]], summary: dict[str, Any], *, block_index: int, hidden_state_index: int, beta: float, primary: bool) -> dict[str, Any]:
@@ -615,6 +723,8 @@ def _build_formal_result(primary_rows: list[dict[str, Any]], primary_summary: di
             "authorized_runner_commit": authorization["runner_commit"],
             "scope": FORMAL_AUTHORIZATION_SCOPE,
             "single_use": True,
+            "consumption_record_path": authorization_context["consumption_record_path"],
+            "run_attempt_id": authorization_context["run_attempt_id"],
         },
         "frozen_authority_bindings": {key: bindings[key] for key in ("frozen_config_sha256", "preregistration_sha256", "prompt_file_sha256", "source_conditions_sha256", "split_transition_manifest_sha256", "model_revision", "model_config_sha256", "tokenizer_identity", "tokenizer_revision")},
         "model_runtime": {
@@ -653,11 +763,12 @@ def _build_formal_result(primary_rows: list[dict[str, Any]], primary_summary: di
 
 
 def formal_run() -> None:
-    """Future authorized computation path; prohibited during Task 082C."""
-    authorization_context = validate_formal_authorization()  # Must remain first: no formal data/model/output access before this line.
+    """Run only after irreversible authorization consumption succeeds."""
+    authorization_context = validate_formal_authorization()
+    _require_no_formal_results()
+    authorization_context.update(_acquire_authorization_consumption(authorization_context))
     _run_validator(EXP_DIR / "validate_exp020_preregistration.py")
     _run_validator(EXP_DIR / "validate_exp020_implementation_spec.py")
-    _require_no_formal_results()
     config, spec = authorization_context["config"], authorization_context["spec"]
     validate_static_environment(config, spec)
     prompts = _json(PROMPT_PATH)  # Formal source access begins only after authorization.
@@ -681,7 +792,19 @@ def formal_run() -> None:
     if len(primary_rows) != config["dataset"]["aggregate_paired_evaluation_count"]:
         raise RuntimeError("REPRESENTATION_REPLICATION_INVALID")
     result = _build_formal_result(primary_rows, primary_summary, secondary_rows, secondary_summary, authorization_context=authorization_context, model=model, tokenizer=tokenizer)
-    _atomic_publish(result, config, {**authorization_context["authorization"], "authorization_sha256": authorization_context["authorization_sha256"]}, authorization_context["runner_commit"])
+    publication = _atomic_publish(
+        result,
+        config,
+        {
+            **authorization_context["authorization"],
+            "authorization_sha256": authorization_context["authorization_sha256"],
+            "consumption_record_path": authorization_context["consumption_record_path"],
+            "run_attempt_id": authorization_context["run_attempt_id"],
+        },
+        authorization_context["runner_commit"],
+    )
+    if publication["publication_status"] != "PUBLISHED":
+        print(f"EXP020_PUBLICATION_WARNING: {publication['publication_status']}")
     del model
     torch.cuda.empty_cache()
 

@@ -1,0 +1,47 @@
+{
+  "task": "082D",
+  "review_only": true,
+  "reviewed_commit": "d080cafd1e36c0daa3128fdff50010b86a02a570",
+  "formal_run_authorized": false,
+  "formal_fit_eval_inference_performed": false,
+  "formal_scientific_results_created": false,
+  "exp020_scientific_status": "NOT_STARTED",
+  "evidence_changed": false,
+  "scientific_conclusion_changed": false,
+  "runner_modified": false,
+  "authority_files_modified": false,
+  "formal_data_access_level": "LEVEL_1",
+  "entry_gate_passed": true,
+  "authority_hashes_verified": true,
+  "preregistration_validator_passed": true,
+  "implementation_spec_validator_passed": true,
+  "targeted_tests_passed": true,
+  "targeted_test_count": 75,
+  "scientific_semantics_unchanged": true,
+  "authorization_schema_complete": true,
+  "authorization_fail_closed": true,
+  "authorization_lifecycle_valid": false,
+  "canonical_result_path_consistent": true,
+  "result_schema_fail_closed": true,
+  "provenance_complete": true,
+  "atomic_publication_assured": false,
+  "formal_inputs_integrity_verified": true,
+  "model_integrity_verified": true,
+  "critical_findings": [
+    {
+      "id": "single_use_not_durably_enforced",
+      "impact": "A valid authorization has no consumption record or lock; retry semantics after a pre-publication failure are undefined."
+    },
+    {
+      "id": "replace_race_can_overwrite_canonical_result",
+      "impact": "A canonical result created after the last exists check can be overwritten by os.replace."
+    }
+  ],
+  "noncritical_findings": [
+    {
+      "id": "staging_cleanup_failure_not_explicitly_tested",
+      "impact": "A cleanup failure can leave a clearly named staging file but cannot publish or overwrite the canonical result."
+    }
+  ],
+  "final_status": "FORMAL_RUN_REREVIEW_BLOCKED_AUTHORIZATION_LIFECYCLE"
+}

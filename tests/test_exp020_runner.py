@@ -5,6 +5,7 @@ from __future__ import annotations
 import copy
 import importlib.util
 import json
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import numpy as np
@@ -72,6 +73,30 @@ def _authorization() -> dict:
     }
 
 
+def _consumed_authorization(digest: str = AUTH_DIGEST, run_attempt_id: str = "33333333-3333-4333-8333-333333333333") -> dict:
+    """Return synthetic authorization provenance required for publication."""
+    return {
+        **_authorization(),
+        "authorization_sha256": digest,
+        "consumption_record_path": (
+            "experiments/exp020/results/authorization_consumption/"
+            f"{digest}.json"
+        ),
+        "run_attempt_id": run_attempt_id,
+    }
+
+
+def _consumption_context(digest: str = AUTH_DIGEST, authorization_id: str | None = None) -> dict:
+    authorization = _authorization()
+    if authorization_id is not None:
+        authorization["authorization_id"] = authorization_id
+    return {
+        "authorization": authorization,
+        "authorization_sha256": digest,
+        "runner_commit": COMMIT,
+    }
+
+
 def _patch_authorization_context(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Path:
     path = tmp_path / "authorization.json"
     path.write_text(json.dumps(_authorization()), encoding="utf-8")
@@ -104,7 +129,15 @@ def _complete_result(config: dict, authorization: dict) -> dict:
         "schema_version": runner.RESULT_SCHEMA_VERSION,
         "experiment": "EXP-020A",
         "run_id": "22222222-2222-4222-8222-222222222222",
-        "authorization": {"authorization_id": authorization["authorization_id"], "authorization_sha256": authorization["authorization_sha256"], "authorized_runner_commit": COMMIT, "scope": list(runner.FORMAL_AUTHORIZATION_SCOPE), "single_use": True},
+        "authorization": {
+            "authorization_id": authorization["authorization_id"],
+            "authorization_sha256": authorization["authorization_sha256"],
+            "authorized_runner_commit": COMMIT,
+            "scope": list(runner.FORMAL_AUTHORIZATION_SCOPE),
+            "single_use": True,
+            "consumption_record_path": authorization["consumption_record_path"],
+            "run_attempt_id": authorization["run_attempt_id"],
+        },
         "frozen_authority_bindings": {key: EXPECTED_BINDINGS[key] for key in ("frozen_config_sha256", "preregistration_sha256", "prompt_file_sha256", "source_conditions_sha256", "split_transition_manifest_sha256", "model_revision", "model_config_sha256", "tokenizer_identity", "tokenizer_revision")},
         "model_runtime": {"model_id": EXPECTED_BINDINGS["model_id"], "model_revision": EXPECTED_BINDINGS["model_revision"], "model_config_sha256": EXPECTED_BINDINGS["model_config_sha256"], "tokenizer_identity": EXPECTED_BINDINGS["tokenizer_identity"], "tokenizer_revision": EXPECTED_BINDINGS["tokenizer_revision"], "python": "3.11", "numpy": "2", "torch": "2", "transformers": "5", "scikit_learn": "1", "device": "cuda:0", "dtype": "bfloat16"},
         "git_runner": {"authorized_runner_commit": COMMIT, "actual_runner_commit": COMMIT},
@@ -216,6 +249,9 @@ def test_canonical_result_path_guards_and_ignores_engineering_reports(tmp_path: 
     engineering.mkdir(parents=True)
     (engineering / "runner_preflight.json").write_text("{}", encoding="utf-8")
     (engineering / "formal_run_review.json").write_text("{}", encoding="utf-8")
+    consumption = runner._authorization_consumption_path(AUTH_DIGEST, tmp_path)
+    consumption.parent.mkdir(parents=True)
+    consumption.write_text("{}", encoding="utf-8")
     runner._require_no_formal_results(tmp_path)
     canonical = runner._canonical_result_path(tmp_path)
     canonical.write_text("{}", encoding="utf-8")
@@ -223,22 +259,218 @@ def test_canonical_result_path_guards_and_ignores_engineering_reports(tmp_path: 
         runner._require_no_formal_results(tmp_path)
 
 
+def test_authorization_consumption_is_durable_and_single_use(tmp_path: Path) -> None:
+    context = _consumption_context()
+    acquired = runner._acquire_authorization_consumption(context, tmp_path)
+    record_path = runner._authorization_consumption_path(AUTH_DIGEST, tmp_path)
+    record = json.loads(record_path.read_text(encoding="utf-8"))
+    assert acquired["consumption_record_path"] == record["canonical_result_path"].replace(
+        "exp020a_results.json", f"authorization_consumption/{AUTH_DIGEST}.json"
+    )
+    assert record["state"] == "consumed"
+    assert record["authorization_id"] == context["authorization"]["authorization_id"]
+    assert record["run_attempt_id"] == acquired["run_attempt_id"]
+    with pytest.raises(PermissionError, match="ALREADY_CONSUMED"):
+        runner._acquire_authorization_consumption(context, tmp_path)
+
+
+@pytest.mark.parametrize("contents", [b"", b"{malformed", b'{"state":"partial"'])
+def test_any_existing_consumption_record_blocks_reuse(tmp_path: Path, contents: bytes) -> None:
+    path = runner._authorization_consumption_path(AUTH_DIGEST, tmp_path)
+    path.parent.mkdir(parents=True)
+    path.write_bytes(contents)
+    with pytest.raises(PermissionError, match="ALREADY_CONSUMED"):
+        runner._acquire_authorization_consumption(_consumption_context(), tmp_path)
+
+
+def test_concurrent_authorization_consumption_has_exactly_one_winner(tmp_path: Path) -> None:
+    context = _consumption_context()
+
+    def acquire() -> str | None:
+        try:
+            return runner._acquire_authorization_consumption(context, tmp_path)["run_attempt_id"]
+        except PermissionError:
+            return None
+
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        attempts = list(pool.map(lambda _: acquire(), range(8)))
+    assert sum(value is not None for value in attempts) == 1
+    record = json.loads(runner._authorization_consumption_path(AUTH_DIGEST, tmp_path).read_text(encoding="utf-8"))
+    assert record["run_attempt_id"] == next(value for value in attempts if value is not None)
+
+
+def test_consumption_write_and_fsync_failures_remain_consumed(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    write_context = _consumption_context("4" * 64)
+    monkeypatch.setattr(runner.json, "dump", lambda *args, **kwargs: (_ for _ in ()).throw(OSError("write failure")))
+    with pytest.raises(RuntimeError, match="CONSUMPTION_WRITE_FAILURE"):
+        runner._acquire_authorization_consumption(write_context, tmp_path)
+    assert runner._authorization_consumption_path("4" * 64, tmp_path).exists()
+    with pytest.raises(PermissionError, match="ALREADY_CONSUMED"):
+        runner._acquire_authorization_consumption(write_context, tmp_path)
+
+    monkeypatch.undo()
+    fsync_context = _consumption_context("5" * 64)
+    monkeypatch.setattr(runner.os, "fsync", lambda _: (_ for _ in ()).throw(OSError("fsync failure")))
+    with pytest.raises(RuntimeError, match="CONSUMPTION_WRITE_FAILURE"):
+        runner._acquire_authorization_consumption(fsync_context, tmp_path)
+    assert runner._authorization_consumption_path("5" * 64, tmp_path).exists()
+    with pytest.raises(PermissionError, match="ALREADY_CONSUMED"):
+        runner._acquire_authorization_consumption(fsync_context, tmp_path)
+
+
+def test_new_authorization_hash_creates_a_distinct_consumption_record(tmp_path: Path) -> None:
+    first = runner._acquire_authorization_consumption(_consumption_context("6" * 64), tmp_path)
+    second = runner._acquire_authorization_consumption(
+        _consumption_context("7" * 64, "44444444-4444-4444-8444-444444444444"),
+        tmp_path,
+    )
+    assert first["consumption_record_path"] != second["consumption_record_path"]
+    assert runner._authorization_consumption_path("6" * 64, tmp_path).exists()
+    assert runner._authorization_consumption_path("7" * 64, tmp_path).exists()
+
+
+def test_authorization_id_cannot_change_consumption_record_identity(tmp_path: Path) -> None:
+    first = runner._acquire_authorization_consumption(_consumption_context(), tmp_path)
+    with pytest.raises(PermissionError, match="ALREADY_CONSUMED"):
+        runner._acquire_authorization_consumption(
+            _consumption_context(AUTH_DIGEST, "55555555-5555-4555-8555-555555555555"),
+            tmp_path,
+        )
+    assert first["consumption_record_path"].endswith(f"{AUTH_DIGEST}.json")
+
+
+def test_existing_canonical_result_blocks_before_authorization_consumption(tmp_path: Path) -> None:
+    final = runner._canonical_result_path(tmp_path)
+    final.parent.mkdir(parents=True)
+    final.write_text("{}", encoding="utf-8")
+    with pytest.raises(RuntimeError, match="Formal output already exists"):
+        runner._acquire_authorization_consumption(_consumption_context(), tmp_path)
+    assert not runner._authorization_consumption_path(AUTH_DIGEST, tmp_path).exists()
+
+
+def test_formal_path_consumes_before_validator_or_formal_source_access(monkeypatch: pytest.MonkeyPatch) -> None:
+    calls: list[str] = []
+    context = {**_consumption_context(), "config": _synthetic_config(), "spec": {}}
+    monkeypatch.setattr(runner, "validate_formal_authorization", lambda: calls.append("authorization") or context)
+    monkeypatch.setattr(runner, "_require_no_formal_results", lambda: calls.append("no-results"))
+    monkeypatch.setattr(
+        runner,
+        "_acquire_authorization_consumption",
+        lambda _: calls.append("consume") or (_ for _ in ()).throw(RuntimeError("stop after consume")),
+    )
+    monkeypatch.setattr(runner, "_run_validator", lambda _: calls.append("validator"))
+    with pytest.raises(RuntimeError, match="stop after consume"):
+        runner.formal_run()
+    assert calls == ["authorization", "no-results", "consume"]
+
+
+def test_consumption_failure_is_not_a_scientific_gate_status(tmp_path: Path) -> None:
+    path = runner._authorization_consumption_path(AUTH_DIGEST, tmp_path)
+    path.parent.mkdir(parents=True)
+    path.write_bytes(b"")
+    with pytest.raises(PermissionError, match="FORMAL_RUN_BLOCKED_AUTHORIZATION_ALREADY_CONSUMED") as error:
+        runner._acquire_authorization_consumption(_consumption_context(), tmp_path)
+    assert "REPRESENTATION_REPLICATION" not in str(error.value)
+
+
 def test_complete_synthetic_result_publishes_atomically(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     _patch_authorization_context(monkeypatch, tmp_path)
-    config, authorization = _synthetic_config(), {**_authorization(), "authorization_sha256": AUTH_DIGEST}
+    config, authorization = _synthetic_config(), _consumed_authorization()
     result = _complete_result(config, authorization)
-    runner._atomic_publish(result, config, authorization, COMMIT, tmp_path)
+    outcome = runner._atomic_publish(result, config, authorization, COMMIT, tmp_path)
     output = runner._canonical_result_path(tmp_path)
     assert output.is_file()
+    assert outcome["publication_status"] == "PUBLISHED"
+    expected_bytes = (json.dumps(result, ensure_ascii=False, allow_nan=False, indent=2) + "\n").encode("utf-8")
+    assert output.read_bytes() == expected_bytes
     assert json.loads(output.read_text(encoding="utf-8"))["experiment"] == "EXP-020A"
+    assert json.loads(output.read_text(encoding="utf-8"))["authorization"] == result["authorization"]
     assert not list(output.parent.glob("*.tmp-*"))
     with pytest.raises(RuntimeError):
         runner._atomic_publish(result, config, authorization, COMMIT, tmp_path)
 
 
+def test_concurrent_publication_has_exactly_one_winner(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    _patch_authorization_context(monkeypatch, tmp_path)
+    config, authorization = _synthetic_config(), _consumed_authorization()
+
+    def publish() -> str | None:
+        result = _complete_result(config, authorization)
+        try:
+            return runner._atomic_publish(result, config, authorization, COMMIT, tmp_path)["publication_status"]
+        except (FileExistsError, RuntimeError):
+            return None
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        outcomes = list(pool.map(lambda _: publish(), range(2)))
+    assert outcomes.count("PUBLISHED") == 1
+    assert outcomes.count(None) == 1
+    output = runner._canonical_result_path(tmp_path)
+    assert output.exists()
+    assert json.loads(output.read_text(encoding="utf-8"))["experiment"] == "EXP-020A"
+
+
+def test_link_publication_never_overwrites_race_winner(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    _patch_authorization_context(monkeypatch, tmp_path)
+    config, authorization = _synthetic_config(), _consumed_authorization()
+    result = _complete_result(config, authorization)
+    output = runner._canonical_result_path(tmp_path)
+    original_link = runner.os.link
+
+    def race_winner(source: str | Path, destination: str | Path) -> None:
+        destination_path = Path(destination)
+        destination_path.write_text("race winner", encoding="utf-8")
+        original_link(source, destination)
+
+    monkeypatch.setattr(runner.os, "link", race_winner)
+    with pytest.raises(FileExistsError):
+        runner._atomic_publish(result, config, authorization, COMMIT, tmp_path)
+    assert output.read_text(encoding="utf-8") == "race winner"
+
+
+def test_link_failure_has_no_replace_fallback(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    _patch_authorization_context(monkeypatch, tmp_path)
+    config, authorization = _synthetic_config(), _consumed_authorization()
+    result = _complete_result(config, authorization)
+    monkeypatch.setattr(runner.os, "link", lambda *_: (_ for _ in ()).throw(OSError("link unavailable")))
+    monkeypatch.setattr(runner.os, "replace", lambda *_: (_ for _ in ()).throw(AssertionError("replace must not run")))
+    with pytest.raises(OSError, match="link unavailable"):
+        runner._atomic_publish(result, config, authorization, COMMIT, tmp_path)
+    assert not runner._canonical_result_path(tmp_path).exists()
+
+
+def test_publication_fsync_failure_leaves_no_final_result(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    _patch_authorization_context(monkeypatch, tmp_path)
+    config, authorization = _synthetic_config(), _consumed_authorization()
+    result = _complete_result(config, authorization)
+    monkeypatch.setattr(runner.os, "fsync", lambda _: (_ for _ in ()).throw(OSError("fsync failure")))
+    with pytest.raises(OSError, match="fsync failure"):
+        runner._atomic_publish(result, config, authorization, COMMIT, tmp_path)
+    assert not runner._canonical_result_path(tmp_path).exists()
+    assert not list((tmp_path / "experiments" / "exp020" / "results").glob("*.tmp-*"))
+
+
+def test_published_result_survives_staging_cleanup_failure(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    _patch_authorization_context(monkeypatch, tmp_path)
+    config, authorization = _synthetic_config(), _consumed_authorization()
+    result = _complete_result(config, authorization)
+    original_unlink = runner.os.unlink
+
+    def fail_staging_cleanup(path: str | Path) -> None:
+        if ".tmp-" in Path(path).name:
+            raise OSError("cleanup failure")
+        original_unlink(path)
+
+    monkeypatch.setattr(runner.os, "unlink", fail_staging_cleanup)
+    outcome = runner._atomic_publish(result, config, authorization, COMMIT, tmp_path)
+    assert outcome["publication_status"] == "PUBLISHED_WITH_STAGING_CLEANUP_FAILURE"
+    assert runner._canonical_result_path(tmp_path).exists()
+    assert len(list(runner._canonical_result_path(tmp_path).parent.glob("*.tmp-*"))) == 1
+
+
 def test_duplicate_or_missing_transition_coverage_never_publishes(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     _patch_authorization_context(monkeypatch, tmp_path)
-    config, authorization = _synthetic_config(), {**_authorization(), "authorization_sha256": AUTH_DIGEST}
+    config, authorization = _synthetic_config(), _consumed_authorization()
     result = _complete_result(config, authorization)
     result["primary"]["comparisons"][-1] = copy.deepcopy(result["primary"]["comparisons"][0])
     with pytest.raises(ValueError, match="coverage"):
@@ -254,10 +486,11 @@ def test_duplicate_or_missing_transition_coverage_never_publishes(monkeypatch: p
     lambda result: result["primary"]["comparisons"].__setitem__(0, {**result["primary"]["comparisons"][0], "task_effect": float("nan")}),
     lambda result: result.update(technical_validity={"status": "INVALID", "reason": "synthetic"}),
     lambda result: result["authorization"].update(authorization_sha256="wrong"),
+    lambda result: result["authorization"].update(run_attempt_id="wrong"),
 ])
 def test_incomplete_or_invalid_results_never_publish(monkeypatch: pytest.MonkeyPatch, tmp_path: Path, mutate) -> None:
     _patch_authorization_context(monkeypatch, tmp_path)
-    config, authorization = _synthetic_config(), {**_authorization(), "authorization_sha256": AUTH_DIGEST}
+    config, authorization = _synthetic_config(), _consumed_authorization()
     result = _complete_result(config, authorization)
     mutate(result)
     with pytest.raises(ValueError):
@@ -268,7 +501,7 @@ def test_incomplete_or_invalid_results_never_publish(monkeypatch: pytest.MonkeyP
 
 def test_staging_failure_leaves_no_final_artifact(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     _patch_authorization_context(monkeypatch, tmp_path)
-    config, authorization = _synthetic_config(), {**_authorization(), "authorization_sha256": AUTH_DIGEST}
+    config, authorization = _synthetic_config(), _consumed_authorization()
     result = _complete_result(config, authorization)
     original_dump = runner.json.dump
     monkeypatch.setattr(runner.json, "dump", lambda *args, **kwargs: (_ for _ in ()).throw(OSError("synthetic staging failure")))
@@ -282,3 +515,5 @@ def test_runner_source_does_not_serialize_raw_hidden_states() -> None:
     source = MODULE_PATH.read_text(encoding="utf-8")
     assert "raw_hidden_states" not in source
     assert "token_ids" not in source
+    assert "os.replace(" not in source
+    assert "os.link(staging, output_path)" in source
