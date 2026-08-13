@@ -1,0 +1,25 @@
+{
+  "requested_model_id": "Qwen/Qwen3-4B",
+  "qualification_status": "HARDWARE_INFEASIBLE",
+  "timestamp_utc": "2026-08-13T01:35:37.541574+00:00",
+  "diagnostic_prompt": "This is a neutral hardware diagnostic.",
+  "cache_dir": "D:\\AI_Cache\\huggingface",
+  "gpu": {
+    "name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+    "total_memory_gib": 7.9595,
+    "bf16_supported": true
+  },
+  "mode_order": [
+    "MODE_A_NATIVE",
+    "MODE_B_CPU_OFFLOAD",
+    "MODE_C_4BIT"
+  ],
+  "formal_exp020_results_created": false,
+  "exp017_accessed": false,
+  "attempts": [],
+  "access_error": {
+    "error": "OSError: We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.\nCheck your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.",
+    "oom": false
+  },
+  "stop_reason": "Model configuration was neither cached nor reachable. Qualification stopped before MODE_A to avoid repeated network downloads."
+}
