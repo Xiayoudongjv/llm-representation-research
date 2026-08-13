@@ -364,6 +364,69 @@ def test_formal_path_consumes_before_validator_or_formal_source_access(monkeypat
     assert calls == ["authorization", "no-results", "consume"]
 
 
+def test_formal_loader_uses_neutral_resource_affecting_kwargs(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Exercise only mocked loader setup; no formal data or model is accessed."""
+    import torch
+    import transformers
+    from src import model_loader
+
+    config = _synthetic_config()
+    config["model"]["canonical_path"] = EXPECTED_BINDINGS["model_canonical_path"]
+    context = {**_consumption_context(), "config": config, "spec": {}, "bindings": EXPECTED_BINDINGS}
+    tokenizer_calls: list[tuple[str, dict]] = []
+    model_call: dict[str, object] = {}
+    monkeypatch.setattr(runner, "validate_formal_authorization", lambda: context)
+    monkeypatch.setattr(runner, "_require_no_formal_results", lambda: None)
+    monkeypatch.setattr(runner, "_acquire_authorization_consumption", lambda _: {"consumption_record_path": "synthetic.json", "run_attempt_id": "33333333-3333-4333-8333-333333333333"})
+    monkeypatch.setattr(runner, "_run_validator", lambda _: None)
+    monkeypatch.setattr(runner, "validate_static_environment", lambda *_: {})
+    monkeypatch.setattr(runner, "_json", lambda _: [])
+    monkeypatch.setattr(model_loader, "load_tokenizer", lambda path, **kwargs: tokenizer_calls.append((path, kwargs)) or object())
+
+    def capture_model(path, **kwargs):
+        model_call.update(path=path, **kwargs)
+        raise RuntimeError("synthetic formal loader stop")
+
+    monkeypatch.setattr(transformers.AutoModelForCausalLM, "from_pretrained", capture_model)
+    with pytest.raises(RuntimeError, match="synthetic formal loader stop"):
+        runner.formal_run()
+    assert tokenizer_calls == [(EXPECTED_BINDINGS["model_canonical_path"], {"local_files_only": True})]
+    assert model_call == {
+        "path": EXPECTED_BINDINGS["model_canonical_path"],
+        "local_files_only": True,
+        "dtype": torch.bfloat16,
+        "device_map": {"": 0},
+        "low_cpu_mem_usage": True,
+    }
+    assert config["model"]["revision"] == EXPECTED_BINDINGS["model_revision"]
+
+
+def test_neutral_loader_uses_the_same_resource_affecting_kwargs(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Capture neutral loader configuration without loading the real model."""
+    import torch
+    import transformers
+
+    captured: dict[str, object] = {}
+    monkeypatch.setattr(runner, "static_preflight", lambda: {})
+    monkeypatch.setattr(transformers.AutoConfig, "from_pretrained", lambda *_args, **_kwargs: object())
+    monkeypatch.setattr(transformers.AutoTokenizer, "from_pretrained", lambda *_args, **_kwargs: object())
+
+    def capture_model(path, **kwargs):
+        captured.update(path=path, **kwargs)
+        raise RuntimeError("synthetic neutral loader stop")
+
+    monkeypatch.setattr(transformers.AutoModelForCausalLM, "from_pretrained", capture_model)
+    with pytest.raises(RuntimeError, match="synthetic neutral loader stop"):
+        runner.neutral_model_preflight()
+    assert captured == {
+        "path": Path(runner._json(runner.FROZEN_CONFIG_PATH)["model"]["canonical_path"]),
+        "local_files_only": True,
+        "dtype": torch.bfloat16,
+        "device_map": {"": 0},
+        "low_cpu_mem_usage": True,
+    }
+
+
 def test_consumption_failure_is_not_a_scientific_gate_status(tmp_path: Path) -> None:
     path = runner._authorization_consumption_path(AUTH_DIGEST, tmp_path)
     path.parent.mkdir(parents=True)

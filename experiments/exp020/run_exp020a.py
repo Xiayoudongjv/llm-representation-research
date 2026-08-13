@@ -773,12 +773,19 @@ def formal_run() -> None:
     validate_static_environment(config, spec)
     prompts = _json(PROMPT_PATH)  # Formal source access begins only after authorization.
     from src.extraction import extract_last_token_hidden_state, move_tokenized_inputs_to_device, tensor_to_numpy_float32
-    from src.model_loader import load_causal_lm, load_tokenizer
+    from src.model_loader import load_tokenizer
     import torch
+    from transformers import AutoModelForCausalLM
 
     layers = [19, 27]
     tokenizer = load_tokenizer(config["model"]["canonical_path"], local_files_only=True)
-    model = load_causal_lm(config["model"]["canonical_path"], dtype="bfloat16", device_map={"": 0}, local_files_only=True)
+    model = AutoModelForCausalLM.from_pretrained(
+        config["model"]["canonical_path"],
+        local_files_only=True,
+        dtype=torch.bfloat16,
+        device_map={"": 0},
+        low_cpu_mem_usage=True,
+    )
     model.eval()
     representations = {layer: {} for layer in layers}
     for prompt in prompts:
