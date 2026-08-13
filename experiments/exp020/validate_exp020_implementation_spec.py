@@ -24,6 +24,34 @@ RESULT_FILENAMES = (
     "transition_metrics.csv", "probe_metrics.csv", "invariant_metrics.csv", "pair_summary.csv",
     "representation_summary.json", "validation_summary.json", "behavioral_outputs.csv",
 )
+SEMANTIC_RULE_SCHEMA_VERSION = "1.0.0"
+REQUIRED_SEMANTIC_RULES = (
+    "input_rendering", "tokenizer_invocation", "tokenizer_effective_defaults", "representation",
+    "layer_mapping", "direction", "intervention", "matched_random", "opposite", "probe",
+    "probability_mapping", "effects", "statistics_bootstrap", "secondary_direction",
+)
+REQUIRED_RULE_CLASSIFICATIONS = {
+    "input_rendering": ("AUTHORITATIVE_RECOVERED_VALUE", "RECOVERED_FROM_EXP018"),
+    "tokenizer_invocation": ("AUTHORITATIVE_RECOVERED_VALUE", "RECOVERED_FROM_EXP018"),
+    "tokenizer_effective_defaults": ("AUTHORITATIVE_RECOVERED_VALUE", "RECOVERED_FROM_FROZEN_RUNTIME"),
+    "representation": ("AUTHORITATIVE_RECOVERED_VALUE", "RECOVERED_FROM_EXP018"),
+    "layer_mapping": ("AUTHORITATIVE_RECOVERED_VALUE", "ALREADY_FROZEN_EXP020"),
+    "direction": ("AUTHORITATIVE_RECOVERED_VALUE", "RECOVERED_FROM_EXP018"),
+    "intervention": ("AUTHORITATIVE_RECOVERED_VALUE", "RECOVERED_FROM_EXP018"),
+    "matched_random": ("AUTHORITATIVE_RECOVERED_VALUE", "RECOVERED_FROM_EXP018"),
+    "opposite": ("AUTHORITATIVE_RECOVERED_VALUE", "RECOVERED_FROM_EXP018"),
+    "probe": ("AUTHORITATIVE_RECOVERED_VALUE", "ALREADY_FROZEN_EXP020"),
+    "probability_mapping": ("IMPLEMENTATION_CORRECTNESS_REQUIREMENT", "IMPLEMENTATION_CORRECTNESS_REQUIREMENT"),
+    "effects": ("AUTHORITATIVE_RECOVERED_VALUE", "ALREADY_FROZEN_EXP020"),
+    "statistics_bootstrap": ("USER_APPROVED_PRE_OUTCOME_IMPLEMENTATION_SPEC", "USER_APPROVED_PRE_OUTCOME_IMPLEMENTATION_SPEC"),
+    "secondary_direction": ("AUTHORITATIVE_RECOVERED_VALUE", "RECOVERED_FROM_EXP018"),
+}
+CANONICAL_ORDER_SOURCE = {
+    "authority": "experiments/exp020/exp020_frozen_config.json",
+    "split_order": "dataset.splits sorted by split_index ascending",
+    "cluster_order": "dataset.groups order then evaluation_ids[group] list order",
+    "row_order": "dataset.ordered_transitions order filtered by source_group",
+}
 
 
 def _sha256(path: Path) -> str:
@@ -158,7 +186,36 @@ def validate_readiness_fields(spec: dict[str, Any]) -> list[str]:
     return errors
 
 
-def _validate_bootstrap_schema(bootstrap: dict[str, Any]) -> list[str]:
+def validate_semantic_rule_registry(spec: dict[str, Any]) -> list[str]:
+    """Require the versioned completeness registry and exact per-rule provenance."""
+    errors: list[str] = []
+    registry = spec.get("semantic_rule_registry", {})
+    serialized = registry.get("required_rules")
+    if registry.get("schema_version") != SEMANTIC_RULE_SCHEMA_VERSION:
+        errors.append("semantic-rule registry schema version mismatch")
+    if not isinstance(serialized, list) or tuple(serialized) != REQUIRED_SEMANTIC_RULES:
+        errors.append("semantic-rule registry does not match canonical ordered registry")
+    if isinstance(serialized, list) and len(serialized) != len(set(serialized)):
+        errors.append("semantic-rule registry contains duplicate entries")
+    rules = spec.get("semantic_rules", {})
+    if set(rules) != set(REQUIRED_SEMANTIC_RULES):
+        errors.append("semantic-rule keys do not exactly match required registry")
+    for name in REQUIRED_SEMANTIC_RULES:
+        rule = rules.get(name)
+        if not isinstance(rule, dict):
+            errors.append(f"required semantic rule missing: {name}")
+            continue
+        if rule.get("value") in (None, "", [], {}):
+            errors.append(f"required semantic rule has empty value: {name}")
+        if rule.get("status") != "RESOLVED":
+            errors.append(f"required semantic rule is not resolved: {name}")
+        expected_classification, expected_tag = REQUIRED_RULE_CLASSIFICATIONS[name]
+        if rule.get("value_classification") != expected_classification or rule.get("provenance_tag") != expected_tag:
+            errors.append(f"required semantic rule classification/provenance mismatch: {name}")
+    return errors
+
+
+def _validate_bootstrap_schema(bootstrap: dict[str, Any], dataset: dict[str, Any]) -> list[str]:
     """Validate every user-approved cluster-bootstrap semantic without running data."""
     errors: list[str] = []
     expected = {
@@ -186,65 +243,127 @@ def _validate_bootstrap_schema(bootstrap: dict[str, Any]) -> list[str]:
         errors.append("bootstrap schema mismatch: degenerate/technical-invalidity policy")
     if "not 72 independent prompts" not in bootstrap.get("interpretation_boundary", ""):
         errors.append("bootstrap schema mismatch: interpretation boundary")
+    if bootstrap.get("canonical_order_source") != CANONICAL_ORDER_SOURCE:
+        errors.append("bootstrap schema mismatch: canonical ordering source")
+    try:
+        canonical_manifest(dataset)
+    except ValueError as exc:
+        errors.append(f"frozen dataset manifest cannot derive canonical ordering: {exc}")
     return errors
 
 
-def validate_cluster_structure(clusters_by_split: dict[str, list[list[dict[str, float]]]]) -> None:
-    """Validate the approved two-stratum, twelve-cluster, three-row design on synthetic data."""
+def canonical_manifest(manifest: dict[str, Any]) -> list[dict[str, Any]]:
+    """Derive split, cluster, and row order solely from frozen-manifest metadata."""
+    groups = manifest.get("groups")
+    splits = manifest.get("splits")
+    transitions = manifest.get("ordered_transitions")
+    if not isinstance(groups, list) or not groups or len(groups) != len(set(groups)):
+        raise ValueError("Manifest groups must be nonempty and unique.")
+    if not isinstance(splits, list) or len(splits) != 2:
+        raise ValueError("Manifest must contain exactly two split strata.")
+    indices = [split.get("split_index") for split in splits]
+    if sorted(indices) != [0, 1]:
+        raise ValueError("Manifest split indices must be the unique frozen values 0 and 1.")
+    if not isinstance(transitions, list):
+        raise ValueError("Manifest ordered transitions are required.")
+    result: list[dict[str, Any]] = []
+    for split in sorted(splits, key=lambda item: item["split_index"]):
+        evaluation_ids = split.get("evaluation_ids", {})
+        if set(evaluation_ids) != set(groups):
+            raise ValueError("Manifest evaluation IDs must cover exactly the frozen groups.")
+        for source_group in groups:
+            target_groups = [target for source, target in transitions if source == source_group]
+            if len(target_groups) != 3 or len(set(target_groups)) != 3:
+                raise ValueError("Each frozen source group must have exactly three ordered targets.")
+            for source_id in evaluation_ids[source_group]:
+                result.append({"split_id": split["id"], "split_index": split["split_index"], "source_group": source_group, "held_out_source_item_id": source_id, "target_groups": target_groups})
+    if len(result) != 24 or any(sum(item["split_id"] == split["id"] for item in result) != 12 for split in splits):
+        raise ValueError("Manifest must derive exactly 12 clusters per split and 24 total.")
+    keys = [(item["split_id"], item["held_out_source_item_id"]) for item in result]
+    if len(keys) != len(set(keys)):
+        raise ValueError("Manifest contains duplicate canonical source-item cluster keys.")
+    return result
+
+
+def canonicalize_clusters(clusters_by_split: dict[str, dict[str, list[dict[str, Any]]]], manifest: dict[str, Any]) -> dict[str, list[list[dict[str, Any]]]]:
+    """Validate and reorder arbitrary caller containers into frozen manifest order."""
     import numpy as np
 
-    if len(clusters_by_split) != 2:
-        raise ValueError("Bootstrap requires exactly two split strata.")
-    for split_id, clusters in clusters_by_split.items():
-        if len(clusters) != 12:
-            raise ValueError(f"Split {split_id!r} must contain exactly 12 clusters.")
-        source_ids = {cluster[0]["held_out_source_item_id"] for cluster in clusters if cluster}
-        if len(source_ids) < 2:
-            raise ValueError(f"Split {split_id!r} has fewer than two distinct source-item clusters.")
-        for cluster in clusters:
-            if len(cluster) != 3:
+    canonical = canonical_manifest(manifest)
+    expected_by_split: dict[str, list[dict[str, Any]]] = {}
+    for item in canonical:
+        expected_by_split.setdefault(item["split_id"], []).append(item)
+    if set(clusters_by_split) != set(expected_by_split):
+        raise ValueError("Caller split keys do not exactly match canonical manifest splits.")
+    result: dict[str, list[list[dict[str, Any]]]] = {}
+    for split_id, expected_clusters in expected_by_split.items():
+        caller_clusters = clusters_by_split[split_id]
+        expected_ids = [item["held_out_source_item_id"] for item in expected_clusters]
+        if set(caller_clusters) != set(expected_ids) or len(caller_clusters) != 12:
+            raise ValueError("Caller cluster keys do not exactly match canonical manifest source IDs.")
+        ordered_clusters: list[list[dict[str, Any]]] = []
+        for expected in expected_clusters:
+            source_id = expected["held_out_source_item_id"]
+            rows = list(caller_clusters[source_id])
+            if len(rows) != 3:
                 raise ValueError("Each cluster must contain exactly three transition rows.")
-            source_id = cluster[0]["held_out_source_item_id"]
-            split_value = cluster[0]["split_id"]
-            for row in cluster:
-                if row["held_out_source_item_id"] != source_id or row["split_id"] != split_value:
-                    raise ValueError("A source-item cluster cannot mix source IDs or split IDs.")
+            observed_targets: list[str] = []
+            for row in rows:
+                if row.get("split_id") != split_id:
+                    raise ValueError("Outer split key must match every contained row split_id.")
+                if row.get("held_out_source_item_id") != source_id:
+                    raise ValueError("Cluster key must match every contained row source ID.")
+                if row.get("source_group") != expected["source_group"]:
+                    raise ValueError("Cluster row source group conflicts with frozen manifest.")
+                observed_targets.append(row.get("target_group"))
                 for outcome in ("task_effect", "D_random", "D_opposite"):
-                    if not np.isfinite(row[outcome]):
+                    if not np.isfinite(row.get(outcome, np.nan)):
                         raise ValueError("Nonfinite observed value is technical invalidity.")
+            if set(observed_targets) != set(expected["target_groups"]) or len(set(observed_targets)) != 3:
+                raise ValueError("Cluster target transitions do not exactly match the frozen manifest.")
+            by_target = {row["target_group"]: row for row in rows}
+            ordered_clusters.append([by_target[target] for target in expected["target_groups"]])
+        result[split_id] = ordered_clusters
+    return result
 
 
-def cluster_resample_plan(clusters_by_split: dict[str, list[list[dict[str, float]]]], *, seed: int, resamples: int) -> list[dict[str, list[int]]]:
+def validate_cluster_structure(clusters_by_split: dict[str, dict[str, list[dict[str, Any]]]], manifest: dict[str, Any]) -> None:
+    """Validate the approved two-stratum, twelve-cluster, three-row design."""
+    canonicalize_clusters(clusters_by_split, manifest)
+
+
+def cluster_resample_plan(clusters_by_split: dict[str, dict[str, list[dict[str, Any]]]], manifest: dict[str, Any], *, seed: int, resamples: int) -> list[dict[str, list[int]]]:
     """Create the approved shared PCG64 plan, preserving supplied split/cluster order."""
     import numpy as np
 
-    validate_cluster_structure(clusters_by_split)
-    split_ids = list(clusters_by_split)
+    canonical = canonicalize_clusters(clusters_by_split, manifest)
+    split_ids = list(canonical)
     rng = np.random.Generator(np.random.PCG64(seed))
     return [{split_id: rng.integers(0, 12, size=12).tolist() for split_id in split_ids} for _ in range(resamples)]
 
 
-def sampled_transition_rows(clusters_by_split: dict[str, list[list[dict[str, float]]]], replicate: dict[str, list[int]]) -> list[dict[str, float]]:
+def sampled_transition_rows(clusters_by_split: dict[str, dict[str, list[dict[str, Any]]]], manifest: dict[str, Any], replicate: dict[str, list[int]]) -> list[dict[str, Any]]:
     """Expand one shared cluster plan without separating any three-row cluster."""
-    rows: list[dict[str, float]] = []
+    canonical = canonicalize_clusters(clusters_by_split, manifest)
+    rows: list[dict[str, Any]] = []
     for split_id, indices in replicate.items():
         for index in indices:
-            rows.extend(clusters_by_split[split_id][index])
+            rows.extend(canonical[split_id][index])
     if len(rows) != 72:
         raise ValueError("Each bootstrap replicate must contain exactly 72 transition-item rows.")
     return rows
 
 
-def bootstrap_cluster_statistics(clusters_by_split: dict[str, list[list[dict[str, float]]]], *, seed: int = 20260812, resamples: int = 10000) -> dict[str, Any]:
+def bootstrap_cluster_statistics(clusters_by_split: dict[str, dict[str, list[dict[str, Any]]]], manifest: dict[str, Any], *, seed: int = 20260812, resamples: int = 10000) -> dict[str, Any]:
     """Compute synthetic-only approved cluster-bootstrap means and percentile CIs."""
     import numpy as np
 
-    plan = cluster_resample_plan(clusters_by_split, seed=seed, resamples=resamples)
+    plan = cluster_resample_plan(clusters_by_split, manifest, seed=seed, resamples=resamples)
     outcomes = ("task_effect", "D_random", "D_opposite")
     means = {outcome: [] for outcome in outcomes}
     for replicate in plan:
         values = {outcome: [] for outcome in outcomes}
-        for row in sampled_transition_rows(clusters_by_split, replicate):
+        for row in sampled_transition_rows(clusters_by_split, manifest, replicate):
             for outcome in outcomes:
                 values[outcome].append(row[outcome])
         for outcome in outcomes:
@@ -320,7 +439,7 @@ def validate_spec(root: Path = ROOT) -> tuple[bool, list[str], dict[str, Any]]:
     statistics = config.get("statistics", {})
     if bootstrap.get("seed") != statistics.get("bootstrap_seed") or bootstrap.get("resamples") != statistics.get("bootstrap_resamples"):
         errors.append("bootstrap seed/resample mismatch")
-    errors.extend(_validate_bootstrap_schema(bootstrap))
+    errors.extend(_validate_bootstrap_schema(bootstrap, config.get("dataset", {})))
     semantics = spec.get("semantic_rules", {})
     extraction = semantics.get("representation", {})
     if extraction.get("status") != "RESOLVED" or extraction.get("value_classification") != "AUTHORITATIVE_RECOVERED_VALUE" or extraction.get("provenance_tag") != "RECOVERED_FROM_EXP018":
@@ -334,7 +453,12 @@ def validate_spec(root: Path = ROOT) -> tuple[bool, list[str], dict[str, Any]]:
     bootstrap_rule = semantics.get("statistics_bootstrap", {})
     if bootstrap_rule.get("value_classification") != "USER_APPROVED_PRE_OUTCOME_IMPLEMENTATION_SPEC" or bootstrap_rule.get("provenance_tag") != "USER_APPROVED_PRE_OUTCOME_IMPLEMENTATION_SPEC":
         errors.append("bootstrap provenance tag is incorrect")
+    errors.extend(validate_semantic_rule_registry(spec))
     errors.extend(validate_readiness_fields(spec))
+    if spec.get("protocol_conflicts") != []:
+        errors.append("protocol conflicts must be empty for readiness")
+    if spec.get("PRIMARY_READY") and spec.get("SECONDARY_READY") and spec.get("FULL_READY") and spec.get("final_task_status") != "READY_FOR_EXP020_RUNNER_IMPLEMENTATION":
+        errors.append("final task status does not match fully resolved readiness")
     prereg_ok, _ = _run_preregistration_validator(root)
     if not prereg_ok:
         errors.append("frozen preregistration validator failed")

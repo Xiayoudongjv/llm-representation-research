@@ -25,7 +25,8 @@ EXP-018 provenance can fill an undefined implementation detail only when it does
 | --- | --- | --- | --- | --- | --- |
 | Prompt loading | `experiments/exp018/independent_validation.py` | `load_json`, `main` | `5bb6c45` | RECOVERED | Loads the frozen prompt path before config validation. |
 | Prompt-field mapping/rendering | same | `_collect_model_representations` | `5bb6c45` | RECOVERED | Reads the record `text` field directly; no chat-template call exists. |
-| Tokenizer invocation | same | `_collect_model_representations` | `5bb6c45` | PARTIALLY_RECOVERED | `tokenizer(prompt["text"], return_tensors="pt")` is exact; omitted tokenizer arguments are unresolved. |
+| Tokenizer invocation | `experiments/exp018/independent_validation.py` | `_collect_model_representations` | `5bb6c45` | RECOVERED | Historical invocation is exactly `tokenizer(prompt["text"], return_tensors="pt")`; it supplies the raw text field and has no chat-template call. |
+| Tokenizer effective defaults | local Qwen3-4B tokenizer snapshot | `Qwen2Tokenizer.__call__` under Transformers 5.14.1 | frozen revision `1cfa9a7208912126459214e8b04321603b3df60c` | RECOVERED | Frozen-runtime inspection resolves the effective defaults without opening formal prompt/source content. |
 | Representation extraction | `src/extraction.py` | `move_tokenized_inputs_to_device`, `get_model_input_device`, `extract_last_token_hidden_state`, `tensor_to_numpy_float32` | `5bb6c45` | RECOVERED | Historical source selects `[0, -1, :]`, then detach/CPU/float32/NumPy; current file is byte-for-byte unchanged relative to this historical source. |
 | FIT routing | `experiments/exp018/independent_validation.py` | `route_split_items`, `_stack` | `5bb6c45` | RECOVERED | FIT and evaluation IDs are separately routed before fitting. |
 | Centroids and task delta | same | `fit_group_centroids`, `construct_task_delta` | `5bb6c45` | RECOVERED | Per-group mean on axis 0; target centroid minus source centroid. |
@@ -35,8 +36,9 @@ EXP-018 provenance can fill an undefined implementation detail only when it does
 | Probe | same | `fit_linear_probe`, `evaluate_probe_items` | `5bb6c45` | RECOVERED | FIT-only scaler/classifier fit and EVAL transform/predict. |
 | Probability mapping | same | `evaluate_probe_items` | `5bb6c45` | PARTIALLY_RECOVERED | Historical integer class indices follow frozen class order, but a future runner must map `classifier.classes_` explicitly. |
 | Effects | EXP-020 frozen protocol | frozen effect definitions | `ea85fa5` authority ancestor | RECOVERED | The four paired effect formulas are explicitly frozen by EXP-020. |
-| Bootstrap/statistics | EXP-020 frozen protocol; EXP-018 runner | frozen seed/count; no bootstrap function | `ea85fa5`; `5bb6c45` | NOT_RECOVERABLE | Seed/count are frozen, but the unit, CI method, percentiles, `ddof`, tie/zero handling, and RNG details are absent. |
-| Aggregation | `experiments/exp018/independent_validation.py` | `aggregate_mean_metrics` | `5bb6c45` | PARTIALLY_RECOVERED | EXP-018 computes arithmetic means; EXP-020's required additional statistics remain unresolved. |
+| Bootstrap/statistics, historical provenance | `experiments/exp018/independent_validation.py` | no bootstrap implementation | `5bb6c45` | NOT_RECOVERABLE | EXP-018 did not define EXP-020's bootstrap semantics. |
+| Bootstrap/statistics, current executable semantics | Task 081B user approval | cluster-bootstrap specification | pre-outcome approval | RECOVERED | RESOLVED as `USER_APPROVED_PRE_OUTCOME_IMPLEMENTATION_SPEC`; it is not attributed to EXP-018. |
+| Aggregation | `experiments/exp018/independent_validation.py`; Task 081B approval | `aggregate_mean_metrics`; approved cluster bootstrap | `5bb6c45`; pre-outcome approval | RECOVERED | EXP-018 recovered arithmetic means; its absent bootstrap/additional summaries are now RESOLVED through the user-approved implementation specification. |
 
 ## Input Rendering
 
@@ -133,7 +135,7 @@ Tests use only fabricated vectors, labels, IDs, and temporary paths. They do not
 
 ## Formal-Run Boundary
 
-This specification neither implements nor authorizes an EXP-020A runner. `EXP020_FORMAL_RUN_AUTHORIZED` remains false until a later explicit task resolves the listed primary-critical statistical choices and separately authorizes implementation.
+No unresolved executable semantic remains. The specification is ready to serve as runner implementation authority, but runner implementation and formal EXP-020A execution each require a later explicit authorization. `EXP020_FORMAL_RUN_AUTHORIZED` remains false.
 
 ## Remaining Decisions
 

@@ -48,7 +48,13 @@
       "ci": {"method": "percentile bootstrap", "quantiles": [0.025, 0.975], "numpy_method": "linear"},
       "descriptive": {"mean": "arithmetic mean", "median": "np.median", "standard_deviation_ddof": 1, "proportion_positive": "mean(value > 0)"},
       "degenerate_behavior": {"retain_degenerate_replicates": true, "all_identical_ci": "[c, c]", "zero_is_positive": false, "technical_invalidity": ["nonfinite observed value", "nonfinite bootstrap statistic", "fewer than two distinct source-item clusters in either split", "not exactly 12 clusters per split", "not exactly 3 transition rows per cluster"]},
-      "interpretation_boundary": "Cluster-resampling uncertainty for the frozen held-out source-item sample, stratified across two complementary splits. Directed task transitions are fixed design factors; the 72 transition-item observations are not 72 independent prompts and arise from 24 clusters."
+      "interpretation_boundary": "Cluster-resampling uncertainty for the frozen held-out source-item sample, stratified across two complementary splits. Directed task transitions are fixed design factors; the 72 transition-item observations are not 72 independent prompts and arise from 24 clusters.",
+      "canonical_order_source": {
+        "authority": "experiments/exp020/exp020_frozen_config.json",
+        "split_order": "dataset.splits sorted by split_index ascending",
+        "cluster_order": "dataset.groups order then evaluation_ids[group] list order",
+        "row_order": "dataset.ordered_transitions order filtered by source_group"
+      }
     }
   },
   "semantic_rules": {
@@ -138,6 +144,25 @@
       "provenance_tag": "RECOVERED_FROM_EXP018",
       "status": "RESOLVED"
     }
+  },
+  "semantic_rule_registry": {
+    "schema_version": "1.0.0",
+    "required_rules": [
+      "input_rendering",
+      "tokenizer_invocation",
+      "tokenizer_effective_defaults",
+      "representation",
+      "layer_mapping",
+      "direction",
+      "intervention",
+      "matched_random",
+      "opposite",
+      "probe",
+      "probability_mapping",
+      "effects",
+      "statistics_bootstrap",
+      "secondary_direction"
+    ]
   },
   "unresolved_primary_critical": [],
   "unresolved_secondary": [],

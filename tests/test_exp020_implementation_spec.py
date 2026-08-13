@@ -113,40 +113,114 @@ def test_fail_open_regression_rejects_inconsistent_ready_combination() -> None:
     assert validator.validate_readiness_fields(spec)
 
 
-def _synthetic_clusters() -> dict[str, list[list[dict[str, float]]]]:
-    result: dict[str, list[list[dict[str, float]]]] = {}
-    for split_index, split_id in enumerate(("split_a", "split_b")):
-        clusters = []
-        for item_index in range(12):
-            clusters.append([
-                {"split_id": split_id, "held_out_source_item_id": f"{split_id}_{item_index}", "task_effect": float(split_index + item_index + target), "D_random": float(item_index - target), "D_opposite": float(target - split_index)}
-                for target in range(3)
-            ])
-        result[split_id] = clusters
+def _synthetic_manifest() -> dict:
+    groups = ["logic", "causality", "analogy", "definition"]
+    transitions = [[source, target] for source in groups for target in groups if source != target]
+    return {
+        "groups": groups,
+        "ordered_transitions": transitions,
+        "splits": [
+            {"id": "split_a", "split_index": 0, "evaluation_ids": {group: [f"a_{group}_{index}" for index in range(3)] for group in groups}},
+            {"id": "split_b", "split_index": 1, "evaluation_ids": {group: [f"b_{group}_{index}" for index in range(3)] for group in groups}},
+        ],
+    }
+
+
+def _synthetic_clusters(manifest: dict | None = None, *, reverse_splits: bool = False, shuffle_rows: bool = False) -> dict:
+    manifest = manifest or _synthetic_manifest()
+    canonical = validator.canonical_manifest(manifest)
+    result: dict = {}
+    for item in canonical:
+        result.setdefault(item["split_id"], {})[item["held_out_source_item_id"]] = [
+            {
+                "split_id": item["split_id"], "held_out_source_item_id": item["held_out_source_item_id"],
+                "source_group": item["source_group"], "target_group": target,
+                "task_effect": float(item["split_index"] + target_index + len(item["held_out_source_item_id"])),
+                "D_random": float(target_index - item["split_index"]), "D_opposite": float(2 - target_index),
+            }
+            for target_index, target in enumerate(item["target_groups"])
+        ]
+    if shuffle_rows:
+        for split in result.values():
+            for rows in split.values():
+                rows.reverse()
+    if reverse_splits:
+        return dict(reversed(list(result.items())))
     return result
 
 
+def _valid_semantic_spec() -> dict:
+    rules = {
+        name: {"value": "synthetic", "status": "RESOLVED", "value_classification": classification, "provenance_tag": tag}
+        for name, (classification, tag) in validator.REQUIRED_RULE_CLASSIFICATIONS.items()
+    }
+    return {
+        "semantic_rule_registry": {"schema_version": validator.SEMANTIC_RULE_SCHEMA_VERSION, "required_rules": list(validator.REQUIRED_SEMANTIC_RULES)},
+        "semantic_rules": rules,
+    }
+
+
+@pytest.mark.parametrize("rule_name", validator.REQUIRED_SEMANTIC_RULES)
+def test_required_rule_deletion_is_rejected(rule_name: str) -> None:
+    spec = _valid_semantic_spec()
+    del spec["semantic_rules"][rule_name]
+    assert validator.validate_semantic_rule_registry(spec)
+
+
+def test_registry_rejects_unknown_renamed_version_and_order_errors() -> None:
+    spec = _valid_semantic_spec()
+    spec["semantic_rules"]["unknown"] = {"value": "x", "status": "RESOLVED"}
+    assert validator.validate_semantic_rule_registry(spec)
+    spec = _valid_semantic_spec()
+    spec["semantic_rule_registry"]["schema_version"] = "2.0.0"
+    assert validator.validate_semantic_rule_registry(spec)
+    spec = _valid_semantic_spec()
+    spec["semantic_rule_registry"]["required_rules"].reverse()
+    assert validator.validate_semantic_rule_registry(spec)
+    spec = _valid_semantic_spec()
+    spec["semantic_rule_registry"]["required_rules"].pop()
+    assert validator.validate_semantic_rule_registry(spec)
+
+
+def test_registry_rejects_empty_unresolved_or_bad_provenance_rule() -> None:
+    for mutation in ("empty", "status", "classification", "provenance"):
+        spec = _valid_semantic_spec()
+        rule = spec["semantic_rules"]["representation"]
+        if mutation == "empty":
+            rule["value"] = ""
+        elif mutation == "status":
+            rule["status"] = "UNRESOLVED"
+        elif mutation == "classification":
+            rule["value_classification"] = "WRONG"
+        else:
+            rule["provenance_tag"] = "WRONG"
+        assert validator.validate_semantic_rule_registry(spec)
+
+
 def test_cluster_plan_preserves_clusters_strata_and_shared_outcome_plan() -> None:
-    clusters = _synthetic_clusters()
-    plan = validator.cluster_resample_plan(clusters, seed=20260812, resamples=1)[0]
+    manifest = _synthetic_manifest()
+    clusters = _synthetic_clusters(manifest)
+    plan = validator.cluster_resample_plan(clusters, manifest, seed=20260812, resamples=1)[0]
     assert list(plan) == ["split_a", "split_b"]
     assert all(len(indices) == 12 for indices in plan.values())
-    rows = validator.sampled_transition_rows(clusters, plan)
+    rows = validator.sampled_transition_rows(clusters, manifest, plan)
     assert len(rows) == 72
     for split_id, indices in plan.items():
         for index in set(indices):
             expected = 3 * indices.count(index)
-            observed = sum(row["held_out_source_item_id"] == f"{split_id}_{index}" for row in rows)
+            source_id = validator.canonical_manifest(manifest)[index if split_id == "split_a" else 12 + index]["held_out_source_item_id"]
+            observed = sum(row["held_out_source_item_id"] == source_id for row in rows)
             assert observed == expected
-    output = validator.bootstrap_cluster_statistics(clusters, seed=20260812, resamples=2)
+    output = validator.bootstrap_cluster_statistics(clusters, manifest, seed=20260812, resamples=2)
     assert len(output["plan"]) == 2
     assert set(output["means"]) == {"task_effect", "D_random", "D_opposite"}
 
 
 def test_cluster_bootstrap_is_explicit_pcg64_deterministic_and_linear_percentile() -> None:
-    clusters = _synthetic_clusters()
-    first = validator.bootstrap_cluster_statistics(clusters, seed=20260812, resamples=9)
-    second = validator.bootstrap_cluster_statistics(clusters, seed=20260812, resamples=9)
+    manifest = _synthetic_manifest()
+    clusters = _synthetic_clusters(manifest)
+    first = validator.bootstrap_cluster_statistics(clusters, manifest, seed=20260812, resamples=9)
+    second = validator.bootstrap_cluster_statistics(clusters, manifest, seed=20260812, resamples=9)
     assert first["plan"] == second["plan"]
     assert np.array_equal(first["means"]["task_effect"], second["means"]["task_effect"])
     assert np.array_equal(first["ci"]["task_effect"], np.quantile(first["means"]["task_effect"], [0.025, 0.975], method="linear"))
@@ -162,35 +236,72 @@ def test_descriptive_statistics_use_sample_sd_and_strict_positive_rule() -> None
     assert stats["proportion_positive"] == pytest.approx(2 / 3)
     identical = validator.descriptive_statistics([4.0, 4.0, 4.0])
     assert identical["standard_deviation"] == 0.0
-    clusters = _synthetic_clusters()
+    manifest = _synthetic_manifest()
+    clusters = _synthetic_clusters(manifest)
     for split in clusters.values():
-        for cluster in split:
+        for cluster in split.values():
             for row in cluster:
                 row["task_effect"] = 4.0
-    result = validator.bootstrap_cluster_statistics(clusters, resamples=3)
+    result = validator.bootstrap_cluster_statistics(clusters, manifest, resamples=3)
     assert np.array_equal(result["ci"]["task_effect"], np.array([4.0, 4.0]))
 
 
 @pytest.mark.parametrize("bad", [float("nan"), float("inf"), float("-inf")])
 def test_technical_invalidity_rejects_nonfinite_observations(bad: float) -> None:
-    clusters = _synthetic_clusters()
-    clusters["split_a"][0][0]["task_effect"] = bad
+    manifest = _synthetic_manifest()
+    clusters = _synthetic_clusters(manifest)
+    first_id = next(iter(clusters["split_a"]))
+    clusters["split_a"][first_id][0]["task_effect"] = bad
     with pytest.raises(ValueError, match="Nonfinite"):
-        validator.bootstrap_cluster_statistics(clusters, resamples=1)
+        validator.bootstrap_cluster_statistics(clusters, manifest, resamples=1)
 
 
 def test_technical_invalidity_rejects_bad_cluster_structure() -> None:
-    clusters = _synthetic_clusters()
-    clusters["split_a"].pop()
-    with pytest.raises(ValueError, match="12 clusters"):
-        validator.cluster_resample_plan(clusters, seed=1, resamples=1)
-    clusters = _synthetic_clusters()
-    clusters["split_a"][0].pop()
+    manifest = _synthetic_manifest()
+    clusters = _synthetic_clusters(manifest)
+    clusters["split_a"].pop(next(iter(clusters["split_a"])))
+    with pytest.raises(ValueError, match="exactly match"):
+        validator.cluster_resample_plan(clusters, manifest, seed=1, resamples=1)
+    clusters = _synthetic_clusters(manifest)
+    first_id = next(iter(clusters["split_a"]))
+    clusters["split_a"][first_id].pop()
     with pytest.raises(ValueError, match="three transition"):
-        validator.cluster_resample_plan(clusters, seed=1, resamples=1)
-    clusters = _synthetic_clusters()
-    for cluster in clusters["split_a"]:
+        validator.cluster_resample_plan(clusters, manifest, seed=1, resamples=1)
+    clusters = _synthetic_clusters(manifest)
+    for cluster in clusters["split_a"].values():
         for row in cluster:
             row["held_out_source_item_id"] = "same"
-    with pytest.raises(ValueError, match="fewer than two"):
-        validator.cluster_resample_plan(clusters, seed=1, resamples=1)
+    with pytest.raises(ValueError, match="Cluster key"):
+        validator.cluster_resample_plan(clusters, manifest, seed=1, resamples=1)
+
+
+def test_bootstrap_is_invariant_to_reversed_and_shuffled_containers() -> None:
+    manifest = _synthetic_manifest()
+    canonical = _synthetic_clusters(manifest)
+    reversed_containers = _synthetic_clusters(manifest, reverse_splits=True, shuffle_rows=True)
+    first = validator.bootstrap_cluster_statistics(canonical, manifest, resamples=7)
+    second = validator.bootstrap_cluster_statistics(reversed_containers, manifest, resamples=7)
+    assert first["plan"] == second["plan"]
+    for outcome in first["means"]:
+        assert np.array_equal(first["means"][outcome], second["means"][outcome])
+        assert np.array_equal(first["ci"][outcome], second["ci"][outcome])
+
+
+def test_manifest_order_rejects_wrong_outer_split_extra_id_and_bad_transition() -> None:
+    manifest = _synthetic_manifest()
+    clusters = _synthetic_clusters(manifest)
+    first_id = next(iter(clusters["split_a"]))
+    clusters["split_a"][first_id][0]["split_id"] = "split_b"
+    with pytest.raises(ValueError, match="Outer split"):
+        validator.cluster_resample_plan(clusters, manifest, seed=1, resamples=1)
+    clusters = _synthetic_clusters(manifest)
+    rows = clusters["split_a"].pop(first_id)
+    clusters["split_a"]["extra"] = rows
+    for row in rows:
+        row["held_out_source_item_id"] = "extra"
+    with pytest.raises(ValueError, match="exactly match"):
+        validator.cluster_resample_plan(clusters, manifest, seed=1, resamples=1)
+    clusters = _synthetic_clusters(manifest)
+    clusters["split_a"][first_id][0]["target_group"] = "logic"
+    with pytest.raises(ValueError, match="target transitions"):
+        validator.cluster_resample_plan(clusters, manifest, seed=1, resamples=1)
