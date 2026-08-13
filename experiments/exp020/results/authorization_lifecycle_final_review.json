@@ -1,0 +1,29 @@
+{
+  "task": "082F",
+  "review_only": true,
+  "reviewed_commit": "6f7289d14d8163acdacfe7804e446cd0f39ab1fb",
+  "formal_run_authorized": false,
+  "formal_fit_eval_inference_performed": false,
+  "formal_scientific_results_created": false,
+  "exp020_scientific_status": "NOT_STARTED",
+  "entry_gate_passed": true,
+  "archive_scope_verified": true,
+  "scientific_semantics_unchanged": true,
+  "authorization_consumption_exclusive": true,
+  "authorization_reuse_blocked": true,
+  "consumption_ordering_valid": true,
+  "consumption_provenance_complete": true,
+  "canonical_result_path_consistent": true,
+  "publication_no_replace": true,
+  "concurrent_publication_safe": true,
+  "partial_publication_blocked": true,
+  "preregistration_validator_passed": true,
+  "implementation_spec_validator_passed": true,
+  "targeted_tests_passed": true,
+  "test_count": 92,
+  "critical_findings": [],
+  "noncritical_findings": [
+    "One existing scikit-learn penalty deprecation warning was emitted during pytest; all targeted tests passed."
+  ],
+  "final_status": "READY_FOR_REVIEW_ARCHIVE_AND_FORMAL_AUTHORIZATION_DECISION"
+}
