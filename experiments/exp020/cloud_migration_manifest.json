@@ -1,0 +1,417 @@
+{
+  "schema_version": "1.0.0",
+  "manifest_identity": {
+    "experiment": "EXP-020A",
+    "manifest_type": "cloud_migration",
+    "schema_version": "1.0.0"
+  },
+  "git_binding": {
+    "schema_version": "1.0.0",
+    "execution_base_commit": "7865727284d633b7d7d174773d8d7ecf5ef35869",
+    "binding_policy": "EXACT_MIGRATION_ONLY_DESCENDANT",
+    "allowed_migration_paths": [
+      "docs/experiments/EXP-020-CLOUD-MIGRATION-PREFLIGHT.md",
+      "experiments/exp020/cloud_migration_manifest.json",
+      "experiments/exp020/validate_cloud_migration_manifest.py",
+      "tests/test_exp020_cloud_migration_manifest.py"
+    ],
+    "source_draft_requirements": {
+      "live_head_equals_execution_base": true,
+      "migration_paths_untracked": true,
+      "tracked_worktree_clean": true,
+      "staging_empty": true,
+      "no_unexpected_untracked_files": true
+    },
+    "archived_checkout_requirements": {
+      "live_head_strict_descendant": true,
+      "exact_committed_delta": true,
+      "tracked_worktree_clean": true,
+      "staging_empty": true,
+      "no_unexpected_untracked_files": true
+    },
+    "observed_checkout_commit_policy": "OBSERVE_LIVE_HEAD_ONLY_NOT_SERIALIZED",
+    "target_checkout_policy": {
+      "schema_version": "1.0.0",
+      "target_operating_system": "Linux",
+      "core_autocrlf": false,
+      "core_eol": "lf",
+      "configuration_applied_before_checkout": true,
+      "checkout_mode": "DETACHED_EXACT_COMMIT",
+      "floating_branch_prohibited": true
+    }
+  },
+  "source_roots": {
+    "repository_root": "D:\\Research\\llm-representation-research",
+    "model_snapshot_root": "D:\\Qwen3-4B-transfer"
+  },
+  "authority_artifacts": [
+    {
+      "logical_role": "model_qualification_artifact",
+      "relative_path": "docs/experiments/EXP-020-QWEN3-4B-LOCAL-QUALIFICATION.md",
+      "sha256": "69a8a4a08b18b696652a4a5dd05d54f4fff8c8af31a2dae30da1ddeb245ab1b2",
+      "size_bytes": 3176,
+      "required": true,
+      "provenance_class": "LOCAL_HARDWARE_QUALIFICATION_RECORD",
+      "content_access_level": "LEVEL_0_FILE_IDENTITY",
+      "git_blob_sha256": "69a8a4a08b18b696652a4a5dd05d54f4fff8c8af31a2dae30da1ddeb245ab1b2",
+      "git_blob_size_bytes": 3176
+    }
+  ],
+  "execution_critical_repository_artifacts": [
+    {
+      "logical_role": "frozen_config",
+      "relative_path": "experiments/exp020/exp020_frozen_config.json",
+      "sha256": "f760f781b4b744a10938eb4de032e0cc345a021706821ecf0ca8523f5d57e667",
+      "size_bytes": 7206,
+      "required": true,
+      "provenance_class": "FROZEN_PROTOCOL_CONFIG",
+      "content_access_level": "LEVEL_0_FILE_IDENTITY",
+      "git_blob_sha256": "f760f781b4b744a10938eb4de032e0cc345a021706821ecf0ca8523f5d57e667",
+      "git_blob_size_bytes": 7206
+    },
+    {
+      "logical_role": "preregistration",
+      "relative_path": "docs/experiments/EXP-020-PREREGISTRATION.md",
+      "sha256": "0621ca1024cf333f463760a834ede3a4be0225048c0e738eff06b8d1d036191a",
+      "size_bytes": 6923,
+      "required": true,
+      "provenance_class": "FROZEN_PREREGISTRATION",
+      "content_access_level": "LEVEL_0_FILE_IDENTITY",
+      "git_blob_sha256": "0621ca1024cf333f463760a834ede3a4be0225048c0e738eff06b8d1d036191a",
+      "git_blob_size_bytes": 6923
+    },
+    {
+      "logical_role": "preregistration_validator",
+      "relative_path": "experiments/exp020/validate_exp020_preregistration.py",
+      "sha256": "df8b692f152037857fbc322348b27090c63d14ad55a56cfa5bc5f32d36bd653a",
+      "size_bytes": 8215,
+      "required": true,
+      "provenance_class": "FROZEN_VALIDATOR",
+      "content_access_level": "LEVEL_0_FILE_IDENTITY",
+      "git_blob_sha256": "df8b692f152037857fbc322348b27090c63d14ad55a56cfa5bc5f32d36bd653a",
+      "git_blob_size_bytes": 8215
+    },
+    {
+      "logical_role": "implementation_specification",
+      "relative_path": "docs/experiments/EXP-020-IMPLEMENTATION-SPECIFICATION.md",
+      "sha256": "80c8e54461a673f39960e6e4c8316c1df4d5b4ad28f95c6cc671670dff548952",
+      "size_bytes": 14756,
+      "required": true,
+      "provenance_class": "FROZEN_IMPLEMENTATION_SPECIFICATION",
+      "content_access_level": "LEVEL_0_FILE_IDENTITY",
+      "git_blob_sha256": "80c8e54461a673f39960e6e4c8316c1df4d5b4ad28f95c6cc671670dff548952",
+      "git_blob_size_bytes": 14756
+    },
+    {
+      "logical_role": "implementation_spec_json",
+      "relative_path": "experiments/exp020/exp020_implementation_spec.json",
+      "sha256": "76d6743decc21997c27fcaecf5884f025ec1809b287a127494f35f85927ad5e8",
+      "size_bytes": 9459,
+      "required": true,
+      "provenance_class": "FROZEN_IMPLEMENTATION_SPECIFICATION",
+      "content_access_level": "LEVEL_0_FILE_IDENTITY",
+      "git_blob_sha256": "76d6743decc21997c27fcaecf5884f025ec1809b287a127494f35f85927ad5e8",
+      "git_blob_size_bytes": 9459
+    },
+    {
+      "logical_role": "implementation_spec_validator",
+      "relative_path": "experiments/exp020/validate_exp020_implementation_spec.py",
+      "sha256": "33d2fa78a31d5df9665024d3e3ea66016b63717e50137385ca577163425c55a4",
+      "size_bytes": 28648,
+      "required": true,
+      "provenance_class": "FROZEN_VALIDATOR",
+      "content_access_level": "LEVEL_0_FILE_IDENTITY",
+      "git_blob_sha256": "33d2fa78a31d5df9665024d3e3ea66016b63717e50137385ca577163425c55a4",
+      "git_blob_size_bytes": 28648
+    },
+    {
+      "logical_role": "formal_runner",
+      "relative_path": "experiments/exp020/run_exp020a.py",
+      "sha256": "7958410af11ecf45b7520c568fe3f4af805bdc506acd5d7812d2bae4f211e564",
+      "size_bytes": 48071,
+      "required": true,
+      "provenance_class": "FORMAL_RUNNER_IMPLEMENTATION",
+      "content_access_level": "LEVEL_0_FILE_IDENTITY",
+      "git_blob_sha256": "7958410af11ecf45b7520c568fe3f4af805bdc506acd5d7812d2bae4f211e564",
+      "git_blob_size_bytes": 48071
+    },
+    {
+      "logical_role": "runner_tests",
+      "relative_path": "tests/test_exp020_runner.py",
+      "sha256": "3b712a0dbdb804f69e6c6d3dee3e82a4560254f860a4d350fbfefc66b87afc98",
+      "size_bytes": 31309,
+      "required": true,
+      "provenance_class": "FORMAL_RUNNER_TEST",
+      "content_access_level": "LEVEL_0_FILE_IDENTITY",
+      "git_blob_sha256": "3b712a0dbdb804f69e6c6d3dee3e82a4560254f860a4d350fbfefc66b87afc98",
+      "git_blob_size_bytes": 31309
+    },
+    {
+      "logical_role": "implementation_spec_tests",
+      "relative_path": "tests/test_exp020_implementation_spec.py",
+      "sha256": "363c6bacad1a7f89c19d72e8b16358a37c70f60fd14f8f6d975ec44bd9bff4d6",
+      "size_bytes": 15885,
+      "required": true,
+      "provenance_class": "FROZEN_IMPLEMENTATION_TEST",
+      "content_access_level": "LEVEL_0_FILE_IDENTITY",
+      "git_blob_sha256": "363c6bacad1a7f89c19d72e8b16358a37c70f60fd14f8f6d975ec44bd9bff4d6",
+      "git_blob_size_bytes": 15885
+    },
+    {
+      "logical_role": "extraction_utilities",
+      "relative_path": "src/extraction.py",
+      "sha256": "d58ed8f6adc066dc0440e703060085678d0571b2e8563d3eeaeb28e9f51dc25b",
+      "size_bytes": 2820,
+      "required": true,
+      "provenance_class": "RUNTIME_DEPENDENCY",
+      "content_access_level": "LEVEL_0_FILE_IDENTITY",
+      "git_blob_sha256": "d58ed8f6adc066dc0440e703060085678d0571b2e8563d3eeaeb28e9f51dc25b",
+      "git_blob_size_bytes": 2820
+    },
+    {
+      "logical_role": "model_loader_utilities",
+      "relative_path": "src/model_loader.py",
+      "sha256": "cf5416e7c94350658eb5ecd66ecc8f89de03b2c9bf377e94be375b97b1b52e85",
+      "size_bytes": 2634,
+      "required": true,
+      "provenance_class": "RUNTIME_DEPENDENCY",
+      "content_access_level": "LEVEL_0_FILE_IDENTITY",
+      "git_blob_sha256": "cf5416e7c94350658eb5ecd66ecc8f89de03b2c9bf377e94be375b97b1b52e85",
+      "git_blob_size_bytes": 2634
+    }
+  ],
+  "formal_input_artifacts": [
+    {
+      "logical_role": "controlled_prompts",
+      "relative_path": "experiments/exp003/prompts_controlled.json",
+      "sha256": "72dab733e6a1639dfc80d186f3af1dbce5c6d70da4905e6d6d422cf47064c472",
+      "size_bytes": 3731,
+      "required": true,
+      "provenance_class": "FROZEN_CONTROLLED_PROMPT_DATASET",
+      "content_access_level": "LEVEL_1_SCHEMA_IDS_COUNTS",
+      "git_blob_sha256": "72dab733e6a1639dfc80d186f3af1dbce5c6d70da4905e6d6d422cf47064c472",
+      "git_blob_size_bytes": 3731,
+      "schema_summary": {
+        "top_level_type": "list",
+        "item_fields": ["group", "id", "text", "variant_type"],
+        "record_count": 24,
+        "id_count": 24,
+        "group_count": 4
+      }
+    },
+    {
+      "logical_role": "validation_conditions",
+      "relative_path": "experiments/exp018/validation_conditions.json",
+      "sha256": "4ce4ebb1af318e7c25725980680c0dc62762e20790adcb7abf2026130f0d4169",
+      "size_bytes": 5697,
+      "required": true,
+      "provenance_class": "FROZEN_SPLIT_TRANSITION_PROTOCOL",
+      "content_access_level": "LEVEL_1_SCHEMA_IDS_COUNTS",
+      "git_blob_sha256": "4ce4ebb1af318e7c25725980680c0dc62762e20790adcb7abf2026130f0d4169",
+      "git_blob_size_bytes": 5697,
+      "schema_summary": {
+        "top_level_type": "object",
+        "record_count": 2,
+        "id_count": 24,
+        "split_count": 2,
+        "split_membership_count": 48,
+        "transition_count": 12,
+        "condition_count": 3,
+        "beta_count": 3
+      }
+    }
+  ],
+  "model_snapshot": {
+    "identity": {
+      "model_id": "Qwen/Qwen3-4B",
+      "revision": "1cfa9a7208912126459214e8b04321603b3df60c",
+      "architecture": "Qwen3ForCausalLM",
+      "model_type": "qwen3",
+      "transformer_blocks": 36,
+      "hidden_size": 2560,
+      "dtype": "bfloat16"
+    },
+    "required_model_files": [
+      {
+        "logical_role": "model_config",
+        "relative_path": "config.json",
+        "sha256": "8ba006f74fecfaaeb392872a60f4a480e7ec9860153d2e1b769ec81f9a147f8a",
+        "size_bytes": 726,
+        "required": true,
+        "provenance_class": "MODEL_SNAPSHOT_FILE",
+        "content_access_level": "LEVEL_0_FILE_IDENTITY"
+      },
+      {
+        "logical_role": "generation_config",
+        "relative_path": "generation_config.json",
+        "sha256": "2325da0f15bb848e018c5ae071b7943332e9f871d6b60e2ed22ca97d4cb993d2",
+        "size_bytes": 239,
+        "required": true,
+        "provenance_class": "MODEL_SNAPSHOT_FILE",
+        "content_access_level": "LEVEL_0_FILE_IDENTITY"
+      },
+      {
+        "logical_role": "model_index",
+        "relative_path": "model.safetensors.index.json",
+        "sha256": "6dc0981b8829fead746441f68f38f24c5ca4a3a66351f652c26c6df0efc43ab2",
+        "size_bytes": 32819,
+        "required": true,
+        "provenance_class": "MODEL_SNAPSHOT_FILE",
+        "content_access_level": "LEVEL_0_FILE_IDENTITY"
+      },
+      {
+        "logical_role": "model_shard_1",
+        "relative_path": "model-00001-of-00003.safetensors",
+        "sha256": "328a91d3122359d5547f9d79521205bc0a46e1f79a792dfe650e99fc2d651223",
+        "size_bytes": 3957900840,
+        "required": true,
+        "provenance_class": "MODEL_SNAPSHOT_FILE",
+        "content_access_level": "LEVEL_0_FILE_IDENTITY"
+      },
+      {
+        "logical_role": "model_shard_2",
+        "relative_path": "model-00002-of-00003.safetensors",
+        "sha256": "6cd087b316306a68c562436b5492edbcf6e16c6dba3a1308279caa5a58e21ca5",
+        "size_bytes": 3987450520,
+        "required": true,
+        "provenance_class": "MODEL_SNAPSHOT_FILE",
+        "content_access_level": "LEVEL_0_FILE_IDENTITY"
+      },
+      {
+        "logical_role": "model_shard_3",
+        "relative_path": "model-00003-of-00003.safetensors",
+        "sha256": "e4bf436957184f4eeb86a80e9db394503f1f56446b2e6b7edeac5b81470f4ca1",
+        "size_bytes": 99630640,
+        "required": true,
+        "provenance_class": "MODEL_SNAPSHOT_FILE",
+        "content_access_level": "LEVEL_0_FILE_IDENTITY"
+      }
+    ],
+    "required_tokenizer_files": [
+      {
+        "logical_role": "tokenizer_config",
+        "relative_path": "tokenizer_config.json",
+        "sha256": "d5d09f07b48c3086c508b30d1c9114bd1189145b74e982a265350c923acd8101",
+        "size_bytes": 9732,
+        "required": true,
+        "provenance_class": "TOKENIZER_SNAPSHOT_FILE",
+        "content_access_level": "LEVEL_0_FILE_IDENTITY"
+      },
+      {
+        "logical_role": "tokenizer_json",
+        "relative_path": "tokenizer.json",
+        "sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+        "size_bytes": 11422654,
+        "required": true,
+        "provenance_class": "TOKENIZER_SNAPSHOT_FILE",
+        "content_access_level": "LEVEL_0_FILE_IDENTITY"
+      },
+      {
+        "logical_role": "tokenizer_vocab",
+        "relative_path": "vocab.json",
+        "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910",
+        "size_bytes": 2776833,
+        "required": true,
+        "provenance_class": "TOKENIZER_SNAPSHOT_FILE",
+        "content_access_level": "LEVEL_0_FILE_IDENTITY"
+      },
+      {
+        "logical_role": "tokenizer_merges",
+        "relative_path": "merges.txt",
+        "sha256": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5",
+        "size_bytes": 1671853,
+        "required": true,
+        "provenance_class": "TOKENIZER_SNAPSHOT_FILE",
+        "content_access_level": "LEVEL_0_FILE_IDENTITY"
+      }
+    ],
+    "index_summary": {
+      "tensor_count": 398,
+      "raw_tensor_bytes": 8044936192,
+      "index_sha256": "6dc0981b8829fead746441f68f38f24c5ca4a3a66351f652c26c6df0efc43ab2"
+    }
+  },
+  "prior_consumed_authorization": {
+    "authorization": {
+      "logical_role": "prior_formal_authorization",
+      "relative_path": "experiments/exp020/exp020_formal_run_authorization.json",
+      "sha256": "070d2e2ccaf8857c2a3d439ea6c87420784f6029c9340ccf2d042399f7ecfd01",
+      "size_bytes": 1677,
+      "required": true,
+      "provenance_class": "CONSUMED_SINGLE_USE_AUTHORIZATION",
+      "content_access_level": "LEVEL_0_FILE_IDENTITY",
+      "git_blob_sha256": "2108b26b4fe7a91e821f0c3a819ab3e0d0b1ff5c1d676e5368c3ab2a71ca0f48",
+      "git_blob_size_bytes": 1647
+    },
+    "consumption_record": {
+      "logical_role": "prior_authorization_consumption",
+      "relative_path": "experiments/exp020/results/authorization_consumption/070d2e2ccaf8857c2a3d439ea6c87420784f6029c9340ccf2d042399f7ecfd01.json",
+      "sha256": "0a39e6a214512ffac928620768100ac9a5c20e1a1fbd8c72c44f76413f6864cc",
+      "size_bytes": 591,
+      "required": true,
+      "provenance_class": "AUTHORIZATION_CONSUMPTION_RECORD",
+      "content_access_level": "LEVEL_0_FILE_IDENTITY",
+      "git_blob_sha256": "0a39e6a214512ffac928620768100ac9a5c20e1a1fbd8c72c44f76413f6864cc",
+      "git_blob_size_bytes": 591
+    },
+    "single_use": true,
+    "state": "consumed",
+    "reusable": false
+  },
+  "intended_cloud_target": {
+    "provider_class": "DOMESTIC_CONTAINER_GPU_SERVICE",
+    "region": "天津一区",
+    "hardware": {
+      "node_count": 1,
+      "gpu_count": 1,
+      "requested_gpu": "NVIDIA GeForce RTX 5090",
+      "requested_vram_gb": 32,
+      "requested_cpu_cores": 26,
+      "requested_host_memory_gb": 63,
+      "scaling_mode": "MANUAL",
+      "multi_container": false,
+      "preemptible": false,
+      "persistent_volume_gb": 100,
+      "persistent_mount": "/workspace/persist",
+      "provenance_class": "USER_SELECTED_PRE_OUTCOME_ENGINEERING_TARGET",
+      "hardware_verified": false
+    },
+    "container": {
+      "image_repository": "pytorch/pytorch",
+      "image_tag": "2.12.1-cuda13.0-cudnn9-devel",
+      "expected_platform": "linux/amd64",
+      "expected_image_manifest_digest": "sha256:ac63aaae09996612bdaf12bbf6d5fe840af6bed3100d6dc15fcb5fd1f4f957c4",
+      "provenance_class": "EXPECTED_TARGET_IMAGE_IDENTITY",
+      "source_registry_resolution_verified": false,
+      "actual_target_image_digest": null,
+      "target_image_verified": false
+    }
+  },
+  "target_bindings": {
+    "repository_root": "/workspace/persist/llm-representation-research",
+    "model_snapshot_root": "/workspace/persist/models/qwen3-4b",
+    "persistent_root": "/workspace/persist",
+    "transfer_mode": "MANUAL_VERIFIED_COPY_REQUIRED",
+    "path_relocation_only": true
+  },
+  "source_side_readiness": {
+    "source_preflight_complete": true,
+    "formal_run_authorized": false,
+    "formal_results_created": false
+  },
+  "target_side_readiness": {
+    "transfer_verified": false,
+    "cloud_runtime_verified": false,
+    "cloud_target_qualified": false,
+    "formal_run_authorized": false,
+    "formal_results_created": false
+  },
+  "prohibited_operations": {
+    "cloud_created": false,
+    "artifacts_uploaded": false,
+    "model_loaded": false,
+    "gpu_used": false,
+    "formal_run_authorized": false,
+    "formal_results_created": false
+  }
+}
