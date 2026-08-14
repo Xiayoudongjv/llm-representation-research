@@ -7,13 +7,17 @@
   },
   "git_binding": {
     "schema_version": "1.0.0",
-    "execution_base_commit": "7865727284d633b7d7d174773d8d7ecf5ef35869",
-    "binding_policy": "EXACT_MIGRATION_ONLY_DESCENDANT",
+    "execution_base_commit": "c830d0b6b8181d287306480317b1c66315ff13f9",
+    "binding_policy": "EXACT_TASK_085D_CORRECTION_ONLY_DESCENDANT",
     "allowed_migration_paths": [
-      "docs/experiments/EXP-020-CLOUD-MIGRATION-PREFLIGHT.md",
+      ".gitignore",
+      "experiments/exp020/archive/consumed_authorizations/exp020_formal_run_authorization.json",
       "experiments/exp020/cloud_migration_manifest.json",
+      "experiments/exp020/exp020_formal_run_authorization.json",
+      "experiments/exp020/prepare_cloud_runtime.py",
       "experiments/exp020/validate_cloud_migration_manifest.py",
-      "tests/test_exp020_cloud_migration_manifest.py"
+      "tests/test_exp020_cloud_migration_manifest.py",
+      "tests/test_exp020_cloud_runtime.py"
     ],
     "source_draft_requirements": {
       "live_head_equals_execution_base": true,
@@ -334,14 +338,17 @@
   "prior_consumed_authorization": {
     "authorization": {
       "logical_role": "prior_formal_authorization",
-      "relative_path": "experiments/exp020/exp020_formal_run_authorization.json",
-      "sha256": "070d2e2ccaf8857c2a3d439ea6c87420784f6029c9340ccf2d042399f7ecfd01",
-      "size_bytes": 1677,
+      "relative_path": "experiments/exp020/archive/consumed_authorizations/exp020_formal_run_authorization.json",
+      "sha256": "2108b26b4fe7a91e821f0c3a819ab3e0d0b1ff5c1d676e5368c3ab2a71ca0f48",
+      "size_bytes": 1647,
       "required": true,
       "provenance_class": "CONSUMED_SINGLE_USE_AUTHORIZATION",
       "content_access_level": "LEVEL_0_FILE_IDENTITY",
       "git_blob_sha256": "2108b26b4fe7a91e821f0c3a819ab3e0d0b1ff5c1d676e5368c3ab2a71ca0f48",
-      "git_blob_size_bytes": 1647
+      "git_blob_size_bytes": 1647,
+      "git_blob_relative_path": "experiments/exp020/exp020_formal_run_authorization.json",
+      "original_operational_crlf_sha256": "070d2e2ccaf8857c2a3d439ea6c87420784f6029c9340ccf2d042399f7ecfd01",
+      "original_operational_crlf_size_bytes": 1677
     },
     "consumption_record": {
       "logical_role": "prior_authorization_consumption",

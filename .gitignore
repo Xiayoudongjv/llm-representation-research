@@ -16,5 +16,8 @@ results/
 *.pt
 *.pth
 
+# Linux-only EXP-020 compatibility alias for the frozen Windows model path.
+/D:\\Qwen3-4B-transfer
+
 # VS Code
 .vscode/

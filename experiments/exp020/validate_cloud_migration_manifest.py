@@ -117,12 +117,21 @@ EXPECTED_TOKENIZER_ROLES = (
     "tokenizer_merges",
 )
 EXPECTED_MIGRATION_PATHS = (
-    "docs/experiments/EXP-020-CLOUD-MIGRATION-PREFLIGHT.md",
+    ".gitignore",
+    "experiments/exp020/archive/consumed_authorizations/exp020_formal_run_authorization.json",
     "experiments/exp020/cloud_migration_manifest.json",
+    "experiments/exp020/exp020_formal_run_authorization.json",
+    "experiments/exp020/prepare_cloud_runtime.py",
     "experiments/exp020/validate_cloud_migration_manifest.py",
     "tests/test_exp020_cloud_migration_manifest.py",
+    "tests/test_exp020_cloud_runtime.py",
 )
-EXECUTION_BASE_COMMIT = "7865727284d633b7d7d174773d8d7ecf5ef35869"
+EXECUTION_BASE_COMMIT = "c830d0b6b8181d287306480317b1c66315ff13f9"
+ARCHIVED_AUTHORIZATION_FIELDS = REPOSITORY_ARTIFACT_FIELDS | {
+    "git_blob_relative_path",
+    "original_operational_crlf_sha256",
+    "original_operational_crlf_size_bytes",
+}
 
 
 class ManifestValidationError(ValueError):
@@ -212,7 +221,7 @@ def _validate_artifact(
 def _validate_repository_artifact(
     artifact: dict[str, Any], repo_root: Path, *, formal: bool = False,
     execution_base_commit: str, validate_source_worktree: bool = True,
-    verify_target_worktree: bool = False,
+    verify_target_worktree: bool = False, git_blob_relative_path: str | None = None,
 ) -> Path:
     """Validate source bytes and frozen Git-blob bytes without exposing contents."""
     path = _validate_artifact_metadata(artifact, repo_root, formal=formal, repository=True)
@@ -226,8 +235,11 @@ def _validate_repository_artifact(
             raise ManifestValidationError(f"artifact size mismatch: {artifact['relative_path']}")
         if sha256_file(path) != artifact["sha256"]:
             raise ManifestValidationError(f"artifact hash mismatch: {artifact['relative_path']}")
+    blob_relative_path = git_blob_relative_path or artifact["relative_path"]
+    if Path(blob_relative_path).is_absolute() or ".." in Path(blob_relative_path).parts:
+        raise ManifestValidationError("repository artifact Git-blob path is not normalized")
     blob = subprocess.run(
-        ["git", "show", f"{execution_base_commit}:{artifact['relative_path']}"],
+        ["git", "show", f"{execution_base_commit}:{blob_relative_path}"],
         cwd=repo_root, capture_output=True, check=False,
     )
     if blob.returncode:
@@ -385,7 +397,7 @@ def _validate_git_binding_schema(
     _require_exact_values(binding, {
         "schema_version": "1.0.0",
         "execution_base_commit": expected_execution_base,
-        "binding_policy": "EXACT_MIGRATION_ONLY_DESCENDANT",
+        "binding_policy": "EXACT_TASK_085D_CORRECTION_ONLY_DESCENDANT",
         "allowed_migration_paths": list(EXPECTED_MIGRATION_PATHS),
         "source_draft_requirements": {
             "live_head_equals_execution_base": True,
@@ -476,7 +488,7 @@ def _validate_git_binding(
         raise ManifestValidationError("execution base is not an ancestor of archived checkout HEAD")
     if untracked:
         raise ManifestValidationError("archived-checkout has unexpected untracked files")
-    delta = _git_output(repo_root, "diff", "--name-only", f"{base}..HEAD")
+    delta = _git_output(repo_root, "diff", "--no-renames", "--name-only", f"{base}..HEAD")
     delta_paths = tuple(line for line in delta.splitlines() if line)
     if delta_paths != tuple(binding["allowed_migration_paths"]):
         raise ManifestValidationError("archived-checkout committed delta does not equal the frozen migration registry")
@@ -526,12 +538,35 @@ def _validate_authorization(
 ) -> None:
     """Verify only the non-reusable provenance of the prior authorization."""
     _require_keys(auth, AUTHORIZATION_FIELDS, "prior_consumed_authorization")
-    for artifact in (auth["authorization"], auth["consumption_record"]):
-        _validate_repository_artifact(
-            artifact, repo_root, execution_base_commit=execution_base_commit,
-            validate_source_worktree=validate_source_worktree,
-            verify_target_worktree=verify_target_worktree,
-        )
+    archived = auth["authorization"]
+    _require_keys(archived, ARCHIVED_AUTHORIZATION_FIELDS, "archived authorization artifact")
+    for field in ("git_blob_relative_path", "original_operational_crlf_sha256"):
+        _require_non_empty_string(archived[field], f"archived authorization artifact.{field}")
+    if len(archived["original_operational_crlf_sha256"]) != 64 or any(
+        char not in "0123456789abcdef" for char in archived["original_operational_crlf_sha256"]
+    ):
+        raise ManifestValidationError("archived authorization original CRLF hash must be a lowercase SHA-256 digest")
+    if archived["git_blob_relative_path"] != "experiments/exp020/exp020_formal_run_authorization.json":
+        raise ManifestValidationError("archived authorization must bind to the historical active-slot Git blob")
+    if archived["original_operational_crlf_size_bytes"] != 1677:
+        raise ManifestValidationError("archived authorization original CRLF size does not match the incident record")
+    _validate_repository_artifact(
+        {field: archived[field] for field in REPOSITORY_ARTIFACT_FIELDS},
+        repo_root, execution_base_commit=execution_base_commit,
+        validate_source_worktree=validate_source_worktree,
+        verify_target_worktree=verify_target_worktree,
+        git_blob_relative_path=archived["git_blob_relative_path"],
+    )
+    archived_bytes = _relative_path(repo_root, archived["relative_path"]).read_bytes()
+    if archived_bytes.count(b"\r\n") or archived_bytes.count(b"\n") != 30:
+        raise ManifestValidationError("archived authorization is not the expected LF incident artifact")
+    if hashlib.sha256(archived_bytes.replace(b"\n", b"\r\n")).hexdigest() != archived["original_operational_crlf_sha256"]:
+        raise ManifestValidationError("archived authorization CRLF reconstruction does not match the incident record")
+    _validate_repository_artifact(
+        auth["consumption_record"], repo_root, execution_base_commit=execution_base_commit,
+        validate_source_worktree=validate_source_worktree,
+        verify_target_worktree=verify_target_worktree,
+    )
     if auth["single_use"] is not True or auth["state"] != "consumed" or auth["reusable"] is not False:
         raise ManifestValidationError("prior authorization is not recorded as consumed and non-reusable")
 

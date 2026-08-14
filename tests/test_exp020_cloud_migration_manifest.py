@@ -14,6 +14,7 @@ import pytest
 
 from experiments.exp020.validate_cloud_migration_manifest import (
     ARTIFACT_FIELDS,
+    EXPECTED_MIGRATION_PATHS,
     EXPECTED_MODEL_ROLES,
     EXPECTED_TOKENIZER_ROLES,
     ManifestValidationError,
@@ -168,24 +169,18 @@ def test_model_index_rejects_unknown_shard_and_bad_summary(tmp_path: Path) -> No
 
 
 def test_authorization_must_be_consumed_and_non_reusable(tmp_path: Path) -> None:
-    repo, _, _ = _synthetic_repo(tmp_path, with_untracked_migration_paths=False)
-    authorization = _artifact(repo, "prior_formal_authorization", "authorization.json")
-    consumption = _artifact(repo, "prior_authorization_consumption", "consumption.json")
-    _git(repo, "add", "authorization.json", "consumption.json")
-    _git(repo, "commit", "-m", "authorization provenance")
-    execution_base = _git(repo, "rev-parse", "HEAD")
-    for artifact in (authorization, consumption):
-        artifact["git_blob_sha256"] = artifact["sha256"]
-        artifact["git_blob_size_bytes"] = artifact["size_bytes"]
-    value = {"authorization": authorization, "consumption_record": consumption, "single_use": True, "state": "consumed", "reusable": False}
+    root = Path(__file__).parents[1]
+    manifest = json.loads((root / "experiments/exp020/cloud_migration_manifest.json").read_text(encoding="utf-8"))
+    value = manifest["prior_consumed_authorization"]
     _validate_authorization(
-        value, repo, execution_base_commit=execution_base,
+        value, root, execution_base_commit=manifest["git_binding"]["execution_base_commit"],
         validate_source_worktree=True, verify_target_worktree=False,
     )
+    value = json.loads(json.dumps(value))
     value["reusable"] = True
     with pytest.raises(ManifestValidationError):
         _validate_authorization(
-            value, repo, execution_base_commit=execution_base,
+            value, root, execution_base_commit=manifest["git_binding"]["execution_base_commit"],
             validate_source_worktree=True, verify_target_worktree=False,
         )
 
@@ -260,15 +255,10 @@ def _git(repo: Path, *args: str) -> str:
 
 
 def _binding(base: str) -> dict[str, object]:
-    paths = [
-        "docs/experiments/EXP-020-CLOUD-MIGRATION-PREFLIGHT.md",
-        "experiments/exp020/cloud_migration_manifest.json",
-        "experiments/exp020/validate_cloud_migration_manifest.py",
-        "tests/test_exp020_cloud_migration_manifest.py",
-    ]
+    paths = list(EXPECTED_MIGRATION_PATHS)
     return {
         "schema_version": "1.0.0", "execution_base_commit": base,
-        "binding_policy": "EXACT_MIGRATION_ONLY_DESCENDANT", "allowed_migration_paths": paths,
+        "binding_policy": "EXACT_TASK_085D_CORRECTION_ONLY_DESCENDANT", "allowed_migration_paths": paths,
         "source_draft_requirements": {"live_head_equals_execution_base": True, "migration_paths_untracked": True, "tracked_worktree_clean": True, "staging_empty": True, "no_unexpected_untracked_files": True},
         "archived_checkout_requirements": {"live_head_strict_descendant": True, "exact_committed_delta": True, "tracked_worktree_clean": True, "staging_empty": True, "no_unexpected_untracked_files": True},
         "observed_checkout_commit_policy": "OBSERVE_LIVE_HEAD_ONLY_NOT_SERIALIZED",
