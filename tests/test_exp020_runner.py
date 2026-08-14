@@ -4,12 +4,15 @@ from __future__ import annotations
 
 import copy
 import importlib.util
+import inspect
 import json
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import numpy as np
 import pytest
+from sklearn.linear_model import LogisticRegression as SklearnLogisticRegression
+from sklearn.preprocessing import StandardScaler as SklearnStandardScaler
 
 
 MODULE_PATH = Path(__file__).resolve().parents[1] / "experiments" / "exp020" / "run_exp020a.py"
@@ -40,6 +43,22 @@ EXPECTED_BINDINGS = {
     "tokenizer_identity": "Qwen2Tokenizer",
     "tokenizer_revision": "2" * 40,
 }
+
+
+def _frozen_probe_config() -> dict:
+    """Return a deep copy of the actual frozen probe object, without prompts."""
+    return copy.deepcopy(runner._json(runner.FROZEN_CONFIG_PATH)["probe"])
+
+
+def _synthetic_probe_fit(class_order: list[str]) -> dict[str, np.ndarray]:
+    """Finite numeric FIT representations only; no model or prompt access."""
+    return {
+        group: np.array(
+            [[float(index * 10), float(index * 10 + 1)], [float(index * 10 + 2), float(index * 10 + 3)]],
+            dtype=float,
+        )
+        for index, group in enumerate(class_order)
+    }
 
 
 def _synthetic_config() -> dict:
@@ -220,10 +239,224 @@ def test_fit_only_centroids_and_probe_and_probability_mapping() -> None:
     fit = {"logic": np.array([[0.0, 0.0], [2.0, 2.0]]), "causality": np.array([[4.0, 4.0], [6.0, 6.0]])}
     centroids = runner._fit_centroids(fit, ["logic", "causality"])
     assert np.array_equal(centroids["logic"], np.array([1.0, 1.0]))
-    config = {"preprocessing": {"with_mean": True, "with_std": True}, "classifier": {"class_order": ["logic", "causality"], "solver": "lbfgs", "penalty": "l2", "C": 1.0, "multi_class": "multinomial", "max_iter": 1000, "class_weight": None, "random_state": 1}}
-    scaler, classifier, order = runner._fit_probe(fit, config)
+    config = _frozen_probe_config()
+    probe_fit = _synthetic_probe_fit(config["classifier"]["class_order"])
+    scaler, classifier, order = runner._fit_probe(probe_fit, config)
     probabilities = runner._target_probabilities(scaler, classifier, order, np.array([[0.0, 0.0]]), "logic")
     assert probabilities.shape == (1,)
+
+
+def test_actual_frozen_probe_config_constructs_and_fits_with_semantic_order() -> None:
+    probe = _frozen_probe_config()
+    fit = _synthetic_probe_fit(probe["classifier"]["class_order"])
+    scaler, classifier, semantic_order = runner._fit_probe(fit, probe)
+    transformed = scaler.transform(np.vstack(list(fit.values())))
+    assert np.isfinite(transformed).all()
+    assert semantic_order == probe["classifier"]["class_order"]
+    assert list(classifier.classes_) == list(range(len(semantic_order)))
+
+
+def test_frozen_scaler_identity_is_validated_but_not_forwarded(monkeypatch: pytest.MonkeyPatch) -> None:
+    probe = _frozen_probe_config()
+    received: dict[str, object] = {}
+
+    def capture_scaler(**kwargs):
+        received.update(kwargs)
+        return SklearnStandardScaler(**kwargs)
+
+    monkeypatch.setattr(runner, "StandardScaler", capture_scaler)
+    runner._fit_probe(_synthetic_probe_fit(probe["classifier"]["class_order"]), probe)
+    assert probe["preprocessing"]["class"] == "StandardScaler"
+    assert received == {"with_mean": True, "with_std": True}
+    assert "class" not in received
+
+
+@pytest.mark.parametrize("field", sorted(runner.PROBE_FIELDS))
+def test_probe_required_fields_fail_closed(field: str) -> None:
+    probe = _frozen_probe_config()
+    del probe[field]
+    with pytest.raises(RuntimeError, match="probe"):
+        runner._fit_probe(_synthetic_probe_fit(_frozen_probe_config()["classifier"]["class_order"]), probe)
+
+
+@pytest.mark.parametrize("field, invalid_value", [
+    (field, invalid_value)
+    for field in ("with_mean", "with_std")
+    for invalid_value in (0, 1, "true", None, [], {})
+])
+def test_preprocessing_boolean_fields_reject_every_non_bool(field: str, invalid_value: object) -> None:
+    probe = _frozen_probe_config()
+    probe["preprocessing"][field] = invalid_value
+    with pytest.raises(RuntimeError, match="StandardScaler"):
+        runner._fit_probe(_synthetic_probe_fit(_frozen_probe_config()["classifier"]["class_order"]), probe)
+
+
+@pytest.mark.parametrize("field", sorted(runner.PREPROCESSING_FIELDS))
+def test_preprocessing_required_fields_fail_closed(field: str) -> None:
+    probe = _frozen_probe_config()
+    del probe["preprocessing"][field]
+    with pytest.raises(RuntimeError, match="preprocessing"):
+        runner._fit_probe(_synthetic_probe_fit(_frozen_probe_config()["classifier"]["class_order"]), probe)
+
+
+@pytest.mark.parametrize("mutation", [
+    lambda section: section.update(unknown=True),
+    lambda section: section.update(with_mean_renamed=section.pop("with_mean")),
+    lambda section: section.update(**{"class": "OtherScaler"}),
+    lambda section: section.update(**{"class": ""}),
+])
+def test_preprocessing_unknown_renamed_or_wrong_identity_fails_closed(mutation) -> None:
+    probe = _frozen_probe_config()
+    mutation(probe["preprocessing"])
+    with pytest.raises(RuntimeError):
+        runner._fit_probe(_synthetic_probe_fit(_frozen_probe_config()["classifier"]["class_order"]), probe)
+
+
+@pytest.mark.parametrize("invalid_value", [True, False, "1.0", None, [], {}])
+def test_classifier_C_rejects_non_numeric_or_bool_values(invalid_value: object) -> None:
+    probe = _frozen_probe_config()
+    probe["classifier"]["C"] = invalid_value
+    with pytest.raises(RuntimeError, match="C parameter"):
+        runner._fit_probe(_synthetic_probe_fit(_frozen_probe_config()["classifier"]["class_order"]), probe)
+
+
+@pytest.mark.parametrize("field, invalid_value", [
+    (field, invalid_value)
+    for field in ("max_iter", "random_state")
+    for invalid_value in (True, False, 1.0, "1", None, [], {})
+])
+def test_classifier_integer_fields_require_strict_int(field: str, invalid_value: object) -> None:
+    probe = _frozen_probe_config()
+    probe["classifier"][field] = invalid_value
+    with pytest.raises(RuntimeError, match="integer parameters"):
+        runner._fit_probe(_synthetic_probe_fit(_frozen_probe_config()["classifier"]["class_order"]), probe)
+
+
+@pytest.mark.parametrize("field", ("fit_data_only", "tuning_on_evaluation_permitted"))
+@pytest.mark.parametrize("invalid_value", (0, 1, "false", None, [], {}))
+def test_probe_data_use_constraints_reject_non_boolean_or_wrong_values(field: str, invalid_value: object) -> None:
+    probe = _frozen_probe_config()
+    probe[field] = invalid_value
+    with pytest.raises(RuntimeError, match="data-use constraints"):
+        runner._fit_probe(_synthetic_probe_fit(_frozen_probe_config()["classifier"]["class_order"]), probe)
+
+
+@pytest.mark.parametrize("field", ("solver", "penalty", "multi_class"))
+@pytest.mark.parametrize("invalid_value", (None, 1, [], {}))
+def test_classifier_string_fields_reject_non_strings(field: str, invalid_value: object) -> None:
+    probe = _frozen_probe_config()
+    probe["classifier"][field] = invalid_value
+    with pytest.raises(RuntimeError, match="string parameters"):
+        runner._fit_probe(_synthetic_probe_fit(_frozen_probe_config()["classifier"]["class_order"]), probe)
+
+
+@pytest.mark.parametrize("invalid_value", (0, True, [], ()))
+def test_classifier_class_weight_rejects_unimplemented_types(invalid_value: object) -> None:
+    probe = _frozen_probe_config()
+    probe["classifier"]["class_weight"] = invalid_value
+    with pytest.raises(RuntimeError, match="class_weight"):
+        runner._fit_probe(_synthetic_probe_fit(_frozen_probe_config()["classifier"]["class_order"]), probe)
+
+
+@pytest.mark.parametrize("invalid_value", ("logic", None, (), {}))
+def test_classifier_class_order_requires_nonempty_list_of_unique_strings(invalid_value: object) -> None:
+    probe = _frozen_probe_config()
+    probe["classifier"]["class_order"] = invalid_value
+    with pytest.raises(RuntimeError, match="class_order"):
+        runner._fit_probe(_synthetic_probe_fit(_frozen_probe_config()["classifier"]["class_order"]), probe)
+
+
+@pytest.mark.parametrize("invalid_order", ([], ["logic", 1], ["logic", "logic"]))
+def test_classifier_class_order_rejects_empty_nonstring_or_duplicate_labels(invalid_order: list[object]) -> None:
+    probe = _frozen_probe_config()
+    probe["classifier"]["class_order"] = invalid_order
+    with pytest.raises(RuntimeError, match="class_order"):
+        runner._fit_probe(_synthetic_probe_fit(_frozen_probe_config()["classifier"]["class_order"]), probe)
+
+
+@pytest.mark.parametrize("field", sorted(runner.CLASSIFIER_FIELDS))
+def test_classifier_required_fields_fail_closed(field: str) -> None:
+    probe = _frozen_probe_config()
+    del probe["classifier"][field]
+    with pytest.raises(RuntimeError, match="classifier"):
+        runner._fit_probe(_synthetic_probe_fit(_frozen_probe_config()["classifier"]["class_order"]), probe)
+
+
+@pytest.mark.parametrize("mutation", [
+    lambda section: section.update(unknown=True),
+    lambda section: section.update(solver_renamed=section.pop("solver")),
+    lambda section: section.update(**{"class": "OtherClassifier"}),
+    lambda section: section.update(**{"class": ""}),
+])
+def test_classifier_unknown_renamed_or_wrong_identity_fails_closed(mutation) -> None:
+    probe = _frozen_probe_config()
+    mutation(probe["classifier"])
+    with pytest.raises(RuntimeError):
+        runner._fit_probe(_synthetic_probe_fit(_frozen_probe_config()["classifier"]["class_order"]), probe)
+
+
+def test_classifier_class_order_is_metadata_not_constructor_kwarg(monkeypatch: pytest.MonkeyPatch) -> None:
+    probe = _frozen_probe_config()
+    received: dict[str, object] = {}
+
+    def capture_classifier(**kwargs):
+        received.update(kwargs)
+        return SklearnLogisticRegression(**kwargs)
+
+    capture_classifier.__signature__ = inspect.signature(SklearnLogisticRegression)
+    monkeypatch.setattr(runner, "LogisticRegression", capture_classifier)
+    runner._fit_probe(_synthetic_probe_fit(probe["classifier"]["class_order"]), probe)
+    assert "class_order" not in received
+    assert received["solver"] == probe["classifier"]["solver"]
+    assert received["penalty"] == probe["classifier"]["penalty"]
+    assert received["C"] == probe["classifier"]["C"]
+    assert received["max_iter"] == probe["classifier"]["max_iter"]
+    assert received["class_weight"] == probe["classifier"]["class_weight"]
+    assert received["random_state"] == probe["classifier"]["random_state"]
+
+
+@pytest.mark.parametrize("mutation", [
+    lambda probe: probe["preprocessing"].update(with_mean=1),
+    lambda probe: probe["classifier"].update(C=True),
+    lambda probe: probe.pop("fit_data_only"),
+])
+def test_invalid_probe_metadata_fails_before_any_sklearn_estimator_construction(
+    monkeypatch: pytest.MonkeyPatch, mutation
+) -> None:
+    probe = _frozen_probe_config()
+    calls: list[str] = []
+
+    def unexpected_scaler(*args, **kwargs):
+        calls.append("StandardScaler")
+        raise AssertionError("invalid metadata reached StandardScaler construction")
+
+    def unexpected_classifier(*args, **kwargs):
+        calls.append("LogisticRegression")
+        raise AssertionError("invalid metadata reached LogisticRegression construction")
+
+    monkeypatch.setattr(runner, "StandardScaler", unexpected_scaler)
+    monkeypatch.setattr(runner, "LogisticRegression", unexpected_classifier)
+    mutation(probe)
+    with pytest.raises(RuntimeError):
+        runner._fit_probe(_synthetic_probe_fit(_frozen_probe_config()["classifier"]["class_order"]), probe)
+    assert calls == []
+
+
+def test_probability_selection_uses_fitted_classifier_classes() -> None:
+    class IdentityScaler:
+        def transform(self, values):
+            return np.asarray(values, dtype=float)
+
+    class ReorderedClassifier:
+        classes_ = np.array([1, 0])
+
+        def predict_proba(self, values):
+            return np.tile(np.array([[0.2, 0.8]]), (len(values), 1))
+
+    probabilities = runner._target_probabilities(
+        IdentityScaler(), ReorderedClassifier(), ["logic", "causality"], np.array([[1.0, 2.0]]), "logic"
+    )
+    assert np.array_equal(probabilities, np.array([0.8]))
 
 
 def test_offline_intervention_matched_random_opposite_and_effects() -> None:

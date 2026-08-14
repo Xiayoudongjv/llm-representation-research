@@ -55,6 +55,14 @@ AUTHORIZATION_FIELDS = frozenset({
     "model_config_path", "model_config_sha256", "tokenizer_identity", "tokenizer_revision",
     "created_at", "authorization_id",
 })
+PREPROCESSING_FIELDS = frozenset({"class", "with_mean", "with_std"})
+CLASSIFIER_FIELDS = frozenset({
+    "class", "solver", "penalty", "C", "multi_class", "max_iter",
+    "class_weight", "random_state", "class_order",
+})
+PROBE_FIELDS = frozenset({
+    "fit_data_only", "preprocessing", "classifier", "tuning_on_evaluation_permitted",
+})
 
 
 def _json(path: Path) -> dict[str, Any]:
@@ -421,18 +429,65 @@ def _fit_centroids(fit: dict[str, np.ndarray], groups: list[str]) -> dict[str, n
     return {group: np.asarray(fit[group], dtype=float).mean(axis=0) for group in groups}
 
 
+def _require_exact_probe_fields(section: dict[str, Any], required: frozenset[str], name: str) -> None:
+    """Reject incomplete, renamed, or expanded frozen estimator configurations."""
+    if not isinstance(section, dict):
+        raise RuntimeError(f"Frozen {name} configuration must be an object.")
+    observed = frozenset(section)
+    if observed != required:
+        missing = sorted(required - observed)
+        unexpected = sorted(observed - required)
+        raise RuntimeError(
+            f"Frozen {name} configuration fields do not match exactly: "
+            f"missing={missing}, unexpected={unexpected}"
+        )
+
+
+def _standard_scaler_kwargs(preprocessing: dict[str, Any]) -> dict[str, bool]:
+    """Validate frozen scaler metadata and map only sklearn constructor fields."""
+    _require_exact_probe_fields(preprocessing, PREPROCESSING_FIELDS, "preprocessing")
+    if preprocessing["class"] != "StandardScaler":
+        raise RuntimeError("Frozen preprocessing estimator must be StandardScaler.")
+    if type(preprocessing["with_mean"]) is not bool or type(preprocessing["with_std"]) is not bool:
+        raise RuntimeError("Frozen StandardScaler parameters must be booleans.")
+    return {"with_mean": preprocessing["with_mean"], "with_std": preprocessing["with_std"]}
+
+
+def _logistic_regression_kwargs(classifier_config: dict[str, Any]) -> tuple[dict[str, Any], list[str]]:
+    """Validate frozen classifier metadata and map only constructor parameters."""
+    _require_exact_probe_fields(classifier_config, CLASSIFIER_FIELDS, "classifier")
+    if classifier_config["class"] != "LogisticRegression":
+        raise RuntimeError("Frozen classifier estimator must be LogisticRegression.")
+    if not all(isinstance(classifier_config[key], str) for key in ("solver", "penalty", "multi_class")):
+        raise RuntimeError("Frozen LogisticRegression string parameters are invalid.")
+    if isinstance(classifier_config["C"], bool) or not isinstance(classifier_config["C"], (int, float)):
+        raise RuntimeError("Frozen LogisticRegression C parameter is invalid.")
+    if any(type(classifier_config[key]) is not int for key in ("max_iter", "random_state")):
+        raise RuntimeError("Frozen LogisticRegression integer parameters are invalid.")
+    if classifier_config["class_weight"] is not None and not isinstance(classifier_config["class_weight"], (str, dict)):
+        raise RuntimeError("Frozen LogisticRegression class_weight parameter is invalid.")
+    classes = classifier_config["class_order"]
+    if not isinstance(classes, list) or not classes or any(not isinstance(value, str) for value in classes) or len(set(classes)) != len(classes):
+        raise RuntimeError("Frozen classifier class_order metadata is invalid.")
+    kwargs = {key: classifier_config[key] for key in ("solver", "penalty", "C", "max_iter", "class_weight", "random_state")}
+    if "multi_class" in inspect.signature(LogisticRegression).parameters:
+        kwargs["multi_class"] = classifier_config["multi_class"]
+    elif classifier_config["multi_class"] != "multinomial":
+        raise RuntimeError("Frozen multinomial probe is incompatible with this scikit-learn version.")
+    return kwargs, list(classes)
+
+
 def _fit_probe(fit: dict[str, np.ndarray], probe_config: dict[str, Any]) -> tuple[StandardScaler, LogisticRegression, list[str]]:
-    classes = list(probe_config["classifier"]["class_order"])
+    _require_exact_probe_fields(probe_config, PROBE_FIELDS, "probe")
+    if probe_config["fit_data_only"] is not True or probe_config["tuning_on_evaluation_permitted"] is not False:
+        raise RuntimeError("Frozen probe data-use constraints do not match the reviewed protocol.")
+    scaler_kwargs = _standard_scaler_kwargs(probe_config["preprocessing"])
+    classifier_kwargs, classes = _logistic_regression_kwargs(probe_config["classifier"])
     features = np.concatenate([np.asarray(fit[group], dtype=float) for group in classes], axis=0)
     labels = np.concatenate([np.full(len(fit[group]), index, dtype=int) for index, group in enumerate(classes)])
-    scaler = StandardScaler(**probe_config["preprocessing"])
+    scaler = StandardScaler(**scaler_kwargs)
     transformed = scaler.fit_transform(features)
-    kwargs = {key: probe_config["classifier"][key] for key in ("solver", "penalty", "C", "max_iter", "class_weight", "random_state")}
-    if "multi_class" in inspect.signature(LogisticRegression).parameters:
-        kwargs["multi_class"] = probe_config["classifier"]["multi_class"]
-    elif probe_config["classifier"]["multi_class"] != "multinomial":
-        raise RuntimeError("Frozen multinomial probe is incompatible with this scikit-learn version.")
-    classifier = LogisticRegression(**kwargs)
+    classifier = LogisticRegression(**classifier_kwargs)
     classifier.fit(transformed, labels)
     return scaler, classifier, classes
 
