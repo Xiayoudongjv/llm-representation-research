@@ -3280,22 +3280,33 @@ def extract_fit_representations(model: Any, tokenizer: Any, records: Sequence[Ma
 
 
 def summarize_checkpoint(rows: Sequence[Mapping[str, Any]], checkpoint: str, split_id: str) -> dict[str, Any]:
-    """Validate and summarize exactly twelve fixed-probe predictions."""
+    """Validate technical invariants and summarize twelve fixed-probe predictions.
+
+    True-label coverage and record/probability integrity are technical-validity
+    prerequisites and fail closed. Predicted argmax class coverage is a frozen
+    Stage-Q pass criterion: an incomplete predicted class set produces a valid
+    adverse checkpoint with pass=false rather than a ProtocolError.
+    """
     selected = [row for row in rows if row.get("checkpoint") == checkpoint]
     if len(selected) != 12:
         raise ProtocolError("Each Stage-Q checkpoint must produce exactly twelve predictions")
-    true_classes = [row.get("true_class") for row in selected]
-    predicted_classes = [row.get("predicted_class") for row in selected]
-    if set(true_classes) != set(CLASS_ORDER) or set(predicted_classes) != set(CLASS_ORDER):
-        raise ProtocolError("Stage-Q checkpoint lacks all required semantic classes")
     for row in selected:
-        if not isinstance(row.get("correct"), bool) or not isinstance(row.get("predicted_class"), str):
+        if (
+            not isinstance(row.get("true_class"), str)
+            or not isinstance(row.get("predicted_class"), str)
+            or not isinstance(row.get("correct"), bool)
+        ):
             raise ProtocolError("Stage-Q prediction record has invalid scalar types")
         probabilities = row.get("probabilities")
         if not isinstance(probabilities, list) or len(probabilities) != 4 or any(not math.isfinite(float(value)) for value in probabilities):
             raise ProtocolError("Stage-Q probability record is invalid")
         if not math.isclose(sum(float(value) for value in probabilities), 1.0, rel_tol=1e-6, abs_tol=1e-6):
             raise ProtocolError("Stage-Q probabilities are not normalized")
+    true_classes = [row.get("true_class") for row in selected]
+    predicted_classes = [row.get("predicted_class") for row in selected]
+    if set(true_classes) != set(CLASS_ORDER):
+        raise ProtocolError("Stage-Q checkpoint lacks required true semantic classes")
+    predicted_class_coverage_pass = set(predicted_classes) == set(CLASS_ORDER)
     correct = sum(bool(row.get("correct")) for row in selected)
     lower = clopper_pearson_lower_bound(correct, 12)
     return {
@@ -3305,7 +3316,8 @@ def summarize_checkpoint(rows: Sequence[Mapping[str, Any]], checkpoint: str, spl
         "correct": correct,
         "accuracy": correct / 12.0,
         "clopper_pearson_lower_bound": lower,
-        "pass": checkpoint_passes(correct, 12),
+        "predicted_class_coverage_pass": predicted_class_coverage_pass,
+        "pass": predicted_class_coverage_pass and checkpoint_passes(correct, 12),
     }
 
 

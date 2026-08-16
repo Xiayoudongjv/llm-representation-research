@@ -1532,8 +1532,8 @@ def test_lifecycle_stage_q_production_entry_active_neutral_fails_before_semantic
     assert semantic_events == []
 
 
-def test_summary_rejects_missing_class_and_nonfinite_probability():
-    rows = [
+def _synthetic_prediction_rows():
+    return [
         {
             "checkpoint": "intervention",
             "true_class": stage_q.CLASS_ORDER[index % 4],
@@ -1543,15 +1543,175 @@ def test_summary_rejects_missing_class_and_nonfinite_probability():
         }
         for index in range(12)
     ]
+
+
+def _synthetic_stage_q_result(global_pass):
+    authority = synthetic_authority()
+    binding = synthetic_binding(authority)
+    split_ids = (
+        "A_original_fit_paraphrase_eval",
+        "B_paraphrase_fit_original_eval",
+    )
+    checkpoint_names = [item["name"] for item in stage_q.CHECKPOINTS]
+    summaries = {}
+    for split_id in split_ids:
+        summaries[split_id] = {}
+        for checkpoint in checkpoint_names:
+            summaries[split_id][checkpoint] = {
+                "split_id": split_id,
+                "checkpoint": checkpoint,
+                "n": 12,
+                "correct": 7,
+                "accuracy": 7 / 12.0,
+                "clopper_pearson_lower_bound": 0.276669685682,
+                "predicted_class_coverage_pass": True,
+                "pass": True,
+            }
+    summaries[split_ids[0]]["intervention"]["predicted_class_coverage_pass"] = False
+    summaries[split_ids[0]]["intervention"]["pass"] = False
+    return {
+        "schema_version": stage_q.SCHEMA_VERSION,
+        "experiment": stage_q.EXPERIMENT,
+        "result_classification": "ENGINEERING_MEASUREMENT_QUALIFICATION_ONLY",
+        "runner_commit": binding["runner_commit"],
+        "runner_sha256": binding["runner_sha256"],
+        "implementation_hashes": binding["implementation_hashes"],
+        "authority_hashes": binding["authority_hashes"],
+        "model_manifest": binding["model_manifest"],
+        "canonical_snapshot_path": authority["primary_model_identity"]["canonical_snapshot_path"],
+        "resolved_snapshot_path": authority["primary_model_identity"]["resolved_snapshot_path"],
+        "neutral_result_binding": {
+            "attempt_id": "ATTEMPT-NEUTRAL-001",
+            "authorization_id": "AUTH-NEUTRAL-001",
+            "authorization_hash": "f" * 64,
+            "runner_sha256": binding["runner_sha256"],
+        },
+        "stage_q_authorization_binding": {
+            "authorization_id": "AUTH-STAGE-Q-001",
+            "authorization_hash": "e" * 64,
+            "attempt_id": "ATTEMPT-STAGE-Q-001",
+            "scope": stage_q.STAGE_Q_SCOPE,
+        },
+        "split_summaries": {
+            split_id: {"fit_count": 12, "fit_ids": [f"{split_id}-{index}" for index in range(12)]}
+            for split_id in split_ids
+        },
+        "checkpoint_summaries": summaries,
+        "processed_fit_ids": {
+            split_id: [f"{split_id}-{index}" for index in range(12)]
+            for split_id in split_ids
+        },
+        "checkpoint_mapping": authority["checkpoint_mapping"],
+        "execution_environment": synthetic_runtime_environment(),
+        "created_at": "2026-08-16T00:00:00+00:00",
+        "eval_accessed": False,
+        "prompt_content_printed": False,
+        "stage_p_accessed": False,
+        "scientific_result_created": False,
+        "global_pass": global_pass,
+        "descriptive_post_norm": {
+            split_id: True for split_id in split_ids
+        },
+    }
+
+
+def test_missing_predicted_class_produces_valid_checkpoint_pass_false():
+    rows = _synthetic_prediction_rows()
     for row in rows:
         if row["predicted_class"] == "definition":
             row["predicted_class"] = "logic"
-    with pytest.raises(stage_q.ProtocolError):
+        row["correct"] = row["predicted_class"] == row["true_class"]
+    summary = stage_q.summarize_checkpoint(rows, "intervention", "split_a")
+    assert summary["predicted_class_coverage_pass"] is False
+    assert summary["pass"] is False
+
+
+def test_missing_predicted_class_still_computes_complete_metrics():
+    rows = _synthetic_prediction_rows()
+    for row in rows:
+        if row["predicted_class"] == "definition":
+            row["predicted_class"] = "logic"
+        row["correct"] = row["predicted_class"] == row["true_class"]
+    summary = stage_q.summarize_checkpoint(rows, "intervention", "split_a")
+    assert summary["n"] == 12
+    assert summary["correct"] == 9
+    assert summary["accuracy"] == pytest.approx(0.75)
+    assert np.isfinite(summary["clopper_pearson_lower_bound"])
+    assert summary["clopper_pearson_lower_bound"] > 0.25
+    assert summary["predicted_class_coverage_pass"] is False
+    assert summary["pass"] is False
+
+
+def test_global_required_checkpoint_predicted_coverage_failure_not_qualified():
+    row = {
+        "split_id": "split_a",
+        "checkpoint": "intervention",
+        "n": 12,
+        "correct": 9,
+        "predicted_class_coverage_pass": False,
+        "pass": False,
+    }
+    assert not stage_q.stage_q_global_gate(
+        [row], ("split_a",), ("intervention",)
+    )
+
+
+def test_descriptive_checkpoint_cannot_rescue_predicted_coverage_failure():
+    result = _synthetic_stage_q_result(global_pass=False)
+    assert result["checkpoint_summaries"]["A_original_fit_paraphrase_eval"]["final_normalized_hidden_state"]["pass"] is True
+    stage_q.validate_stage_q_result(result)
+    gate_rows = [
+        summary
+        for split_summary in result["checkpoint_summaries"].values()
+        for summary in split_summary.values()
+        if summary["checkpoint"] in stage_q.REQUIRED_GATE_CHECKPOINTS
+    ]
+    assert not stage_q.stage_q_global_gate(
+        gate_rows,
+        ("A_original_fit_paraphrase_eval", "B_paraphrase_fit_original_eval"),
+        stage_q.REQUIRED_GATE_CHECKPOINTS,
+    )
+
+
+def test_result_validator_accepts_valid_adverse_coverage_failure():
+    stage_q.validate_stage_q_result(_synthetic_stage_q_result(global_pass=False))
+
+
+def test_true_label_missing_class_raises():
+    rows = _synthetic_prediction_rows()
+    rows[0]["true_class"] = "missing_class"
+    with pytest.raises(stage_q.ProtocolError, match="required true semantic classes"):
         stage_q.summarize_checkpoint(rows, "intervention", "split_a")
-    rows[-1]["predicted_class"] = stage_q.CLASS_ORDER[3]
-    rows[0]["probabilities"] = [float("nan")] * 4
-    with pytest.raises(stage_q.ProtocolError):
-        stage_q.summarize_checkpoint(rows, "intervention", "split_a")
+
+
+def test_classifier_classes_missing_class_raises():
+    probabilities = np.array([[0.2, 0.3, 0.5]])
+    with pytest.raises(stage_q.ProtocolError, match="Classifier classes"):
+        stage_q.map_classifier_probabilities(
+            probabilities,
+            ["logic", "causality", "analogy"],
+        )
+
+
+def test_probability_mapping_missing_class_raises():
+    probabilities = np.array([[0.2, 0.3, 0.5]])
+    with pytest.raises(stage_q.ProtocolError, match="Probability matrix shape"):
+        stage_q.map_classifier_probabilities(
+            probabilities,
+            ["logic", "causality", "analogy", "definition"],
+        )
+
+
+def test_all_predicted_classes_preserves_previous_behavior():
+    rows = _synthetic_prediction_rows()
+    for index in range(12):
+        if index >= 7:
+            rows[index]["predicted_class"] = "logic"
+            rows[index]["correct"] = False
+    summary = stage_q.summarize_checkpoint(rows, "intervention", "split_a")
+    assert summary["correct"] == 7
+    assert summary["predicted_class_coverage_pass"] is True
+    assert summary["pass"] is True
 
 
 def test_inactive_hook_requires_exact_equality():

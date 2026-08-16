@@ -136,6 +136,18 @@ REQUIRED_LIFECYCLE_TESTS = {
     "test_lifecycle_stage_q_production_entry_active_neutral_fails_before_semantics",
 }
 
+REQUIRED_STAGE_Q_090U_TESTS = {
+    "test_missing_predicted_class_produces_valid_checkpoint_pass_false",
+    "test_missing_predicted_class_still_computes_complete_metrics",
+    "test_global_required_checkpoint_predicted_coverage_failure_not_qualified",
+    "test_descriptive_checkpoint_cannot_rescue_predicted_coverage_failure",
+    "test_result_validator_accepts_valid_adverse_coverage_failure",
+    "test_true_label_missing_class_raises",
+    "test_classifier_classes_missing_class_raises",
+    "test_probability_mapping_missing_class_raises",
+    "test_all_predicted_classes_preserves_previous_behavior",
+}
+
 REQUIRED_STAGE_Q_090K_TESTS = {
     "test_stage_q_frozen_fit_json_array_positive_regression",
     "test_stage_q_frozen_fit_loader_fails_closed",
@@ -731,6 +743,7 @@ def validate() -> None:
         | REQUIRED_CHECKPOINT_MAPPING_TESTS
         | REQUIRED_LIFECYCLE_TESTS
         | REQUIRED_STAGE_Q_090K_TESTS
+        | REQUIRED_STAGE_Q_090U_TESTS
     ):
         function_node(tests_tree, name)
     neutral_dynamic_test = function_node(tests_tree, NEUTRAL_DYNAMIC_TEST)
@@ -739,6 +752,61 @@ def validate() -> None:
         raise ValidationError("neutral production-entry regression test does not invoke the real entry")
     if not calls_any_function_containing(stage_q_dynamic_test, "run_stage_q"):
         raise ValidationError("Stage-Q production-entry regression test does not invoke the real entry")
+    coverage_runner = load_runner_module()
+    adverse_rows = [
+        {
+            "checkpoint": "intervention",
+            "true_class": coverage_runner.CLASS_ORDER[index % 4],
+            "predicted_class": coverage_runner.CLASS_ORDER[index % 4],
+            "probabilities": [0.25, 0.25, 0.25, 0.25],
+            "correct": True,
+        }
+        for index in range(12)
+    ]
+    for row in adverse_rows:
+        if row["predicted_class"] == coverage_runner.CLASS_ORDER[3]:
+            row["predicted_class"] = coverage_runner.CLASS_ORDER[0]
+        row["correct"] = row["predicted_class"] == row["true_class"]
+    try:
+        adverse_summary = coverage_runner.summarize_checkpoint(
+            adverse_rows, "intervention", "split_a"
+        )
+    except Exception as exc:
+        raise ValidationError(
+            f"valid adverse predicted-class noncoverage raises technical invalidity: {exc}"
+        )
+    if adverse_summary.get("predicted_class_coverage_pass") is not False:
+        raise ValidationError("predicted-class noncoverage did not set the coverage criterion false")
+    if adverse_summary.get("pass") is not False:
+        raise ValidationError("predicted-class noncoverage did not make checkpoint pass false")
+    if adverse_summary.get("n") != 12 or adverse_summary.get("correct") != 9:
+        raise ValidationError("predicted-class noncoverage did not continue complete metric computation")
+    true_missing_rows = [dict(row) for row in adverse_rows]
+    true_missing_rows[0]["true_class"] = "missing_class"
+    try:
+        coverage_runner.summarize_checkpoint(true_missing_rows, "intervention", "split_a")
+    except coverage_runner.ProtocolError:
+        pass
+    else:
+        raise ValidationError("true-label class noncoverage no longer fails closed")
+    try:
+        coverage_runner.map_classifier_probabilities(
+            [[0.2, 0.3, 0.5]],
+            ["logic", "causality", "analogy"],
+        )
+    except coverage_runner.ProtocolError:
+        pass
+    else:
+        raise ValidationError("classifier.classes_ class noncoverage no longer fails closed")
+    try:
+        coverage_runner.map_classifier_probabilities(
+            [[0.2, 0.3, 0.5]],
+            ["logic", "causality", "analogy", "definition"],
+        )
+    except coverage_runner.ProtocolError:
+        pass
+    else:
+        raise ValidationError("probability-column class noncoverage no longer fails closed")
     manifest = function_node(tree, "validate_model_manifest")
     if not guarded_call(manifest, "sha256_file", "verify_payload") or not guarded_call(manifest, "_validate_safetensors_header", "verify_payload"):
         raise ValidationError("full model verification is not guarded by post-consumption verify_payload")
