@@ -88,6 +88,14 @@ REQUIRED_LIFECYCLE_TESTS = {
     "test_lifecycle_multiple_active_authorizations_fail",
     "test_lifecycle_active_and_consumed_impossible_fails",
     "test_lifecycle_result_without_consumption_fails",
+    "test_lifecycle_consumed_neutral_authorization_not_active",
+    "test_lifecycle_consumed_neutral_qualified_result_static_passes",
+    "test_lifecycle_identity_two_dispositions_plus_consumed_neutral_passes",
+    "test_lifecycle_consumed_authorization_wrong_result_authorization_id_fails",
+    "test_lifecycle_consumed_authorization_malformed_consumption_fails",
+    "test_lifecycle_consumed_authorization_same_identity_disposition_fails",
+    "test_lifecycle_consumed_authorization_result_attempt_mismatch_fails",
+    "test_lifecycle_consumed_neutral_not_neutral_active",
     "test_lifecycle_stage_q_with_active_neutral_fails",
     "test_lifecycle_neutral_with_stage_q_consumption_fails",
     "test_lifecycle_known_disposition_paths_not_globally_rejected",
@@ -212,6 +220,25 @@ def _validator_completed_disposition(root: Path, runner, authorization_id: str):
         non_executable_reason="validator identity-aware lifecycle dynamic check",
     )
     return auth, auth_hash
+
+
+def _validator_consumption_record(root: Path, runner, authorization: dict, authorization_hash: str):
+    path = root / "experiments/exp021/consumed/neutral.json"
+    _validator_write_json(
+        path,
+        {
+            "schema_version": "1.0.0",
+            "experiment": "EXP-021",
+            "authorization_hash": authorization_hash,
+            "attempt_id": "ATTEMPT-VALIDATOR-CONSUMED",
+            "runner_commit": authorization["runner_commit"],
+            "acquired_at": "2026-08-16T00:00:00+00:00",
+            "scope": runner.NEUTRAL_SCOPE,
+            "output_path": str(root / "experiments/exp021/engineering/neutral_result.json"),
+            "state": "consumed",
+        },
+    )
+    return path
 
 
 class ImportAndCallVisitor(ast.NodeVisitor):
@@ -612,6 +639,35 @@ def validate() -> None:
             pass
         else:
             raise ValidationError("closed-world lifecycle validation accepts an unknown authorization artifact")
+    with tempfile.TemporaryDirectory() as tmpdir:
+        consumed_root = Path(tmpdir)
+        consumed_runner = load_runner_module()
+        _auth_path, consumed_auth, consumed_hash = _validator_active_authorization(
+            consumed_root, consumed_runner, "AUTH-DYN-CONSUMED"
+        )
+        _validator_consumption_record(
+            consumed_root, consumed_runner, consumed_auth, consumed_hash
+        )
+        consumed_state = consumed_runner.validate_mode_lifecycle(
+            consumed_root, consumed_runner.LIFECYCLE_MODE_STATIC
+        )
+        if consumed_state.get("active_neutral") is not None:
+            raise ValidationError("matching consumption did not deactivate the retained neutral authorization")
+        if consumed_state.get("consumed_neutral") is None:
+            raise ValidationError("matching consumption was not classified as consumed neutral evidence")
+        if consumed_state.get("retained_authorizations", {}).get("neutral") is None:
+            raise ValidationError("retained consumed authorization was not preserved as audit evidence")
+        wrong_consumption = _validator_consumption_record(
+            consumed_root, consumed_runner, consumed_auth, "f" * 64
+        )
+        try:
+            consumed_runner.validate_mode_lifecycle(
+                consumed_root, consumed_runner.LIFECYCLE_MODE_STATIC
+            )
+        except Exception:
+            pass
+        else:
+            raise ValidationError("mismatched consumption identity did not fail closed")
     with tempfile.TemporaryDirectory() as tmpdir:
         identity_root = Path(tmpdir)
         identity_runner = load_runner_module()

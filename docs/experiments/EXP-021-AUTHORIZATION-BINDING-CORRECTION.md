@@ -85,3 +85,14 @@ The fresh 089Q neutral authorization remains
 `ISSUED_UNCONSUMED_NONEXECUTABLE_PENDING_LIFECYCLE_CORRECTION`. It is
 byte-identical, unconsumed, and must not be considered executable after this
 runner edit.
+
+## Task 089Y correction
+
+Task 089Y corrects post-qualification authorization lifecycle semantics.
+Authorization file persistence is audit evidence and does not alone imply an
+ACTIVE grant. A retained authorization file with a valid matching canonical
+consumption record is classified as CONSUMED/exhausted while the original
+authorization bytes remain preserved. Consumed and dispositioned are distinct
+terminal lifecycle histories: disposition applies to an unconsumed superseded
+authorization, while consumption is the single-use exhaustion after an
+authorized launch. Mismatched or malformed consumption evidence fails closed.

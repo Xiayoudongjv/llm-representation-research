@@ -503,8 +503,10 @@ Static preflight:
 - accepts known mutable lifecycle artifacts as observations;
 - current active neutral authorization is recognized but not executable;
 - unknown paths, legacy stale paths, multiple active authorizations,
-  active-plus-consumed contradictions, result-without-consumption, and
+  mismatched consumed-authorization identities, result-without-consumption, and
   same-identity active-plus-completed-disposition contradictions fail closed;
+- a retained authorization file plus an exact matching canonical consumption
+  record is classified as CONSUMED/exhausted, not ACTIVE;
 - completed historical dispositions of distinct authorization identities are
   retained as audit evidence and may coexist with exactly one later active
   authorization;
@@ -525,11 +527,24 @@ Stage-Q:
 - active Stage-Q authorization must exist;
 - no Stage-Q consumption or result may already exist;
 - no active neutral authorization or disposition lifecycle for the active
-  Stage-Q identity; distinct completed historical dispositions may coexist.
+  Stage-Q identity; distinct completed historical dispositions may coexist;
+- the retained consumed neutral authorization remains audit evidence but is
+  not an active grant.
 
 Disposition and recovery paths are recognized by the generic inspector without
 being globally rejected, but unknown children under those namespaces remain
 fail closed.
+
+### Consumed authorization lifecycle rule
+
+Authorization file persistence is audit evidence and does not alone imply an
+ACTIVE grant. When a retained authorization file has a valid matching canonical
+consumption record with the same authorization SHA-256, scope, and runner
+binding, its lifecycle state is CONSUMED/exhausted. The original authorization
+bytes remain preserved, but the identity cannot be consumed again or treated as
+an active replacement. Consumed and dispositioned are distinct terminal
+histories: disposition is for an unconsumed superseded authorization, while
+consumption is the single-use exhaustion after an authorized launch.
 
 ## Task 089R correction
 

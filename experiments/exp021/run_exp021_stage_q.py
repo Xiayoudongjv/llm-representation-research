@@ -527,12 +527,15 @@ def inspect_lifecycle_paths(repo_root: str | Path) -> dict[str, Any]:
         "consumed_stage_q": None,
         "engineering_neutral": None,
         "engineering_stage_q": None,
+        "retained_authorizations": {},
         "disposition_archives": [],
         "disposition_journals": [],
         "disposition_records": [],
         "unknown_paths": [],
         "legacy_contamination": [],
     }
+    authorization_files: dict[str, Path] = {}
+    consumption_files: dict[str, Path] = {}
     for scan_relative in sorted(LIFECYCLE_SCAN_DIRECTORIES, key=lambda path: path.as_posix()):
         scan_root = root / scan_relative
         if not os.path.lexists(scan_root):
@@ -563,16 +566,10 @@ def inspect_lifecycle_paths(repo_root: str | Path) -> dict[str, Any]:
                 relative_path = Path(relative)
                 if relative_path in LIFECYCLE_ACTIVE_AUTHORIZATION_PATHS:
                     scope = LIFECYCLE_ACTIVE_AUTHORIZATION_PATHS[relative_path]
-                    if scope == "neutral":
-                        state["active_neutral"] = child
-                    else:
-                        state["active_stage_q"] = child
+                    authorization_files[scope] = child
                 elif relative_path in LIFECYCLE_CONSUMPTION_PATHS:
                     scope = LIFECYCLE_CONSUMPTION_PATHS[relative_path]
-                    if scope == "neutral":
-                        state["consumed_neutral"] = child
-                    else:
-                        state["consumed_stage_q"] = child
+                    consumption_files[scope] = child
                 elif relative_path in LIFECYCLE_ENGINEERING_RESULT_PATHS:
                     scope = LIFECYCLE_ENGINEERING_RESULT_PATHS[relative_path]
                     if scope == "neutral":
@@ -591,7 +588,104 @@ def inspect_lifecycle_paths(repo_root: str | Path) -> dict[str, Any]:
         legacy_path = root / legacy_relative
         if os.path.lexists(legacy_path):
             state["legacy_contamination"].append(legacy_relative.as_posix())
+    for scope, expected_scope in (
+        ("neutral", NEUTRAL_SCOPE),
+        ("stage_q", STAGE_Q_SCOPE),
+    ):
+        authorization_path = authorization_files.get(scope)
+        consumption_path = consumption_files.get(scope)
+        if authorization_path is None:
+            if consumption_path is not None:
+                raise ProtocolError(
+                    f"{scope} consumption record exists without a retained authorization identity"
+                )
+            continue
+        if consumption_path is None:
+            state[f"active_{scope}"] = authorization_path
+            continue
+        _classify_consumed_authorization(
+            root,
+            state,
+            scope,
+            expected_scope,
+            authorization_path,
+            consumption_path,
+        )
     return state
+
+
+def _authorization_keys_for_scope(scope: str) -> frozenset[str]:
+    """Return the closed authorization schema for one lifecycle scope."""
+    if scope == NEUTRAL_SCOPE:
+        return NEUTRAL_AUTHORIZATION_KEYS
+    if scope == STAGE_Q_SCOPE:
+        return STAGE_Q_AUTHORIZATION_KEYS
+    raise ProtocolError(f"Unsupported authorization scope: {scope}")
+
+
+def _validate_retained_authorization_identity(
+    authorization_path: Path, expected_scope: str
+) -> dict[str, Any]:
+    """Validate a retained authorization sufficiently for consumption correlation."""
+    authorization = read_json_no_duplicates(authorization_path)
+    require_exact_keys(
+        authorization,
+        _authorization_keys_for_scope(expected_scope),
+        "retained authorization",
+    )
+    if authorization["schema_version"] != SCHEMA_VERSION or authorization["experiment"] != EXPERIMENT:
+        raise ProtocolError("Retained authorization schema identity mismatch")
+    if authorization["scope"] != expected_scope:
+        raise ProtocolError("Retained authorization scope mismatch")
+    require_string(authorization["authorization_id"], "authorization_id")
+    require_string(authorization["runner_commit"], "runner_commit")
+    runner_sha256 = require_string(authorization["runner_sha256"], "runner_sha256")
+    if len(runner_sha256) != 64:
+        raise ProtocolError("Retained authorization runner_sha256 must be a SHA-256 digest")
+    return authorization
+
+
+def _validate_consumption_identity(
+    consumption_path: Path, expected_scope: str
+) -> dict[str, Any]:
+    """Validate a canonical consumption record for lifecycle correlation."""
+    consumption = read_json_no_duplicates(consumption_path)
+    require_exact_keys(consumption, CONSUMPTION_KEYS, "consumption record")
+    if consumption["schema_version"] != SCHEMA_VERSION or consumption["experiment"] != EXPERIMENT:
+        raise ProtocolError("Consumption record schema identity mismatch")
+    if consumption["scope"] != expected_scope:
+        raise ProtocolError("Consumption record scope mismatch")
+    if consumption["state"] != "consumed":
+        raise ProtocolError("Consumption record state must be consumed")
+    authorization_hash = require_string(consumption["authorization_hash"], "authorization_hash")
+    if len(authorization_hash) != 64:
+        raise ProtocolError("Consumption authorization_hash must be a SHA-256 digest")
+    require_string(consumption["attempt_id"], "attempt_id")
+    require_string(consumption["runner_commit"], "runner_commit")
+    require_string(consumption["output_path"], "output_path")
+    parse_timestamp(consumption["acquired_at"], "acquired_at")
+    return consumption
+
+
+def _classify_consumed_authorization(
+    root: Path,
+    state: dict[str, Any],
+    scope: str,
+    expected_scope: str,
+    authorization_path: Path,
+    consumption_path: Path,
+) -> None:
+    """Classify a retained authorization as consumed, never active, when identity matches."""
+    authorization = _validate_retained_authorization_identity(authorization_path, expected_scope)
+    consumption = _validate_consumption_identity(consumption_path, expected_scope)
+    authorization_hash = sha256_file(authorization_path)
+    if consumption["authorization_hash"] != authorization_hash:
+        raise ProtocolError("Consumption authorization hash does not match retained authorization")
+    if consumption["runner_commit"] != authorization["runner_commit"]:
+        raise ProtocolError("Consumption runner commit does not match retained authorization")
+    state[f"active_{scope}"] = None
+    state[f"consumed_{scope}"] = consumption_path
+    state["retained_authorizations"][scope] = authorization_path
 
 
 def _lifecycle_artifact_sha256(relative: str) -> str | None:
@@ -690,6 +784,37 @@ def _validate_completed_historical_disposition(
             raise ProtocolError("Impossible lifecycle state: historical disposition journal record mismatch")
 
 
+def _validate_neutral_result_lifecycle_correlation(state: Mapping[str, Any]) -> None:
+    """Require the retained neutral authorization, consumption, and result to bind."""
+    if state["engineering_neutral"] is None:
+        return
+    if state["consumed_neutral"] is None:
+        raise ProtocolError("Impossible lifecycle state: neutral qualification result without neutral consumption record")
+    root = Path(state["root"])
+    authorization_path = state.get("retained_authorizations", {}).get("neutral")
+    if authorization_path is None:
+        raise ProtocolError("Neutral qualification result exists without a retained neutral authorization identity")
+    authorization = read_json_no_duplicates(authorization_path)
+    consumption = read_json_no_duplicates(state["consumed_neutral"])
+    result = read_json_no_duplicates(state["engineering_neutral"])
+    require_exact_keys(result, NEUTRAL_RESULT_KEYS, "neutral result")
+    if result["schema_version"] != SCHEMA_VERSION or result["experiment"] != EXPERIMENT:
+        raise ProtocolError("Neutral result schema identity mismatch")
+    if result["result_classification"] != "ENGINEERING_NEUTRAL_HOOK_QUALIFICATION_ONLY" or result["overall_pass"] is not True:
+        raise ProtocolError("Neutral result is not a qualified engineering-only result")
+    authorization_hash = sha256_file(authorization_path)
+    if result["authorization_id"] != authorization["authorization_id"]:
+        raise ProtocolError("Neutral result authorization ID does not match retained authorization")
+    if result["authorization_hash"] != authorization_hash:
+        raise ProtocolError("Neutral result authorization hash does not match retained authorization")
+    if result["authorization_hash"] != consumption["authorization_hash"]:
+        raise ProtocolError("Neutral result authorization hash does not match consumption record")
+    if result["attempt_id"] != consumption["attempt_id"]:
+        raise ProtocolError("Neutral result attempt ID does not match consumption record")
+    if result["runner_commit"] != authorization["runner_commit"] or result["runner_sha256"] != authorization["runner_sha256"]:
+        raise ProtocolError("Neutral result runner identity does not match retained authorization")
+
+
 def _validate_no_impossible_lifecycle_state(state: Mapping[str, Any]) -> None:
     """Reject contradictory active/consumed/result/disposition combinations.
 
@@ -708,6 +833,8 @@ def _validate_no_impossible_lifecycle_state(state: Mapping[str, Any]) -> None:
         raise ProtocolError("Impossible lifecycle state: neutral qualification result without neutral consumption record")
     if state["engineering_stage_q"] is not None and state["consumed_stage_q"] is None:
         raise ProtocolError("Impossible lifecycle state: Stage-Q result without Stage-Q consumption record")
+    if state["engineering_neutral"] is not None:
+        _validate_neutral_result_lifecycle_correlation(state)
 
     active_paths = [
         path
@@ -717,6 +844,12 @@ def _validate_no_impossible_lifecycle_state(state: Mapping[str, Any]) -> None:
     active_hashes = {sha256_file(path) for path in active_paths} if active_paths else set()
     root = Path(state["root"])
     groups = _group_disposition_artifacts(state)
+    retained_paths = [
+        path
+        for path in state.get("retained_authorizations", {}).values()
+        if path is not None
+    ]
+    retained_hashes = {sha256_file(path) for path in retained_paths} if retained_paths else set()
     active_ids: list[str | None] = []
     if active_paths and groups:
         for path in active_paths:
@@ -727,6 +860,10 @@ def _validate_no_impossible_lifecycle_state(state: Mapping[str, Any]) -> None:
                 active_ids.append(None)
 
     for digest, group in groups.items():
+        if digest in retained_hashes:
+            raise ProtocolError(
+                "Impossible lifecycle state: consumed authorization has a disposition lifecycle"
+            )
         if digest in active_hashes:
             if group["archives"] or group["records"]:
                 raise ProtocolError(

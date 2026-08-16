@@ -117,6 +117,114 @@ def _write_active_neutral_auth(tmp_path: Path, authorization_id: str = "AUTH-B",
     return auth_path, auth, stage_q.sha256_file(auth_path)
 
 
+def _write_consumption_record(
+    tmp_path: Path,
+    scope: str,
+    authorization: dict,
+    authorization_hash: str,
+    attempt_id: str,
+    output_relative: str,
+):
+    """Write a canonical consumption record matching a retained authorization."""
+    consumption = {
+        "schema_version": stage_q.SCHEMA_VERSION,
+        "experiment": stage_q.EXPERIMENT,
+        "authorization_hash": authorization_hash,
+        "attempt_id": attempt_id,
+        "runner_commit": authorization["runner_commit"],
+        "acquired_at": "2026-08-16T00:00:00+00:00",
+        "scope": scope,
+        "output_path": str(tmp_path / "experiments" / "exp021" / output_relative),
+        "state": "consumed",
+    }
+    consumption_path = _lifecycle_write(tmp_path, output_relative, consumption)
+    return consumption_path, consumption
+
+
+def _write_consumed_neutral_state(
+    tmp_path: Path,
+    authorization_id: str = "AUTH-CONSUMED",
+    attempt_id: str = "ATTEMPT-CONSUMED-001",
+    **overrides,
+):
+    """Write retained consumed neutral authorization, consumption, and valid result."""
+    auth_path, auth, auth_hash = _write_active_neutral_auth(
+        tmp_path, authorization_id=authorization_id, **overrides
+    )
+    consumption_path, consumption = _write_consumption_record(
+        tmp_path,
+        stage_q.NEUTRAL_SCOPE,
+        auth,
+        auth_hash,
+        attempt_id,
+        "consumed/neutral.json",
+    )
+    authority = synthetic_authority()
+    binding = synthetic_binding(authority)
+    result = valid_neutral_result(
+        authority,
+        binding,
+        attempt_id=attempt_id,
+        authorization_id=authorization_id,
+        authorization_hash=auth_hash,
+    )
+    result_path = _lifecycle_write(
+        tmp_path,
+        "engineering/neutral_result.json",
+        result,
+    )
+    return auth_path, auth, auth_hash, consumption_path, result_path
+
+
+def _write_active_stage_q_auth(tmp_path: Path, authorization_id: str = "AUTH-STAGE-Q"):
+    """Write a complete Stage-Q authorization at the canonical active path."""
+    auth = {
+        "schema_version": stage_q.SCHEMA_VERSION,
+        "experiment": "EXP-021",
+        "scope": stage_q.STAGE_Q_SCOPE,
+        "authorization_id": authorization_id,
+        "issued_at": "2026-08-15T00:00:00+00:00",
+        "expires_at": "2099-08-15T00:00:00+00:00",
+        "runner_commit": stage_q.AUTHORITY_ARCHIVE_COMMIT,
+        "runner_sha256": "a" * 64,
+        "implementation_hashes": {"runner": "a" * 64, "validator": "b" * 64},
+        "authority_hashes": {"original": "c" * 64, "amendment": "d" * 64, "reconciliation": "e" * 64},
+        "model_manifest": {"identity": "manifest-sha"},
+        "environment_binding": stage_q.required_environment_binding(),
+        "allowed_output_path": str(tmp_path / "experiments" / "exp021" / "engineering" / "stage_q_result.json"),
+        "maximum_launch_count": 1,
+        "fit_access_permitted": True,
+        "eval_access_permitted": False,
+        "scientific_result_permitted": False,
+        "automatic_retry_permitted": False,
+        "stage_p_intervention_permitted": False,
+        "per_checkpoint_probe_refit_permitted": False,
+    }
+    auth_path = tmp_path / "experiments" / "exp021" / "authorization" / "stage_q.json"
+    write_json(auth_path, auth)
+    return auth_path, auth, stage_q.sha256_file(auth_path)
+
+
+def _write_consumed_stage_q_state(
+    tmp_path: Path,
+    authorization_id: str = "AUTH-STAGE-Q",
+    attempt_id: str = "ATTEMPT-STAGE-Q-001",
+):
+    """Write retained consumed Stage-Q authorization and matching consumption record."""
+    auth_path, auth, auth_hash = _write_active_stage_q_auth(
+        tmp_path, authorization_id=authorization_id
+    )
+    consumption_path, consumption = _write_consumption_record(
+        tmp_path,
+        stage_q.STAGE_Q_SCOPE,
+        auth,
+        auth_hash,
+        attempt_id,
+        "consumed/stage_q.json",
+    )
+    return auth_path, auth, auth_hash, consumption_path
+
+
 def _create_completed_historical_disposition(tmp_path: Path, authorization_id: str = "AUTH-A"):
     """Dispose one synthetic authorization and return its identity and hash."""
     auth_path, auth, auth_hash = _write_active_neutral_auth(
@@ -795,9 +903,8 @@ def test_lifecycle_neutral_valid_state_passes(tmp_path):
 
 
 def test_lifecycle_stage_q_valid_state_passes(tmp_path):
-    _lifecycle_write(tmp_path, "consumed/neutral.json", {})
-    _lifecycle_write(tmp_path, "engineering/neutral_result.json", {})
-    _lifecycle_write(tmp_path, "authorization/stage_q.json", {})
+    _write_consumed_neutral_state(tmp_path)
+    _write_active_stage_q_auth(tmp_path)
     state = stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STAGE_Q)
     assert state["consumed_neutral"] is not None
     assert state["engineering_neutral"] is not None
@@ -857,11 +964,27 @@ def test_lifecycle_multiple_active_authorizations_fail(tmp_path):
 
 
 def test_lifecycle_active_and_consumed_impossible_fails(tmp_path):
-    _lifecycle_write(tmp_path, "authorization/neutral.json", {})
-    _lifecycle_write(tmp_path, "consumed/neutral.json", {})
+    _auth_path, auth, auth_hash = _write_active_neutral_auth(
+        tmp_path, authorization_id="AUTH-C"
+    )
+    _lifecycle_write(
+        tmp_path,
+        "consumed/neutral.json",
+        {
+            "schema_version": stage_q.SCHEMA_VERSION,
+            "experiment": stage_q.EXPERIMENT,
+            "authorization_hash": "f" * 64,
+            "attempt_id": "ATTEMPT-WRONG-HASH",
+            "runner_commit": auth["runner_commit"],
+            "acquired_at": "2026-08-16T00:00:00+00:00",
+            "scope": stage_q.NEUTRAL_SCOPE,
+            "output_path": str(tmp_path / "experiments" / "exp021" / "engineering" / "neutral_result.json"),
+            "state": "consumed",
+        },
+    )
     with pytest.raises(
         stage_q.ProtocolError,
-        match="active neutral authorization with neutral consumption record",
+        match="Consumption authorization hash does not match retained authorization",
     ):
         stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
 
@@ -875,6 +998,93 @@ def test_lifecycle_result_without_consumption_fails(tmp_path):
         stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
 
 
+def test_lifecycle_consumed_neutral_authorization_not_active(tmp_path):
+    auth_path, _auth, _auth_hash, consumption_path, _result_path = _write_consumed_neutral_state(
+        tmp_path, authorization_id="AUTH-CONSUMED"
+    )
+    state = stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
+    assert state["active_neutral"] is None
+    assert state["consumed_neutral"] == consumption_path
+    assert state["retained_authorizations"]["neutral"] == auth_path
+
+
+def test_lifecycle_consumed_neutral_qualified_result_static_passes(tmp_path):
+    _write_consumed_neutral_state(tmp_path, authorization_id="AUTH-CONSUMED")
+    state = stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
+    assert state["engineering_neutral"] is not None
+    assert state["consumed_neutral"] is not None
+
+
+def test_lifecycle_identity_two_dispositions_plus_consumed_neutral_passes(tmp_path):
+    _create_completed_historical_disposition(tmp_path, authorization_id="AUTH-A")
+    _create_completed_historical_disposition(tmp_path, authorization_id="AUTH-B")
+    _write_consumed_neutral_state(tmp_path, authorization_id="AUTH-CONSUMED")
+    state = stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
+    assert len(state["disposition_archives"]) == 2
+    assert state["active_neutral"] is None
+    assert state["consumed_neutral"] is not None
+
+
+def test_lifecycle_consumed_authorization_wrong_result_authorization_id_fails(tmp_path):
+    _auth_path, _auth, _auth_hash, _consumption_path, result_path = _write_consumed_neutral_state(
+        tmp_path, authorization_id="AUTH-CONSUMED"
+    )
+    result = stage_q.read_json_no_duplicates(result_path)
+    result["authorization_id"] = "AUTH-OTHER"
+    write_json(result_path, result)
+    with pytest.raises(
+        stage_q.ProtocolError,
+        match="Neutral result authorization ID does not match retained authorization",
+    ):
+        stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
+
+
+def test_lifecycle_consumed_authorization_malformed_consumption_fails(tmp_path):
+    _write_active_neutral_auth(tmp_path, authorization_id="AUTH-CONSUMED")
+    _lifecycle_write(tmp_path, "consumed/neutral.json", {})
+    with pytest.raises(stage_q.ProtocolError, match="consumption record"):
+        stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
+
+
+def test_lifecycle_consumed_authorization_same_identity_disposition_fails(tmp_path):
+    _auth_path, _auth, auth_hash, _consumption_path, _result_path = _write_consumed_neutral_state(
+        tmp_path, authorization_id="AUTH-CONSUMED"
+    )
+    _lifecycle_write(
+        tmp_path,
+        f"authorization/dispositions/{auth_hash}.json",
+        {},
+    )
+    with pytest.raises(
+        stage_q.ProtocolError,
+        match="consumed authorization has a disposition lifecycle",
+    ):
+        stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
+
+
+def test_lifecycle_consumed_authorization_result_attempt_mismatch_fails(tmp_path):
+    _auth_path, _auth, _auth_hash, _consumption_path, result_path = _write_consumed_neutral_state(
+        tmp_path, authorization_id="AUTH-CONSUMED"
+    )
+    result = stage_q.read_json_no_duplicates(result_path)
+    result["attempt_id"] = "ATTEMPT-OTHER"
+    write_json(result_path, result)
+    with pytest.raises(
+        stage_q.ProtocolError,
+        match="Neutral result attempt ID does not match consumption record",
+    ):
+        stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
+
+
+def test_lifecycle_consumed_neutral_not_neutral_active(tmp_path):
+    _write_consumed_neutral_state(tmp_path, authorization_id="AUTH-CONSUMED")
+    with pytest.raises(
+        stage_q.ProtocolError,
+        match="Neutral qualification requires an active neutral authorization",
+    ):
+        stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_NEUTRAL)
+
+
 def test_lifecycle_stage_q_with_active_neutral_fails(tmp_path):
     _lifecycle_write(tmp_path, "authorization/neutral.json", {})
     with pytest.raises(
@@ -885,8 +1095,8 @@ def test_lifecycle_stage_q_with_active_neutral_fails(tmp_path):
 
 
 def test_lifecycle_neutral_with_stage_q_consumption_fails(tmp_path):
-    _lifecycle_write(tmp_path, "authorization/neutral.json", {})
-    _lifecycle_write(tmp_path, "consumed/stage_q.json", {})
+    _write_active_neutral_auth(tmp_path, authorization_id="AUTH-ACTIVE")
+    _write_consumed_stage_q_state(tmp_path, authorization_id="AUTH-STAGE-Q")
     with pytest.raises(
         stage_q.ProtocolError,
         match="Neutral qualification is incompatible with a Stage-Q consumption record",
@@ -1016,9 +1226,8 @@ def test_lifecycle_identity_historical_journal_not_unresolved_for_active(tmp_pat
 
 def test_lifecycle_identity_stage_q_coexists_with_historical_disposition_passes(tmp_path):
     _create_completed_historical_disposition(tmp_path, authorization_id="AUTH-A")
-    _lifecycle_write(tmp_path, "consumed/neutral.json", {})
-    _lifecycle_write(tmp_path, "engineering/neutral_result.json", {})
-    _lifecycle_write(tmp_path, "authorization/stage_q.json", {})
+    _write_consumed_neutral_state(tmp_path, authorization_id="AUTH-C")
+    _write_active_stage_q_auth(tmp_path, authorization_id="AUTH-STAGE-Q")
     state = stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STAGE_Q)
     assert state["active_stage_q"] is not None
     assert state["disposition_records"]
@@ -1261,19 +1470,12 @@ def test_lifecycle_stage_q_production_entry_reaches_neutral_semantics(
     tmp_path,
     monkeypatch,
 ):
-    _lifecycle_write(tmp_path, "consumed/neutral.json", {})
-    _lifecycle_write(tmp_path, "engineering/neutral_result.json", {})
-    _lifecycle_write(tmp_path, "authorization/stage_q.json", {})
+    _write_consumed_neutral_state(tmp_path, authorization_id="AUTH-C")
+    _write_active_stage_q_auth(tmp_path, authorization_id="AUTH-STAGE-Q")
     authority = synthetic_authority()
     binding = synthetic_binding(authority)
     events = []
     _patch_lifecycle_common_entry_boundary(monkeypatch, authority, binding, events)
-
-    def fake_read_neutral_result(path):
-        events.append("read_neutral_result")
-        return valid_neutral_result(authority, binding)
-
-    monkeypatch.setattr(stage_q, "read_json_no_duplicates", fake_read_neutral_result)
 
     def fake_validate_neutral_result(*args, **kwargs):
         events.append("validate_neutral_result")
