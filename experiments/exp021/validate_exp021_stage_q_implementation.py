@@ -136,6 +136,29 @@ REQUIRED_LIFECYCLE_TESTS = {
     "test_lifecycle_stage_q_production_entry_active_neutral_fails_before_semantics",
 }
 
+REQUIRED_STAGE_Q_090K_TESTS = {
+    "test_stage_q_frozen_fit_json_array_positive_regression",
+    "test_stage_q_frozen_fit_loader_fails_closed",
+    "test_stage_q_consumed_attempt_archives_identity_wise_in_temp",
+    "test_stage_q_consumed_archive_bytes_equal_original",
+    "test_stage_q_archived_q1_plus_active_q2_passes",
+    "test_stage_q_archived_q1_q2_reaches_consumption_boundary",
+    "test_stage_q_archived_q1_q2_consumed_remain_independent",
+    "test_stage_q_two_archived_generations_plus_active_q3_passes",
+    "test_stage_q_archive_wrong_consumption_sha_fails",
+    "test_stage_q_archive_path_digest_mismatch_fails",
+    "test_stage_q_archive_consumption_claims_different_auth_fails",
+    "test_stage_q_archive_status_attempt_id_mismatch_fails",
+    "test_stage_q_archive_invalid_result_with_terminal_status_fails",
+    "test_stage_q_archive_same_authorization_reuse_fails",
+    "test_stage_q_active_q2_with_unresolved_q1_archive_fails",
+    "test_stage_q_cross_generation_swap_fails",
+    "test_stage_q_unknown_archive_child_fails",
+    "test_stage_q_duplicate_historical_generation_identity_fails",
+    "test_stage_q_second_consumption_does_not_overwrite_canonical",
+    "test_stage_q_terminal_status_rejects_non_technical_invalid_outcome",
+}
+
 
 
 class ValidationError(RuntimeError):
@@ -243,6 +266,66 @@ def _validator_consumption_record(root: Path, runner, authorization: dict, autho
             "acquired_at": "2026-08-16T00:00:00+00:00",
             "scope": runner.NEUTRAL_SCOPE,
             "output_path": str(root / "experiments/exp021/engineering/neutral_result.json"),
+            "state": "consumed",
+        },
+    )
+    return path
+
+
+def _validator_stage_q_authorization(root: Path, runner, authorization_id: str):
+    auth = {
+        "schema_version": "1.0.0",
+        "experiment": "EXP-021",
+        "scope": runner.STAGE_Q_SCOPE,
+        "authorization_id": authorization_id,
+        "issued_at": "2099-08-15T00:00:00+00:00",
+        "expires_at": "2099-08-16T00:00:00+00:00",
+        "runner_commit": "d" * 40,
+        "runner_sha256": "a" * 64,
+        "implementation_hashes": {"runner": "a" * 64, "validator": "b" * 64},
+        "authority_hashes": {
+            "original": "c" * 64,
+            "amendment": "d" * 64,
+            "reconciliation": "e" * 64,
+        },
+        "model_manifest": {"identity": "manifest-sha"},
+        "environment_binding": {
+            "device": "cuda:0",
+            "dtype": "float16",
+            "local_files_only": True,
+            "model_eval_mode": True,
+            "gradients_enabled": False,
+            "use_cache": False,
+        },
+        "allowed_output_path": str(root / "experiments" / "exp021" / "engineering" / "stage_q_result.json"),
+        "maximum_launch_count": 1,
+        "fit_access_permitted": True,
+        "eval_access_permitted": False,
+        "scientific_result_permitted": False,
+        "automatic_retry_permitted": False,
+        "stage_p_intervention_permitted": False,
+        "per_checkpoint_probe_refit_permitted": False,
+    }
+    path = root / "experiments" / "exp021" / "authorization" / "stage_q.json"
+    _validator_write_json(path, auth)
+    return path, auth, runner.sha256_file(path)
+
+
+def _validator_stage_q_consumption(
+    root: Path, runner, authorization: dict, authorization_hash: str, attempt_id: str
+):
+    path = root / "experiments" / "exp021" / "consumed" / "stage_q.json"
+    _validator_write_json(
+        path,
+        {
+            "schema_version": "1.0.0",
+            "experiment": "EXP-021",
+            "authorization_hash": authorization_hash,
+            "attempt_id": attempt_id,
+            "runner_commit": authorization["runner_commit"],
+            "acquired_at": "2026-08-16T00:00:00+00:00",
+            "scope": runner.STAGE_Q_SCOPE,
+            "output_path": str(root / "experiments" / "exp021" / "engineering" / "stage_q_result.json"),
             "state": "consumed",
         },
     )
@@ -390,6 +473,10 @@ def validate() -> None:
         "LIFECYCLE_KNOWN_DIRECTORIES",
         "LIFECYCLE_SCAN_DIRECTORIES",
         "LIFECYCLE_LEGACY_CONTAMINATION_PATHS",
+        "STAGE_Q_CONSUMPTION_ARCHIVE_RELATIVE_DIR",
+        "STAGE_Q_CONSUMPTION_ARCHIVE_JOURNAL_RELATIVE_DIR",
+        "STAGE_Q_CONSUMPTION_ARCHIVE_STATUS_RELATIVE_DIR",
+        "STAGE_Q_AUTHORIZATION_ARCHIVE_RELATIVE_DIR",
     }
     missing_lifecycle_constants = sorted(lifecycle_constants - constant_names)
     if missing_lifecycle_constants:
@@ -416,6 +503,12 @@ def validate() -> None:
         "_group_disposition_artifacts",
         "_validate_completed_historical_disposition",
         "_reject_active_identity_disposition_state",
+        "_group_stage_q_archive_artifacts",
+        "_validate_completed_stage_q_archive",
+        "_validate_stage_q_archive_identity_state",
+        "validate_stage_q_archive_journal",
+        "validate_stage_q_terminal_attempt_status",
+        "archive_consumed_stage_q_technically_invalid_attempt",
     ):
         function_node(tree, identity_function)
     mode_validator = function_node(tree, "validate_mode_lifecycle")
@@ -427,6 +520,7 @@ def validate() -> None:
     for identity_token in (
         "_group_disposition_artifacts",
         "_validate_completed_historical_disposition",
+        "_validate_stage_q_archive_identity_state",
         "active_hashes",
         "authorization_id",
     ):
@@ -504,6 +598,13 @@ def validate() -> None:
     require_calls(consume, {"validate_authorization", "confined_path"}, "authorization consumption")
     adapter = function_node(tree, "load_fit_source_records")
     require_calls(adapter, {"validate_fit_eval_routing"}, "FIT source adapter")
+    adapter_source = ast.unparse(adapter)
+    if "read_json_value_no_duplicates" not in adapter_source:
+        raise ValidationError("FIT source loader does not parse the frozen JSON document")
+    if "isinstance(document, list)" not in adapter_source:
+        raise ValidationError("FIT source loader does not fail closed on a non-array document")
+    if "for line in" in adapter_source:
+        raise ValidationError("FIT source loader still assumes JSONL")
     if not called_before(stage_q, "validate_stage_q_result", "atomic_publish_json"):
         raise ValidationError("Stage-Q result is not validated before publication")
     historical_binding = function_node(tree, "build_historical_neutral_binding")
@@ -629,6 +730,7 @@ def validate() -> None:
         | REQUIRED_HISTORICAL_PROVENANCE_TESTS
         | REQUIRED_CHECKPOINT_MAPPING_TESTS
         | REQUIRED_LIFECYCLE_TESTS
+        | REQUIRED_STAGE_Q_090K_TESTS
     ):
         function_node(tests_tree, name)
     neutral_dynamic_test = function_node(tests_tree, NEUTRAL_DYNAMIC_TEST)
@@ -735,6 +837,122 @@ def validate() -> None:
             pass
         else:
             raise ValidationError("unresolved historical disposition does not block a distinct active replacement")
+    dynamic_runner = load_runner_module()
+    frozen_prompt = ROOT / "experiments/exp003/prompts_controlled.json"
+    if dynamic_runner.sha256_file(frozen_prompt) != "72dab733e6a1639dfc80d186f3af1dbce5c6d70da4905e6d6d422cf47064c472":
+        raise ValidationError("frozen FIT artifact hash changed before JSON-array dynamic proof")
+    frozen_records = dynamic_runner.load_fit_source_records(
+        ROOT, "A_original_fit_paraphrase_eval"
+    )
+    if len(frozen_records) != 12 or frozen_records[0]["item_id"] != "logic_orig_01":
+        raise ValidationError("frozen FIT JSON array did not parse into the expected Stage-Q FIT records")
+    with tempfile.TemporaryDirectory() as tmpdir:
+        archive_root = Path(tmpdir)
+        archive_runner = load_runner_module()
+        q1_path, q1_auth, q1_hash = _validator_stage_q_authorization(
+            archive_root, archive_runner, "AUTH-DYN-SQ-Q1"
+        )
+        q1_consumption_path = _validator_stage_q_consumption(
+            archive_root,
+            archive_runner,
+            q1_auth,
+            q1_hash,
+            "ATTEMPT-DYN-SQ-Q1",
+        )
+        q1_consumption_hash = archive_runner.sha256_file(q1_consumption_path)
+        status = archive_runner.archive_consumed_stage_q_technically_invalid_attempt(
+            repo_root=archive_root,
+            authorization_path=q1_path,
+            consumption_path=q1_consumption_path,
+            expected_authorization_id=q1_auth["authorization_id"],
+            expected_authorization_sha256=q1_hash,
+            expected_consumption_sha256=q1_consumption_hash,
+            expected_attempt_id="ATTEMPT-DYN-SQ-Q1",
+            explicit_archival_authorized=True,
+        )
+        if status["attempt_outcome"] != "TECHNICALLY_INVALID":
+            raise ValidationError("consumed Stage-Q archive did not preserve technical-invalidity classification")
+        if status["measurement_status"] != "NOT_OBSERVED_DUE_TO_TECHNICAL_INVALIDITY":
+            raise ValidationError("consumed Stage-Q archive did not preserve no-observation status")
+        archived_state = archive_runner.validate_mode_lifecycle(
+            archive_root, archive_runner.LIFECYCLE_MODE_STATIC
+        )
+        if archived_state.get("active_stage_q") is not None:
+            raise ValidationError("archived consumed Stage-Q authorization was misclassified as active")
+        if len(archived_state.get("stage_q_consumption_archives", [])) != 1:
+            raise ValidationError("consumed Stage-Q archive was not recognized as historical evidence")
+        _validator_write_json(
+            archive_root / "experiments" / "exp021" / "authorization" / "stage_q.json",
+            q1_auth,
+        )
+        q1_reuse_consumption_path = _validator_stage_q_consumption(
+            archive_root,
+            archive_runner,
+            q1_auth,
+            q1_hash,
+            "ATTEMPT-DYN-SQ-Q1-REUSE",
+        )
+        if archive_runner.sha256_file(q1_reuse_consumption_path) == q1_hash:
+            raise ValidationError("archived-vs-canonical dynamic fixture lacks the file-hash collision identity")
+        try:
+            archive_runner.validate_mode_lifecycle(
+                archive_root, archive_runner.LIFECYCLE_MODE_STATIC
+            )
+        except Exception:
+            pass
+        else:
+            raise ValidationError("archived consumed Stage-Q authorization coexisted with a canonical same-generation consumption")
+        (archive_root / "experiments" / "exp021" / "authorization" / "stage_q.json").unlink()
+        q1_reuse_consumption_path.unlink()
+        _validator_write_json(
+            archive_root / "experiments" / "exp021" / "authorization" / "stage_q.json",
+            q1_auth,
+        )
+        try:
+            archive_runner.validate_mode_lifecycle(
+                archive_root, archive_runner.LIFECYCLE_MODE_STATIC
+            )
+        except Exception:
+            pass
+        else:
+            raise ValidationError("archived consumed Stage-Q authorization was reactivated")
+        (archive_root / "experiments" / "exp021" / "authorization" / "stage_q.json").unlink()
+        _q2_path, _q2_auth, q2_hash = _validator_stage_q_authorization(
+            archive_root, archive_runner, "AUTH-DYN-SQ-Q2"
+        )
+        if q1_hash == q2_hash:
+            raise ValidationError("Stage-Q archive dynamic fixtures do not have distinct identities")
+        try:
+            multi_state = archive_runner.validate_mode_lifecycle(
+                archive_root, archive_runner.LIFECYCLE_MODE_STATIC
+            )
+        except Exception as exc:
+            raise ValidationError(
+                f"consumed Stage-Q archive does not coexist with a fresh authorization: {exc}"
+            )
+        if multi_state.get("active_stage_q") is None:
+            raise ValidationError("fresh Stage-Q authorization was not classified as active after archival")
+        if len(multi_state.get("stage_q_authorization_archives", [])) != 1:
+            raise ValidationError("historical consumed Stage-Q authorization archive is missing after coexistence")
+        q2_consumption_path = _validator_stage_q_consumption(
+            archive_root,
+            archive_runner,
+            _q2_auth,
+            q2_hash,
+            "ATTEMPT-DYN-SQ-Q2",
+        )
+        try:
+            q2_consumed_state = archive_runner.validate_mode_lifecycle(
+                archive_root, archive_runner.LIFECYCLE_MODE_STATIC
+            )
+        except Exception as exc:
+            raise ValidationError(
+                f"distinct-generation canonical Stage-Q consumption is not representable after archival: {exc}"
+            )
+        if q2_consumed_state.get("active_stage_q") is not None:
+            raise ValidationError("distinct-generation canonical Stage-Q consumption was misclassified as active")
+        if q2_consumed_state.get("consumed_stage_q") is None:
+            raise ValidationError("distinct-generation canonical Stage-Q consumption was not classified as consumed")
     with tempfile.TemporaryDirectory() as tmpdir:
         provenance_runner = load_runner_module()
         neutral_result_path = ROOT / "experiments/exp021/engineering/neutral_result.json"

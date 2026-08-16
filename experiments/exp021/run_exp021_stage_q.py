@@ -61,6 +61,18 @@ NEUTRAL_RESULT_RELATIVE_PATH = Path("experiments/exp021/engineering/neutral_resu
 NEUTRAL_CONSUMPTION_RELATIVE_PATH = Path("experiments/exp021/consumed/neutral.json")
 STAGE_Q_RESULT_RELATIVE_PATH = Path("experiments/exp021/engineering/stage_q_result.json")
 STAGE_Q_CONSUMPTION_RELATIVE_PATH = Path("experiments/exp021/consumed/stage_q.json")
+STAGE_Q_CONSUMPTION_ARCHIVE_RELATIVE_DIR = Path(
+    "experiments/exp021/consumed/archive/stage_q"
+)
+STAGE_Q_CONSUMPTION_ARCHIVE_JOURNAL_RELATIVE_DIR = Path(
+    "experiments/exp021/consumed/archive/stage_q_journal"
+)
+STAGE_Q_CONSUMPTION_ARCHIVE_STATUS_RELATIVE_DIR = Path(
+    "experiments/exp021/consumed/archive/stage_q_status"
+)
+STAGE_Q_AUTHORIZATION_ARCHIVE_RELATIVE_DIR = Path(
+    "experiments/exp021/authorization/archive/consumed_stage_q"
+)
 RUNNER_IMPLEMENTATION_RELATIVE_PATH = Path("experiments/exp021/run_exp021_stage_q.py")
 VALIDATOR_IMPLEMENTATION_RELATIVE_PATH = Path("experiments/exp021/validate_exp021_stage_q_implementation.py")
 EXPECTED_NEUTRAL_RESULT_SHA256 = "0a6273050e6c9974e917ea4de4865bc8428a5b7f634a32c29d8a634ae49c9bf1"
@@ -87,9 +99,14 @@ LIFECYCLE_KNOWN_DIRECTORIES = {
     Path("experiments/exp021/authorization"),
     Path("experiments/exp021/authorization/archive"),
     Path("experiments/exp021/authorization/archive/superseded_unconsumed_nonexecutable"),
+    Path("experiments/exp021/authorization/archive/consumed_stage_q"),
     Path("experiments/exp021/authorization/dispositions"),
     Path("experiments/exp021/authorization/disposition_journal"),
     Path("experiments/exp021/consumed"),
+    Path("experiments/exp021/consumed/archive"),
+    Path("experiments/exp021/consumed/archive/stage_q"),
+    Path("experiments/exp021/consumed/archive/stage_q_journal"),
+    Path("experiments/exp021/consumed/archive/stage_q_status"),
     Path("experiments/exp021/engineering"),
 }
 LIFECYCLE_SCAN_DIRECTORIES = {
@@ -138,6 +155,15 @@ DISPOSITION_STATE_PARTIAL_OR_RECOVERY_REQUIRED = "PARTIAL_OR_RECOVERY_REQUIRED"
 DISPOSITION_STATE_AMBIGUOUS_OR_CORRUPT = "AMBIGUOUS_OR_CORRUPT"
 DISPOSITION_STATE_CLEAR = "CLEAR"
 
+STAGE_Q_ARCHIVE_TYPE = "CONSUMED_STAGE_Q_TECHNICALLY_INVALID_NO_RESULT"
+STAGE_Q_ARCHIVE_STATE_ACTIVE = "ACTIVE"
+STAGE_Q_ARCHIVE_STATE_PREPARED = "PREPARED"
+STAGE_Q_ARCHIVE_STATE_PREPARED_OR_IN_PROGRESS = "PREPARED_OR_IN_PROGRESS"
+STAGE_Q_ARCHIVE_STATE_ARCHIVED = "ARCHIVED"
+STAGE_Q_ARCHIVE_STATE_PARTIAL_OR_RECOVERY_REQUIRED = "PARTIAL_OR_RECOVERY_REQUIRED"
+STAGE_Q_ARCHIVE_STATE_AMBIGUOUS_OR_CORRUPT = "AMBIGUOUS_OR_CORRUPT"
+STAGE_Q_ARCHIVE_STATE_CLEAR = "CLEAR"
+
 DISPOSITION_RECORD_KEYS = frozenset(
     {
         "schema_version", "experiment", "disposition_type", "authorization_id",
@@ -159,6 +185,29 @@ DISPOSITION_JOURNAL_KEYS = frozenset(
         "state", "expected_archive_path", "expected_disposition_path",
         "non_executable_reason", "created_at", "updated_at",
         "explicit_disposition_authorized", "journal_sha256",
+    }
+)
+
+STAGE_Q_ARCHIVE_JOURNAL_KEYS = frozenset(
+    {
+        "schema_version", "experiment", "archive_type", "authorization_id",
+        "authorization_sha256", "consumption_sha256", "attempt_id", "scope",
+        "runner_commit", "transaction_id", "status_record_id", "state",
+        "expected_authorization_archive_path", "expected_consumption_archive_path",
+        "expected_status_path", "original_can_never_be_consumed", "result_exists",
+        "attempt_outcome", "measurement_status", "created_at", "updated_at",
+        "explicit_archival_authorized", "journal_sha256",
+    }
+)
+
+STAGE_Q_TERMINAL_ATTEMPT_STATUS_KEYS = frozenset(
+    {
+        "schema_version", "experiment", "status_type", "authorization_id",
+        "authorization_sha256", "consumption_sha256", "attempt_id", "scope",
+        "runner_commit", "transaction_id", "status_record_id",
+        "authorization_archive_path", "consumption_archive_path",
+        "journal_sha256", "attempt_outcome", "measurement_status",
+        "result_exists", "original_can_never_be_consumed", "created_at", "state",
     }
 )
 
@@ -551,6 +600,10 @@ def inspect_lifecycle_paths(repo_root: str | Path) -> dict[str, Any]:
         "disposition_archives": [],
         "disposition_journals": [],
         "disposition_records": [],
+        "stage_q_authorization_archives": [],
+        "stage_q_consumption_archives": [],
+        "stage_q_consumption_journals": [],
+        "stage_q_consumption_statuses": [],
         "unknown_paths": [],
         "legacy_contamination": [],
     }
@@ -602,6 +655,14 @@ def inspect_lifecycle_paths(repo_root: str | Path) -> dict[str, Any]:
                     state["disposition_journals"].append(relative)
                 elif _matches_disposition_file(relative_path, AUTHORIZATION_DISPOSITION_RELATIVE_DIR):
                     state["disposition_records"].append(relative)
+                elif _matches_disposition_file(relative_path, STAGE_Q_AUTHORIZATION_ARCHIVE_RELATIVE_DIR):
+                    state["stage_q_authorization_archives"].append(relative)
+                elif _matches_disposition_file(relative_path, STAGE_Q_CONSUMPTION_ARCHIVE_RELATIVE_DIR):
+                    state["stage_q_consumption_archives"].append(relative)
+                elif _matches_disposition_file(relative_path, STAGE_Q_CONSUMPTION_ARCHIVE_JOURNAL_RELATIVE_DIR):
+                    state["stage_q_consumption_journals"].append(relative)
+                elif _matches_disposition_file(relative_path, STAGE_Q_CONSUMPTION_ARCHIVE_STATUS_RELATIVE_DIR):
+                    state["stage_q_consumption_statuses"].append(relative)
                 else:
                     state["unknown_paths"].append(relative)
     for legacy_relative in LIFECYCLE_LEGACY_CONTAMINATION_PATHS:
@@ -733,6 +794,142 @@ def _group_disposition_artifacts(state: Mapping[str, Any]) -> dict[str, dict[str
             group = groups.setdefault(digest, {"archives": [], "journals": [], "records": []})
             group[kind].append(relative)
     return groups
+
+
+def _group_stage_q_archive_artifacts(
+    state: Mapping[str, Any],
+) -> dict[str, dict[str, list[str]]]:
+    """Group consumed Stage-Q archive paths by their encoded authorization SHA-256."""
+    groups: dict[str, dict[str, list[str]]] = {}
+    for kind, state_key in (
+        ("authorization_archives", "stage_q_authorization_archives"),
+        ("consumption_archives", "stage_q_consumption_archives"),
+        ("journals", "stage_q_consumption_journals"),
+        ("statuses", "stage_q_consumption_statuses"),
+    ):
+        for relative in state[state_key]:
+            digest = _lifecycle_artifact_sha256(relative)
+            if digest is None:
+                raise ProtocolError(f"Stage-Q archive artifact has an invalid identity: {relative}")
+            group = groups.setdefault(
+                digest,
+                {
+                    "authorization_archives": [],
+                    "consumption_archives": [],
+                    "journals": [],
+                    "statuses": [],
+                },
+            )
+            group[kind].append(relative)
+    return groups
+
+
+def _validate_completed_stage_q_archive(
+    root: Path,
+    digest: str,
+    group: Mapping[str, list[str]],
+) -> None:
+    """Require a historical consumed Stage-Q generation to be fully resolved and valid."""
+    auth_archives = group["authorization_archives"]
+    consumption_archives = group["consumption_archives"]
+    journals = group["journals"]
+    statuses = group["statuses"]
+    if len(auth_archives) != 1 or len(consumption_archives) != 1 or len(journals) != 1 or len(statuses) != 1:
+        raise ProtocolError(
+            "Impossible lifecycle state: unresolved historical Stage-Q archive blocks replacement"
+        )
+    auth_rel = auth_archives[0]
+    consumption_rel = consumption_archives[0]
+    journal_rel = journals[0]
+    status_rel = statuses[0]
+    auth_path = root / auth_rel
+    consumption_path = root / consumption_rel
+    journal_path = root / journal_rel
+    status_path = root / status_rel
+    if sha256_file(auth_path) != digest:
+        raise ProtocolError("Impossible lifecycle state: historical Stage-Q authorization archive hash mismatch")
+    authorization = read_json_no_duplicates(auth_path)
+    require_exact_keys(authorization, STAGE_Q_AUTHORIZATION_KEYS, "archived Stage-Q authorization")
+    if authorization["schema_version"] != SCHEMA_VERSION or authorization["experiment"] != EXPERIMENT:
+        raise ProtocolError("Impossible lifecycle state: historical Stage-Q authorization archive schema mismatch")
+    if authorization["scope"] != STAGE_Q_SCOPE:
+        raise ProtocolError("Impossible lifecycle state: historical Stage-Q authorization archive scope mismatch")
+    _validate_retained_authorization_identity(auth_path, STAGE_Q_SCOPE)
+    if type(authorization["maximum_launch_count"]) is not int or authorization["maximum_launch_count"] != 1:
+        raise ProtocolError("Impossible lifecycle state: historical Stage-Q authorization must be single-launch")
+    if authorization["automatic_retry_permitted"] is not False:
+        raise ProtocolError("Impossible lifecycle state: historical Stage-Q authorization must not permit retry")
+    if authorization["fit_access_permitted"] is not True:
+        raise ProtocolError("Impossible lifecycle state: historical Stage-Q authorization must be FIT-scoped")
+    if authorization["eval_access_permitted"] is not False or authorization["scientific_result_permitted"] is not False:
+        raise ProtocolError("Impossible lifecycle state: historical Stage-Q authorization has invalid data access")
+    if authorization["stage_p_intervention_permitted"] is not False or authorization["per_checkpoint_probe_refit_permitted"] is not False:
+        raise ProtocolError("Impossible lifecycle state: historical Stage-Q authorization has invalid Stage-P permissions")
+    consumption = _validate_consumption_identity(consumption_path, STAGE_Q_SCOPE)
+    consumption_hash = sha256_file(consumption_path)
+    if consumption["authorization_hash"] != digest:
+        raise ProtocolError("Impossible lifecycle state: historical Stage-Q consumption identity mismatch")
+    journal = read_json_no_duplicates(journal_path)
+    validate_stage_q_archive_journal(journal)
+    status = read_json_no_duplicates(status_path)
+    validate_stage_q_terminal_attempt_status(status)
+    if journal["authorization_sha256"] != digest:
+        raise ProtocolError("Impossible lifecycle state: historical Stage-Q archive journal identity mismatch")
+    if journal["consumption_sha256"] != consumption_hash:
+        raise ProtocolError("Impossible lifecycle state: historical Stage-Q archive journal consumption mismatch")
+    if journal["attempt_id"] != consumption["attempt_id"]:
+        raise ProtocolError("Impossible lifecycle state: historical Stage-Q archive journal attempt mismatch")
+    if journal["expected_authorization_archive_path"] != auth_rel:
+        raise ProtocolError("Impossible lifecycle state: historical Stage-Q archive journal auth path mismatch")
+    if journal["expected_consumption_archive_path"] != consumption_rel:
+        raise ProtocolError("Impossible lifecycle state: historical Stage-Q archive journal consumption path mismatch")
+    if journal["expected_status_path"] != status_rel:
+        raise ProtocolError("Impossible lifecycle state: historical Stage-Q archive journal status path mismatch")
+    if status["authorization_sha256"] != digest:
+        raise ProtocolError("Impossible lifecycle state: historical Stage-Q terminal status identity mismatch")
+    if status["consumption_sha256"] != consumption_hash:
+        raise ProtocolError("Impossible lifecycle state: historical Stage-Q terminal status consumption mismatch")
+    if status["attempt_id"] != consumption["attempt_id"]:
+        raise ProtocolError("Impossible lifecycle state: historical Stage-Q terminal status attempt mismatch")
+    if status["authorization_id"] != authorization["authorization_id"]:
+        raise ProtocolError("Impossible lifecycle state: historical Stage-Q terminal status auth ID mismatch")
+    if status["runner_commit"] != authorization["runner_commit"]:
+        raise ProtocolError("Impossible lifecycle state: historical Stage-Q terminal status runner mismatch")
+    if status["authorization_archive_path"] != auth_rel:
+        raise ProtocolError("Impossible lifecycle state: historical Stage-Q terminal status auth path mismatch")
+    if status["consumption_archive_path"] != consumption_rel:
+        raise ProtocolError("Impossible lifecycle state: historical Stage-Q terminal status consumption path mismatch")
+    if status["journal_sha256"] != journal["journal_sha256"]:
+        raise ProtocolError("Impossible lifecycle state: historical Stage-Q terminal status journal mismatch")
+
+
+def _validate_stage_q_archive_identity_state(state: Mapping[str, Any]) -> None:
+    """Reject same-authorization reactivation and unresolved Stage-Q archive states."""
+    groups = _group_stage_q_archive_artifacts(state)
+    if not groups:
+        return
+    root = Path(state["root"])
+    active_paths = [
+        path
+        for path in (state["active_neutral"], state["active_stage_q"])
+        if path is not None
+    ]
+    active_hashes = {sha256_file(path) for path in active_paths} if active_paths else set()
+    consumed_stage_q_authorization_hash = None
+    if state["consumed_stage_q"] is not None:
+        canonical_consumption = _validate_consumption_identity(
+            state["consumed_stage_q"], STAGE_Q_SCOPE
+        )
+        consumed_stage_q_authorization_hash = canonical_consumption["authorization_hash"]
+    for digest, group in groups.items():
+        if digest in active_hashes:
+            raise ProtocolError("Impossible lifecycle state: active authorization has a consumed Stage-Q archive")
+        if (
+            consumed_stage_q_authorization_hash is not None
+            and digest == consumed_stage_q_authorization_hash
+        ):
+            raise ProtocolError("Impossible lifecycle state: canonical consumed Stage-Q authorization has a historical archive")
+        _validate_completed_stage_q_archive(root, digest, group)
 
 
 def _validate_completed_historical_disposition(
@@ -896,6 +1093,7 @@ def _validate_no_impossible_lifecycle_state(state: Mapping[str, Any]) -> None:
             group,
             active_authorization_id=active_ids[0] if active_ids else None,
         )
+    _validate_stage_q_archive_identity_state(state)
 
 
 def _reject_active_identity_disposition_state(state: Mapping[str, Any]) -> None:
@@ -2317,6 +2515,574 @@ def consume_authorization(
     return authorization, attempt
 
 
+def _stage_q_archive_transaction_paths(
+    root: Path, authorization_sha256: str
+) -> tuple[Path, Path, Path, Path]:
+    """Return deterministic consumed Stage-Q archive, journal, and status paths."""
+    authorization_archive_path = confined_path(
+        root / STAGE_Q_AUTHORIZATION_ARCHIVE_RELATIVE_DIR / f"{authorization_sha256}.json",
+        root,
+        allow_missing=True,
+    )
+    consumption_archive_path = confined_path(
+        root / STAGE_Q_CONSUMPTION_ARCHIVE_RELATIVE_DIR / f"{authorization_sha256}.json",
+        root,
+        allow_missing=True,
+    )
+    journal_path = confined_path(
+        root / STAGE_Q_CONSUMPTION_ARCHIVE_JOURNAL_RELATIVE_DIR / f"{authorization_sha256}.json",
+        root,
+        allow_missing=True,
+    )
+    status_path = confined_path(
+        root / STAGE_Q_CONSUMPTION_ARCHIVE_STATUS_RELATIVE_DIR / f"{authorization_sha256}.json",
+        root,
+        allow_missing=True,
+    )
+    return authorization_archive_path, consumption_archive_path, journal_path, status_path
+
+
+def _stage_q_archive_transaction_ids(authorization_sha256: str) -> tuple[str, str]:
+    """Return deterministic consumed Stage-Q transaction identities."""
+    return "SQ-ARCH-TXN-" + authorization_sha256, "SQ-STATUS-" + authorization_sha256
+
+
+def _stage_q_archive_journal_sha256(journal: Mapping[str, Any]) -> str:
+    """Hash the stable consumed Stage-Q journal identity without the self field."""
+    stable = {key: value for key, value in journal.items() if key != "journal_sha256"}
+    canonical = json.dumps(stable, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return sha256_bytes(canonical.encode("utf-8"))
+
+
+def validate_stage_q_archive_journal(journal: Mapping[str, Any]) -> None:
+    """Validate the closed schema and fail-closed invariants of an archive journal."""
+    require_exact_keys(journal, STAGE_Q_ARCHIVE_JOURNAL_KEYS, "Stage-Q archive journal")
+    if journal["schema_version"] != SCHEMA_VERSION or journal["experiment"] != EXPERIMENT:
+        raise ProtocolError("Stage-Q archive journal schema identity mismatch")
+    if journal["archive_type"] != STAGE_Q_ARCHIVE_TYPE:
+        raise ProtocolError("Stage-Q archive journal type mismatch")
+    if journal["state"] != STAGE_Q_ARCHIVE_STATE_PREPARED:
+        raise ProtocolError("Stage-Q archive journal must be in PREPARED state")
+    require_string(journal["authorization_id"], "authorization_id")
+    require_string(journal["authorization_sha256"], "authorization_sha256")
+    require_string(journal["consumption_sha256"], "consumption_sha256")
+    require_string(journal["attempt_id"], "attempt_id")
+    if len(journal["authorization_sha256"]) != 64 or len(journal["consumption_sha256"]) != 64:
+        raise ProtocolError("Stage-Q archive journal contains an invalid SHA-256 digest")
+    if journal["scope"] != STAGE_Q_SCOPE:
+        raise ProtocolError("Stage-Q archive journal scope mismatch")
+    require_string(journal["runner_commit"], "runner_commit")
+    require_string(journal["transaction_id"], "transaction_id")
+    require_string(journal["status_record_id"], "status_record_id")
+    require_string(journal["expected_authorization_archive_path"], "expected_authorization_archive_path")
+    require_string(journal["expected_consumption_archive_path"], "expected_consumption_archive_path")
+    require_string(journal["expected_status_path"], "expected_status_path")
+    if journal["original_can_never_be_consumed"] is not True:
+        raise ProtocolError("Stage-Q archive journal must permanently exhaust the authorization")
+    if journal["result_exists"] is not False:
+        raise ProtocolError("Stage-Q archive journal requires no canonical result")
+    if journal["attempt_outcome"] != "TECHNICALLY_INVALID":
+        raise ProtocolError("Stage-Q archive journal attempt outcome mismatch")
+    if journal["measurement_status"] != "NOT_OBSERVED_DUE_TO_TECHNICAL_INVALIDITY":
+        raise ProtocolError("Stage-Q archive journal measurement status mismatch")
+    parse_timestamp(journal["created_at"], "created_at")
+    parse_timestamp(journal["updated_at"], "updated_at")
+    if journal["explicit_archival_authorized"] is not True:
+        raise ProtocolError("Stage-Q archive journal requires explicit authorization")
+    require_string(journal["journal_sha256"], "journal_sha256")
+    if len(journal["journal_sha256"]) != 64:
+        raise ProtocolError("journal_sha256 must be a SHA-256 digest")
+    if journal["journal_sha256"] != _stage_q_archive_journal_sha256(journal):
+        raise ProtocolError("Stage-Q archive journal self-hash mismatch")
+
+
+def validate_stage_q_terminal_attempt_status(status: Mapping[str, Any]) -> None:
+    """Validate the closed terminal-attempt schema for a no-result technical invalidity."""
+    require_exact_keys(status, STAGE_Q_TERMINAL_ATTEMPT_STATUS_KEYS, "Stage-Q terminal attempt status")
+    if status["schema_version"] != SCHEMA_VERSION or status["experiment"] != EXPERIMENT:
+        raise ProtocolError("Stage-Q terminal attempt schema identity mismatch")
+    if status["status_type"] != STAGE_Q_ARCHIVE_TYPE:
+        raise ProtocolError("Stage-Q terminal attempt status type mismatch")
+    if status["state"] != STAGE_Q_ARCHIVE_STATE_ARCHIVED:
+        raise ProtocolError("Stage-Q terminal attempt status must be ARCHIVED")
+    require_string(status["authorization_id"], "authorization_id")
+    require_string(status["authorization_sha256"], "authorization_sha256")
+    require_string(status["consumption_sha256"], "consumption_sha256")
+    require_string(status["attempt_id"], "attempt_id")
+    require_string(status["scope"], "scope")
+    if status["scope"] != STAGE_Q_SCOPE:
+        raise ProtocolError("Stage-Q terminal attempt scope mismatch")
+    require_string(status["runner_commit"], "runner_commit")
+    require_string(status["transaction_id"], "transaction_id")
+    require_string(status["status_record_id"], "status_record_id")
+    require_string(status["authorization_archive_path"], "authorization_archive_path")
+    require_string(status["consumption_archive_path"], "consumption_archive_path")
+    require_string(status["journal_sha256"], "journal_sha256")
+    if len(status["authorization_sha256"]) != 64 or len(status["consumption_sha256"]) != 64:
+        raise ProtocolError("Stage-Q terminal attempt status contains an invalid SHA-256 digest")
+    if len(status["journal_sha256"]) != 64:
+        raise ProtocolError("Stage-Q terminal attempt journal_sha256 must be a SHA-256 digest")
+    if status["attempt_outcome"] != "TECHNICALLY_INVALID":
+        raise ProtocolError("Stage-Q terminal attempt outcome must be TECHNICALLY_INVALID")
+    if status["measurement_status"] != "NOT_OBSERVED_DUE_TO_TECHNICAL_INVALIDITY":
+        raise ProtocolError("Stage-Q terminal attempt measurement status mismatch")
+    if status["result_exists"] is not False:
+        raise ProtocolError("Stage-Q terminal attempt must have no canonical result")
+    if status["original_can_never_be_consumed"] is not True:
+        raise ProtocolError("Stage-Q terminal attempt must permanently exhaust the authorization")
+    parse_timestamp(status["created_at"], "created_at")
+
+
+def _read_consumed_stage_q_for_archive(
+    root: Path,
+    authorization_path: str | Path,
+    consumption_path: str | Path,
+    expected_authorization_id: str,
+    expected_authorization_sha256: str,
+    expected_consumption_sha256: str,
+    expected_attempt_id: str,
+) -> tuple[Path, dict[str, Any], str, Path, dict[str, Any], str]:
+    """Validate consumed Stage-Q evidence before an archival transaction may start."""
+    auth_path = confined_path(authorization_path, root)
+    consumption_destination = confined_path(consumption_path, root)
+    result_path = confined_path(root / STAGE_Q_RESULT_RELATIVE_PATH, root, allow_missing=True)
+    if os.path.lexists(result_path):
+        raise ProtocolError("Cannot archive a Stage-Q attempt with an existing canonical result")
+    authorization = read_json_no_duplicates(auth_path)
+    validate_authorization(authorization, STAGE_Q_SCOPE, root)
+    consumption = _validate_consumption_identity(consumption_destination, STAGE_Q_SCOPE)
+    authorization_hash = sha256_file(auth_path)
+    consumption_hash = sha256_file(consumption_destination)
+    if authorization_hash != expected_authorization_sha256:
+        raise ProtocolError("Stage-Q archive authorization hash mismatch")
+    if consumption_hash != expected_consumption_sha256:
+        raise ProtocolError("Stage-Q archive consumption hash mismatch")
+    if authorization["authorization_id"] != expected_authorization_id:
+        raise ProtocolError("Stage-Q archive authorization ID mismatch")
+    if consumption["authorization_hash"] != authorization_hash:
+        raise ProtocolError("Stage-Q consumption authorization hash does not match retained authorization")
+    if consumption["attempt_id"] != expected_attempt_id:
+        raise ProtocolError("Stage-Q archive attempt ID mismatch")
+    if consumption["runner_commit"] != authorization["runner_commit"]:
+        raise ProtocolError("Stage-Q consumption runner commit does not match retained authorization")
+    return (
+        auth_path,
+        authorization,
+        authorization_hash,
+        consumption_destination,
+        consumption,
+        consumption_hash,
+    )
+
+
+def _build_stage_q_archive_journal(
+    root: Path,
+    authorization_archive_path: Path,
+    consumption_archive_path: Path,
+    status_path: Path,
+    authorization: Mapping[str, Any],
+    authorization_hash: str,
+    consumption: Mapping[str, Any],
+    consumption_hash: str,
+    transaction_id: str,
+    status_record_id: str,
+) -> dict[str, Any]:
+    """Build and validate the PREPARED Stage-Q consumed-attempt archive journal."""
+    timestamp = datetime.now(timezone.utc).isoformat()
+    journal: dict[str, Any] = {
+        "schema_version": SCHEMA_VERSION,
+        "experiment": EXPERIMENT,
+        "archive_type": STAGE_Q_ARCHIVE_TYPE,
+        "authorization_id": authorization["authorization_id"],
+        "authorization_sha256": authorization_hash,
+        "consumption_sha256": consumption_hash,
+        "attempt_id": consumption["attempt_id"],
+        "scope": STAGE_Q_SCOPE,
+        "runner_commit": authorization["runner_commit"],
+        "transaction_id": transaction_id,
+        "status_record_id": status_record_id,
+        "state": STAGE_Q_ARCHIVE_STATE_PREPARED,
+        "expected_authorization_archive_path": _relative_path_string(authorization_archive_path, root),
+        "expected_consumption_archive_path": _relative_path_string(consumption_archive_path, root),
+        "expected_status_path": _relative_path_string(status_path, root),
+        "original_can_never_be_consumed": True,
+        "result_exists": False,
+        "attempt_outcome": "TECHNICALLY_INVALID",
+        "measurement_status": "NOT_OBSERVED_DUE_TO_TECHNICAL_INVALIDITY",
+        "created_at": timestamp,
+        "updated_at": timestamp,
+        "explicit_archival_authorized": True,
+        "journal_sha256": "",
+    }
+    journal["journal_sha256"] = _stage_q_archive_journal_sha256(journal)
+    validate_stage_q_archive_journal(journal)
+    return journal
+
+
+def _publish_stage_q_archive_journal(journal_path: Path, journal: Mapping[str, Any], root: Path) -> Path:
+    """Exclusively create the PREPARED Stage-Q archive journal."""
+    journal_path.parent.mkdir(parents=True, exist_ok=True)
+    return atomic_publish_json(journal_path, journal, root)
+
+
+def _archive_stage_q_authorization(
+    auth_path: Path, archive_destination: Path, authorization_hash: str
+) -> None:
+    """Move retained consumed Stage-Q authorization bytes to identity-keyed archive."""
+    archive_destination.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        os.replace(auth_path, archive_destination)
+    except OSError as exc:
+        raise ProtocolError("Stage-Q authorization archive move failed") from exc
+    if sha256_file(archive_destination) != authorization_hash:
+        raise ProtocolError("Archived Stage-Q authorization hash drifted during archival")
+
+
+def _archive_stage_q_consumption(
+    consumption_path: Path, archive_destination: Path, consumption_hash: str
+) -> None:
+    """Move original Stage-Q consumption bytes to identity-keyed archive."""
+    archive_destination.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        os.replace(consumption_path, archive_destination)
+    except OSError as exc:
+        raise ProtocolError("Stage-Q consumption archive move failed") from exc
+    if sha256_file(archive_destination) != consumption_hash:
+        raise ProtocolError("Archived Stage-Q consumption hash drifted during archival")
+
+
+def _build_stage_q_terminal_attempt_status(
+    journal: Mapping[str, Any],
+    authorization: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Build and validate the terminal no-result technical-invalidity status record."""
+    status: dict[str, Any] = {
+        "schema_version": SCHEMA_VERSION,
+        "experiment": EXPERIMENT,
+        "status_type": STAGE_Q_ARCHIVE_TYPE,
+        "authorization_id": journal["authorization_id"],
+        "authorization_sha256": journal["authorization_sha256"],
+        "consumption_sha256": journal["consumption_sha256"],
+        "attempt_id": journal["attempt_id"],
+        "scope": STAGE_Q_SCOPE,
+        "runner_commit": journal["runner_commit"],
+        "transaction_id": journal["transaction_id"],
+        "status_record_id": journal["status_record_id"],
+        "authorization_archive_path": journal["expected_authorization_archive_path"],
+        "consumption_archive_path": journal["expected_consumption_archive_path"],
+        "journal_sha256": journal["journal_sha256"],
+        "attempt_outcome": journal["attempt_outcome"],
+        "measurement_status": journal["measurement_status"],
+        "result_exists": journal["result_exists"],
+        "original_can_never_be_consumed": journal["original_can_never_be_consumed"],
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "state": STAGE_Q_ARCHIVE_STATE_ARCHIVED,
+    }
+    validate_stage_q_terminal_attempt_status(status)
+    return status
+
+
+def _publish_stage_q_terminal_attempt_status(
+    status_path: Path, status: Mapping[str, Any], root: Path
+) -> Path:
+    """Exclusively create the terminal Stage-Q attempt status."""
+    status_path.parent.mkdir(parents=True, exist_ok=True)
+    return atomic_publish_json(status_path, status, root)
+
+
+def archive_consumed_stage_q_technically_invalid_attempt(
+    repo_root: str | Path,
+    authorization_path: str | Path,
+    consumption_path: str | Path,
+    expected_authorization_id: str,
+    expected_authorization_sha256: str,
+    expected_consumption_sha256: str,
+    expected_attempt_id: str,
+    *,
+    explicit_archival_authorized: bool,
+) -> dict[str, Any]:
+    """Archive a consumed technically-invalid no-result Stage-Q attempt.
+
+    The original authorization and consumption are moved to identity-keyed
+    archives. A PREPARED journal is published first, both moves are hash
+    verified, a terminal attempt status is published last, and only then is the
+    singleton active-consumption slot considered retired.
+    """
+    root = Path(repo_root).resolve()
+    if explicit_archival_authorized is not True:
+        raise ProtocolError("Explicit Stage-Q archive authorization is required")
+    require_string(expected_authorization_id, "expected_authorization_id")
+    require_string(expected_authorization_sha256, "expected_authorization_sha256")
+    require_string(expected_consumption_sha256, "expected_consumption_sha256")
+    require_string(expected_attempt_id, "expected_attempt_id")
+    (
+        auth_path,
+        authorization,
+        authorization_hash,
+        consumption_destination,
+        consumption,
+        consumption_hash,
+    ) = _read_consumed_stage_q_for_archive(
+        root,
+        authorization_path,
+        consumption_path,
+        expected_authorization_id,
+        expected_authorization_sha256,
+        expected_consumption_sha256,
+        expected_attempt_id,
+    )
+    (
+        authorization_archive_path,
+        consumption_archive_path,
+        journal_path,
+        status_path,
+    ) = _stage_q_archive_transaction_paths(root, authorization_hash)
+    if (
+        os.path.lexists(authorization_archive_path)
+        or os.path.lexists(consumption_archive_path)
+        or os.path.lexists(journal_path)
+        or os.path.lexists(status_path)
+    ):
+        raise ProtocolError("Stage-Q archive transaction state already exists")
+    transaction_id, status_record_id = _stage_q_archive_transaction_ids(authorization_hash)
+    journal = _build_stage_q_archive_journal(
+        root,
+        authorization_archive_path,
+        consumption_archive_path,
+        status_path,
+        authorization,
+        authorization_hash,
+        consumption,
+        consumption_hash,
+        transaction_id,
+        status_record_id,
+    )
+    _publish_stage_q_archive_journal(journal_path, journal, root)
+    _archive_stage_q_consumption(consumption_destination, consumption_archive_path, consumption_hash)
+    _archive_stage_q_authorization(auth_path, authorization_archive_path, authorization_hash)
+    status = _build_stage_q_terminal_attempt_status(journal, authorization)
+    _publish_stage_q_terminal_attempt_status(status_path, status, root)
+    final = inspect_stage_q_archive_transaction(
+        root,
+        authorization_path,
+        consumption_path,
+        expected_authorization_id,
+        expected_authorization_sha256,
+        expected_consumption_sha256,
+        expected_attempt_id,
+    )
+    if final["state"] != STAGE_Q_ARCHIVE_STATE_ARCHIVED:
+        raise ProtocolError("Stage-Q archive transaction did not reach a completed state")
+    return status
+
+
+def inspect_stage_q_archive_transaction(
+    repo_root: str | Path,
+    authorization_path: str | Path,
+    consumption_path: str | Path,
+    expected_authorization_id: str,
+    expected_authorization_sha256: str,
+    expected_consumption_sha256: str,
+    expected_attempt_id: str,
+) -> dict[str, Any]:
+    """Inspect filesystem state and return an unambiguous Stage-Q archive lifecycle state."""
+    root = Path(repo_root).resolve()
+    active_path = confined_path(authorization_path, root, allow_missing=True)
+    active_consumption_path = confined_path(consumption_path, root, allow_missing=True)
+    (
+        authorization_archive_path,
+        consumption_archive_path,
+        journal_path,
+        status_path,
+    ) = _stage_q_archive_transaction_paths(root, expected_authorization_sha256)
+    active_exists = os.path.lexists(active_path)
+    active_consumption_exists = os.path.lexists(active_consumption_path)
+    auth_archive_exists = os.path.lexists(authorization_archive_path)
+    consumption_archive_exists = os.path.lexists(consumption_archive_path)
+    journal_exists = os.path.lexists(journal_path)
+    status_exists = os.path.lexists(status_path)
+
+    def result(state: str, replacement_blocked: bool) -> dict[str, Any]:
+        return {
+            "state": state,
+            "active_authorization_exists": active_exists,
+            "active_consumption_exists": active_consumption_exists,
+            "authorization_archive_exists": auth_archive_exists,
+            "consumption_archive_exists": consumption_archive_exists,
+            "journal_exists": journal_exists,
+            "status_exists": status_exists,
+            "active_authorization_path": _relative_path_string(active_path, root),
+            "active_consumption_path": _relative_path_string(active_consumption_path, root),
+            "authorization_archive_path": _relative_path_string(authorization_archive_path, root),
+            "consumption_archive_path": _relative_path_string(consumption_archive_path, root),
+            "journal_path": _relative_path_string(journal_path, root),
+            "status_path": _relative_path_string(status_path, root),
+            "replacement_blocked": replacement_blocked,
+        }
+
+    if active_exists and auth_archive_exists:
+        return result(STAGE_Q_ARCHIVE_STATE_AMBIGUOUS_OR_CORRUPT, True)
+    if active_consumption_exists and consumption_archive_exists:
+        return result(STAGE_Q_ARCHIVE_STATE_AMBIGUOUS_OR_CORRUPT, True)
+
+    if active_exists and active_consumption_exists:
+        if journal_exists or auth_archive_exists or consumption_archive_exists or status_exists:
+            return result(STAGE_Q_ARCHIVE_STATE_PREPARED_OR_IN_PROGRESS, True)
+        return result(STAGE_Q_ARCHIVE_STATE_ACTIVE, True)
+
+    if not active_exists and not active_consumption_exists:
+        if auth_archive_exists and consumption_archive_exists and status_exists:
+            if sha256_file(authorization_archive_path) != expected_authorization_sha256:
+                return result(STAGE_Q_ARCHIVE_STATE_AMBIGUOUS_OR_CORRUPT, True)
+            if sha256_file(consumption_archive_path) != expected_consumption_sha256:
+                return result(STAGE_Q_ARCHIVE_STATE_AMBIGUOUS_OR_CORRUPT, True)
+            archived_auth = _read_archived_stage_q_authorization_for_recovery(
+                root,
+                authorization_archive_path,
+                expected_authorization_id,
+                expected_authorization_sha256,
+            )
+            archived_consumption = _validate_consumption_identity(
+                consumption_archive_path, STAGE_Q_SCOPE
+            )
+            if archived_consumption["authorization_hash"] != expected_authorization_sha256:
+                return result(STAGE_Q_ARCHIVE_STATE_AMBIGUOUS_OR_CORRUPT, True)
+            status = read_json_no_duplicates(status_path)
+            validate_stage_q_terminal_attempt_status(status)
+            if status["authorization_sha256"] != expected_authorization_sha256:
+                return result(STAGE_Q_ARCHIVE_STATE_AMBIGUOUS_OR_CORRUPT, True)
+            if status["consumption_sha256"] != expected_consumption_sha256:
+                return result(STAGE_Q_ARCHIVE_STATE_AMBIGUOUS_OR_CORRUPT, True)
+            if status["attempt_id"] != expected_attempt_id:
+                return result(STAGE_Q_ARCHIVE_STATE_AMBIGUOUS_OR_CORRUPT, True)
+            return result(STAGE_Q_ARCHIVE_STATE_ARCHIVED, False)
+        if auth_archive_exists or consumption_archive_exists or journal_exists or status_exists:
+            return result(STAGE_Q_ARCHIVE_STATE_PARTIAL_OR_RECOVERY_REQUIRED, True)
+        return result(STAGE_Q_ARCHIVE_STATE_CLEAR, False)
+
+    return result(STAGE_Q_ARCHIVE_STATE_AMBIGUOUS_OR_CORRUPT, True)
+
+
+def _read_archived_stage_q_authorization_for_recovery(
+    root: Path,
+    archive_path: Path,
+    expected_authorization_id: str,
+    expected_authorization_sha256: str,
+) -> dict[str, Any]:
+    """Validate an archived consumed Stage-Q authorization for recovery identity."""
+    if sha256_file(archive_path) != expected_authorization_sha256:
+        raise ProtocolError("Archived Stage-Q authorization hash mismatch during recovery")
+    authorization = read_json_no_duplicates(archive_path)
+    require_exact_keys(authorization, STAGE_Q_AUTHORIZATION_KEYS, "archived Stage-Q authorization")
+    if authorization["schema_version"] != SCHEMA_VERSION or authorization["experiment"] != EXPERIMENT:
+        raise ProtocolError("Archived Stage-Q authorization schema identity mismatch")
+    if authorization["scope"] != STAGE_Q_SCOPE:
+        raise ProtocolError("Archived Stage-Q authorization scope mismatch")
+    if authorization["authorization_id"] != expected_authorization_id:
+        raise ProtocolError("Archived Stage-Q authorization ID mismatch")
+    return authorization
+
+
+def recover_stage_q_archive_transaction(
+    repo_root: str | Path,
+    authorization_path: str | Path,
+    consumption_path: str | Path,
+    expected_authorization_id: str,
+    expected_authorization_sha256: str,
+    expected_consumption_sha256: str,
+    expected_attempt_id: str,
+    *,
+    explicit_archival_authorized: bool,
+) -> dict[str, Any]:
+    """Resume only an exact interrupted Stage-Q consumed-attempt archive transaction."""
+    root = Path(repo_root).resolve()
+    if explicit_archival_authorized is not True:
+        raise ProtocolError("Explicit Stage-Q archive recovery authorization is required")
+    active_path = confined_path(authorization_path, root, allow_missing=True)
+    active_consumption_path = confined_path(consumption_path, root, allow_missing=True)
+    (
+        authorization_archive_path,
+        consumption_archive_path,
+        journal_path,
+        status_path,
+    ) = _stage_q_archive_transaction_paths(root, expected_authorization_sha256)
+    lifecycle = inspect_stage_q_archive_transaction(
+        root,
+        authorization_path,
+        consumption_path,
+        expected_authorization_id,
+        expected_authorization_sha256,
+        expected_consumption_sha256,
+        expected_attempt_id,
+    )
+
+    if lifecycle["state"] == STAGE_Q_ARCHIVE_STATE_ARCHIVED:
+        return read_json_no_duplicates(status_path)
+
+    if lifecycle["state"] == STAGE_Q_ARCHIVE_STATE_PREPARED_OR_IN_PROGRESS:
+        (
+            _auth_path,
+            authorization,
+            authorization_hash,
+            consumption_destination,
+            consumption,
+            consumption_hash,
+        ) = _read_consumed_stage_q_for_archive(
+            root,
+            active_path,
+            active_consumption_path,
+            expected_authorization_id,
+            expected_authorization_sha256,
+            expected_consumption_sha256,
+            expected_attempt_id,
+        )
+        journal = read_json_no_duplicates(journal_path)
+        validate_stage_q_archive_journal(journal)
+        if journal["authorization_sha256"] != expected_authorization_sha256:
+            raise ProtocolError("Stage-Q archive recovery journal identity mismatch")
+        _archive_stage_q_consumption(consumption_destination, consumption_archive_path, consumption_hash)
+        _archive_stage_q_authorization(active_path, authorization_archive_path, authorization_hash)
+        status = _build_stage_q_terminal_attempt_status(journal, authorization)
+        _publish_stage_q_terminal_attempt_status(status_path, status, root)
+    elif lifecycle["state"] == STAGE_Q_ARCHIVE_STATE_PARTIAL_OR_RECOVERY_REQUIRED:
+        if not os.path.lexists(authorization_archive_path) or not os.path.lexists(consumption_archive_path):
+            raise ProtocolError("Stage-Q archive recovery is missing archived identity")
+        authorization = _read_archived_stage_q_authorization_for_recovery(
+            root,
+            authorization_archive_path,
+            expected_authorization_id,
+            expected_authorization_sha256,
+        )
+        consumption = _validate_consumption_identity(consumption_archive_path, STAGE_Q_SCOPE)
+        if consumption["authorization_hash"] != expected_authorization_sha256:
+            raise ProtocolError("Stage-Q archive recovery consumption identity mismatch")
+        if sha256_file(consumption_archive_path) != expected_consumption_sha256:
+            raise ProtocolError("Stage-Q archive recovery consumption hash mismatch")
+        if not os.path.lexists(journal_path):
+            raise ProtocolError("Stage-Q archive recovery journal is missing")
+        journal = read_json_no_duplicates(journal_path)
+        validate_stage_q_archive_journal(journal)
+        if journal["authorization_sha256"] != expected_authorization_sha256:
+            raise ProtocolError("Stage-Q archive recovery journal identity mismatch")
+        status = _build_stage_q_terminal_attempt_status(journal, authorization)
+        _publish_stage_q_terminal_attempt_status(status_path, status, root)
+    else:
+        raise ProtocolError("Stage-Q archive transaction is not in a recoverable state")
+
+    final = inspect_stage_q_archive_transaction(
+        root,
+        authorization_path,
+        consumption_path,
+        expected_authorization_id,
+        expected_authorization_sha256,
+        expected_consumption_sha256,
+        expected_attempt_id,
+    )
+    if final["state"] != STAGE_Q_ARCHIVE_STATE_ARCHIVED:
+        raise ProtocolError("Stage-Q archive recovery did not reach a completed state")
+    return read_json_no_duplicates(status_path)
+
+
 def _load_model_and_tokenizer(identity: Mapping[str, Any]) -> tuple[Any, Any]:
     """Load the frozen model only from an authorized execution path."""
     import torch  # Runtime-only model-runtime import.
@@ -2432,26 +3198,30 @@ def load_fit_source_records(root: Path, split_id: str) -> list[dict[str, str]]:
     prompt_path = confined_path(root / dataset["prompt_file"], root)
     if sha256_file(prompt_path) != dataset["prompt_file_sha256"]:
         raise ProtocolError("Frozen prompt source hash mismatch")
+    document = read_json_value_no_duplicates(prompt_path)
+    if not isinstance(document, list):
+        raise ProtocolError("Frozen prompt source must be a JSON array")
     records: list[dict[str, str]] = []
     seen: set[str] = set()
-    record_pattern = re.compile(r'^\s*\{"id"\s*:\s*"([^"\\]+)"')
-    with prompt_path.open("r", encoding="utf-8") as handle:
-        for line in handle:
-            match = record_pattern.match(line)
-            if match is None or match.group(1) not in fit_set:
-                continue
-            record = json.loads(line)
-            item_id = record.get("id")
-            if item_id in seen or item_id not in fit_set:
-                raise ProtocolError("Duplicate or unknown FIT source ID")
-            if not isinstance(record.get("text"), str) or not isinstance(record.get("group"), str):
-                raise ProtocolError("FIT source record schema is invalid")
-            expected_group = next(label for label in CLASS_ORDER if item_id in set(fit_ids_by_class[label]))
-            if record["group"] != expected_group:
-                raise ProtocolError("FIT source record class routing is invalid")
-            seen.add(item_id)
-            records.append({"item_id": item_id, "split_id": split_id, "role": "FIT", "task_class": record["group"], "prompt_text": record["text"]})
-    if seen != fit_set:
+    for record in document:
+        if not isinstance(record, Mapping):
+            raise ProtocolError("FIT source record schema is invalid")
+        item_id = record.get("id")
+        if not isinstance(item_id, str) or not item_id:
+            raise ProtocolError("FIT source record schema is invalid")
+        if item_id in seen:
+            raise ProtocolError("Duplicate prompt source ID")
+        seen.add(item_id)
+        if not isinstance(record.get("text"), str) or not isinstance(record.get("group"), str):
+            raise ProtocolError("FIT source record schema is invalid")
+        if item_id not in fit_set:
+            continue
+        expected_group = next(label for label in CLASS_ORDER if item_id in set(fit_ids_by_class[label]))
+        if record["group"] != expected_group:
+            raise ProtocolError("FIT source record class routing is invalid")
+        records.append({"item_id": item_id, "split_id": split_id, "role": "FIT", "task_class": record["group"], "prompt_text": record["text"]})
+    selected_ids = {record["item_id"] for record in records}
+    if selected_ids != fit_set:
         raise ProtocolError("Frozen split FIT source is incomplete")
     return validate_fit_eval_routing(records, fit_ids, [], split_id)
 

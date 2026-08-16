@@ -66,11 +66,13 @@ The preregistered checkpoints, layer mapping, direction construction, control
 conditions, and primary beta remain fixed. Evaluation representations are
 never used to fit directions or probes.
 
-After Stage-Q authorization consumption, the source adapter reads the frozen
-split manifest and selects exactly twelve FIT-role IDs for one split at a time.
-Only those records enter tokenization and forward execution; EVAL records are
-not routed, logged, or serialized. The adapter records IDs, split, role, and
-class metadata without exposing prompt text in results.
+After Stage-Q authorization consumption, the source adapter validates the
+frozen prompt-file SHA and parses the frozen controlled prompt artifact as one
+JSON-array document. It reads the frozen split manifest and selects exactly
+twelve FIT-role IDs for one split at a time. Only those records enter
+tokenization and forward execution; EVAL records are not routed, logged, or
+serialized. The adapter records IDs, split, role, and class metadata without
+exposing prompt text in results.
 
 Production execution obtains hidden states 17, 18, 21, 25, and 28, plus a
 block-27 pre-final-RMSNorm hook capture. The pre-final-RMSNorm capture remains
@@ -570,3 +572,90 @@ The current Stage-Q authorization is still independently validated against the
 live HEAD and current runner SHA-256 before consumption. A later reviewed
 runner commit does not retroactively invalidate an immutable historical result,
 but the exact canonical neutral-result SHA-256 dependency remains mandatory.
+
+## Task 090J diagnosis
+
+Two independently diagnosed engineering defects are:
+
+1. The canonical frozen controlled-prompt artifact
+   `experiments/exp003/prompts_controlled.json` is a single JSON-array
+   document bound by exact SHA-256, while `load_fit_source_records()` assumed
+   JSONL line parsing.
+
+2. Stage-Q consumption used a singleton `consumed/stage_q.json` without an
+   identity-keyed historical archive, so a separately authorized future
+   Stage-Q generation could not use the canonical active-consumption slot
+   after a consumed technically-invalid no-result attempt.
+
+## Task 090K correction
+
+`load_fit_source_records()` now reads the frozen prompt artifact as one JSON
+document through `read_json_value_no_duplicates()` and fails closed unless the
+top-level value is a list. Record IDs, groups, class labels, split membership,
+ordering, and FIT selection remain frozen. JSONL, top-level objects, malformed
+JSON, missing required record fields, duplicate prompt IDs, and prompt-hash
+drift all fail closed.
+
+### Historical consumed Stage-Q archive
+
+Consumed Stage-Q attempts are terminal authorization histories. A consumed
+technically-invalid Stage-Q attempt with no canonical result may be archived
+identity-wise so a separately authorized future generation can reuse the
+canonical active-consumption slot.
+
+Canonical historical-consumption archive:
+- `experiments/exp021/consumed/archive/stage_q/<authorization_sha256>.json`
+
+Consumed-authorization archive:
+- `experiments/exp021/authorization/archive/consumed_stage_q/<authorization_sha256>.json`
+
+Archive journal:
+- `experiments/exp021/consumed/archive/stage_q_journal/<authorization_sha256>.json`
+
+Terminal attempt status:
+- `experiments/exp021/consumed/archive/stage_q_status/<authorization_sha256>.json`
+
+The archive key is the authorization SHA-256, not attempt order. Archival is
+explicit, deterministic, and crash-safe: validate the consumed authorization
+and consumption identity, prove no canonical Stage-Q result exists, publish a
+self-hashed `PREPARED` journal, move and verify the original consumption bytes,
+move and verify the retained consumed authorization bytes, publish the terminal
+attempt status, and only then consider the singleton active-consumption slot
+retired.
+
+The terminal status records:
+- authorization ID and SHA-256;
+- consumption SHA-256;
+- run-attempt ID;
+- `attempt_outcome = TECHNICALLY_INVALID`;
+- `measurement_status = NOT_OBSERVED_DUE_TO_TECHNICAL_INVALIDITY`;
+- `result_exists = false`;
+- `original_can_never_be_consumed = true`.
+
+Archival never reactivates the consumed authorization, never creates a retry,
+and never creates a replacement authorization. A later launch requires a
+different authorization identity and separate explicit authority. Valid
+`QUALIFIED` or `QUALIFICATION_FAILED` results are not automatically
+replacement-eligible.
+
+Lifecycle validation recognizes the exact historical archive, journal, and
+status namespaces. Each historical generation is independently grouped by
+authorization SHA-256; unresolved, malformed, duplicate, cross-generation,
+same-authorization-reactivation, or unknown-child states fail closed. The real
+Task-090I consumed Stage-Q evidence is not archived by Task 090K.
+
+## Task 090M correction
+
+Historical Stage-Q archive paths are keyed by authorization SHA-256. The
+canonical consumption file SHA-256 identifies the consumption artifact itself,
+not the authorization generation. The consumption record's validated
+`authorization_hash` identifies which authorization generation the consumption
+belongs to. These identities are not interchangeable.
+
+Lifecycle collision detection now validates the canonical consumption record
+and compares the historical archive authorization digest to
+`canonical_consumption.authorization_hash`, not to the SHA-256 of the
+consumption file. A historical archived Stage-Q generation therefore cannot be
+re-presented as either an active authorization or a canonical consumed
+authorization under the same authorization identity, while a distinct later
+generation remains representable.

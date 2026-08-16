@@ -2869,3 +2869,576 @@ def test_disposition_recovery_cross_authorization_attack_fails(
     assert not disposition_path.exists()
     assert stage_q.sha256_file(archive_path) == original_hash
     assert not (tmp_path / stage_q.NEUTRAL_CONSUMPTION_RELATIVE_PATH).exists()
+
+
+def _prompt_record(item_id: str, group: str):
+    return {
+        "id": item_id,
+        "group": group,
+        "variant_type": "original_style" if "_orig_" in item_id else "paraphrase",
+        "text": "synthetic frozen prompt text",
+    }
+
+
+def _full_prompt_document():
+    records = []
+    for label in stage_q.CLASS_ORDER:
+        for index in (1, 2, 3):
+            records.append(_prompt_record(f"{label}_orig_{index:02d}", label))
+    for label in stage_q.CLASS_ORDER:
+        for index in (1, 2, 3):
+            records.append(_prompt_record(f"{label}_para_{index:02d}", label))
+    return records
+
+
+def _loader_splits():
+    fit_original = {
+        label: [f"{label}_orig_{index:02d}" for index in (1, 2, 3)]
+        for label in stage_q.CLASS_ORDER
+    }
+    fit_paraphrase = {
+        label: [f"{label}_para_{index:02d}" for index in (1, 2, 3)]
+        for label in stage_q.CLASS_ORDER
+    }
+    evaluation_original = {
+        label: [f"{label}_para_{index:02d}" for index in (1, 2, 3)]
+        for label in stage_q.CLASS_ORDER
+    }
+    evaluation_paraphrase = {
+        label: [f"{label}_orig_{index:02d}" for index in (1, 2, 3)]
+        for label in stage_q.CLASS_ORDER
+    }
+    return [
+        {
+            "id": "A_original_fit_paraphrase_eval",
+            "fit_ids": fit_original,
+            "evaluation_ids": evaluation_original,
+        },
+        {
+            "id": "B_paraphrase_fit_original_eval",
+            "fit_ids": fit_paraphrase,
+            "evaluation_ids": evaluation_paraphrase,
+        },
+    ]
+
+
+def _write_loader_fixture(tmp_path, monkeypatch, prompt_value, split_id="A_original_fit_paraphrase_eval", prompt_hash=None):
+    prompt_path = tmp_path / "experiments" / "exp003" / "prompts_controlled.json"
+    write_json(prompt_path, prompt_value)
+    config_path = tmp_path / "experiments" / "exp020" / "exp020_frozen_config.json"
+    config = {
+        "dataset": {
+            "prompt_file": "experiments/exp003/prompts_controlled.json",
+            "prompt_file_sha256": prompt_hash or stage_q.sha256_file(prompt_path),
+            "splits": _loader_splits(),
+        }
+    }
+    write_json(config_path, config)
+    monkeypatch.setattr(stage_q, "EXP020_CONFIG_SHA256", stage_q.sha256_file(config_path))
+    return prompt_path, config_path
+
+
+def test_stage_q_frozen_fit_json_array_positive_regression():
+    repo_root = Path(__file__).resolve().parents[1]
+    prompt_path = repo_root / "experiments" / "exp003" / "prompts_controlled.json"
+    assert stage_q.sha256_file(prompt_path) == (
+        "72dab733e6a1639dfc80d186f3af1dbce5c6d70da4905e6d6d422cf47064c472"
+    )
+    records = stage_q.load_fit_source_records(
+        repo_root, "A_original_fit_paraphrase_eval"
+    )
+    assert len(records) == 12
+    assert [record["item_id"] for record in records] == [
+        "logic_orig_01", "logic_orig_02", "logic_orig_03",
+        "causality_orig_01", "causality_orig_02", "causality_orig_03",
+        "analogy_orig_01", "analogy_orig_02", "analogy_orig_03",
+        "definition_orig_01", "definition_orig_02", "definition_orig_03",
+    ]
+    assert all(record["split_id"] == "A_original_fit_paraphrase_eval" for record in records)
+    assert all(record["role"] == "FIT" for record in records)
+
+
+@pytest.mark.parametrize(
+    "case",
+    [
+        "top_level_object",
+        "malformed_json",
+        "missing_fields",
+        "duplicate_identity",
+        "wrong_frozen_hash",
+        "jsonl_input",
+    ],
+)
+def test_stage_q_frozen_fit_loader_fails_closed(tmp_path, monkeypatch, case):
+    if case == "top_level_object":
+        prompt_value = {"id": "logic_orig_01", "group": "logic", "text": "x"}
+        _write_loader_fixture(tmp_path, monkeypatch, prompt_value)
+    elif case == "malformed_json":
+        prompt_path = tmp_path / "experiments" / "exp003" / "prompts_controlled.json"
+        prompt_path.parent.mkdir(parents=True, exist_ok=True)
+        prompt_path.write_text("[", encoding="utf-8")
+        config_path = tmp_path / "experiments" / "exp020" / "exp020_frozen_config.json"
+        write_json(
+            config_path,
+            {
+                "dataset": {
+                    "prompt_file": "experiments/exp003/prompts_controlled.json",
+                    "prompt_file_sha256": stage_q.sha256_file(prompt_path),
+                    "splits": _loader_splits(),
+                }
+            },
+        )
+        monkeypatch.setattr(stage_q, "EXP020_CONFIG_SHA256", stage_q.sha256_file(config_path))
+    elif case == "missing_fields":
+        prompt_value = _full_prompt_document()
+        del prompt_value[0]["text"]
+        _write_loader_fixture(tmp_path, monkeypatch, prompt_value)
+    elif case == "duplicate_identity":
+        prompt_value = _full_prompt_document()
+        prompt_value.append(dict(prompt_value[0]))
+        _write_loader_fixture(tmp_path, monkeypatch, prompt_value)
+    elif case == "wrong_frozen_hash":
+        _write_loader_fixture(tmp_path, monkeypatch, _full_prompt_document(), prompt_hash="f" * 64)
+    else:
+        prompt_value = _full_prompt_document()
+        prompt_path, _config_path = _write_loader_fixture(tmp_path, monkeypatch, prompt_value)
+        prompt_path.write_text(
+            "\n".join(json.dumps(record) for record in prompt_value),
+            encoding="utf-8",
+        )
+        monkeypatch.setattr(
+            stage_q,
+            "EXP020_CONFIG_SHA256",
+            stage_q.sha256_file(
+                tmp_path / "experiments" / "exp020" / "exp020_frozen_config.json"
+            ),
+        )
+    with pytest.raises(stage_q.ProtocolError):
+        stage_q.load_fit_source_records(
+            tmp_path, "A_original_fit_paraphrase_eval"
+        )
+
+
+def _archive_consumed_stage_q_fixture(
+    tmp_path,
+    authorization_id="AUTH-STAGE-Q-Q1",
+    attempt_id="ATTEMPT-STAGE-Q-001",
+):
+    _write_consumed_neutral_state(tmp_path)
+    auth_path, auth, auth_hash = _write_active_stage_q_auth(
+        tmp_path, authorization_id=authorization_id
+    )
+    consumption_path, consumption = _write_consumption_record(
+        tmp_path,
+        stage_q.STAGE_Q_SCOPE,
+        auth,
+        auth_hash,
+        attempt_id,
+        "consumed/stage_q.json",
+    )
+    consumption_hash = stage_q.sha256_file(consumption_path)
+    status = stage_q.archive_consumed_stage_q_technically_invalid_attempt(
+        repo_root=tmp_path,
+        authorization_path=auth_path,
+        consumption_path=consumption_path,
+        expected_authorization_id=authorization_id,
+        expected_authorization_sha256=auth_hash,
+        expected_consumption_sha256=consumption_hash,
+        expected_attempt_id=attempt_id,
+        explicit_archival_authorized=True,
+    )
+    return auth, auth_hash, consumption, consumption_hash, status
+
+
+def test_stage_q_consumed_attempt_archives_identity_wise_in_temp(tmp_path):
+    auth, auth_hash, consumption, consumption_hash, status = _archive_consumed_stage_q_fixture(
+        tmp_path
+    )
+    state = stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
+    assert state["stage_q_authorization_archives"]
+    assert state["stage_q_consumption_archives"]
+    assert state["stage_q_consumption_journals"]
+    assert state["stage_q_consumption_statuses"]
+    assert state["active_stage_q"] is None
+    assert state["consumed_stage_q"] is None
+    assert status["attempt_outcome"] == "TECHNICALLY_INVALID"
+    assert status["measurement_status"] == "NOT_OBSERVED_DUE_TO_TECHNICAL_INVALIDITY"
+    assert status["original_can_never_be_consumed"] is True
+
+
+def test_stage_q_consumed_archive_bytes_equal_original(tmp_path):
+    _write_consumed_neutral_state(tmp_path)
+    auth_path, auth, auth_hash = _write_active_stage_q_auth(tmp_path)
+    consumption_path, consumption = _write_consumption_record(
+        tmp_path,
+        stage_q.STAGE_Q_SCOPE,
+        auth,
+        auth_hash,
+        "ATTEMPT-STAGE-Q-001",
+        "consumed/stage_q.json",
+    )
+    original_bytes = consumption_path.read_bytes()
+    consumption_hash = stage_q.sha256_file(consumption_path)
+    stage_q.archive_consumed_stage_q_technically_invalid_attempt(
+        repo_root=tmp_path,
+        authorization_path=auth_path,
+        consumption_path=consumption_path,
+        expected_authorization_id=auth["authorization_id"],
+        expected_authorization_sha256=auth_hash,
+        expected_consumption_sha256=consumption_hash,
+        expected_attempt_id="ATTEMPT-STAGE-Q-001",
+        explicit_archival_authorized=True,
+    )
+    archive_path = (
+        tmp_path
+        / "experiments"
+        / "exp021"
+        / "consumed"
+        / "archive"
+        / "stage_q"
+        / f"{auth_hash}.json"
+    )
+    assert archive_path.read_bytes() == original_bytes
+    assert stage_q.sha256_file(archive_path) == consumption_hash
+    assert not consumption_path.exists()
+
+
+def test_stage_q_archived_q1_plus_active_q2_passes(tmp_path):
+    _archive_consumed_stage_q_fixture(tmp_path, authorization_id="AUTH-STAGE-Q-Q1")
+    _write_active_stage_q_auth(tmp_path, authorization_id="AUTH-STAGE-Q-Q2")
+    state = stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STAGE_Q)
+    assert state["active_stage_q"] is not None
+    assert len(state["stage_q_authorization_archives"]) == 1
+    assert len(state["stage_q_consumption_archives"]) == 1
+
+
+def test_stage_q_archived_q1_q2_reaches_consumption_boundary(tmp_path):
+    _archive_consumed_stage_q_fixture(tmp_path, authorization_id="AUTH-STAGE-Q-Q1")
+    auth_path, auth, auth_hash = _write_active_stage_q_auth(
+        tmp_path, authorization_id="AUTH-STAGE-Q-Q2"
+    )
+    stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STAGE_Q)
+    consumption_path = tmp_path / stage_q.STAGE_Q_CONSUMPTION_RELATIVE_PATH
+    _auth, consumption = stage_q.consume_authorization(
+        auth_path,
+        consumption_path,
+        tmp_path,
+        stage_q.STAGE_Q_SCOPE,
+    )
+    assert consumption["authorization_hash"] == auth_hash
+    assert stage_q.sha256_file(consumption_path) != auth_hash
+
+
+def test_stage_q_archived_q1_q2_consumed_remain_independent(tmp_path):
+    _archive_consumed_stage_q_fixture(
+        tmp_path, authorization_id="AUTH-STAGE-Q-Q1", attempt_id="ATTEMPT-STAGE-Q-001"
+    )
+    auth_path, auth, auth_hash = _write_active_stage_q_auth(
+        tmp_path, authorization_id="AUTH-STAGE-Q-Q2"
+    )
+    consumption_path, consumption = _write_consumption_record(
+        tmp_path,
+        stage_q.STAGE_Q_SCOPE,
+        auth,
+        auth_hash,
+        "ATTEMPT-STAGE-Q-002",
+        "consumed/stage_q.json",
+    )
+    state = stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
+    assert state["consumed_stage_q"] is not None
+    assert state["active_stage_q"] is None
+    assert len(state["stage_q_authorization_archives"]) == 1
+    assert len(state["stage_q_consumption_archives"]) == 1
+    assert state["stage_q_consumption_archives"][0] != str(stage_q.STAGE_Q_CONSUMPTION_RELATIVE_PATH)
+
+
+def test_stage_q_archived_q1_canonical_q1_auth_and_consumption_rejected(tmp_path):
+    auth, auth_hash, _consumption, _consumption_hash, _status = _archive_consumed_stage_q_fixture(
+        tmp_path
+    )
+    active_path = tmp_path / "experiments" / "exp021" / "authorization" / "stage_q.json"
+    write_json(active_path, auth)
+    consumption_path, _consumption = _write_consumption_record(
+        tmp_path,
+        stage_q.STAGE_Q_SCOPE,
+        auth,
+        auth_hash,
+        "ATTEMPT-STAGE-Q-Q1-REUSE",
+        "consumed/stage_q.json",
+    )
+    assert stage_q.sha256_file(consumption_path) != auth_hash
+    with pytest.raises(stage_q.ProtocolError):
+        stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
+
+
+def test_stage_q_archived_q1_canonical_q1_consumed_only_rejected(tmp_path):
+    auth, auth_hash, _consumption, _consumption_hash, _status = _archive_consumed_stage_q_fixture(
+        tmp_path
+    )
+    active_path = tmp_path / "experiments" / "exp021" / "authorization" / "stage_q.json"
+    write_json(active_path, auth)
+    _write_consumption_record(
+        tmp_path,
+        stage_q.STAGE_Q_SCOPE,
+        auth,
+        auth_hash,
+        "ATTEMPT-STAGE-Q-Q1-CONSUMED-ONLY",
+        "consumed/stage_q.json",
+    )
+    state = stage_q.inspect_lifecycle_paths(tmp_path)
+    assert state["active_stage_q"] is None
+    assert state["consumed_stage_q"] is not None
+    with pytest.raises(stage_q.ProtocolError):
+        stage_q._validate_stage_q_archive_identity_state(state)
+    with pytest.raises(stage_q.ProtocolError):
+        stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
+
+
+def test_stage_q_archived_q1_canonical_q2_consumption_claiming_q1_fails(tmp_path):
+    _q1_auth, q1_hash, _q1_consumption, _q1_consumption_hash, _status = _archive_consumed_stage_q_fixture(
+        tmp_path
+    )
+    _q2_path, q2_auth, _q2_hash = _write_active_stage_q_auth(
+        tmp_path, authorization_id="AUTH-STAGE-Q-Q2"
+    )
+    _write_consumption_record(
+        tmp_path,
+        stage_q.STAGE_Q_SCOPE,
+        q2_auth,
+        q1_hash,
+        "ATTEMPT-STAGE-Q-Q2-CLAIMS-Q1",
+        "consumed/stage_q.json",
+    )
+    with pytest.raises(stage_q.ProtocolError):
+        stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
+
+
+def test_stage_q_archived_q1_malformed_canonical_consumption_rejected(tmp_path):
+    auth, _auth_hash, _consumption, _consumption_hash, _status = _archive_consumed_stage_q_fixture(
+        tmp_path
+    )
+    active_path = tmp_path / "experiments" / "exp021" / "authorization" / "stage_q.json"
+    write_json(active_path, auth)
+    _lifecycle_write(tmp_path, "consumed/stage_q.json", {})
+    with pytest.raises(stage_q.ProtocolError):
+        stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
+
+
+def test_stage_q_two_archived_generations_plus_active_q3_passes(tmp_path):
+    _archive_consumed_stage_q_fixture(
+        tmp_path, authorization_id="AUTH-STAGE-Q-Q1", attempt_id="ATTEMPT-STAGE-Q-001"
+    )
+    _archive_consumed_stage_q_fixture(
+        tmp_path, authorization_id="AUTH-STAGE-Q-Q2", attempt_id="ATTEMPT-STAGE-Q-002"
+    )
+    _write_active_stage_q_auth(tmp_path, authorization_id="AUTH-STAGE-Q-Q3")
+    state = stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STAGE_Q)
+    assert state["active_stage_q"] is not None
+    assert len(state["stage_q_authorization_archives"]) == 2
+    assert len(state["stage_q_consumption_archives"]) == 2
+    assert len(state["stage_q_consumption_journals"]) == 2
+    assert len(state["stage_q_consumption_statuses"]) == 2
+
+
+def test_stage_q_two_archived_generations_plus_q3_consumed_passes(tmp_path):
+    _archive_consumed_stage_q_fixture(
+        tmp_path, authorization_id="AUTH-STAGE-Q-Q1", attempt_id="ATTEMPT-STAGE-Q-001"
+    )
+    _archive_consumed_stage_q_fixture(
+        tmp_path, authorization_id="AUTH-STAGE-Q-Q2", attempt_id="ATTEMPT-STAGE-Q-002"
+    )
+    _q3_path, q3_auth, q3_hash = _write_active_stage_q_auth(
+        tmp_path, authorization_id="AUTH-STAGE-Q-Q3"
+    )
+    _write_consumption_record(
+        tmp_path,
+        stage_q.STAGE_Q_SCOPE,
+        q3_auth,
+        q3_hash,
+        "ATTEMPT-STAGE-Q-003",
+        "consumed/stage_q.json",
+    )
+    state = stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
+    assert state["active_stage_q"] is None
+    assert state["consumed_stage_q"] is not None
+    assert len(state["stage_q_authorization_archives"]) == 2
+    assert len(state["stage_q_consumption_archives"]) == 2
+
+
+def test_stage_q_archive_wrong_consumption_sha_fails(tmp_path):
+    _archive_consumed_stage_q_fixture(tmp_path)
+    archive_path = next(
+        (
+            tmp_path / "experiments" / "exp021" / "consumed" / "archive" / "stage_q"
+        ).glob("*.json")
+    )
+    archive_path.write_text("{}", encoding="utf-8")
+    with pytest.raises(stage_q.ProtocolError):
+        stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
+
+
+def test_stage_q_archive_path_digest_mismatch_fails(tmp_path):
+    _archive_consumed_stage_q_fixture(tmp_path)
+    auth, auth_hash, _consumption, _consumption_hash, _status = _archive_consumed_stage_q_fixture(
+        tmp_path, authorization_id="AUTH-STAGE-Q-Q2", attempt_id="ATTEMPT-STAGE-Q-002"
+    )
+    archive_dir = (
+        tmp_path / "experiments" / "exp021" / "consumed" / "archive" / "stage_q"
+    )
+    first = next(archive_dir.glob("*.json"))
+    first.rename(archive_dir / f"{'f' * 64}.json")
+    with pytest.raises(stage_q.ProtocolError):
+        stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
+
+
+def test_stage_q_archive_consumption_claims_different_auth_fails(tmp_path):
+    _archive_consumed_stage_q_fixture(tmp_path)
+    archive_path = next(
+        (
+            tmp_path / "experiments" / "exp021" / "consumed" / "archive" / "stage_q"
+        ).glob("*.json")
+    )
+    record = stage_q.read_json_no_duplicates(archive_path)
+    record["authorization_hash"] = "f" * 64
+    write_json(archive_path, record)
+    with pytest.raises(stage_q.ProtocolError):
+        stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
+
+
+def test_stage_q_archive_status_attempt_id_mismatch_fails(tmp_path):
+    _archive_consumed_stage_q_fixture(tmp_path)
+    status_path = next(
+        (
+            tmp_path / "experiments" / "exp021" / "consumed" / "archive" / "stage_q_status"
+        ).glob("*.json")
+    )
+    status = stage_q.read_json_no_duplicates(status_path)
+    status["attempt_id"] = "ATTEMPT-DRIFT"
+    write_json(status_path, status)
+    with pytest.raises(stage_q.ProtocolError):
+        stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
+
+
+def test_stage_q_archive_invalid_result_with_terminal_status_fails(tmp_path):
+    _archive_consumed_stage_q_fixture(tmp_path)
+    _lifecycle_write(tmp_path, "engineering/stage_q_result.json", {})
+    with pytest.raises(stage_q.ProtocolError):
+        stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
+
+
+def test_stage_q_archive_same_authorization_reuse_fails(tmp_path):
+    auth, auth_hash, _consumption, _consumption_hash, _status = _archive_consumed_stage_q_fixture(
+        tmp_path
+    )
+    active_path = tmp_path / "experiments" / "exp021" / "authorization" / "stage_q.json"
+    write_json(active_path, auth)
+    with pytest.raises(stage_q.ProtocolError):
+        stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
+
+
+def test_stage_q_active_q2_with_unresolved_q1_archive_fails(tmp_path):
+    _write_consumed_neutral_state(tmp_path)
+    _write_active_stage_q_auth(tmp_path, authorization_id="AUTH-STAGE-Q-Q2")
+    unresolved = (
+        tmp_path
+        / "experiments"
+        / "exp021"
+        / "consumed"
+        / "archive"
+        / "stage_q"
+        / f"{'a' * 64}.json"
+    )
+    write_json(unresolved, {})
+    with pytest.raises(stage_q.ProtocolError):
+        stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
+
+
+def test_stage_q_cross_generation_swap_fails(tmp_path):
+    _archive_consumed_stage_q_fixture(
+        tmp_path, authorization_id="AUTH-STAGE-Q-Q1", attempt_id="ATTEMPT-STAGE-Q-001"
+    )
+    _archive_consumed_stage_q_fixture(
+        tmp_path, authorization_id="AUTH-STAGE-Q-Q2", attempt_id="ATTEMPT-STAGE-Q-002"
+    )
+    status_dir = (
+        tmp_path / "experiments" / "exp021" / "consumed" / "archive" / "stage_q_status"
+    )
+    first, second = sorted(status_dir.glob("*.json"))
+    first_status = stage_q.read_json_no_duplicates(first)
+    second_status = stage_q.read_json_no_duplicates(second)
+    write_json(first, second_status)
+    write_json(second, first_status)
+    with pytest.raises(stage_q.ProtocolError):
+        stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
+
+
+def test_stage_q_unknown_archive_child_fails(tmp_path):
+    _write_consumed_neutral_state(tmp_path)
+    unknown = tmp_path / "experiments" / "exp021" / "consumed" / "archive" / "stage_q" / "unknown.txt"
+    write_json(unknown, {})
+    with pytest.raises(stage_q.ProtocolError, match="Unknown lifecycle artifact"):
+        stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
+
+
+def test_stage_q_duplicate_historical_generation_identity_fails(tmp_path):
+    _archive_consumed_stage_q_fixture(tmp_path)
+    status_dir = (
+        tmp_path / "experiments" / "exp021" / "consumed" / "archive" / "stage_q_status"
+    )
+    first = next(status_dir.glob("*.json"))
+    duplicate = status_dir / "duplicate.json"
+    duplicate.write_text(first.read_text(encoding="utf-8"), encoding="utf-8")
+    with pytest.raises(stage_q.ProtocolError):
+        stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
+
+
+def test_stage_q_second_consumption_does_not_overwrite_canonical(tmp_path):
+    _archive_consumed_stage_q_fixture(tmp_path, authorization_id="AUTH-STAGE-Q-Q1")
+    auth_path, auth, auth_hash = _write_active_stage_q_auth(
+        tmp_path, authorization_id="AUTH-STAGE-Q-Q2"
+    )
+    consumption_path = tmp_path / stage_q.STAGE_Q_CONSUMPTION_RELATIVE_PATH
+    stage_q.consume_authorization(
+        auth_path,
+        consumption_path,
+        tmp_path,
+        stage_q.STAGE_Q_SCOPE,
+    )
+    first_hash = stage_q.sha256_file(consumption_path)
+    with pytest.raises(stage_q.ProtocolError):
+        stage_q.consume_authorization(
+            auth_path,
+            consumption_path,
+            tmp_path,
+            stage_q.STAGE_Q_SCOPE,
+        )
+    assert stage_q.sha256_file(consumption_path) == first_hash
+
+
+@pytest.mark.parametrize("outcome", ["QUALIFICATION_FAILED", "QUALIFIED"])
+def test_stage_q_terminal_status_rejects_non_technical_invalid_outcome(outcome):
+    with pytest.raises(stage_q.ProtocolError):
+        stage_q.validate_stage_q_terminal_attempt_status(
+            {
+                "schema_version": stage_q.SCHEMA_VERSION,
+                "experiment": stage_q.EXPERIMENT,
+                "status_type": stage_q.STAGE_Q_ARCHIVE_TYPE,
+                "authorization_id": "AUTH-X",
+                "authorization_sha256": "a" * 64,
+                "consumption_sha256": "b" * 64,
+                "attempt_id": "ATTEMPT-X",
+                "scope": stage_q.STAGE_Q_SCOPE,
+                "runner_commit": stage_q.AUTHORITY_ARCHIVE_COMMIT,
+                "transaction_id": "SQ-ARCH-TXN-" + "a" * 64,
+                "status_record_id": "SQ-STATUS-" + "a" * 64,
+                "authorization_archive_path": "experiments/exp021/authorization/archive/consumed_stage_q/" + "a" * 64 + ".json",
+                "consumption_archive_path": "experiments/exp021/consumed/archive/stage_q/" + "a" * 64 + ".json",
+                "journal_sha256": "c" * 64,
+                "attempt_outcome": outcome,
+                "measurement_status": "NOT_OBSERVED_DUE_TO_TECHNICAL_INVALIDITY",
+                "result_exists": False,
+                "original_can_never_be_consumed": True,
+                "created_at": "2026-08-16T00:00:00+00:00",
+                "state": stage_q.STAGE_Q_ARCHIVE_STATE_ARCHIVED,
+            }
+        )
