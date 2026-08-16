@@ -64,6 +64,14 @@ REQUIRED_DISPOSITION_TESTS = {
     "test_disposition_recovery_resumes_exact_pre_move_prepared_state",
     "test_disposition_recovery_cross_authorization_attack_fails",
 }
+REQUIRED_HISTORICAL_PROVENANCE_TESTS = {
+    "test_historical_neutral_producer_and_current_executor_identity_are_independent",
+    "test_historical_neutral_producer_commit_tamper_fails",
+    "test_historical_neutral_producer_runner_sha_tamper_fails",
+    "test_stage_q_current_executor_drift_after_historical_result_still_fails",
+    "test_stage_q_neutral_result_sha_dependency_mismatch_fails",
+}
+
 REQUIRED_CHECKPOINT_MAPPING_TESTS = {
     "test_checkpoint_and_probability_validation_reject_invalid_values",
     "test_checkpoint_mapping_accepts_frozen_metadata_shape",
@@ -463,9 +471,10 @@ def validate() -> None:
         stage_q,
         {
             "validate_authority_files", "validate_mode_lifecycle", "validate_neutral_result",
-            "consume_authorization", "validate_model_manifest", "_load_model_and_tokenizer",
-            "load_fit_source_records", "extract_fit_representations", "leave_one_out_fixed_probe",
-            "stage_q_global_gate", "validate_stage_q_result", "atomic_publish_json",
+            "build_historical_neutral_binding", "consume_authorization", "validate_model_manifest",
+            "_load_model_and_tokenizer", "load_fit_source_records", "extract_fit_representations",
+            "leave_one_out_fixed_probe", "stage_q_global_gate", "validate_stage_q_result",
+            "atomic_publish_json",
         },
         "Stage-Q path",
     )
@@ -479,6 +488,8 @@ def validate() -> None:
         raise ValidationError("Stage-Q lifecycle validation is not before neutral-result validation")
     if not called_before(stage_q, "validate_mode_lifecycle", "consume_authorization"):
         raise ValidationError("Stage-Q lifecycle validation is not before authorization consumption")
+    if not called_before(stage_q, "build_historical_neutral_binding", "validate_neutral_result"):
+        raise ValidationError("historical neutral-result binding is not built before result validation")
     if not called_before(stage_q, "validate_neutral_result", "consume_authorization"):
         raise ValidationError("Stage-Q neutral drift is not checked before authorization consumption")
     if not called_before(stage_q, "consume_authorization", "_load_model_and_tokenizer"):
@@ -495,6 +506,19 @@ def validate() -> None:
     require_calls(adapter, {"validate_fit_eval_routing"}, "FIT source adapter")
     if not called_before(stage_q, "validate_stage_q_result", "atomic_publish_json"):
         raise ValidationError("Stage-Q result is not validated before publication")
+    historical_binding = function_node(tree, "build_historical_neutral_binding")
+    historical_binding_source = ast.unparse(historical_binding)
+    for token in (
+        "EXPECTED_NEUTRAL_RESULT_SHA256",
+        "EXPECTED_NEUTRAL_PRODUCER_COMMIT",
+        "EXPECTED_NEUTRAL_PRODUCER_RUNNER_SHA256",
+        "EXPECTED_NEUTRAL_PRODUCER_VALIDATOR_SHA256",
+        "_git_blob_sha256",
+        "sha256_file",
+    ):
+        if token not in historical_binding_source:
+            raise ValidationError(f"historical neutral-result provenance binding is missing {token}")
+    function_node(tree, "_git_blob_sha256")
     neutral_validator = function_node(tree, "validate_neutral_result")
     require_calls(
         neutral_validator,
@@ -602,6 +626,7 @@ def validate() -> None:
     for name in (
         REQUIRED_COMMIT_BINDING_TESTS
         | REQUIRED_DISPOSITION_TESTS
+        | REQUIRED_HISTORICAL_PROVENANCE_TESTS
         | REQUIRED_CHECKPOINT_MAPPING_TESTS
         | REQUIRED_LIFECYCLE_TESTS
     ):
@@ -710,6 +735,61 @@ def validate() -> None:
             pass
         else:
             raise ValidationError("unresolved historical disposition does not block a distinct active replacement")
+    with tempfile.TemporaryDirectory() as tmpdir:
+        provenance_runner = load_runner_module()
+        neutral_result_path = ROOT / "experiments/exp021/engineering/neutral_result.json"
+        if not neutral_result_path.is_file():
+            raise ValidationError("real neutral qualification result is missing for provenance proof")
+        result = provenance_runner.read_json_no_duplicates(neutral_result_path)
+        historical_binding = provenance_runner.build_historical_neutral_binding(
+            ROOT,
+            neutral_result_path,
+            result,
+        )
+        if historical_binding.get("runner_commit") != "6d828cafc5c22926cdfce5060118b1dcaf15aeb4":
+            raise ValidationError("historical neutral producer commit is not independently identified")
+        current_commit = provenance_runner._git_output(ROOT, "rev-parse", "HEAD")
+        if historical_binding.get("runner_commit") == current_commit:
+            raise ValidationError("historical producer and current executor identities are not separated")
+        try:
+            provenance_runner.validate_neutral_result(result, authority, historical_binding)
+        except Exception as exc:
+            raise ValidationError(
+                f"historically valid neutral result does not validate against producer identity: {exc}"
+            )
+        current_binding = {
+            "runner_commit": current_commit,
+            "runner_sha256": provenance_runner.implementation_hashes(ROOT)["runner"],
+            "implementation_hashes": provenance_runner.implementation_hashes(ROOT),
+            "authority_hashes": provenance_runner.authority_hashes(ROOT),
+            "model_manifest": provenance_runner.model_manifest_binding(
+                authority["primary_model_identity"]
+            ),
+            "environment_binding": provenance_runner.required_environment_binding(),
+            "runtime_identity": {
+                key: result["execution_environment"][key]
+                for key in provenance_runner.RUNTIME_IDENTITY_KEYS
+            },
+        }
+        try:
+            provenance_runner.validate_neutral_result(result, authority, current_binding)
+        except Exception:
+            pass
+        else:
+            raise ValidationError("current-executor drift no longer fails closed for historical neutral result")
+        tampered = dict(result)
+        tampered["runner_commit"] = "0" * 40
+        try:
+            provenance_runner.build_historical_neutral_binding(
+                ROOT,
+                neutral_result_path,
+                tampered,
+            )
+        except Exception:
+            pass
+        else:
+            raise ValidationError("tampered historical producer commit is accepted")
+
     mapping_validator = function_node(tree, "validate_checkpoint_mapping")
     mapping_validator_source = ast.unparse(mapping_validator)
     if "tuple_semantics" not in mapping_validator_source or "TUPLE_SEMANTICS_FROZEN_TEXT" not in mapping_validator_source:

@@ -432,6 +432,11 @@ def _patch_lifecycle_common_entry_boundary(monkeypatch, authority, binding, even
         return binding
 
     monkeypatch.setattr(stage_q, "build_static_execution_binding", fake_build_static_execution_binding)
+    monkeypatch.setattr(
+        stage_q,
+        "build_historical_neutral_binding",
+        lambda *args, **kwargs: binding,
+    )
 
 
 def _install_neutral_entry_harness(
@@ -547,6 +552,12 @@ def _install_stage_q_entry_harness(monkeypatch, authority, binding, neutral_resu
     published = {}
 
     _patch_common_entry_boundary(monkeypatch, authority, binding, events)
+
+    monkeypatch.setattr(
+        stage_q,
+        "build_historical_neutral_binding",
+        lambda *args, **kwargs: binding,
+    )
 
     def fake_read_json_no_duplicates(path):
         events.append("read_json_no_duplicates")
@@ -1736,6 +1747,107 @@ def test_neutral_result_accepts_complete_identity():
     binding = synthetic_binding(authority)
     result = valid_neutral_result(authority, binding)
     stage_q.validate_neutral_result(result, authority, binding)
+
+
+def _install_historical_neutral_binding_fixture(
+    tmp_path, monkeypatch, *, runner_commit="A", runner_sha="a" * 64, validator_sha="b" * 64
+):
+    authority = synthetic_authority()
+    binding = synthetic_binding(authority)
+    result = valid_neutral_result(
+        authority,
+        binding,
+        runner_commit=runner_commit,
+        runner_sha256=runner_sha,
+        implementation_hashes={"runner": runner_sha, "validator": validator_sha},
+    )
+    result_path = tmp_path / "neutral_result.json"
+    write_json(result_path, result)
+    monkeypatch.setattr(
+        stage_q, "EXPECTED_NEUTRAL_RESULT_SHA256", stage_q.sha256_file(result_path)
+    )
+    monkeypatch.setattr(stage_q, "EXPECTED_NEUTRAL_PRODUCER_COMMIT", runner_commit)
+    monkeypatch.setattr(stage_q, "EXPECTED_NEUTRAL_PRODUCER_RUNNER_SHA256", runner_sha)
+    monkeypatch.setattr(
+        stage_q, "EXPECTED_NEUTRAL_PRODUCER_VALIDATOR_SHA256", validator_sha
+    )
+
+    def fake_git_blob(repo_root, commit, relative_path):
+        if relative_path == stage_q.RUNNER_IMPLEMENTATION_RELATIVE_PATH.as_posix():
+            return runner_sha
+        if relative_path == stage_q.VALIDATOR_IMPLEMENTATION_RELATIVE_PATH.as_posix():
+            return validator_sha
+        raise AssertionError(f"unexpected git blob path: {relative_path}")
+
+    monkeypatch.setattr(stage_q, "_git_blob_sha256", fake_git_blob)
+    return authority, binding, result, result_path
+
+
+def test_historical_neutral_producer_and_current_executor_identity_are_independent(
+    tmp_path, monkeypatch
+):
+    authority, binding, result, result_path = _install_historical_neutral_binding_fixture(
+        tmp_path, monkeypatch, runner_commit="A"
+    )
+    historical_binding = stage_q.build_historical_neutral_binding(
+        tmp_path, result_path, result
+    )
+    assert historical_binding["runner_commit"] == "A"
+    assert binding["runner_commit"] != historical_binding["runner_commit"]
+    stage_q.validate_neutral_result(result, authority, historical_binding)
+
+
+def test_historical_neutral_producer_commit_tamper_fails(tmp_path, monkeypatch):
+    authority, _binding, result, result_path = _install_historical_neutral_binding_fixture(
+        tmp_path, monkeypatch, runner_commit="A"
+    )
+    result["runner_commit"] = "B"
+    write_json(result_path, result)
+    monkeypatch.setattr(
+        stage_q, "EXPECTED_NEUTRAL_RESULT_SHA256", stage_q.sha256_file(result_path)
+    )
+    with pytest.raises(stage_q.ProtocolError, match="producer commit"):
+        stage_q.build_historical_neutral_binding(tmp_path, result_path, result)
+
+
+def test_historical_neutral_producer_runner_sha_tamper_fails(tmp_path, monkeypatch):
+    authority, _binding, result, result_path = _install_historical_neutral_binding_fixture(
+        tmp_path, monkeypatch, runner_sha="a" * 64
+    )
+    result["runner_sha256"] = "f" * 64
+    write_json(result_path, result)
+    monkeypatch.setattr(
+        stage_q, "EXPECTED_NEUTRAL_RESULT_SHA256", stage_q.sha256_file(result_path)
+    )
+    with pytest.raises(stage_q.ProtocolError, match="runner SHA"):
+        stage_q.build_historical_neutral_binding(tmp_path, result_path, result)
+
+
+def test_stage_q_current_executor_drift_after_historical_result_still_fails(
+    tmp_path, monkeypatch
+):
+    authority, _binding, result, result_path = _install_historical_neutral_binding_fixture(
+        tmp_path, monkeypatch, runner_commit="A", runner_sha="a" * 64
+    )
+    historical_binding = stage_q.build_historical_neutral_binding(
+        tmp_path, result_path, result
+    )
+    stage_q.validate_neutral_result(result, authority, historical_binding)
+    drifted_binding = dict(historical_binding)
+    drifted_binding["runner_commit"] = "CURRENT-EXECUTOR"
+    drifted_binding["runner_sha256"] = "c" * 64
+    drifted_binding["implementation_hashes"] = {"runner": "c" * 64, "validator": "d" * 64}
+    with pytest.raises(stage_q.ProtocolError, match="drift in runner_commit"):
+        stage_q.validate_neutral_result(result, authority, drifted_binding)
+
+
+def test_stage_q_neutral_result_sha_dependency_mismatch_fails(tmp_path, monkeypatch):
+    authority, _binding, result, result_path = _install_historical_neutral_binding_fixture(
+        tmp_path, monkeypatch
+    )
+    monkeypatch.setattr(stage_q, "EXPECTED_NEUTRAL_RESULT_SHA256", "0" * 64)
+    with pytest.raises(stage_q.ProtocolError, match="SHA dependency mismatch"):
+        stage_q.build_historical_neutral_binding(tmp_path, result_path, result)
 
 
 @pytest.mark.parametrize(

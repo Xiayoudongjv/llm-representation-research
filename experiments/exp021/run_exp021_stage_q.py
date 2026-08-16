@@ -61,6 +61,12 @@ NEUTRAL_RESULT_RELATIVE_PATH = Path("experiments/exp021/engineering/neutral_resu
 NEUTRAL_CONSUMPTION_RELATIVE_PATH = Path("experiments/exp021/consumed/neutral.json")
 STAGE_Q_RESULT_RELATIVE_PATH = Path("experiments/exp021/engineering/stage_q_result.json")
 STAGE_Q_CONSUMPTION_RELATIVE_PATH = Path("experiments/exp021/consumed/stage_q.json")
+RUNNER_IMPLEMENTATION_RELATIVE_PATH = Path("experiments/exp021/run_exp021_stage_q.py")
+VALIDATOR_IMPLEMENTATION_RELATIVE_PATH = Path("experiments/exp021/validate_exp021_stage_q_implementation.py")
+EXPECTED_NEUTRAL_RESULT_SHA256 = "0a6273050e6c9974e917ea4de4865bc8428a5b7f634a32c29d8a634ae49c9bf1"
+EXPECTED_NEUTRAL_PRODUCER_COMMIT = "6d828cafc5c22926cdfce5060118b1dcaf15aeb4"
+EXPECTED_NEUTRAL_PRODUCER_RUNNER_SHA256 = "eb083ccb216b6d2987cf5de217fc1bb3f6361af4cebf0f702c63560b83715259"
+EXPECTED_NEUTRAL_PRODUCER_VALIDATOR_SHA256 = "3ba0c0e32596c2cdaf35740f4410162b9d681684d95b759ea626c2b3b1170ee4"
 LIFECYCLE_EXPERIMENT_DIR = Path("experiments/exp021")
 LIFECYCLE_MODE_STATIC = "static"
 LIFECYCLE_MODE_NEUTRAL = "neutral"
@@ -355,6 +361,20 @@ def _git_output(repo_root: Path, *args: str) -> str:
         return subprocess.check_output(["git", *args], cwd=repo_root, text=True).strip()
     except (OSError, subprocess.CalledProcessError) as exc:
         raise ProtocolError(f"Git identity check failed: git {' '.join(args)}") from exc
+
+
+def _git_blob_sha256(repo_root: Path, commit: str, relative_path: str) -> str:
+    """Return the SHA-256 of a committed Git blob without changing live HEAD."""
+    try:
+        blob = subprocess.check_output(
+            ["git", "show", f"{commit}:{relative_path}"],
+            cwd=repo_root,
+        )
+    except (OSError, subprocess.CalledProcessError) as exc:
+        raise ProtocolError(
+            f"Historical Git blob unavailable: {commit}:{relative_path}"
+        ) from exc
+    return sha256_bytes(blob)
 
 
 def _validate_safetensors_header(path: Path) -> None:
@@ -1392,6 +1412,74 @@ def build_static_execution_binding(root: str | Path, authority: Mapping[str, Any
         "model_manifest": model_manifest_binding(authority["primary_model_identity"]),
         "environment_binding": required_environment_binding(),
         "runtime_identity": runtime_identity_binding(),
+    }
+
+
+def build_historical_neutral_binding(
+    repo_root: str | Path,
+    result_path: str | Path,
+    result: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Build the immutable producing-runner binding for a historical neutral result.
+
+    Stage-Q validates the neutral prerequisite against the implementation that
+    actually produced it, not against the current Stage-Q runner.  The result
+    file must still be the frozen canonical bytes, and its recorded producer
+    identities must match the archived Git blobs at the frozen producer commit.
+    """
+    root = Path(repo_root).resolve()
+    if sha256_file(result_path) != EXPECTED_NEUTRAL_RESULT_SHA256:
+        raise ProtocolError("Stage-Q neutral result SHA dependency mismatch")
+    require_exact_keys(result, NEUTRAL_RESULT_KEYS, "neutral result")
+    runner_commit = require_string(result["runner_commit"], "neutral result runner_commit")
+    runner_sha256 = require_string(result["runner_sha256"], "neutral result runner_sha256")
+    implementation_hashes = result["implementation_hashes"]
+    if not isinstance(implementation_hashes, Mapping) or set(implementation_hashes) != {"runner", "validator"}:
+        raise ProtocolError("neutral result implementation_hashes schema mismatch")
+    validator_sha256 = require_string(
+        implementation_hashes["validator"], "neutral result validator hash"
+    )
+    if runner_commit != EXPECTED_NEUTRAL_PRODUCER_COMMIT:
+        raise ProtocolError("Neutral result producer commit is not the frozen historical commit")
+    if runner_sha256 != EXPECTED_NEUTRAL_PRODUCER_RUNNER_SHA256:
+        raise ProtocolError("Neutral result producer runner SHA is not the frozen historical identity")
+    if implementation_hashes["runner"] != EXPECTED_NEUTRAL_PRODUCER_RUNNER_SHA256:
+        raise ProtocolError("Neutral result producer runner hash mismatch")
+    if validator_sha256 != EXPECTED_NEUTRAL_PRODUCER_VALIDATOR_SHA256:
+        raise ProtocolError("Neutral result producer validator hash mismatch")
+    if (
+        _git_blob_sha256(
+            root,
+            runner_commit,
+            RUNNER_IMPLEMENTATION_RELATIVE_PATH.as_posix(),
+        )
+        != runner_sha256
+    ):
+        raise ProtocolError("Historical runner Git blob does not match producer runner SHA")
+    if (
+        _git_blob_sha256(
+            root,
+            runner_commit,
+            VALIDATOR_IMPLEMENTATION_RELATIVE_PATH.as_posix(),
+        )
+        != validator_sha256
+    ):
+        raise ProtocolError("Historical validator Git blob does not match producer validator SHA")
+    execution_environment = result["execution_environment"]
+    if not isinstance(execution_environment, Mapping):
+        raise ProtocolError("neutral result execution_environment must be an object")
+    runtime_identity = {
+        key: require_string(execution_environment[key], f"execution_environment.{key}")
+        for key in RUNTIME_IDENTITY_KEYS
+    }
+    return {
+        "runner_commit": runner_commit,
+        "runner_sha256": runner_sha256,
+        "implementation_hashes": implementation_hashes,
+        "authority_hashes": result["authority_hashes"],
+        "model_manifest": result["model_manifest"],
+        "environment_binding": required_environment_binding(),
+        "runtime_identity": runtime_identity,
     }
 
 
@@ -2616,7 +2704,12 @@ def run_stage_q(repo_root: str | Path) -> None:
     binding = build_static_execution_binding(root, authority)
     neutral_result_path = confined_path(root / NEUTRAL_RESULT_RELATIVE_PATH, root)
     neutral_result = read_json_no_duplicates(neutral_result_path)
-    validate_neutral_result(neutral_result, authority, binding)
+    historical_binding = build_historical_neutral_binding(
+        root,
+        neutral_result_path,
+        neutral_result,
+    )
+    validate_neutral_result(neutral_result, authority, historical_binding)
     auth_path = confined_path(root / "experiments/exp021/authorization/stage_q.json", root)
     consumption_path = confined_path(root / "experiments/exp021/consumed/stage_q.json", root, allow_missing=True)
     output_path = confined_path(STAGE_Q_RESULT_RELATIVE_PATH, root, allow_missing=True)

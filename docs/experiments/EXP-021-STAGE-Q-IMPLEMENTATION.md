@@ -560,3 +560,13 @@ Unresolved `PREPARED`, `PARTIAL`, `AMBIGUOUS_OR_CORRUPT`, malformed, hash-mismat
 identity-mismatched, or cross-authorization historical evidence still blocks a
 replacement. The current fresh 089Q neutral authorization remains issued,
 unconsumed, and non-executable after this runner edit.
+## Task 090D correction
+
+Task 090D separates historical neutral-result provenance validation from the
+current Stage-Q executor identity. A canonical neutral qualification result is
+validated against the exact implementation identity that produced it, including
+the frozen producing commit, producing runner SHA-256, and archived Git blobs.
+The current Stage-Q authorization is still independently validated against the
+live HEAD and current runner SHA-256 before consumption. A later reviewed
+runner commit does not retroactively invalidate an immutable historical result,
+but the exact canonical neutral-result SHA-256 dependency remains mandatory.

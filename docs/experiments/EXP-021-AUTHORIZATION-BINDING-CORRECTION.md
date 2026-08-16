@@ -96,3 +96,13 @@ authorization bytes remain preserved. Consumed and dispositioned are distinct
 terminal lifecycle histories: disposition applies to an unconsumed superseded
 authorization, while consumption is the single-use exhaustion after an
 authorized launch. Mismatched or malformed consumption evidence fails closed.
+## Task 090D correction
+
+Task 090D separates historical neutral-result provenance validation from the
+current Stage-Q executor identity. A canonical neutral qualification result is
+validated against the exact implementation identity that produced it, including
+the frozen producing commit, producing runner SHA-256, and archived Git blobs.
+The current Stage-Q authorization is still independently validated against the
+live HEAD and current runner SHA-256 before consumption. A later reviewed
+runner commit does not retroactively invalidate an immutable historical result,
+but the exact canonical neutral-result SHA-256 dependency remains mandatory.
