@@ -1,0 +1,203 @@
+﻿# EXP-022A Protocol Reconciliation
+
+## General status
+
+EXP-022A is a new clean-state mechanism-diagnosis experiment.
+
+It is not:
+
+- an EXP-021 retry;
+- Stage-P;
+- an intervention-propagation experiment;
+- a functional-binding experiment.
+
+Current core question:
+
+Does late clean-state fixed source-class readout degradation reflect:
+
+1. featurewise calibration drift;
+2. readout-coordinate remapping;
+3. held-out source-class linear decodability decline;
+4. mixed / split-heterogeneous behavior;
+5. indeterminate evidence?
+
+## Authority Extraction A - Label Semantics
+
+- `STATUS = EXP022A_091A_LABEL_SEMANTICS_RESOLVED`
+- Class universe: `logic`, `causality`, `analogy`, `definition`
+- Stage-Q `y_true = SOURCE_SEMANTIC_CLASS`
+- Stage-Q predicted-class role: `SOURCE_SEMANTIC_CLASS`
+- `source class = intrinsic source-item semantic identity`
+- `target class = directed intervention destination`
+- `source_class == y_true = PROVED_EQUIVALENT`
+- `target_class == y_true = PROVED_DISTINCT`
+- `EXP-018 target_probability target vs Stage-Q y_true = DISTINCT_ROLE`
+- `original/paraphrase y_true semantic class = INVARIANT`
+- Do not infer source-family identity from this invariance.
+
+## Authority Extraction B - Intervention and State Semantics
+
+- `STATUS = EXP022A_091B_INTERVENTION_SEMANTICS_RESOLVED`
+- Historical intervention direction: `delta_task = centroid_target_FIT - centroid_source_FIT`
+- Direction uses split-specific FIT centroids.
+- Historical TASK intervention: `h' = h + beta * delta_(s->t)`
+- `EXP-018 / EXP-020A intervention = offline held-out representation manipulation`
+- `EXP-021 Stage-Q = NO INTERVENTION`
+- `Stage-Q X = BASELINE_SOURCE_STATE`
+- `Stage-Q states = clean unmodified forward representations`
+- `Stage-Q measurement role = SOURCE_CLASS_READOUT_ON_NONINTERVENED_STATES`
+- `target acquisition = NOT OBSERVABLE`
+- `Stage-Q baseline availability = BASELINE_ONLY`
+- `EXP-021 relation to EXP-018/020 intervention object = different operational measurement construct`
+
+Clarification: different operational construct does not mean unrelated broader
+research question.
+
+## Corrected EXP-021 / 090Z interpretation
+
+- `EXP021 Q3 = QUALIFICATION_FAILED`
+- Result SHA-256: `833002c8e8bf47883bbab2063c4dfe7d91346a1c055ac5df4d50357cb061b851`
+- Consumption SHA-256: `eb1fd673569c914e1a23386df021476f6c155a17b3fa7fc7b3df9e06f1abb96a`
+
+Directly measured:
+
+- clean-state fixed source-semantic-class readout degradation across depth
+
+Not directly measured:
+
+- intervention propagation
+- target acquisition
+- perturbation transport
+- coordinate-remapping mechanism
+- information disappearance
+- functional binding
+
+Status classification:
+
+- `DIRECTLY_MEASURED`: fixed source-class readout degradation
+- `CONSISTENT_BUT_NOT_IDENTIFIED`: source-class linear decodability change, readout-coordinate remapping, representation/statistical change
+- `NOT_MEASURED`: target acquisition, intervention perturbation transport, functional binding
+
+090Z is not described as intervention propagation.
+
+## Authority Extraction C - Source-Family Mapping
+
+- `EXP022A_091C_SOURCE_FAMILY_MAPPING_BLOCKED`
+- Controlled artifact: `experiments/exp003/prompts_controlled.json`
+- Controlled artifact SHA-256: `72dab733e6a1639dfc80d186f3af1dbce5c6d70da4905e6d6d422cf47064c472`
+- Fields: `id`, `group`, `variant_type`, `text`
+- Explicit pair/base/source-family field: `none`
+- Pairing classification: `ID_GRAMMAR_ONLY`
+- ID grammar authority: `false`
+- Historical production treats original/paraphrase as explicit class-balanced FIT/EVAL ID sets, not authoritative paired source families.
+- Complementary split relation: `CLASS_BALANCED_BUT_NOT_FAMILY_SWAP`
+- Historical source-family cluster: `NOT_SUPPORTED`
+- Derived historical family manifest eligibility: `false`
+
+Do NOT treat `*_orig_01` and `*_para_01` as the same source family without a
+future new frozen authority.
+
+## Statistical consequence of 091C
+
+Retired design candidate:
+
+```text
+SOURCE-FAMILY SUPER-CLUSTER BOOTSTRAP = REJECTED FOR CURRENT HISTORICAL DATA
+```
+
+This is a design correction, not a scientific result.
+
+Replacement current statistical candidate:
+
+```text
+SPLIT-WISE EVAL-ITEM CLUSTERING
+```
+
+For each split separately:
+
+- cluster unit candidate = held-out EVAL record identity
+- all repeated measurements for that record stay together
+- all layers stay together
+- all readout conditions stay together
+
+Class stratification candidate:
+
+- 3 logic
+- 3 causality
+- 3 analogy
+- 3 definition
+
+Do NOT yet freeze:
+
+- bootstrap replicate count
+- RNG seed
+- CI method
+
+## A/B split relation
+
+- `A/B source-family independence = UNRESOLVED`
+
+Therefore prohibit in current design:
+
+- treating A+B as 24 independent observations
+- source-family paired A/B bootstrap
+- claims that A/B are exact paired family swaps
+
+Current inferential candidate:
+
+- analyze A separately
+- analyze B separately
+- use cross-split concordance/heterogeneity as a replication diagnostic
+
+Do NOT define exact concordance threshold yet.
+
+## Current EXP-022A design candidate
+
+Record as `NEW_FREEZE_PENDING`:
+
+- clean-state only
+- readout ladder:
+  - `A0 Fixed`
+  - `A1 Featurewise-Affine Recalibration`
+  - `A2 Layer-wise Linear Refit`
+- Reference: `block16 / hidden_states[17]`
+- Candidate primary final endpoint: `final block pre-final-RMSNorm`
+- Full L16-L27 trajectory: `secondary`
+- post-final-RMSNorm: `secondary mechanistic endpoint`
+
+Primary candidate estimands:
+
+```text
+G_scale  = BA_recal - BA_fixed
+G_refit  = BA_refit - BA_fixed
+G_noncal = BA_refit - BA_recal
+R_refit  = BA_refit_final - BA_refit_reference
+```
+
+All remain `NOT YET FROZEN`.
+
+## Reconciliation matrix
+
+- semantic universe: `REUSE_FROZEN`
+- source label semantics: `RESOLVED / REUSE_FROZEN`
+- target label semantics: `RESOLVED / DISTINCT ROLE`
+- Stage-Q clean-state semantics: `RESOLVED / REUSE_FROZEN`
+- historical intervention semantics: `RESOLVED / REUSE_FROZEN FOR HISTORICAL CONTEXT`
+- historical source-family mapping: `BLOCKED / NOT AVAILABLE`
+- source-family bootstrap: `NOT SUPPORTED FOR CURRENT DATA`
+- split-wise held-out-item clustering: `RECONCILE_THEN_FREEZE`
+- qualification-rule portability: `PENDING_091D`
+- Fixed readout: `RECONCILE_THEN_FREEZE`
+- Featurewise recalibration: `NEW_FREEZE_PENDING`
+- Layer-wise refit: `NEW_FREEZE_PENDING`
+- structured alignment: `OUT_OF_SCOPE_022A`
+- perturbation transport: `OUT_OF_SCOPE_022A`
+- functional binding: `OUT_OF_SCOPE_022A`
+
+## Frozen authority references
+
+- EXP-021 preregistration SHA-256: `2ea9c54a49c41b3c1c8e6c39b029dc333d3ee6753ae0608603d6365ae063301a`
+- EXP-021 amendment SHA-256: `c026587c90b74d75e9f395001f94732d41f3b550c22247e5613cc6d3cc880635`
+- EXP-021 reconciliation SHA-256: `4630a253db1454c9b6cb0850bf6f99cf61781d44e48e37994cba8e1c6d47da95`
+- EXP-018 validation conditions SHA-256: `4ce4ebb1af318e7c25725980680c0dc62762e20790adcb7abf2026130f0d4169`
+- EXP-020A frozen config SHA-256: `f760f781b4b744a10938eb4de032e0cc345a021706821ecf0ca8523f5d57e667`
