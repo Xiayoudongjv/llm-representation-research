@@ -5,7 +5,12 @@ experimental artifacts outrank it.
 
 ## Current research phase
 
-EXP-022A preregistration preparation
+EXP-022A preregistration draft + static operational reconciliation
+
+## Current preregistration draft
+
+- `docs/experiments/EXP-022A-PREREGISTRATION-DRAFT.md`
+- Status: `v0.1` / `DRAFT` / `NOT FROZEN`
 
 ## Read order
 
@@ -13,7 +18,8 @@ EXP-022A preregistration preparation
 2. `CLAIM-LEDGER.md`
 3. `CONSTRUCT-REGISTRY.md`
 4. `experiments/EXP-022A-PROTOCOL-RECONCILIATION.md`
-5. canonical experiment authority/results
+5. `../experiments/EXP-022A-PREREGISTRATION-DRAFT.md`
+6. canonical experiment authority/results
 
 ## Resolved historical gates
 
@@ -26,9 +32,14 @@ EXP-022A preregistration preparation
 
 COMPLETE
 
+## Protocol reconciliation
+
+v1.0 COMPLETE
+
 ## Current next action
 
-Draft EXP-022A Preregistration v0.1 from reconciliation v1.0.
+Task 092B — read-only static operational reconciliation of EXP-022A constants.
 
-Do not run implementation/model work before preregistration is frozen and
-independently reviewed.
+Then: independent preregistration review before freeze.
+
+No implementation/model/EVAL execution is authorized.
