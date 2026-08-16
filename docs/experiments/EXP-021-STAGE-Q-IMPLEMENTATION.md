@@ -504,7 +504,10 @@ Static preflight:
 - current active neutral authorization is recognized but not executable;
 - unknown paths, legacy stale paths, multiple active authorizations,
   active-plus-consumed contradictions, result-without-consumption, and
-  active-plus-completed-disposition contradictions fail closed;
+  same-identity active-plus-completed-disposition contradictions fail closed;
+- completed historical dispositions of distinct authorization identities are
+  retained as audit evidence and may coexist with exactly one later active
+  authorization;
 - an active authorization may coexist with a matching `PREPARED` journal for
   the interrupted-before-move disposition state.
 
@@ -513,15 +516,32 @@ Neutral qualification:
 - no neutral consumption record;
 - no neutral engineering result;
 - no Stage-Q launch state, consumption, or result;
-- no active disposition lifecycle.
+- no disposition lifecycle for the active authorization identity; distinct
+  completed historical dispositions may coexist.
 
 Stage-Q:
 - neutral authorization must be consumed;
 - neutral engineering result must exist;
 - active Stage-Q authorization must exist;
 - no Stage-Q consumption or result may already exist;
-- no active neutral authorization or disposition lifecycle.
+- no active neutral authorization or disposition lifecycle for the active
+  Stage-Q identity; distinct completed historical dispositions may coexist.
 
 Disposition and recovery paths are recognized by the generic inspector without
 being globally rejected, but unknown children under those namespaces remain
 fail closed.
+
+## Task 089R correction
+
+Task 089R makes impossible-state validation authorization-identity-aware.
+Completed historical disposition artifacts are grouped by the authorization
+SHA-256 encoded in their canonical paths, and each non-active group must
+contain one archive, one valid completed disposition record, and zero or one
+matching journal. A completed historical disposition may coexist with a later
+active authorization of a distinct identity.
+
+Same-identity active/archive/disposition conflicts still fail closed.
+Unresolved `PREPARED`, `PARTIAL`, `AMBIGUOUS_OR_CORRUPT`, malformed, hash-mismatched,
+identity-mismatched, or cross-authorization historical evidence still blocks a
+replacement. The current fresh 089Q neutral authorization remains issued,
+unconsumed, and non-executable after this runner edit.

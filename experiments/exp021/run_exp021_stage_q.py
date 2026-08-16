@@ -520,6 +520,7 @@ def inspect_lifecycle_paths(repo_root: str | Path) -> dict[str, Any]:
     """Return the closed-world lifecycle path state for EXP-021 mutable artifacts."""
     root = Path(repo_root).resolve()
     state: dict[str, Any] = {
+        "root": root,
         "active_neutral": None,
         "active_stage_q": None,
         "consumed_neutral": None,
@@ -607,14 +608,95 @@ def _lifecycle_artifact_sha256(relative: str) -> str | None:
     return None
 
 
+def _group_disposition_artifacts(state: Mapping[str, Any]) -> dict[str, dict[str, list[str]]]:
+    """Group canonical disposition paths by their encoded authorization SHA-256."""
+    groups: dict[str, dict[str, list[str]]] = {}
+    for kind in ("archives", "journals", "records"):
+        for relative in state[f"disposition_{kind}"]:
+            digest = _lifecycle_artifact_sha256(relative)
+            if digest is None:
+                raise ProtocolError(f"Disposition artifact has an invalid identity: {relative}")
+            group = groups.setdefault(digest, {"archives": [], "journals": [], "records": []})
+            group[kind].append(relative)
+    return groups
+
+
+def _validate_completed_historical_disposition(
+    root: Path,
+    digest: str,
+    group: Mapping[str, list[str]],
+    *,
+    active_authorization_id: str | None,
+) -> None:
+    """Require a non-active disposition identity to be fully resolved and internally valid."""
+    archives = group["archives"]
+    journals = group["journals"]
+    records = group["records"]
+    if len(archives) != 1 or len(records) != 1:
+        raise ProtocolError(
+            "Impossible lifecycle state: unresolved historical disposition blocks a replacement authorization"
+        )
+    if len(journals) > 1:
+        raise ProtocolError("Impossible lifecycle state: malformed historical disposition journal evidence")
+    archive_rel = archives[0]
+    record_rel = records[0]
+    archive_path = root / archive_rel
+    record_path = root / record_rel
+    if sha256_file(archive_path) != digest:
+        raise ProtocolError("Impossible lifecycle state: historical disposition archive hash mismatch")
+    record = read_json_no_duplicates(record_path)
+    validate_disposition_record(record)
+    if record["authorization_sha256"] != digest:
+        raise ProtocolError("Impossible lifecycle state: historical disposition identity mismatch")
+    if active_authorization_id is not None and record["authorization_id"] == active_authorization_id:
+        raise ProtocolError("Impossible lifecycle state: active authorization has a completed disposition")
+    if record["authorization_scope"] not in {NEUTRAL_SCOPE, STAGE_Q_SCOPE}:
+        raise ProtocolError("Impossible lifecycle state: historical disposition scope mismatch")
+    archived = read_json_no_duplicates(archive_path)
+    archived_keys = (
+        NEUTRAL_AUTHORIZATION_KEYS
+        if record["authorization_scope"] == NEUTRAL_SCOPE
+        else STAGE_Q_AUTHORIZATION_KEYS
+    )
+    require_exact_keys(archived, archived_keys, "archived authorization")
+    if archived["schema_version"] != SCHEMA_VERSION or archived["experiment"] != EXPERIMENT:
+        raise ProtocolError("Impossible lifecycle state: historical disposition archive schema mismatch")
+    if archived["scope"] != record["authorization_scope"]:
+        raise ProtocolError("Impossible lifecycle state: historical disposition archive scope mismatch")
+    if archived["authorization_id"] != record["authorization_id"]:
+        raise ProtocolError("Impossible lifecycle state: historical disposition archive authorization ID mismatch")
+    if (
+        archived["runner_commit"] != record["authorization_runner_commit"]
+        or archived["runner_sha256"] != record["authorization_runner_sha256"]
+    ):
+        raise ProtocolError("Impossible lifecycle state: historical disposition archive runner identity mismatch")
+    expected_transaction_id, expected_record_id = _disposition_transaction_ids(digest)
+    if record["transaction_id"] != expected_transaction_id or record["disposition_record_id"] != expected_record_id:
+        raise ProtocolError("Impossible lifecycle state: historical disposition transaction identity mismatch")
+    if record["archived_authorization_path"] != archive_rel:
+        raise ProtocolError("Impossible lifecycle state: historical disposition archive path mismatch")
+    if journals:
+        journal_rel = journals[0]
+        journal_path = root / journal_rel
+        journal = read_json_no_duplicates(journal_path)
+        validate_disposition_journal(journal)
+        if journal["authorization_sha256"] != digest:
+            raise ProtocolError("Impossible lifecycle state: historical disposition journal identity mismatch")
+        if journal["transaction_id"] != expected_transaction_id or journal["disposition_record_id"] != expected_record_id:
+            raise ProtocolError("Impossible lifecycle state: historical disposition journal transaction mismatch")
+        if journal["expected_archive_path"] != archive_rel or journal["expected_disposition_path"] != record_rel:
+            raise ProtocolError("Impossible lifecycle state: historical disposition journal path mismatch")
+        if record["journal_sha256"] != journal["journal_sha256"]:
+            raise ProtocolError("Impossible lifecycle state: historical disposition journal record mismatch")
+
+
 def _validate_no_impossible_lifecycle_state(state: Mapping[str, Any]) -> None:
     """Reject contradictory active/consumed/result/disposition combinations.
 
-    A single PREPARED journal may coexist with the matching active
-    authorization (the normal interrupted-before-move state). Archive and
-    completed disposition artifacts may not coexist with any active
-    authorization, and a journal for a different authorization while another
-    authorization remains active is treated as unresolved replacement state.
+    Completed historical dispositions are grouped by authorization SHA-256 and
+    may coexist with a later active authorization of a different identity.
+    Same-identity active/disposition conflicts and unresolved prior generations
+    remain fail closed.
     """
     if state["active_neutral"] is not None and state["active_stage_q"] is not None:
         raise ProtocolError("Impossible lifecycle state: multiple active authorizations")
@@ -632,19 +714,48 @@ def _validate_no_impossible_lifecycle_state(state: Mapping[str, Any]) -> None:
         for path in (state["active_neutral"], state["active_stage_q"])
         if path is not None
     ]
+    active_hashes = {sha256_file(path) for path in active_paths} if active_paths else set()
+    root = Path(state["root"])
+    groups = _group_disposition_artifacts(state)
+    active_ids: list[str | None] = []
+    if active_paths and groups:
+        for path in active_paths:
+            auth = read_json_no_duplicates(path)
+            if isinstance(auth, Mapping) and isinstance(auth.get("authorization_id"), str):
+                active_ids.append(auth["authorization_id"])
+            else:
+                active_ids.append(None)
+
+    for digest, group in groups.items():
+        if digest in active_hashes:
+            if group["archives"] or group["records"]:
+                raise ProtocolError(
+                    "Impossible lifecycle state: active authorization with archive or completed disposition"
+                )
+            continue
+        _validate_completed_historical_disposition(
+            root,
+            digest,
+            group,
+            active_authorization_id=active_ids[0] if active_ids else None,
+        )
+
+
+def _reject_active_identity_disposition_state(state: Mapping[str, Any]) -> None:
+    """Reject disposition artifacts that refer to the currently active authorization."""
+    active_paths = [
+        path
+        for path in (state["active_neutral"], state["active_stage_q"])
+        if path is not None
+    ]
     if not active_paths:
         return
     active_hashes = {sha256_file(path) for path in active_paths}
-    if state["disposition_archives"] or state["disposition_records"]:
-        raise ProtocolError(
-            "Impossible lifecycle state: active authorization with archive or completed disposition"
-        )
-    for relative in state["disposition_journals"]:
-        digest = _lifecycle_artifact_sha256(relative)
-        if digest not in active_hashes:
-            raise ProtocolError(
-                "Impossible lifecycle state: unresolved disposition journal for another authorization while an active authorization exists"
-            )
+    for kind in ("disposition_archives", "disposition_journals", "disposition_records"):
+        for relative in state[kind]:
+            digest = _lifecycle_artifact_sha256(relative)
+            if digest in active_hashes:
+                raise ProtocolError("Qualification is incompatible with an active disposition lifecycle")
 
 
 def _validate_neutral_lifecycle_state(state: Mapping[str, Any]) -> None:
@@ -660,8 +771,7 @@ def _validate_neutral_lifecycle_state(state: Mapping[str, Any]) -> None:
         raise ProtocolError("Neutral qualification result already exists")
     if state["engineering_stage_q"] is not None:
         raise ProtocolError("Neutral qualification is incompatible with a Stage-Q result")
-    if state["disposition_archives"] or state["disposition_journals"] or state["disposition_records"]:
-        raise ProtocolError("Neutral qualification is incompatible with an active disposition lifecycle")
+    _reject_active_identity_disposition_state(state)
 
 
 def _validate_stage_q_lifecycle_state(state: Mapping[str, Any]) -> None:
@@ -677,8 +787,7 @@ def _validate_stage_q_lifecycle_state(state: Mapping[str, Any]) -> None:
         raise ProtocolError("Stage-Q requires an active Stage-Q authorization")
     if state["consumed_stage_q"] is not None:
         raise ProtocolError("Stage-Q authorization has already been consumed")
-    if state["disposition_archives"] or state["disposition_journals"] or state["disposition_records"]:
-        raise ProtocolError("Stage-Q is incompatible with an active disposition lifecycle")
+    _reject_active_identity_disposition_state(state)
 
 
 def validate_lifecycle_state(state: Mapping[str, Any], mode: str) -> None:

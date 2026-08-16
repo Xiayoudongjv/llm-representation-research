@@ -95,6 +95,24 @@ REQUIRED_LIFECYCLE_TESTS = {
     "test_lifecycle_prepared_journal_matching_active_authorization_passes",
     "test_lifecycle_active_with_completed_disposition_fails",
     "test_lifecycle_active_with_journal_for_other_authorization_fails",
+    "test_lifecycle_identity_completed_historical_plus_active_passes",
+    "test_lifecycle_identity_neutral_production_entry_reaches_authorization_semantics",
+    "test_lifecycle_identity_two_completed_historical_dispositions_plus_active_passes",
+    "test_lifecycle_identity_historical_journal_not_unresolved_for_active",
+    "test_lifecycle_identity_stage_q_coexists_with_historical_disposition_passes",
+    "test_lifecycle_identity_real_current_structure_static_preflight_passes",
+    "test_lifecycle_identity_same_authorization_active_and_disposition_fails",
+    "test_lifecycle_identity_same_authorization_active_and_archive_fails",
+    "test_lifecycle_identity_unresolved_prepared_blocks_replacement",
+    "test_lifecycle_identity_unresolved_partial_blocks_replacement",
+    "test_lifecycle_identity_ambiguous_historical_blocks_replacement",
+    "test_lifecycle_identity_malformed_historical_disposition_fails",
+    "test_lifecycle_identity_historical_archive_hash_mismatch_fails",
+    "test_lifecycle_identity_historical_disposition_identity_mismatch_fails",
+    "test_lifecycle_identity_multiple_active_authorization_ids_fail",
+    "test_lifecycle_identity_cross_authorization_disposition_claims_active_fails",
+    "test_lifecycle_identity_arbitrary_historical_artifact_fails",
+    "test_lifecycle_identity_resolved_historical_plus_unknown_child_fails",
     "test_lifecycle_static_preflight_with_active_authorization_passes",
     "test_lifecycle_neutral_production_entry_reaches_authorization_semantics",
     "test_lifecycle_neutral_production_entry_unknown_authorization_fails_before_consumption",
@@ -132,6 +150,68 @@ def load_runner_module():
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def _validator_write_json(path: Path, value) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(value), encoding="utf-8")
+
+
+def _validator_neutral_authorization(root: Path, authorization_id: str) -> dict:
+    return {
+        "schema_version": "1.0.0",
+        "experiment": "EXP-021",
+        "scope": "NEUTRAL_HOOK_ORACLE_QUALIFICATION",
+        "authorization_id": authorization_id,
+        "issued_at": "2099-08-15T00:00:00+00:00",
+        "expires_at": "2099-08-16T00:00:00+00:00",
+        "runner_commit": "d" * 40,
+        "runner_sha256": "a" * 64,
+        "implementation_hashes": {"runner": "a" * 64, "validator": "b" * 64},
+        "authority_hashes": {
+            "original": "c" * 64,
+            "amendment": "d" * 64,
+            "reconciliation": "e" * 64,
+        },
+        "model_manifest": {"identity": "manifest-sha"},
+        "environment_binding": {
+            "device": "cuda:0",
+            "dtype": "float16",
+            "local_files_only": True,
+            "model_eval_mode": True,
+            "gradients_enabled": False,
+            "use_cache": False,
+        },
+        "allowed_output_path": str(root / "engineering" / "neutral.json"),
+        "maximum_launch_count": 1,
+        "fit_access_permitted": False,
+        "eval_access_permitted": False,
+        "scientific_result_permitted": False,
+        "automatic_retry_permitted": False,
+    }
+
+
+def _validator_active_authorization(root: Path, runner, authorization_id: str):
+    auth = _validator_neutral_authorization(root, authorization_id)
+    path = root / "experiments/exp021/authorization/neutral.json"
+    _validator_write_json(path, auth)
+    return path, auth, runner.sha256_file(path)
+
+
+def _validator_completed_disposition(root: Path, runner, authorization_id: str):
+    auth_path, auth, auth_hash = _validator_active_authorization(
+        root, runner, authorization_id
+    )
+    runner.disposition_unconsumed_nonexecutable_authorization(
+        repo_root=root,
+        authorization_path=auth_path,
+        expected_authorization_id=auth["authorization_id"],
+        expected_authorization_sha256=auth_hash,
+        expected_scope=runner.NEUTRAL_SCOPE,
+        explicit_disposition_authorized=True,
+        non_executable_reason="validator identity-aware lifecycle dynamic check",
+    )
+    return auth, auth_hash
 
 
 class ImportAndCallVisitor(ast.NodeVisitor):
@@ -297,10 +377,36 @@ def validate() -> None:
         "validate_mode_lifecycle",
     ):
         function_node(tree, lifecycle_function)
+    for identity_function in (
+        "_group_disposition_artifacts",
+        "_validate_completed_historical_disposition",
+        "_reject_active_identity_disposition_state",
+    ):
+        function_node(tree, identity_function)
     mode_validator = function_node(tree, "validate_mode_lifecycle")
     mode_validator_source = ast.unparse(mode_validator)
     if "inspect_lifecycle_paths" not in mode_validator_source or "validate_lifecycle_state" not in mode_validator_source:
         raise ValidationError("mode-specific lifecycle validation is incomplete")
+    impossible_state_validator = function_node(tree, "_validate_no_impossible_lifecycle_state")
+    impossible_state_source = ast.unparse(impossible_state_validator)
+    for identity_token in (
+        "_group_disposition_artifacts",
+        "_validate_completed_historical_disposition",
+        "active_hashes",
+        "authorization_id",
+    ):
+        if identity_token not in impossible_state_source:
+            raise ValidationError("impossible lifecycle validation is not authorization-identity-aware")
+    for mode_state_function in (
+        "_validate_neutral_lifecycle_state",
+        "_validate_stage_q_lifecycle_state",
+    ):
+        if "_reject_active_identity_disposition_state" not in call_names(
+            function_node(tree, mode_state_function)
+        ):
+            raise ValidationError(
+                f"{mode_state_function} does not apply identity-aware disposition rejection"
+            )
     for mode in ("--static-preflight", "--neutral-hook-qualification", "--stage-q"):
         if mode not in source:
             raise ValidationError(f"missing CLI mode: {mode}")
@@ -506,6 +612,48 @@ def validate() -> None:
             pass
         else:
             raise ValidationError("closed-world lifecycle validation accepts an unknown authorization artifact")
+    with tempfile.TemporaryDirectory() as tmpdir:
+        identity_root = Path(tmpdir)
+        identity_runner = load_runner_module()
+        historical_auth, historical_hash = _validator_completed_disposition(
+            identity_root, identity_runner, "AUTH-DYN-A"
+        )
+        active_path, active_auth, active_hash = _validator_active_authorization(
+            identity_root, identity_runner, "AUTH-DYN-B"
+        )
+        if historical_hash == active_hash:
+            raise ValidationError("identity-aware dynamic fixtures do not have distinct hashes")
+        try:
+            static_state = identity_runner.validate_mode_lifecycle(
+                identity_root, identity_runner.LIFECYCLE_MODE_STATIC
+            )
+            neutral_state = identity_runner.validate_mode_lifecycle(
+                identity_root, identity_runner.LIFECYCLE_MODE_NEUTRAL
+            )
+        except Exception as exc:
+            raise ValidationError(
+                f"identity-aware lifecycle does not accept completed historical disposition plus distinct active authorization: {exc}"
+            )
+        if static_state.get("active_neutral") is None:
+            raise ValidationError("identity-aware static lifecycle did not classify the active replacement")
+        if len(static_state.get("disposition_records", [])) != 1:
+            raise ValidationError("identity-aware static lifecycle did not retain the completed historical disposition")
+        if neutral_state.get("active_neutral") is None:
+            raise ValidationError("identity-aware neutral lifecycle did not classify the active replacement")
+        unresolved_journal = (
+            identity_root
+            / "experiments/exp021/authorization/disposition_journal"
+            / f"{'a' * 64}.json"
+        )
+        _validator_write_json(unresolved_journal, {})
+        try:
+            identity_runner.validate_mode_lifecycle(
+                identity_root, identity_runner.LIFECYCLE_MODE_STATIC
+            )
+        except Exception:
+            pass
+        else:
+            raise ValidationError("unresolved historical disposition does not block a distinct active replacement")
     mapping_validator = function_node(tree, "validate_checkpoint_mapping")
     mapping_validator_source = ast.unparse(mapping_validator)
     if "tuple_semantics" not in mapping_validator_source or "TUPLE_SEMANTICS_FROZEN_TEXT" not in mapping_validator_source:

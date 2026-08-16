@@ -72,3 +72,16 @@ self-consistent but drifted journal.
 
 The Task 089B authorization remains unconsumed, byte-identical, and not
 dispositioned. No replacement authorization exists.
+
+## Task 089R correction
+
+Task 089R makes lifecycle validation authorization-identity-aware. Completed
+historical authorization dispositions are retained as audit evidence and may
+coexist with a later active authorization of a distinct identity.
+Same-identity active/disposition conflicts and unresolved prior generations
+still block replacement.
+
+The fresh 089Q neutral authorization remains
+`ISSUED_UNCONSUMED_NONEXECUTABLE_PENDING_LIFECYCLE_CORRECTION`. It is
+byte-identical, unconsumed, and must not be considered executable after this
+runner edit.

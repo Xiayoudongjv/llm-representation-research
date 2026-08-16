@@ -109,6 +109,31 @@ def _lifecycle_write(tmp_path: Path, relative: str, value=None):
     return path
 
 
+def _write_active_neutral_auth(tmp_path: Path, authorization_id: str = "AUTH-B", **overrides):
+    """Write a complete neutral authorization at the canonical active path."""
+    auth = neutral_authorization(tmp_path, authorization_id=authorization_id, **overrides)
+    auth_path = tmp_path / "experiments" / "exp021" / "authorization" / "neutral.json"
+    write_json(auth_path, auth)
+    return auth_path, auth, stage_q.sha256_file(auth_path)
+
+
+def _create_completed_historical_disposition(tmp_path: Path, authorization_id: str = "AUTH-A"):
+    """Dispose one synthetic authorization and return its identity and hash."""
+    auth_path, auth, auth_hash = _write_active_neutral_auth(
+        tmp_path, authorization_id=authorization_id
+    )
+    stage_q.disposition_unconsumed_nonexecutable_authorization(
+        repo_root=tmp_path,
+        authorization_path=auth_path,
+        expected_authorization_id=auth["authorization_id"],
+        expected_authorization_sha256=auth_hash,
+        expected_scope=stage_q.NEUTRAL_SCOPE,
+        explicit_disposition_authorized=True,
+        non_executable_reason="test identity-aware lifecycle",
+    )
+    return auth, auth_hash
+
+
 def _valid_checkpoint_mapping():
     return {
         "num_transformer_blocks": 28,
@@ -870,14 +895,7 @@ def test_lifecycle_neutral_with_stage_q_consumption_fails(tmp_path):
 
 
 def test_lifecycle_known_disposition_paths_not_globally_rejected(tmp_path):
-    digest = "a" * 64
-    _lifecycle_write(
-        tmp_path,
-        f"authorization/archive/superseded_unconsumed_nonexecutable/{digest}.json",
-        {},
-    )
-    _lifecycle_write(tmp_path, f"authorization/disposition_journal/{digest}.json", {})
-    _lifecycle_write(tmp_path, f"authorization/dispositions/{digest}.json", {})
+    _create_completed_historical_disposition(tmp_path, authorization_id="AUTH-HISTORICAL")
     state = stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
     assert state["disposition_archives"]
     assert state["disposition_journals"]
@@ -926,7 +944,252 @@ def test_lifecycle_active_with_journal_for_other_authorization_fails(tmp_path):
     _lifecycle_write(tmp_path, f"authorization/disposition_journal/{'f' * 64}.json", {})
     with pytest.raises(
         stage_q.ProtocolError,
-        match="unresolved disposition journal for another authorization",
+        match="unresolved historical disposition blocks a replacement authorization",
+    ):
+        stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
+
+
+def test_lifecycle_identity_completed_historical_plus_active_passes(tmp_path):
+    _create_completed_historical_disposition(tmp_path, authorization_id="AUTH-A")
+    auth_path, _auth, active_hash = _write_active_neutral_auth(
+        tmp_path, authorization_id="AUTH-B"
+    )
+    state = stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
+    assert state["active_neutral"] == auth_path
+    assert state["disposition_archives"]
+    assert state["disposition_journals"]
+    assert state["disposition_records"]
+    assert active_hash not in {
+        Path(path).name for path in state["disposition_records"]
+    }
+
+
+def test_lifecycle_identity_neutral_production_entry_reaches_authorization_semantics(
+    tmp_path,
+    monkeypatch,
+):
+    _create_completed_historical_disposition(tmp_path, authorization_id="AUTH-A")
+    _write_active_neutral_auth(tmp_path, authorization_id="AUTH-B")
+    authority = synthetic_authority()
+    binding = synthetic_binding(authority)
+    events = []
+    _patch_lifecycle_common_entry_boundary(monkeypatch, authority, binding, events)
+
+    def fake_validate_authorization(*args, **kwargs):
+        events.append("validate_authorization")
+        raise stage_q.ProtocolError("reached authorization validation")
+
+    monkeypatch.setattr(stage_q, "validate_authorization", fake_validate_authorization)
+
+    with pytest.raises(stage_q.ProtocolError, match="reached authorization validation"):
+        stage_q.run_neutral_hook_qualification(tmp_path)
+
+    assert "validate_authorization" in events
+    assert "consume_authorization" not in events
+
+
+def test_lifecycle_identity_two_completed_historical_dispositions_plus_active_passes(tmp_path):
+    _create_completed_historical_disposition(tmp_path, authorization_id="AUTH-A")
+    _create_completed_historical_disposition(tmp_path, authorization_id="AUTH-A2")
+    _write_active_neutral_auth(tmp_path, authorization_id="AUTH-C")
+    state = stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
+    assert len(state["disposition_archives"]) == 2
+    assert len(state["disposition_journals"]) == 2
+    assert len(state["disposition_records"]) == 2
+    assert state["active_neutral"] is not None
+
+
+def test_lifecycle_identity_historical_journal_not_unresolved_for_active(tmp_path):
+    _auth_a, historical_hash = _create_completed_historical_disposition(
+        tmp_path, authorization_id="AUTH-A"
+    )
+    _auth_path, _auth, active_hash = _write_active_neutral_auth(
+        tmp_path, authorization_id="AUTH-B"
+    )
+    state = stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_NEUTRAL)
+    assert state["active_neutral"] is not None
+    assert [Path(path).name for path in state["disposition_journals"]] == [
+        f"{historical_hash}.json"
+    ]
+    assert active_hash != historical_hash
+
+
+def test_lifecycle_identity_stage_q_coexists_with_historical_disposition_passes(tmp_path):
+    _create_completed_historical_disposition(tmp_path, authorization_id="AUTH-A")
+    _lifecycle_write(tmp_path, "consumed/neutral.json", {})
+    _lifecycle_write(tmp_path, "engineering/neutral_result.json", {})
+    _lifecycle_write(tmp_path, "authorization/stage_q.json", {})
+    state = stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STAGE_Q)
+    assert state["active_stage_q"] is not None
+    assert state["disposition_records"]
+    assert state["disposition_journals"]
+    assert state["disposition_archives"]
+
+
+def test_lifecycle_identity_real_current_structure_static_preflight_passes():
+    repo_root = Path(__file__).resolve().parents[1]
+    result = stage_q.run_static_preflight(repo_root)
+    assert result["status"] == "EXP021_STATIC_PREFLIGHT_PASS"
+
+
+def test_lifecycle_identity_same_authorization_active_and_disposition_fails(tmp_path):
+    _auth_path, _auth, digest = _write_active_neutral_auth(
+        tmp_path, authorization_id="AUTH-SAME"
+    )
+    _lifecycle_write(tmp_path, f"authorization/dispositions/{digest}.json", {})
+    with pytest.raises(
+        stage_q.ProtocolError,
+        match="active authorization with archive or completed disposition",
+    ):
+        stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
+
+
+def test_lifecycle_identity_same_authorization_active_and_archive_fails(tmp_path):
+    _auth_path, _auth, digest = _write_active_neutral_auth(
+        tmp_path, authorization_id="AUTH-SAME"
+    )
+    _lifecycle_write(
+        tmp_path,
+        f"authorization/archive/superseded_unconsumed_nonexecutable/{digest}.json",
+        {},
+    )
+    with pytest.raises(
+        stage_q.ProtocolError,
+        match="active authorization with archive or completed disposition",
+    ):
+        stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
+
+
+def test_lifecycle_identity_unresolved_prepared_blocks_replacement(tmp_path):
+    _write_active_neutral_auth(tmp_path, authorization_id="AUTH-B")
+    _lifecycle_write(tmp_path, f"authorization/disposition_journal/{'a' * 64}.json", {})
+    with pytest.raises(
+        stage_q.ProtocolError,
+        match="unresolved historical disposition blocks a replacement authorization",
+    ):
+        stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
+
+
+def test_lifecycle_identity_unresolved_partial_blocks_replacement(tmp_path):
+    _write_active_neutral_auth(tmp_path, authorization_id="AUTH-B")
+    _lifecycle_write(
+        tmp_path,
+        f"authorization/archive/superseded_unconsumed_nonexecutable/{'a' * 64}.json",
+        {},
+    )
+    _lifecycle_write(tmp_path, f"authorization/disposition_journal/{'a' * 64}.json", {})
+    with pytest.raises(
+        stage_q.ProtocolError,
+        match="unresolved historical disposition blocks a replacement authorization",
+    ):
+        stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
+
+
+def test_lifecycle_identity_ambiguous_historical_blocks_replacement(tmp_path):
+    _create_completed_historical_disposition(tmp_path, authorization_id="AUTH-A")
+    _write_active_neutral_auth(tmp_path, authorization_id="AUTH-B")
+    historical_path = tmp_path / "experiments" / "exp021" / "authorization" / "dispositions"
+    record_path = next(historical_path.glob("*.json"))
+    record = stage_q.read_json_no_duplicates(record_path)
+    record["state"] = stage_q.DISPOSITION_STATE_AMBIGUOUS_OR_CORRUPT
+    write_json(record_path, record)
+    with pytest.raises(stage_q.ProtocolError):
+        stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
+
+
+def test_lifecycle_identity_malformed_historical_disposition_fails(tmp_path):
+    _create_completed_historical_disposition(tmp_path, authorization_id="AUTH-A")
+    _write_active_neutral_auth(tmp_path, authorization_id="AUTH-B")
+    historical_path = tmp_path / "experiments" / "exp021" / "authorization" / "dispositions"
+    record_path = next(historical_path.glob("*.json"))
+    write_json(record_path, {})
+    with pytest.raises(stage_q.ProtocolError):
+        stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
+
+
+def test_lifecycle_identity_historical_archive_hash_mismatch_fails(tmp_path):
+    _create_completed_historical_disposition(tmp_path, authorization_id="AUTH-A")
+    _write_active_neutral_auth(tmp_path, authorization_id="AUTH-B")
+    archive_dir = (
+        tmp_path
+        / "experiments"
+        / "exp021"
+        / "authorization"
+        / "archive"
+        / "superseded_unconsumed_nonexecutable"
+    )
+    archive_path = next(archive_dir.glob("*.json"))
+    write_json(archive_path, {"drift": True})
+    with pytest.raises(
+        stage_q.ProtocolError,
+        match="historical disposition archive hash mismatch",
+    ):
+        stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
+
+
+def test_lifecycle_identity_historical_disposition_identity_mismatch_fails(tmp_path):
+    _create_completed_historical_disposition(tmp_path, authorization_id="AUTH-A")
+    _write_active_neutral_auth(tmp_path, authorization_id="AUTH-B")
+    historical_path = tmp_path / "experiments" / "exp021" / "authorization" / "dispositions"
+    record_path = next(historical_path.glob("*.json"))
+    record = stage_q.read_json_no_duplicates(record_path)
+    record["authorization_sha256"] = "f" * 64
+    write_json(record_path, record)
+    with pytest.raises(
+        stage_q.ProtocolError,
+        match="historical disposition identity mismatch",
+    ):
+        stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
+
+
+def test_lifecycle_identity_multiple_active_authorization_ids_fail(tmp_path):
+    _write_active_neutral_auth(tmp_path, authorization_id="AUTH-B")
+    _lifecycle_write(tmp_path, "authorization/stage_q.json", {})
+    with pytest.raises(
+        stage_q.ProtocolError,
+        match="multiple active authorizations",
+    ):
+        stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
+
+
+def test_lifecycle_identity_cross_authorization_disposition_claims_active_fails(tmp_path):
+    _create_completed_historical_disposition(tmp_path, authorization_id="AUTH-A")
+    _auth_path, active_auth, _active_hash = _write_active_neutral_auth(
+        tmp_path, authorization_id="AUTH-B"
+    )
+    historical_path = tmp_path / "experiments" / "exp021" / "authorization" / "dispositions"
+    record_path = next(historical_path.glob("*.json"))
+    record = stage_q.read_json_no_duplicates(record_path)
+    record["authorization_id"] = active_auth["authorization_id"]
+    write_json(record_path, record)
+    with pytest.raises(
+        stage_q.ProtocolError,
+        match="active authorization has a completed disposition",
+    ):
+        stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
+
+
+def test_lifecycle_identity_arbitrary_historical_artifact_fails(tmp_path):
+    _write_active_neutral_auth(tmp_path, authorization_id="AUTH-B")
+    _lifecycle_write(
+        tmp_path,
+        "authorization/archive/superseded_unconsumed_nonexecutable/not-a-hash.json",
+        {},
+    )
+    with pytest.raises(
+        stage_q.ProtocolError,
+        match="Unknown lifecycle artifact",
+    ):
+        stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
+
+
+def test_lifecycle_identity_resolved_historical_plus_unknown_child_fails(tmp_path):
+    _create_completed_historical_disposition(tmp_path, authorization_id="AUTH-A")
+    _write_active_neutral_auth(tmp_path, authorization_id="AUTH-B")
+    _lifecycle_write(tmp_path, "authorization/unknown.json", {})
+    with pytest.raises(
+        stage_q.ProtocolError,
+        match="Unknown lifecycle artifact",
     ):
         stage_q.validate_mode_lifecycle(tmp_path, stage_q.LIFECYCLE_MODE_STATIC)
 
