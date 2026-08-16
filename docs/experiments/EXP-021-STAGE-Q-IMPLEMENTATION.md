@@ -285,3 +285,243 @@ closed result schemas before any authorization or runtime qualification is
 considered. Model loading, tokenizer loading, neutral qualification, Stage-Q,
 Stage-P, formal inference, and scientific result publication remain blocked
 until those reviews and their separate gates pass.
+
+
+## Authority archive identity
+
+`AUTHORITY_ARCHIVE_COMMIT` is `db11ff7a1ab90ad05c7aaf7451b6dba206bdeb8e`.
+That commit is the historical Git anchor for the frozen EXP-021
+preregistration amendment and reconciliation blobs. It is used only for
+immutable blob verification and must not be treated as the required live
+runtime `HEAD`.
+
+## Executable implementation identity
+
+For neutral qualification and Stage-Q, the executable implementation identity
+comes from the validated single-use authorization, not from
+`AUTHORITY_ARCHIVE_COMMIT`. Before consumption the runner requires exact
+equality between:
+
+- authorization `runner_commit` and live `git rev-parse HEAD`;
+- authorization `runner_sha256` and the current runner SHA-256.
+
+Descendant commits and the historical authority-archive commit do not satisfy
+the runtime binding. Static preflight does not have a runtime authorization
+and therefore does not require live `HEAD` to equal the authority-archive
+commit.
+
+## Authorization disposition
+
+An issued, unconsumed authorization whose bound implementation is no longer
+executable is classified as `SUPERSEDED_UNCONSUMED_NONEXECUTABLE`. A future
+explicit, audited disposition may move the original authorization bytes to the
+deterministic archive namespace and publish a separate disposition record that
+binds the original SHA-256. Disposition is not consumption, is not a launch,
+and does not automatically authorize a replacement. Archived bytes are never
+reaccepted as an active authorization.
+
+Current Task 089B authorization status is only:
+
+`ISSUED_BUT_UNCONSUMED_AND_NONEXECUTABLE_PENDING_BINDING_CORRECTION`
+
+It has not been dispositioned and no replacement exists.
+
+## Task 089E independent rereview
+
+Task 089E passed:
+
+- authority archive vs executable commit separation;
+- exact live `HEAD` binding;
+- exact runner SHA binding;
+- pre-consumption ordering;
+- static preflight preservation;
+- disposition eligibility;
+- explicit disposition authority;
+- byte preservation;
+- disposition is not consumption.
+
+Remaining finding from Task 089E:
+
+`DISPOSITION_CRASH_CONSISTENCY_BLOCKER`
+
+The sequence previously moved the active authorization to archive before the
+final disposition record was published. A crash in that window left active
+absent, archive present, and disposition missing without deterministic
+recovery semantics.
+
+## Task 089F correction
+
+Task 089F changes only the disposition crash window. It introduces a
+fail-closed journal/intent transaction, deterministic partial-state
+inspection, exact recovery, and a reusable replacement-authorization gate.
+Scientific semantics, runtime identity binding, static preflight, and
+commit-binding behavior are unchanged.
+
+### Disposition lifecycle states
+
+The filesystem state is classified unambiguously as one of:
+
+- `ACTIVE`: active authorization exists, archive/journal/disposition absent;
+  replacement is blocked while the active authorization still exists.
+- `PREPARED_OR_IN_PROGRESS`: active authorization exists, `PREPARED` journal
+  exists, archive/disposition absent; interrupted before move; replacement is
+  blocked.
+- `PARTIAL_OR_RECOVERY_REQUIRED`: active absent, archive exists, `PREPARED`
+  journal exists, disposition absent; interrupted after move; replacement is
+  blocked and only exact recovery can finish the transaction.
+- `DISPOSITIONED`: active absent, archive exists with matching SHA-256, and a
+  valid completed disposition record exists; lifecycle resolved.
+- `AMBIGUOUS_OR_CORRUPT`: any inconsistent combination (active and archive,
+  archive without recognized journal/disposition, disposition without archive,
+  or corrupt identity) fails closed and blocks replacement.
+
+### Journal intent schema
+
+The deterministic journal binds the authorization ID, SHA-256, scope, runner
+commit, runner SHA-256, disposition type, explicit disposition authority,
+transaction ID, disposition record ID, expected archive path, expected
+disposition path, non-executable reason, timestamps, and `PREPARED` state. The
+journal carries a canonical self-digest (`journal_sha256`) excluding the
+self-digest field.
+
+### Filesystem operation order
+
+1. Validate the active authorization and all preconditions.
+2. Exclusively create the `PREPARED` journal.
+3. Move original authorization bytes to the deterministic archive path.
+4. Verify archived SHA-256 equals the original authorization SHA-256.
+5. Exclusively publish the completed disposition record from journal identity.
+6. Verify the final state is `DISPOSITIONED`.
+
+Recovery resumes only an exact interrupted transaction: same authorization ID,
+SHA-256, scope, disposition type, journal paths, transaction/disposition IDs,
+explicit authority, and non-executable reason. Recovery never creates a
+replacement, consumption record, qualification result, or scientific result.
+
+### Replacement blocking
+
+A new active authorization is blocked while any active authorization,
+prepared/incomplete journal, archive without valid completed disposition, or
+other ambiguous partial state exists. Only a fully validated completed
+disposition clears the lifecycle for a future explicit replacement decision.
+
+The real Task 089B authorization remains
+`ISSUED_BUT_UNCONSUMED_AND_NONEXECUTABLE_PENDING_BINDING_CORRECTION`. It has
+not been dispositioned and no real journal, archive, disposition, consumption,
+or replacement artifact exists.
+
+## Task 089G independent rereview
+
+Task 089G passed crash-consistency detection, recovery-required detection, and
+replacement blocking. It identified one remaining defect:
+
+`RECOVERY_IDENTITY_DRIFT_ACCEPTED`
+
+A `PREPARED` journal with modified runner/transaction identity fields could be
+accepted after recomputing only the journal self-hash.
+
+## Task 089H correction
+
+Task 089H changes only recovery identity binding. Recovery now reconstructs
+expected authorization and transaction identity from the active authorization,
+or from the archived authorization after move, before trusting the journal.
+Runner commit, runner SHA, transaction ID, disposition record ID, expected
+paths, disposition type, and non-executable reason are independently checked.
+
+The real Task 089B authorization remains
+`ISSUED_BUT_UNCONSUMED_AND_NONEXECUTABLE_PENDING_BINDING_CORRECTION`. It has
+not been dispositioned and no replacement exists.
+
+## Task 089J diagnosis
+
+`EXP021_089J_STATIC_PREFLIGHT_IMPLEMENTATION_DEFECT`
+
+Cause:
+`tuple_semantics` is frozen non-checkpoint metadata but was rejected as an
+unexpected checkpoint.
+
+## Task 089K correction
+
+Closed-schema checkpoint validation now recognizes `tuple_semantics`
+explicitly without weakening unknown-key rejection.
+
+
+## Task 089L diagnosis
+
+`EXP021_089L_MODE_SPECIFIC_LIFECYCLE_VALIDATION_DEFECT`
+
+The prior implementation kept a global mutable-path denylist inside
+`validate_authority_files()` and rejected the existence of
+`experiments/exp021/authorization`, `experiments/exp021/results`,
+`experiments/exp021/neutral_qualification_result.json`, and
+`experiments/exp021/stage_q_result.json` before execution. That conflated
+immutable authority verification with mutable lifecycle state and prevented
+the current issued-but-unconsumed neutral authorization from being observed by
+static preflight.
+
+## Task 089M correction
+
+`validate_authority_files()` now verifies frozen archived authority identity
+and content only. Mutable authorization, consumption, engineering-result, and
+disposition/recovery state is checked by a separate closed-world
+`validate_mode_lifecycle()` layer. The layer inspects exact canonical paths and
+applies different rules for static preflight, neutral qualification, and
+Stage-Q.
+
+### Canonical lifecycle paths
+
+Active authorization:
+- `experiments/exp021/authorization/neutral.json`
+- `experiments/exp021/authorization/stage_q.json`
+
+Consumption:
+- `experiments/exp021/consumed/neutral.json`
+- `experiments/exp021/consumed/stage_q.json`
+
+Engineering results:
+- `experiments/exp021/engineering/neutral_result.json`
+- `experiments/exp021/engineering/stage_q_result.json`
+
+Disposition archive:
+- `experiments/exp021/authorization/archive/superseded_unconsumed_nonexecutable/<authorization_sha256>.json`
+
+Disposition journal:
+- `experiments/exp021/authorization/disposition_journal/<authorization_sha256>.json`
+
+Disposition record:
+- `experiments/exp021/authorization/dispositions/<authorization_sha256>.json`
+
+Legacy contamination paths remain fail closed when present:
+- `experiments/exp021/results`
+- `experiments/exp021/neutral_qualification_result.json`
+- `experiments/exp021/stage_q_result.json`
+
+### Mode rules
+
+Static preflight:
+- model/tokenizer/GPU/FIT/EVAL/shard-payload free;
+- accepts known mutable lifecycle artifacts as observations;
+- current active neutral authorization is recognized but not executable;
+- unknown paths, legacy stale paths, multiple active authorizations,
+  active-plus-consumed contradictions, result-without-consumption, and
+  active-plus-completed-disposition contradictions fail closed;
+- an active authorization may coexist with a matching `PREPARED` journal for
+  the interrupted-before-move disposition state.
+
+Neutral qualification:
+- exactly one active neutral authorization;
+- no neutral consumption record;
+- no neutral engineering result;
+- no Stage-Q launch state, consumption, or result;
+- no active disposition lifecycle.
+
+Stage-Q:
+- neutral authorization must be consumed;
+- neutral engineering result must exist;
+- active Stage-Q authorization must exist;
+- no Stage-Q consumption or result may already exist;
+- no active neutral authorization or disposition lifecycle.
+
+Disposition and recovery paths are recognized by the generic inspector without
+being globally rejected, but unknown children under those namespaces remain
+fail closed.

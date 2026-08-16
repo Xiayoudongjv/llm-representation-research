@@ -25,8 +25,8 @@ from typing import Any, Callable
 
 EXPERIMENT = "EXP-021"
 SCHEMA_VERSION = "1.0.0"
-ARCHIVE_COMMIT = "db11ff7a1ab90ad05c7aaf7451b6dba206bdeb8e"
-ARCHIVE_PARENT = "163112e91bfed2576b87827672c21b49df75f0e2"
+AUTHORITY_ARCHIVE_COMMIT = "db11ff7a1ab90ad05c7aaf7451b6dba206bdeb8e"
+AUTHORITY_ARCHIVE_PARENT = "163112e91bfed2576b87827672c21b49df75f0e2"
 ORIGINAL_PREREGISTRATION_SHA256 = (
     "2ea9c54a49c41b3c1c8e6c39b029dc333d3ee6753ae0608603d6365ae063301a"
 )
@@ -46,11 +46,56 @@ AUTHORITY_AMENDMENT = Path(
 AUTHORITY_RECONCILIATION = Path(
     "experiments/exp021/exp021_preregistration_reconciliation.json"
 )
+AUTHORIZATION_ARCHIVE_RELATIVE_DIR = Path(
+    "experiments/exp021/authorization/archive/superseded_unconsumed_nonexecutable"
+)
+AUTHORIZATION_DISPOSITION_RELATIVE_DIR = Path(
+    "experiments/exp021/authorization/dispositions"
+)
+AUTHORIZATION_DISPOSITION_JOURNAL_RELATIVE_DIR = Path(
+    "experiments/exp021/authorization/disposition_journal"
+)
+AUTHORIZATION_DISPOSITION_TYPE = "SUPERSEDED_UNCONSUMED_NONEXECUTABLE"
 EXP020_CONFIG = Path("experiments/exp020/exp020_frozen_config.json")
 NEUTRAL_RESULT_RELATIVE_PATH = Path("experiments/exp021/engineering/neutral_result.json")
 NEUTRAL_CONSUMPTION_RELATIVE_PATH = Path("experiments/exp021/consumed/neutral.json")
 STAGE_Q_RESULT_RELATIVE_PATH = Path("experiments/exp021/engineering/stage_q_result.json")
 STAGE_Q_CONSUMPTION_RELATIVE_PATH = Path("experiments/exp021/consumed/stage_q.json")
+LIFECYCLE_EXPERIMENT_DIR = Path("experiments/exp021")
+LIFECYCLE_MODE_STATIC = "static"
+LIFECYCLE_MODE_NEUTRAL = "neutral"
+LIFECYCLE_MODE_STAGE_Q = "stage_q"
+LIFECYCLE_ACTIVE_AUTHORIZATION_PATHS = {
+    Path("experiments/exp021/authorization/neutral.json"): "neutral",
+    Path("experiments/exp021/authorization/stage_q.json"): "stage_q",
+}
+LIFECYCLE_CONSUMPTION_PATHS = {
+    Path("experiments/exp021/consumed/neutral.json"): "neutral",
+    Path("experiments/exp021/consumed/stage_q.json"): "stage_q",
+}
+LIFECYCLE_ENGINEERING_RESULT_PATHS = {
+    Path("experiments/exp021/engineering/neutral_result.json"): "neutral",
+    Path("experiments/exp021/engineering/stage_q_result.json"): "stage_q",
+}
+LIFECYCLE_KNOWN_DIRECTORIES = {
+    Path("experiments/exp021/authorization"),
+    Path("experiments/exp021/authorization/archive"),
+    Path("experiments/exp021/authorization/archive/superseded_unconsumed_nonexecutable"),
+    Path("experiments/exp021/authorization/dispositions"),
+    Path("experiments/exp021/authorization/disposition_journal"),
+    Path("experiments/exp021/consumed"),
+    Path("experiments/exp021/engineering"),
+}
+LIFECYCLE_SCAN_DIRECTORIES = {
+    Path("experiments/exp021/authorization"),
+    Path("experiments/exp021/consumed"),
+    Path("experiments/exp021/engineering"),
+}
+LIFECYCLE_LEGACY_CONTAMINATION_PATHS = {
+    Path("experiments/exp021/results"),
+    Path("experiments/exp021/neutral_qualification_result.json"),
+    Path("experiments/exp021/stage_q_result.json"),
+}
 NEUTRAL_DIAGNOSTIC_TEXT = "A neutral diagnostic sentence is used for engineering qualification."
 EXPECTED_SHARD_FILES = {"model-00001-of-00002.safetensors", "model-00002-of-00002.safetensors"}
 EXP020_CONFIG_SHA256 = "f760f781b4b744a10938eb4de032e0cc345a021706821ecf0ca8523f5d57e667"
@@ -63,6 +108,12 @@ CHECKPOINTS = (
     {"name": "final_block_pre_final_rmsnorm", "block_index": 27, "hidden_state_index": None, "role": "required"},
     {"name": "final_normalized_hidden_state", "block_index": 27, "hidden_state_index": 28, "role": "descriptive"},
 )
+CHECKPOINT_MAPPING_METADATA_KEYS = frozenset({"num_transformer_blocks", "tuple_semantics"})
+TUPLE_SEMANTICS_FROZEN_TEXT = (
+    "hidden_states[0] is embedding output; "
+    "hidden_states[1..27] are decoder block outputs before final RMSNorm; "
+    "hidden_states[28] is the post-final-RMSNorm last_hidden_state in the inspected Qwen3 Transformers implementation."
+)
 REQUIRED_GATE_CHECKPOINTS = tuple(
     checkpoint["name"] for checkpoint in CHECKPOINTS if checkpoint["role"] != "descriptive"
 )
@@ -72,6 +123,38 @@ BETA = 0.75
 CLASS_ORDER = ("logic", "causality", "analogy", "definition")
 STAGE_Q_SCOPE = "EXP021_STAGE_Q_FIT_ONLY_MEASUREMENT_QUALIFICATION"
 NEUTRAL_SCOPE = "NEUTRAL_HOOK_ORACLE_QUALIFICATION"
+
+DISPOSITION_STATE_ACTIVE = "ACTIVE"
+DISPOSITION_STATE_PREPARED = "PREPARED"
+DISPOSITION_STATE_PREPARED_OR_IN_PROGRESS = "PREPARED_OR_IN_PROGRESS"
+DISPOSITION_STATE_DISPOSITIONED = "DISPOSITIONED"
+DISPOSITION_STATE_PARTIAL_OR_RECOVERY_REQUIRED = "PARTIAL_OR_RECOVERY_REQUIRED"
+DISPOSITION_STATE_AMBIGUOUS_OR_CORRUPT = "AMBIGUOUS_OR_CORRUPT"
+DISPOSITION_STATE_CLEAR = "CLEAR"
+
+DISPOSITION_RECORD_KEYS = frozenset(
+    {
+        "schema_version", "experiment", "disposition_type", "authorization_id",
+        "authorization_sha256", "authorization_scope", "authorization_runner_commit",
+        "authorization_runner_sha256", "authorization_consumed",
+        "consumption_record_exists", "qualification_result_exists",
+        "non_executable_reason", "replacement_automatically_authorized",
+        "original_can_never_be_consumed", "archived_authorization_path",
+        "disposition_record_id", "disposition_timestamp",
+        "explicit_disposition_authorized", "transaction_id", "state",
+        "journal_sha256",
+    }
+)
+DISPOSITION_JOURNAL_KEYS = frozenset(
+    {
+        "schema_version", "experiment", "disposition_type", "authorization_id",
+        "authorization_sha256", "authorization_scope", "authorization_runner_commit",
+        "authorization_runner_sha256", "transaction_id", "disposition_record_id",
+        "state", "expected_archive_path", "expected_disposition_path",
+        "non_executable_reason", "created_at", "updated_at",
+        "explicit_disposition_authorized", "journal_sha256",
+    }
+)
 
 COMMON_AUTHORIZATION_KEYS = frozenset(
     {
@@ -372,11 +455,9 @@ def validate_authority_files(repo_root: str | Path, *, verify_model_files: bool 
         raise ProtocolError("Archived amendment hash mismatch")
     if sha256_file(reconciliation) != RECONCILIATION_SHA256:
         raise ProtocolError("Archived reconciliation hash mismatch")
-    if _git_output(root, "rev-parse", "HEAD") != ARCHIVE_COMMIT:
-        raise ProtocolError("Unexpected archive commit")
-    if _git_output(root, "ls-tree", ARCHIVE_COMMIT, str(AUTHORITY_AMENDMENT)).split()[2] != AMENDMENT_BLOB_OID:
+    if _git_output(root, "ls-tree", AUTHORITY_ARCHIVE_COMMIT, str(AUTHORITY_AMENDMENT)).split()[2] != AMENDMENT_BLOB_OID:
         raise ProtocolError("Amendment Git blob mismatch")
-    if _git_output(root, "ls-tree", ARCHIVE_COMMIT, str(AUTHORITY_RECONCILIATION)).split()[2] != RECONCILIATION_BLOB_OID:
+    if _git_output(root, "ls-tree", AUTHORITY_ARCHIVE_COMMIT, str(AUTHORITY_RECONCILIATION)).split()[2] != RECONCILIATION_BLOB_OID:
         raise ProtocolError("Reconciliation Git blob mismatch")
     data = read_json_no_duplicates(reconciliation)
     if data.get("overall_status") != "EXP021_AMENDMENT_READY_FOR_TARGETED_FINAL_REREVIEW":
@@ -410,24 +491,230 @@ def validate_authority_files(repo_root: str | Path, *, verify_model_files: bool 
         "interval_definition": "scipy.stats.beta.ppf(0.025, correct, total-correct+1)",
     }:
         raise ProtocolError("Stage-Q statistical rule mismatch")
-    for path in (
-        root / "experiments/exp021/authorization",
-        root / "experiments/exp021/results",
-        root / "experiments/exp021/neutral_qualification_result.json",
-        root / "experiments/exp021/stage_q_result.json",
-    ):
-        if os.path.lexists(path):
-            raise ProtocolError(f"Unexpected authorization or result path: {path}")
     return data
+
+
+def _is_unsafe_lifecycle_entry(path: Path) -> bool:
+    """Return True for symlinks, junctions, or other reparse-style ambiguity."""
+    try:
+        if path.is_symlink():
+            return True
+        is_junction = getattr(path, "is_junction", None)
+        if callable(is_junction) and is_junction():
+            return True
+    except OSError:
+        return True
+    return False
+
+
+def _matches_disposition_file(path: Path, directory: Path) -> bool:
+    """Return True when path is exactly one SHA-256-named JSON child of directory."""
+    try:
+        relative = path.relative_to(directory)
+    except ValueError:
+        return False
+    return len(relative.parts) == 1 and re.fullmatch(r"[0-9a-f]{64}\.json", relative.name) is not None
+
+
+def inspect_lifecycle_paths(repo_root: str | Path) -> dict[str, Any]:
+    """Return the closed-world lifecycle path state for EXP-021 mutable artifacts."""
+    root = Path(repo_root).resolve()
+    state: dict[str, Any] = {
+        "active_neutral": None,
+        "active_stage_q": None,
+        "consumed_neutral": None,
+        "consumed_stage_q": None,
+        "engineering_neutral": None,
+        "engineering_stage_q": None,
+        "disposition_archives": [],
+        "disposition_journals": [],
+        "disposition_records": [],
+        "unknown_paths": [],
+        "legacy_contamination": [],
+    }
+    for scan_relative in sorted(LIFECYCLE_SCAN_DIRECTORIES, key=lambda path: path.as_posix()):
+        scan_root = root / scan_relative
+        if not os.path.lexists(scan_root):
+            continue
+        if _is_unsafe_lifecycle_entry(scan_root):
+            raise ProtocolError(f"Unsafe lifecycle path: {scan_relative.as_posix()}")
+        if not scan_root.is_dir():
+            raise ProtocolError(f"Lifecycle scan root is not a directory: {scan_relative.as_posix()}")
+        for dirpath, dirnames, filenames in os.walk(scan_root, topdown=True, followlinks=False):
+            current = Path(dirpath)
+            for dirname in list(dirnames):
+                child = current / dirname
+                relative = child.relative_to(root).as_posix()
+                if _is_unsafe_lifecycle_entry(child):
+                    state["unknown_paths"].append(relative)
+                    dirnames.remove(dirname)
+                    continue
+                if Path(relative) not in LIFECYCLE_KNOWN_DIRECTORIES:
+                    state["unknown_paths"].append(relative)
+                    dirnames.remove(dirname)
+                    continue
+            for filename in filenames:
+                child = current / filename
+                relative = child.relative_to(root).as_posix()
+                if _is_unsafe_lifecycle_entry(child):
+                    state["unknown_paths"].append(relative)
+                    continue
+                relative_path = Path(relative)
+                if relative_path in LIFECYCLE_ACTIVE_AUTHORIZATION_PATHS:
+                    scope = LIFECYCLE_ACTIVE_AUTHORIZATION_PATHS[relative_path]
+                    if scope == "neutral":
+                        state["active_neutral"] = child
+                    else:
+                        state["active_stage_q"] = child
+                elif relative_path in LIFECYCLE_CONSUMPTION_PATHS:
+                    scope = LIFECYCLE_CONSUMPTION_PATHS[relative_path]
+                    if scope == "neutral":
+                        state["consumed_neutral"] = child
+                    else:
+                        state["consumed_stage_q"] = child
+                elif relative_path in LIFECYCLE_ENGINEERING_RESULT_PATHS:
+                    scope = LIFECYCLE_ENGINEERING_RESULT_PATHS[relative_path]
+                    if scope == "neutral":
+                        state["engineering_neutral"] = child
+                    else:
+                        state["engineering_stage_q"] = child
+                elif _matches_disposition_file(relative_path, AUTHORIZATION_ARCHIVE_RELATIVE_DIR):
+                    state["disposition_archives"].append(relative)
+                elif _matches_disposition_file(relative_path, AUTHORIZATION_DISPOSITION_JOURNAL_RELATIVE_DIR):
+                    state["disposition_journals"].append(relative)
+                elif _matches_disposition_file(relative_path, AUTHORIZATION_DISPOSITION_RELATIVE_DIR):
+                    state["disposition_records"].append(relative)
+                else:
+                    state["unknown_paths"].append(relative)
+    for legacy_relative in LIFECYCLE_LEGACY_CONTAMINATION_PATHS:
+        legacy_path = root / legacy_relative
+        if os.path.lexists(legacy_path):
+            state["legacy_contamination"].append(legacy_relative.as_posix())
+    return state
+
+
+def _lifecycle_artifact_sha256(relative: str) -> str | None:
+    """Return the lowercase SHA-256 digest encoded in a canonical disposition path."""
+    try:
+        name = Path(relative).name
+    except Exception:
+        return None
+    if not name.endswith(".json"):
+        return None
+    digest = name[:-5]
+    if re.fullmatch(r"[0-9a-f]{64}", digest):
+        return digest
+    return None
+
+
+def _validate_no_impossible_lifecycle_state(state: Mapping[str, Any]) -> None:
+    """Reject contradictory active/consumed/result/disposition combinations.
+
+    A single PREPARED journal may coexist with the matching active
+    authorization (the normal interrupted-before-move state). Archive and
+    completed disposition artifacts may not coexist with any active
+    authorization, and a journal for a different authorization while another
+    authorization remains active is treated as unresolved replacement state.
+    """
+    if state["active_neutral"] is not None and state["active_stage_q"] is not None:
+        raise ProtocolError("Impossible lifecycle state: multiple active authorizations")
+    if state["active_neutral"] is not None and state["consumed_neutral"] is not None:
+        raise ProtocolError("Impossible lifecycle state: active neutral authorization with neutral consumption record")
+    if state["active_stage_q"] is not None and state["consumed_stage_q"] is not None:
+        raise ProtocolError("Impossible lifecycle state: active Stage-Q authorization with Stage-Q consumption record")
+    if state["engineering_neutral"] is not None and state["consumed_neutral"] is None:
+        raise ProtocolError("Impossible lifecycle state: neutral qualification result without neutral consumption record")
+    if state["engineering_stage_q"] is not None and state["consumed_stage_q"] is None:
+        raise ProtocolError("Impossible lifecycle state: Stage-Q result without Stage-Q consumption record")
+
+    active_paths = [
+        path
+        for path in (state["active_neutral"], state["active_stage_q"])
+        if path is not None
+    ]
+    if not active_paths:
+        return
+    active_hashes = {sha256_file(path) for path in active_paths}
+    if state["disposition_archives"] or state["disposition_records"]:
+        raise ProtocolError(
+            "Impossible lifecycle state: active authorization with archive or completed disposition"
+        )
+    for relative in state["disposition_journals"]:
+        digest = _lifecycle_artifact_sha256(relative)
+        if digest not in active_hashes:
+            raise ProtocolError(
+                "Impossible lifecycle state: unresolved disposition journal for another authorization while an active authorization exists"
+            )
+
+
+def _validate_neutral_lifecycle_state(state: Mapping[str, Any]) -> None:
+    if state["active_neutral"] is None:
+        raise ProtocolError("Neutral qualification requires an active neutral authorization")
+    if state["active_stage_q"] is not None:
+        raise ProtocolError("Neutral qualification is incompatible with an active Stage-Q authorization")
+    if state["consumed_neutral"] is not None:
+        raise ProtocolError("Neutral authorization has already been consumed")
+    if state["consumed_stage_q"] is not None:
+        raise ProtocolError("Neutral qualification is incompatible with a Stage-Q consumption record")
+    if state["engineering_neutral"] is not None:
+        raise ProtocolError("Neutral qualification result already exists")
+    if state["engineering_stage_q"] is not None:
+        raise ProtocolError("Neutral qualification is incompatible with a Stage-Q result")
+    if state["disposition_archives"] or state["disposition_journals"] or state["disposition_records"]:
+        raise ProtocolError("Neutral qualification is incompatible with an active disposition lifecycle")
+
+
+def _validate_stage_q_lifecycle_state(state: Mapping[str, Any]) -> None:
+    if state["active_neutral"] is not None:
+        raise ProtocolError("Stage-Q requires the neutral authorization to be consumed")
+    if state["consumed_neutral"] is None:
+        raise ProtocolError("Stage-Q requires a neutral consumption record")
+    if state["engineering_neutral"] is None:
+        raise ProtocolError("Stage-Q requires a neutral qualification result")
+    if state["engineering_stage_q"] is not None:
+        raise ProtocolError("Stage-Q result already exists")
+    if state["active_stage_q"] is None:
+        raise ProtocolError("Stage-Q requires an active Stage-Q authorization")
+    if state["consumed_stage_q"] is not None:
+        raise ProtocolError("Stage-Q authorization has already been consumed")
+    if state["disposition_archives"] or state["disposition_journals"] or state["disposition_records"]:
+        raise ProtocolError("Stage-Q is incompatible with an active disposition lifecycle")
+
+
+def validate_lifecycle_state(state: Mapping[str, Any], mode: str) -> None:
+    """Apply the closed-world lifecycle rules for one execution mode."""
+    if mode not in {LIFECYCLE_MODE_STATIC, LIFECYCLE_MODE_NEUTRAL, LIFECYCLE_MODE_STAGE_Q}:
+        raise ProtocolError(f"Unknown lifecycle validation mode: {mode}")
+    if state["unknown_paths"]:
+        raise ProtocolError(f"Unknown lifecycle artifact: {state['unknown_paths'][0]}")
+    if state["legacy_contamination"]:
+        raise ProtocolError(f"Legacy lifecycle contamination: {state['legacy_contamination'][0]}")
+    _validate_no_impossible_lifecycle_state(state)
+    if mode == LIFECYCLE_MODE_STATIC:
+        return
+    if mode == LIFECYCLE_MODE_NEUTRAL:
+        _validate_neutral_lifecycle_state(state)
+    else:
+        _validate_stage_q_lifecycle_state(state)
+
+
+def validate_mode_lifecycle(repo_root: str | Path, mode: str) -> dict[str, Any]:
+    """Inspect and validate mutable EXP-021 lifecycle state for a single mode."""
+    state = inspect_lifecycle_paths(repo_root)
+    validate_lifecycle_state(state, mode)
+    return state
 
 
 def validate_checkpoint_mapping(mapping: Mapping[str, Any]) -> None:
     """Validate the six frozen checkpoint roles without loading a model."""
+    expected = {item["name"]: item for item in CHECKPOINTS}
+    allowed_keys = CHECKPOINT_MAPPING_METADATA_KEYS | set(expected)
+    if set(mapping) != allowed_keys:
+        raise ProtocolError("Checkpoint mapping top-level schema mismatch")
     if mapping.get("num_transformer_blocks") != 28:
         raise ProtocolError("Checkpoint mapping block count mismatch")
-    expected = {item["name"]: item for item in CHECKPOINTS}
-    if set(mapping) - {"num_transformer_blocks", *expected}:
-        raise ProtocolError("Checkpoint mapping contains an unexpected checkpoint")
+    if mapping.get("tuple_semantics") != TUPLE_SEMANTICS_FROZEN_TEXT:
+        raise ProtocolError("Checkpoint mapping tuple semantics mismatch")
     for name, checkpoint in expected.items():
         actual = mapping.get(name)
         if not actual or actual.get("block_index") != checkpoint["block_index"]:
@@ -924,6 +1211,733 @@ def validate_authorization(
     return output_path
 
 
+
+def _disposition_scope_paths(scope: str) -> tuple[Path, Path]:
+    """Return the frozen consumption and result paths for a supported scope."""
+    if scope == NEUTRAL_SCOPE:
+        return NEUTRAL_CONSUMPTION_RELATIVE_PATH, NEUTRAL_RESULT_RELATIVE_PATH
+    if scope == STAGE_Q_SCOPE:
+        return STAGE_Q_CONSUMPTION_RELATIVE_PATH, STAGE_Q_RESULT_RELATIVE_PATH
+    raise ProtocolError(f"Unsupported disposition scope: {scope}")
+
+
+def _disposition_transaction_paths(
+    root: Path, authorization_sha256: str
+) -> tuple[Path, Path, Path]:
+    """Return the deterministic archive, journal, and disposition paths."""
+    archive_path = confined_path(
+        root / AUTHORIZATION_ARCHIVE_RELATIVE_DIR / f"{authorization_sha256}.json",
+        root,
+        allow_missing=True,
+    )
+    journal_path = confined_path(
+        root / AUTHORIZATION_DISPOSITION_JOURNAL_RELATIVE_DIR / f"{authorization_sha256}.json",
+        root,
+        allow_missing=True,
+    )
+    disposition_path = confined_path(
+        root / AUTHORIZATION_DISPOSITION_RELATIVE_DIR / f"{authorization_sha256}.json",
+        root,
+        allow_missing=True,
+    )
+    return archive_path, journal_path, disposition_path
+
+
+def _disposition_transaction_ids(authorization_sha256: str) -> tuple[str, str]:
+    """Return the deterministic transaction identities for an authorization hash."""
+    return "DISP-TXN-" + authorization_sha256, "DISP-" + authorization_sha256
+
+
+def _relative_path_string(path: Path, root: Path) -> str:
+    """Return a portable slash-separated path relative to ``root``."""
+    return path.relative_to(root).as_posix()
+
+
+def _disposition_journal_sha256(journal: Mapping[str, Any]) -> str:
+    """Hash the stable journal identity without the self-referential digest field."""
+    stable = {key: value for key, value in journal.items() if key != "journal_sha256"}
+    canonical = json.dumps(stable, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return sha256_bytes(canonical.encode("utf-8"))
+
+
+def validate_disposition_journal(journal: Mapping[str, Any]) -> None:
+    """Validate the closed schema and fail-closed invariants of a disposition journal."""
+    require_exact_keys(journal, DISPOSITION_JOURNAL_KEYS, "disposition journal")
+    if journal["schema_version"] != SCHEMA_VERSION or journal["experiment"] != EXPERIMENT:
+        raise ProtocolError("Disposition journal schema identity mismatch")
+    if journal["disposition_type"] != AUTHORIZATION_DISPOSITION_TYPE:
+        raise ProtocolError("Disposition journal type mismatch")
+    if journal["state"] != DISPOSITION_STATE_PREPARED:
+        raise ProtocolError("Disposition journal must be in PREPARED state")
+    require_string(journal["authorization_id"], "authorization_id")
+    require_string(journal["authorization_sha256"], "authorization_sha256")
+    if len(journal["authorization_sha256"]) != 64:
+        raise ProtocolError("authorization_sha256 must be a SHA-256 digest")
+    require_string(journal["authorization_scope"], "authorization_scope")
+    require_string(journal["authorization_runner_commit"], "authorization_runner_commit")
+    require_string(journal["authorization_runner_sha256"], "authorization_runner_sha256")
+    if len(journal["authorization_runner_sha256"]) != 64:
+        raise ProtocolError("authorization_runner_sha256 must be a SHA-256 digest")
+    require_string(journal["transaction_id"], "transaction_id")
+    require_string(journal["disposition_record_id"], "disposition_record_id")
+    require_string(journal["expected_archive_path"], "expected_archive_path")
+    require_string(journal["expected_disposition_path"], "expected_disposition_path")
+    require_string(journal["non_executable_reason"], "non_executable_reason")
+    parse_timestamp(journal["created_at"], "created_at")
+    parse_timestamp(journal["updated_at"], "updated_at")
+    if journal["explicit_disposition_authorized"] is not True:
+        raise ProtocolError("Disposition journal requires explicit authorization")
+    require_string(journal["journal_sha256"], "journal_sha256")
+    if len(journal["journal_sha256"]) != 64:
+        raise ProtocolError("journal_sha256 must be a SHA-256 digest")
+    if journal["journal_sha256"] != _disposition_journal_sha256(journal):
+        raise ProtocolError("Disposition journal self-hash mismatch")
+
+
+def validate_disposition_record(record: Mapping[str, Any]) -> None:
+    """Validate the closed schema and fail-closed invariants of a disposition record."""
+    require_exact_keys(record, DISPOSITION_RECORD_KEYS, "disposition record")
+    if record["schema_version"] != SCHEMA_VERSION or record["experiment"] != EXPERIMENT:
+        raise ProtocolError("Disposition schema identity mismatch")
+    if record["disposition_type"] != AUTHORIZATION_DISPOSITION_TYPE:
+        raise ProtocolError("Disposition type mismatch")
+    if record["state"] != DISPOSITION_STATE_DISPOSITIONED:
+        raise ProtocolError("Disposition record state must be DISPOSITIONED")
+    require_string(record["authorization_id"], "authorization_id")
+    require_string(record["authorization_sha256"], "authorization_sha256")
+    if len(record["authorization_sha256"]) != 64:
+        raise ProtocolError("authorization_sha256 must be a SHA-256 digest")
+    require_string(record["authorization_scope"], "authorization_scope")
+    require_string(record["authorization_runner_commit"], "authorization_runner_commit")
+    require_string(record["authorization_runner_sha256"], "authorization_runner_sha256")
+    if len(record["authorization_runner_sha256"]) != 64:
+        raise ProtocolError("authorization_runner_sha256 must be a SHA-256 digest")
+    if record["authorization_consumed"] is not False:
+        raise ProtocolError("Disposition requires an unconsumed authorization")
+    if record["consumption_record_exists"] is not False:
+        raise ProtocolError("Disposition requires no consumption record")
+    if record["qualification_result_exists"] is not False:
+        raise ProtocolError("Disposition requires no qualification result")
+    require_string(record["non_executable_reason"], "non_executable_reason")
+    if record["replacement_automatically_authorized"] is not False:
+        raise ProtocolError("Disposition must not automatically authorize a replacement")
+    if record["original_can_never_be_consumed"] is not True:
+        raise ProtocolError("Disposition must permanently prohibit original consumption")
+    require_string(record["archived_authorization_path"], "archived_authorization_path")
+    require_string(record["disposition_record_id"], "disposition_record_id")
+    require_string(record["transaction_id"], "transaction_id")
+    parse_timestamp(record["disposition_timestamp"], "disposition_timestamp")
+    if record["explicit_disposition_authorized"] is not True:
+        raise ProtocolError("Disposition requires explicit authorization")
+    require_string(record["journal_sha256"], "journal_sha256")
+    if len(record["journal_sha256"]) != 64:
+        raise ProtocolError("journal_sha256 must be a SHA-256 digest")
+
+
+def _read_active_authorization_for_disposition(
+    root: Path,
+    authorization_path: str | Path,
+    expected_scope: str,
+    expected_authorization_id: str,
+    expected_authorization_sha256: str,
+) -> tuple[Path, dict[str, Any], str, str, str, str]:
+    """Validate an active authorization and all preconditions before intent creation."""
+    auth_path = confined_path(authorization_path, root)
+    consumption_rel, result_rel = _disposition_scope_paths(expected_scope)
+    consumption_path = confined_path(root / consumption_rel, root, allow_missing=True)
+    result_path = confined_path(root / result_rel, root, allow_missing=True)
+    if os.path.lexists(consumption_path):
+        raise ProtocolError("Cannot disposition authorization with an existing consumption record")
+    if os.path.lexists(result_path):
+        raise ProtocolError("Cannot disposition authorization with an existing qualification result")
+    authorization = read_json_no_duplicates(auth_path)
+    expected_keys = NEUTRAL_AUTHORIZATION_KEYS if expected_scope == NEUTRAL_SCOPE else STAGE_Q_AUTHORIZATION_KEYS
+    require_exact_keys(authorization, expected_keys, "authorization")
+    if authorization["schema_version"] != SCHEMA_VERSION or authorization["experiment"] != EXPERIMENT:
+        raise ProtocolError("Authorization schema identity mismatch")
+    if authorization["scope"] != expected_scope:
+        raise ProtocolError("Authorization scope mismatch")
+    authorization_id = require_string(authorization["authorization_id"], "authorization_id")
+    if authorization_id != expected_authorization_id:
+        raise ProtocolError("Authorization ID does not match expected disposition identity")
+    authorization_hash = sha256_file(auth_path)
+    if authorization_hash != expected_authorization_sha256:
+        raise ProtocolError("Authorization hash does not match expected disposition identity")
+    runner_commit = require_string(authorization["runner_commit"], "runner_commit")
+    runner_sha256 = require_string(authorization["runner_sha256"], "runner_sha256")
+    if len(runner_sha256) != 64:
+        raise ProtocolError("runner_sha256 must be a SHA-256 digest")
+    return auth_path, authorization, authorization_id, authorization_hash, runner_commit, runner_sha256
+
+
+def _read_archived_authorization_for_recovery(
+    root: Path,
+    archive_path: Path,
+    expected_authorization_id: str,
+    expected_authorization_sha256: str,
+    expected_scope: str,
+) -> dict[str, Any]:
+    """Independently validate an archived authorization for recovery identity."""
+    if sha256_file(archive_path) != expected_authorization_sha256:
+        raise ProtocolError("Archived authorization hash mismatch during recovery")
+    authorization = read_json_no_duplicates(archive_path)
+    expected_keys = NEUTRAL_AUTHORIZATION_KEYS if expected_scope == NEUTRAL_SCOPE else STAGE_Q_AUTHORIZATION_KEYS
+    require_exact_keys(authorization, expected_keys, "archived authorization")
+    if authorization["schema_version"] != SCHEMA_VERSION or authorization["experiment"] != EXPERIMENT:
+        raise ProtocolError("Archived authorization schema identity mismatch")
+    if authorization["scope"] != expected_scope:
+        raise ProtocolError("Archived authorization scope mismatch")
+    authorization_id = require_string(authorization["authorization_id"], "authorization_id")
+    if authorization_id != expected_authorization_id:
+        raise ProtocolError("Archived authorization ID mismatch")
+    runner_commit = require_string(authorization["runner_commit"], "runner_commit")
+    runner_sha256 = require_string(authorization["runner_sha256"], "runner_sha256")
+    if len(runner_sha256) != 64:
+        raise ProtocolError("Archived runner_sha256 must be a SHA-256 digest")
+    return authorization
+
+
+def _build_disposition_journal(
+    root: Path,
+    archive_path: Path,
+    disposition_path: Path,
+    authorization_id: str,
+    authorization_hash: str,
+    authorization_scope: str,
+    runner_commit: str,
+    runner_sha256: str,
+    transaction_id: str,
+    disposition_record_id: str,
+    non_executable_reason: str,
+) -> dict[str, Any]:
+    """Build and validate the PREPARED disposition intent journal."""
+    timestamp = datetime.now(timezone.utc).isoformat()
+    journal: dict[str, Any] = {
+        "schema_version": SCHEMA_VERSION,
+        "experiment": EXPERIMENT,
+        "disposition_type": AUTHORIZATION_DISPOSITION_TYPE,
+        "authorization_id": authorization_id,
+        "authorization_sha256": authorization_hash,
+        "authorization_scope": authorization_scope,
+        "authorization_runner_commit": runner_commit,
+        "authorization_runner_sha256": runner_sha256,
+        "transaction_id": transaction_id,
+        "disposition_record_id": disposition_record_id,
+        "state": DISPOSITION_STATE_PREPARED,
+        "expected_archive_path": _relative_path_string(archive_path, root),
+        "expected_disposition_path": _relative_path_string(disposition_path, root),
+        "non_executable_reason": non_executable_reason,
+        "created_at": timestamp,
+        "updated_at": timestamp,
+        "explicit_disposition_authorized": True,
+        "journal_sha256": "",
+    }
+    journal["journal_sha256"] = _disposition_journal_sha256(journal)
+    validate_disposition_journal(journal)
+    return journal
+
+
+def _publish_disposition_journal(
+    journal_path: Path, journal: Mapping[str, Any], root: Path
+) -> Path:
+    """Exclusively create the PREPARED disposition journal."""
+    journal_path.parent.mkdir(parents=True, exist_ok=True)
+    return atomic_publish_json(journal_path, journal, root)
+
+
+def _archive_disposition_authorization(
+    auth_path: Path, archive_destination: Path, authorization_hash: str
+) -> None:
+    """Move original authorization bytes to archive and verify byte preservation."""
+    archive_destination.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        os.replace(auth_path, archive_destination)
+    except OSError as exc:
+        raise ProtocolError("Authorization archive move failed") from exc
+    if sha256_file(archive_destination) != authorization_hash:
+        raise ProtocolError("Archived authorization hash drifted during disposition")
+
+
+def _build_disposition_record(journal: Mapping[str, Any]) -> dict[str, Any]:
+    """Build and validate the completed disposition record from the exact journal identity."""
+    record: dict[str, Any] = {
+        "schema_version": SCHEMA_VERSION,
+        "experiment": EXPERIMENT,
+        "disposition_type": AUTHORIZATION_DISPOSITION_TYPE,
+        "authorization_id": journal["authorization_id"],
+        "authorization_sha256": journal["authorization_sha256"],
+        "authorization_scope": journal["authorization_scope"],
+        "authorization_runner_commit": journal["authorization_runner_commit"],
+        "authorization_runner_sha256": journal["authorization_runner_sha256"],
+        "authorization_consumed": False,
+        "consumption_record_exists": False,
+        "qualification_result_exists": False,
+        "non_executable_reason": journal["non_executable_reason"],
+        "replacement_automatically_authorized": False,
+        "original_can_never_be_consumed": True,
+        "archived_authorization_path": journal["expected_archive_path"],
+        "disposition_record_id": journal["disposition_record_id"],
+        "disposition_timestamp": datetime.now(timezone.utc).isoformat(),
+        "explicit_disposition_authorized": True,
+        "transaction_id": journal["transaction_id"],
+        "state": DISPOSITION_STATE_DISPOSITIONED,
+        "journal_sha256": journal["journal_sha256"],
+    }
+    validate_disposition_record(record)
+    return record
+
+
+def _publish_disposition_record(
+    disposition_path: Path, record: Mapping[str, Any], root: Path
+) -> Path:
+    """Exclusively create the completed disposition record."""
+    disposition_path.parent.mkdir(parents=True, exist_ok=True)
+    return atomic_publish_json(disposition_path, record, root)
+
+
+def _load_matching_journal(
+    root: Path,
+    journal_path: Path,
+    archive_path: Path,
+    disposition_path: Path,
+    expected_authorization_id: str,
+    expected_authorization_sha256: str,
+    expected_scope: str,
+    expected_runner_commit: str,
+    expected_runner_sha256: str,
+    expected_transaction_id: str,
+    expected_disposition_record_id: str,
+) -> dict[str, Any]:
+    """Load a journal and require exact independent authorization/transaction identity."""
+    journal = read_json_no_duplicates(journal_path)
+    validate_disposition_journal(journal)
+    if journal["authorization_id"] != expected_authorization_id:
+        raise ProtocolError("Disposition journal authorization ID mismatch")
+    if journal["authorization_sha256"] != expected_authorization_sha256:
+        raise ProtocolError("Disposition journal authorization hash mismatch")
+    if journal["authorization_scope"] != expected_scope:
+        raise ProtocolError("Disposition journal authorization scope mismatch")
+    if journal["authorization_runner_commit"] != expected_runner_commit:
+        raise ProtocolError("Disposition journal runner commit mismatch")
+    if journal["authorization_runner_sha256"] != expected_runner_sha256:
+        raise ProtocolError("Disposition journal runner SHA mismatch")
+    if journal["transaction_id"] != expected_transaction_id:
+        raise ProtocolError("Disposition journal transaction ID mismatch")
+    if journal["disposition_record_id"] != expected_disposition_record_id:
+        raise ProtocolError("Disposition journal record ID mismatch")
+    expected_archive = _relative_path_string(archive_path, root)
+    expected_disposition = _relative_path_string(disposition_path, root)
+    if journal["expected_archive_path"] != expected_archive:
+        raise ProtocolError("Disposition journal archive path mismatch")
+    if journal["expected_disposition_path"] != expected_disposition:
+        raise ProtocolError("Disposition journal disposition path mismatch")
+    return journal
+
+
+def _load_matching_disposition_record(
+    root: Path,
+    disposition_path: Path,
+    archive_path: Path,
+    expected_authorization_id: str,
+    expected_authorization_sha256: str,
+    expected_scope: str,
+    expected_runner_commit: str,
+    expected_runner_sha256: str,
+    expected_transaction_id: str,
+    expected_disposition_record_id: str,
+    journal: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Load and require exact independent identity, archive, and optional journal binding."""
+    record = read_json_no_duplicates(disposition_path)
+    validate_disposition_record(record)
+    if record["authorization_id"] != expected_authorization_id:
+        raise ProtocolError("Disposition record authorization ID mismatch")
+    if record["authorization_sha256"] != expected_authorization_sha256:
+        raise ProtocolError("Disposition record authorization hash mismatch")
+    if record["authorization_scope"] != expected_scope:
+        raise ProtocolError("Disposition record authorization scope mismatch")
+    if record["authorization_runner_commit"] != expected_runner_commit:
+        raise ProtocolError("Disposition record runner commit mismatch")
+    if record["authorization_runner_sha256"] != expected_runner_sha256:
+        raise ProtocolError("Disposition record runner SHA mismatch")
+    if record["transaction_id"] != expected_transaction_id:
+        raise ProtocolError("Disposition record transaction ID mismatch")
+    if record["disposition_record_id"] != expected_disposition_record_id:
+        raise ProtocolError("Disposition record record ID mismatch")
+    if record["archived_authorization_path"] != _relative_path_string(archive_path, root):
+        raise ProtocolError("Disposition record archive path mismatch")
+    if sha256_file(archive_path) != record["authorization_sha256"]:
+        raise ProtocolError("Disposition record archive hash mismatch")
+    if journal is not None:
+        if record["transaction_id"] != journal["transaction_id"]:
+            raise ProtocolError("Disposition record transaction identity mismatch")
+        if record["disposition_record_id"] != journal["disposition_record_id"]:
+            raise ProtocolError("Disposition record ID mismatch")
+        if record["journal_sha256"] != journal["journal_sha256"]:
+            raise ProtocolError("Disposition record journal hash mismatch")
+    return record
+
+
+def inspect_disposition_transaction(
+    repo_root: str | Path,
+    active_authorization_path: str | Path,
+    expected_authorization_id: str,
+    expected_authorization_sha256: str,
+    expected_scope: str = NEUTRAL_SCOPE,
+) -> dict[str, Any]:
+    """Inspect filesystem state and return an unambiguous disposition lifecycle state."""
+    root = Path(repo_root).resolve()
+    require_string(expected_authorization_id, "expected_authorization_id")
+    require_string(expected_authorization_sha256, "expected_authorization_sha256")
+    active_path = confined_path(active_authorization_path, root, allow_missing=True)
+    archive_path, journal_path, disposition_path = _disposition_transaction_paths(
+        root, expected_authorization_sha256
+    )
+    active_exists = os.path.lexists(active_path)
+    archive_exists = os.path.lexists(archive_path)
+    journal_exists = os.path.lexists(journal_path)
+    disposition_exists = os.path.lexists(disposition_path)
+
+    def result(state: str, replacement_blocked: bool) -> dict[str, Any]:
+        return {
+            "state": state,
+            "active_exists": active_exists,
+            "archive_exists": archive_exists,
+            "journal_exists": journal_exists,
+            "disposition_exists": disposition_exists,
+            "active_authorization_path": _relative_path_string(active_path, root),
+            "archive_path": _relative_path_string(archive_path, root),
+            "journal_path": _relative_path_string(journal_path, root),
+            "disposition_path": _relative_path_string(disposition_path, root),
+            "replacement_blocked": replacement_blocked,
+        }
+
+    if active_exists and archive_exists:
+        return result(DISPOSITION_STATE_AMBIGUOUS_OR_CORRUPT, True)
+
+    if active_exists:
+        if journal_exists:
+            (
+                _active_path,
+                _authorization,
+                _authorization_id,
+                authorization_hash,
+                runner_commit,
+                runner_sha256,
+            ) = _read_active_authorization_for_disposition(
+                root,
+                active_path,
+                expected_scope,
+                expected_authorization_id,
+                expected_authorization_sha256,
+            )
+            transaction_id, disposition_record_id = _disposition_transaction_ids(
+                authorization_hash
+            )
+            _load_matching_journal(
+                root,
+                journal_path,
+                archive_path,
+                disposition_path,
+                expected_authorization_id,
+                expected_authorization_sha256,
+                expected_scope,
+                runner_commit,
+                runner_sha256,
+                transaction_id,
+                disposition_record_id,
+            )
+            if disposition_exists:
+                return result(DISPOSITION_STATE_AMBIGUOUS_OR_CORRUPT, True)
+            return result(DISPOSITION_STATE_PREPARED_OR_IN_PROGRESS, True)
+        if disposition_exists:
+            return result(DISPOSITION_STATE_AMBIGUOUS_OR_CORRUPT, True)
+        return result(DISPOSITION_STATE_ACTIVE, True)
+
+    if archive_exists:
+        if sha256_file(archive_path) != expected_authorization_sha256:
+            return result(DISPOSITION_STATE_AMBIGUOUS_OR_CORRUPT, True)
+        journal = None
+        archived = None
+        if journal_exists or disposition_exists:
+            archived = _read_archived_authorization_for_recovery(
+                root,
+                archive_path,
+                expected_authorization_id,
+                expected_authorization_sha256,
+                expected_scope,
+            )
+            transaction_id, disposition_record_id = _disposition_transaction_ids(
+                expected_authorization_sha256
+            )
+        if journal_exists:
+            journal = _load_matching_journal(
+                root,
+                journal_path,
+                archive_path,
+                disposition_path,
+                expected_authorization_id,
+                expected_authorization_sha256,
+                expected_scope,
+                archived["runner_commit"],
+                archived["runner_sha256"],
+                transaction_id,
+                disposition_record_id,
+            )
+        if disposition_exists:
+            _load_matching_disposition_record(
+                root,
+                disposition_path,
+                archive_path,
+                expected_authorization_id,
+                expected_authorization_sha256,
+                expected_scope,
+                archived["runner_commit"],
+                archived["runner_sha256"],
+                transaction_id,
+                disposition_record_id,
+                journal,
+            )
+            return result(DISPOSITION_STATE_DISPOSITIONED, False)
+        if journal_exists:
+            return result(DISPOSITION_STATE_PARTIAL_OR_RECOVERY_REQUIRED, True)
+        return result(DISPOSITION_STATE_AMBIGUOUS_OR_CORRUPT, True)
+
+    if journal_exists or disposition_exists:
+        return result(DISPOSITION_STATE_AMBIGUOUS_OR_CORRUPT, True)
+    return result(DISPOSITION_STATE_CLEAR, False)
+
+
+def is_replacement_authorization_blocked(
+    repo_root: str | Path,
+    active_authorization_path: str | Path,
+    expected_authorization_id: str,
+    expected_authorization_sha256: str,
+    expected_scope: str = NEUTRAL_SCOPE,
+) -> bool:
+    """Return whether an unresolved disposition state blocks a replacement authorization."""
+    return inspect_disposition_transaction(
+        repo_root,
+        active_authorization_path,
+        expected_authorization_id,
+        expected_authorization_sha256,
+        expected_scope,
+    )["replacement_blocked"]
+
+
+def recover_disposition_transaction(
+    repo_root: str | Path,
+    active_authorization_path: str | Path,
+    expected_authorization_id: str,
+    expected_authorization_sha256: str,
+    expected_scope: str = NEUTRAL_SCOPE,
+    *,
+    explicit_disposition_authorized: bool,
+    non_executable_reason: str,
+) -> dict[str, Any]:
+    """Resume only an exact interrupted disposition transaction or return the completed one.
+
+    The journal is never the authority for authorization or transaction identity.
+    Recovery reconstructs expected runner and transaction identity from the active
+    authorization, or from the archived authorization after the move.
+    """
+    root = Path(repo_root).resolve()
+    if explicit_disposition_authorized is not True:
+        raise ProtocolError("Explicit disposition recovery authorization is required")
+    require_string(non_executable_reason, "non_executable_reason")
+    active_path = confined_path(active_authorization_path, root, allow_missing=True)
+    archive_path, journal_path, disposition_path = _disposition_transaction_paths(
+        root, expected_authorization_sha256
+    )
+    lifecycle = inspect_disposition_transaction(
+        root,
+        active_path,
+        expected_authorization_id,
+        expected_authorization_sha256,
+        expected_scope,
+    )
+
+    if lifecycle["state"] == DISPOSITION_STATE_DISPOSITIONED:
+        archived = _read_archived_authorization_for_recovery(
+            root,
+            archive_path,
+            expected_authorization_id,
+            expected_authorization_sha256,
+            expected_scope,
+        )
+        transaction_id, disposition_record_id = _disposition_transaction_ids(
+            expected_authorization_sha256
+        )
+        record = _load_matching_disposition_record(
+            root,
+            disposition_path,
+            archive_path,
+            expected_authorization_id,
+            expected_authorization_sha256,
+            expected_scope,
+            archived["runner_commit"],
+            archived["runner_sha256"],
+            transaction_id,
+            disposition_record_id,
+        )
+        validate_disposition_record(record)
+        return record
+
+    if lifecycle["state"] == DISPOSITION_STATE_PREPARED_OR_IN_PROGRESS:
+        (
+            active_path,
+            _authorization,
+            _authorization_id,
+            authorization_hash,
+            runner_commit,
+            runner_sha256,
+        ) = _read_active_authorization_for_disposition(
+            root,
+            active_path,
+            expected_scope,
+            expected_authorization_id,
+            expected_authorization_sha256,
+        )
+        transaction_id, disposition_record_id = _disposition_transaction_ids(
+            authorization_hash
+        )
+        journal = _load_matching_journal(
+            root,
+            journal_path,
+            archive_path,
+            disposition_path,
+            expected_authorization_id,
+            expected_authorization_sha256,
+            expected_scope,
+            runner_commit,
+            runner_sha256,
+            transaction_id,
+            disposition_record_id,
+        )
+        if journal["non_executable_reason"] != non_executable_reason:
+            raise ProtocolError("Disposition recovery non-executable reason mismatch")
+        _archive_disposition_authorization(active_path, archive_path, authorization_hash)
+        record = _build_disposition_record(journal)
+        _publish_disposition_record(disposition_path, record, root)
+    elif lifecycle["state"] == DISPOSITION_STATE_PARTIAL_OR_RECOVERY_REQUIRED:
+        archived = _read_archived_authorization_for_recovery(
+            root,
+            archive_path,
+            expected_authorization_id,
+            expected_authorization_sha256,
+            expected_scope,
+        )
+        transaction_id, disposition_record_id = _disposition_transaction_ids(
+            expected_authorization_sha256
+        )
+        journal = _load_matching_journal(
+            root,
+            journal_path,
+            archive_path,
+            disposition_path,
+            expected_authorization_id,
+            expected_authorization_sha256,
+            expected_scope,
+            archived["runner_commit"],
+            archived["runner_sha256"],
+            transaction_id,
+            disposition_record_id,
+        )
+        if journal["non_executable_reason"] != non_executable_reason:
+            raise ProtocolError("Disposition recovery non-executable reason mismatch")
+        record = _build_disposition_record(journal)
+        _publish_disposition_record(disposition_path, record, root)
+    else:
+        raise ProtocolError("Disposition transaction is not in a recoverable state")
+
+    final = inspect_disposition_transaction(
+        root,
+        active_path,
+        expected_authorization_id,
+        expected_authorization_sha256,
+        expected_scope,
+    )
+    if final["state"] != DISPOSITION_STATE_DISPOSITIONED:
+        raise ProtocolError("Disposition recovery did not reach a completed state")
+    return record
+
+
+def disposition_unconsumed_nonexecutable_authorization(
+    repo_root: str | Path,
+    authorization_path: str | Path,
+    expected_authorization_id: str,
+    expected_authorization_sha256: str,
+    expected_scope: str = NEUTRAL_SCOPE,
+    *,
+    explicit_disposition_authorized: bool,
+    non_executable_reason: str,
+) -> dict[str, Any]:
+    """Archive an issued, unconsumed, non-executable authorization without consuming it.
+
+    The operation is modeled as an explicit crash-safe transaction: publish a
+    PREPARED journal, move the original bytes to archive, verify the archive
+    hash, then publish the completed disposition record. Interrupted states are
+    detectable and block replacement until exact recovery.
+    """
+    root = Path(repo_root).resolve()
+    if explicit_disposition_authorized is not True:
+        raise ProtocolError("Explicit disposition authorization is required")
+    require_string(non_executable_reason, "non_executable_reason")
+    (
+        auth_path,
+        _authorization,
+        authorization_id,
+        authorization_hash,
+        runner_commit,
+        runner_sha256,
+    ) = _read_active_authorization_for_disposition(
+        root,
+        authorization_path,
+        expected_scope,
+        expected_authorization_id,
+        expected_authorization_sha256,
+    )
+    archive_path, journal_path, disposition_path = _disposition_transaction_paths(
+        root, authorization_hash
+    )
+    if (
+        os.path.lexists(archive_path)
+        or os.path.lexists(journal_path)
+        or os.path.lexists(disposition_path)
+    ):
+        raise ProtocolError("Disposition transaction state already exists")
+    transaction_id, disposition_record_id = _disposition_transaction_ids(
+        authorization_hash
+    )
+    journal = _build_disposition_journal(
+        root,
+        archive_path,
+        disposition_path,
+        authorization_id,
+        authorization_hash,
+        expected_scope,
+        runner_commit,
+        runner_sha256,
+        transaction_id,
+        disposition_record_id,
+        non_executable_reason,
+    )
+    _publish_disposition_journal(journal_path, journal, root)
+    _archive_disposition_authorization(auth_path, archive_path, authorization_hash)
+    record = _build_disposition_record(journal)
+    _publish_disposition_record(disposition_path, record, root)
+    final = inspect_disposition_transaction(
+        root,
+        auth_path,
+        authorization_id,
+        authorization_hash,
+        expected_scope,
+    )
+    if final["state"] != DISPOSITION_STATE_DISPOSITIONED:
+        raise ProtocolError("Disposition transaction did not reach a completed state")
+    return record
+
+
 def consume_authorization(
     authorization_path: str | Path,
     consumption_path: str | Path,
@@ -1240,6 +2254,7 @@ def run_neutral_hook_qualification(repo_root: str | Path) -> None:
     """Execute neutral qualification only after consuming its authorization."""
     root = Path(repo_root).resolve()
     authority = validate_authority_files(root, verify_model_files=False)
+    validate_mode_lifecycle(root, LIFECYCLE_MODE_NEUTRAL)
     validate_checkpoint_mapping(authority["checkpoint_mapping"])
     binding = build_static_execution_binding(root, authority)
     auth_path = confined_path(root / "experiments/exp021/authorization/neutral.json", root)
@@ -1350,6 +2365,7 @@ def run_stage_q(repo_root: str | Path) -> None:
     """Execute Stage Q only after neutral qualification and authorization checks."""
     root = Path(repo_root).resolve()
     authority = validate_authority_files(root, verify_model_files=False)
+    validate_mode_lifecycle(root, LIFECYCLE_MODE_STAGE_Q)
     validate_checkpoint_mapping(authority["checkpoint_mapping"])
     binding = build_static_execution_binding(root, authority)
     neutral_result_path = confined_path(root / NEUTRAL_RESULT_RELATIVE_PATH, root)
@@ -1446,6 +2462,7 @@ def run_static_preflight(repo_root: str | Path) -> dict[str, Any]:
     """Run metadata-only authority and implementation preflight."""
     root = Path(repo_root).resolve()
     authority = validate_authority_files(root)
+    validate_mode_lifecycle(root, LIFECYCLE_MODE_STATIC)
     validate_checkpoint_mapping(authority["checkpoint_mapping"])
     return {
         "status": "EXP021_STATIC_PREFLIGHT_PASS",

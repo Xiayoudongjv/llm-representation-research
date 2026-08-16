@@ -4,8 +4,10 @@ from __future__ import annotations
 
 import ast
 import hashlib
+import importlib.util
 import json
 import re
+import tempfile
 from pathlib import Path
 
 
@@ -21,6 +23,85 @@ EXPECTED_AUTHORITY_BLOB = "08d621f311dbc1c9c2c00ef024cdc42a6ac3c6f7"
 FORBIDDEN_MODULE_IMPORTS = {"torch", "transformers", "accelerate", "datasets", "safetensors"}
 NEUTRAL_DYNAMIC_TEST = "test_neutral_production_path_validates_before_publish"
 STAGE_Q_DYNAMIC_TEST = "test_stage_q_production_path_validates_neutral_before_consumption"
+REQUIRED_COMMIT_BINDING_TESTS = {
+    "test_authority_archive_commit_used_as_blob_anchor_without_head_gate",
+    "test_authorization_accepts_exact_live_commit_binding",
+    "test_authorization_rejects_live_commit_mismatch",
+    "test_authorization_rejects_live_runner_hash_mismatch",
+    "test_authorization_rejects_authority_archive_commit_as_live_commit",
+    "test_authorization_rejects_descendant_commit_substitution",
+    "test_neutral_production_entry_binds_live_commit_before_consumption",
+    "test_stage_q_production_entry_binds_live_commit_before_consumption",
+}
+REQUIRED_DISPOSITION_TESTS = {
+    "test_disposition_requires_explicit_authorization",
+    "test_disposition_preserves_original_authorization_hash",
+    "test_disposition_frees_active_authorization_path",
+    "test_disposition_record_binds_authorization_hash",
+    "test_disposition_rejects_consumed_authorization",
+    "test_disposition_rejects_consumption_record",
+    "test_disposition_rejects_qualification_result",
+    "test_disposition_rejects_hash_drift",
+    "test_disposition_rejects_existing_archive_destination",
+    "test_disposition_rejects_existing_disposition_record",
+    "test_disposition_does_not_create_replacement_authorization",
+    "test_disposition_does_not_create_consumption_record",
+    "test_disposition_archive_is_not_active_authorization",
+    "test_disposition_failure_before_journal_leaves_active_unchanged",
+    "test_disposition_prepared_before_move_blocks_replacement",
+    "test_disposition_os_replace_failure_blocks_replacement",
+    "test_disposition_interrupted_after_move_is_recoverable",
+    "test_disposition_final_publication_failure_is_recoverable",
+    "test_disposition_recovery_preserves_archive_and_finalizes",
+    "test_disposition_recovery_is_idempotent_after_completion",
+    "test_disposition_recovery_rejects_identity_mismatch",
+    "test_disposition_archive_without_journal_or_record_fails_closed",
+    "test_disposition_record_without_archive_fails_closed",
+    "test_disposition_active_and_archive_both_exist_fails_closed",
+    "test_disposition_incomplete_blocks_replacement_eligibility",
+    "test_disposition_recovery_rejects_tampered_self_hashed_journal",
+    "test_disposition_rejects_valid_self_hash_but_drifted_runner_identity",
+    "test_disposition_recovery_resumes_exact_pre_move_prepared_state",
+    "test_disposition_recovery_cross_authorization_attack_fails",
+}
+REQUIRED_CHECKPOINT_MAPPING_TESTS = {
+    "test_checkpoint_and_probability_validation_reject_invalid_values",
+    "test_checkpoint_mapping_accepts_frozen_metadata_shape",
+    "test_checkpoint_mapping_rejects_missing_tuple_semantics",
+    "test_checkpoint_mapping_rejects_unknown_metadata_key",
+    "test_checkpoint_mapping_rejects_unknown_checkpoint_object",
+    "test_checkpoint_mapping_rejects_missing_required_checkpoint",
+    "test_checkpoint_mapping_rejects_wrong_tuple_semantics_type",
+    "test_checkpoint_mapping_rejects_malformed_checkpoint_object",
+    "test_descriptive_final_checkpoint_remains_descriptive_only",
+    "test_real_reconciliation_checkpoint_mapping_passes",
+}
+REQUIRED_LIFECYCLE_TESTS = {
+    "test_lifecycle_static_accepts_active_neutral_authorization",
+    "test_lifecycle_neutral_valid_state_passes",
+    "test_lifecycle_stage_q_valid_state_passes",
+    "test_lifecycle_unknown_authorization_fails",
+    "test_lifecycle_unknown_directory_fails",
+    "test_lifecycle_legacy_result_paths_fail",
+    "test_lifecycle_legacy_results_directory_fails",
+    "test_lifecycle_unknown_consumed_or_engineering_child_fails",
+    "test_lifecycle_multiple_active_authorizations_fail",
+    "test_lifecycle_active_and_consumed_impossible_fails",
+    "test_lifecycle_result_without_consumption_fails",
+    "test_lifecycle_stage_q_with_active_neutral_fails",
+    "test_lifecycle_neutral_with_stage_q_consumption_fails",
+    "test_lifecycle_known_disposition_paths_not_globally_rejected",
+    "test_lifecycle_wrong_disposition_name_fails",
+    "test_lifecycle_prepared_journal_matching_active_authorization_passes",
+    "test_lifecycle_active_with_completed_disposition_fails",
+    "test_lifecycle_active_with_journal_for_other_authorization_fails",
+    "test_lifecycle_static_preflight_with_active_authorization_passes",
+    "test_lifecycle_neutral_production_entry_reaches_authorization_semantics",
+    "test_lifecycle_neutral_production_entry_unknown_authorization_fails_before_consumption",
+    "test_lifecycle_stage_q_production_entry_reaches_neutral_semantics",
+    "test_lifecycle_stage_q_production_entry_active_neutral_fails_before_semantics",
+}
+
 
 
 class ValidationError(RuntimeError):
@@ -44,6 +125,13 @@ def read_json_no_duplicates(path: Path) -> dict:
     if not isinstance(value, dict):
         raise ValidationError(f"expected JSON object: {path}")
     return value
+
+
+def load_runner_module():
+    spec = importlib.util.spec_from_file_location("exp021_runner_under_validation", RUNNER)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 class ImportAndCallVisitor(ast.NodeVisitor):
@@ -162,6 +250,57 @@ def validate() -> None:
     if unguarded_calls:
         raise ValidationError(f"module-level calls imply import-time work: {unguarded_calls}")
     source = RUNNER.read_text(encoding="utf-8")
+    constant_names = {
+        node.targets[0].id
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Assign)
+        and len(node.targets) == 1
+        and isinstance(node.targets[0], ast.Name)
+    }
+    if "AUTHORITY_ARCHIVE_COMMIT" not in constant_names:
+        raise ValidationError("authority archive identity is missing")
+    if "CHECKPOINT_MAPPING_METADATA_KEYS" not in constant_names:
+        raise ValidationError("checkpoint mapping metadata schema is missing")
+    if "TUPLE_SEMANTICS_FROZEN_TEXT" not in constant_names:
+        raise ValidationError("frozen tuple semantics constant is missing")
+    if "ARCHIVE_COMMIT" in constant_names:
+        raise ValidationError("legacy runtime HEAD constant is still present")
+    lifecycle_constants = {
+        "LIFECYCLE_MODE_STATIC",
+        "LIFECYCLE_MODE_NEUTRAL",
+        "LIFECYCLE_MODE_STAGE_Q",
+        "LIFECYCLE_ACTIVE_AUTHORIZATION_PATHS",
+        "LIFECYCLE_CONSUMPTION_PATHS",
+        "LIFECYCLE_ENGINEERING_RESULT_PATHS",
+        "LIFECYCLE_KNOWN_DIRECTORIES",
+        "LIFECYCLE_SCAN_DIRECTORIES",
+        "LIFECYCLE_LEGACY_CONTAMINATION_PATHS",
+    }
+    missing_lifecycle_constants = sorted(lifecycle_constants - constant_names)
+    if missing_lifecycle_constants:
+        raise ValidationError(f"mode-specific lifecycle constants are missing: {missing_lifecycle_constants}")
+    authority_files = function_node(tree, "validate_authority_files")
+    authority_files_source = ast.unparse(authority_files)
+    if "rev-parse" in authority_files_source:
+        raise ValidationError("authority archive commit still constrains live HEAD")
+    for legacy_path_token in (
+        "experiments/exp021/authorization",
+        "experiments/exp021/results",
+        "experiments/exp021/neutral_qualification_result.json",
+        "experiments/exp021/stage_q_result.json",
+    ):
+        if legacy_path_token in authority_files_source:
+            raise ValidationError(f"stale global mutable-path denylist remains in validate_authority_files: {legacy_path_token}")
+    for lifecycle_function in (
+        "inspect_lifecycle_paths",
+        "validate_lifecycle_state",
+        "validate_mode_lifecycle",
+    ):
+        function_node(tree, lifecycle_function)
+    mode_validator = function_node(tree, "validate_mode_lifecycle")
+    mode_validator_source = ast.unparse(mode_validator)
+    if "inspect_lifecycle_paths" not in mode_validator_source or "validate_lifecycle_state" not in mode_validator_source:
+        raise ValidationError("mode-specific lifecycle validation is incomplete")
     for mode in ("--static-preflight", "--neutral-hook-qualification", "--stage-q"):
         if mode not in source:
             raise ValidationError(f"missing CLI mode: {mode}")
@@ -180,9 +319,9 @@ def validate() -> None:
     require_calls(
         neutral,
         {
-            "validate_authority_files", "build_static_execution_binding", "consume_authorization",
-            "validate_model_manifest", "_load_model_and_tokenizer", "_forward_with_capture",
-            "construct_expected_hook_output", "validate_active_hook_output",
+            "validate_authority_files", "validate_mode_lifecycle", "build_static_execution_binding",
+            "consume_authorization", "validate_model_manifest", "_load_model_and_tokenizer",
+            "_forward_with_capture", "construct_expected_hook_output", "validate_active_hook_output",
             "validate_neutral_result", "atomic_publish_json",
         },
         "neutral path",
@@ -190,17 +329,23 @@ def validate() -> None:
     require_calls(
         stage_q,
         {
-            "validate_authority_files", "validate_neutral_result", "consume_authorization",
-            "validate_model_manifest", "_load_model_and_tokenizer", "load_fit_source_records",
-            "extract_fit_representations", "leave_one_out_fixed_probe", "stage_q_global_gate",
-            "validate_stage_q_result", "atomic_publish_json",
+            "validate_authority_files", "validate_mode_lifecycle", "validate_neutral_result",
+            "consume_authorization", "validate_model_manifest", "_load_model_and_tokenizer",
+            "load_fit_source_records", "extract_fit_representations", "leave_one_out_fixed_probe",
+            "stage_q_global_gate", "validate_stage_q_result", "atomic_publish_json",
         },
         "Stage-Q path",
     )
+    if not called_before(neutral, "validate_mode_lifecycle", "consume_authorization"):
+        raise ValidationError("neutral lifecycle validation is not before authorization consumption")
     if not called_before(neutral, "consume_authorization", "_load_model_and_tokenizer"):
         raise ValidationError("neutral authorization is not consumed before model load")
     if not called_before(neutral, "validate_neutral_result", "atomic_publish_json"):
         raise ValidationError("neutral result is not validated before publication")
+    if not called_before(stage_q, "validate_mode_lifecycle", "validate_neutral_result"):
+        raise ValidationError("Stage-Q lifecycle validation is not before neutral-result validation")
+    if not called_before(stage_q, "validate_mode_lifecycle", "consume_authorization"):
+        raise ValidationError("Stage-Q lifecycle validation is not before authorization consumption")
     if not called_before(stage_q, "validate_neutral_result", "consume_authorization"):
         raise ValidationError("Stage-Q neutral drift is not checked before authorization consumption")
     if not called_before(stage_q, "consume_authorization", "_load_model_and_tokenizer"):
@@ -239,12 +384,95 @@ def validate() -> None:
         {"runtime_identity_binding"},
         "execution binding",
     )
+    if "rev-parse" not in ast.unparse(execution_binding):
+        raise ValidationError("live execution commit is not established")
+    disposition = function_node(tree, "disposition_unconsumed_nonexecutable_authorization")
+    require_calls(
+        disposition,
+        {
+            "_publish_disposition_journal",
+            "_archive_disposition_authorization",
+            "_publish_disposition_record",
+            "inspect_disposition_transaction",
+        },
+        "disposition lifecycle",
+    )
+    if not called_before(disposition, "_publish_disposition_journal", "_archive_disposition_authorization"):
+        raise ValidationError("disposition journal is not published before archive move")
+    if not called_before(disposition, "_archive_disposition_authorization", "_publish_disposition_record"):
+        raise ValidationError("disposition archive move is not before final publication")
+    archive_fn = function_node(tree, "_archive_disposition_authorization")
+    if "os.replace" not in ast.unparse(archive_fn) or "sha256_file" not in call_names(archive_fn):
+        raise ValidationError("disposition does not archive original bytes fail-closed")
+    for name in (
+        "validate_disposition_journal",
+        "inspect_disposition_transaction",
+        "recover_disposition_transaction",
+        "is_replacement_authorization_blocked",
+        "_read_archived_authorization_for_recovery",
+        "_disposition_transaction_ids",
+    ):
+        function_node(tree, name)
+    journal_validator = function_node(tree, "validate_disposition_journal")
+    if "journal_sha256" not in ast.unparse(journal_validator):
+        raise ValidationError("disposition journal validator is incomplete")
+    journal_binding = function_node(tree, "_load_matching_journal")
+    journal_binding_source = ast.unparse(journal_binding)
+    for token in (
+        "authorization_runner_commit",
+        "authorization_runner_sha256",
+        "transaction_id",
+        "disposition_record_id",
+    ):
+        if token not in journal_binding_source:
+            raise ValidationError(f"disposition journal binding is missing {token}")
+    disposition_validator = function_node(tree, "validate_disposition_record")
+    if "original_can_never_be_consumed" not in ast.unparse(disposition_validator):
+        raise ValidationError("disposition validator is incomplete")
+    if "DISPOSITION_STATE_DISPOSITIONED" not in ast.unparse(disposition_validator):
+        raise ValidationError("completed disposition state is not verified")
+    recovery = function_node(tree, "recover_disposition_transaction")
+    require_calls(
+        recovery,
+        {
+            "_read_active_authorization_for_disposition",
+            "_read_archived_authorization_for_recovery",
+            "_disposition_transaction_ids",
+            "_load_matching_journal",
+            "_build_disposition_record",
+            "_publish_disposition_record",
+            "inspect_disposition_transaction",
+        },
+        "disposition recovery",
+    )
+    inspection = function_node(tree, "inspect_disposition_transaction")
+    require_calls(
+        inspection,
+        {
+            "_read_active_authorization_for_disposition",
+            "_read_archived_authorization_for_recovery",
+            "_disposition_transaction_ids",
+            "_load_matching_journal",
+        },
+        "disposition inspection",
+    )
+    if "replacement_blocked" not in ast.unparse(inspection):
+        raise ValidationError("disposition inspection does not define replacement blocking")
+    if "DISPOSITION_STATE_PARTIAL_OR_RECOVERY_REQUIRED" not in ast.unparse(inspection):
+        raise ValidationError("disposition inspection does not detect recovery-required state")
     environment_validator = function_node(tree, "_validate_neutral_execution_environment")
     if "runtime_identity" not in ast.unparse(environment_validator):
         raise ValidationError("neutral environment validation does not use dynamic runtime identity binding")
     if not TESTS.is_file():
         raise ValidationError("Stage-Q production-entry regression tests are missing")
     tests_tree = ast.parse(TESTS.read_text(encoding="utf-8"), filename=str(TESTS))
+    for name in (
+        REQUIRED_COMMIT_BINDING_TESTS
+        | REQUIRED_DISPOSITION_TESTS
+        | REQUIRED_CHECKPOINT_MAPPING_TESTS
+        | REQUIRED_LIFECYCLE_TESTS
+    ):
+        function_node(tests_tree, name)
     neutral_dynamic_test = function_node(tests_tree, NEUTRAL_DYNAMIC_TEST)
     stage_q_dynamic_test = function_node(tests_tree, STAGE_Q_DYNAMIC_TEST)
     if not calls_any_function_containing(neutral_dynamic_test, "run_neutral_hook_qualification"):
@@ -255,8 +483,42 @@ def validate() -> None:
     if not guarded_call(manifest, "sha256_file", "verify_payload") or not guarded_call(manifest, "_validate_safetensors_header", "verify_payload"):
         raise ValidationError("full model verification is not guarded by post-consumption verify_payload")
     static = function_node(tree, "run_static_preflight")
+    if "validate_mode_lifecycle" not in call_names(static):
+        raise ValidationError("static preflight does not perform mode-specific lifecycle validation")
     if "sha256_file" in call_names(static) or "_validate_safetensors_header" in call_names(static):
         raise ValidationError("static preflight directly reads model payloads")
+    with tempfile.TemporaryDirectory() as tmpdir:
+        lifecycle_root = Path(tmpdir)
+        active_path = lifecycle_root / "experiments/exp021/authorization/neutral.json"
+        active_path.parent.mkdir(parents=True)
+        active_path.write_text("{}", encoding="utf-8")
+        try:
+            lifecycle_state = load_runner_module().validate_mode_lifecycle(lifecycle_root, "static")
+        except Exception as exc:
+            raise ValidationError(f"static lifecycle validation does not recognize active neutral authorization: {exc}")
+        if lifecycle_state.get("active_neutral") is None:
+            raise ValidationError("static lifecycle inspection does not classify active neutral authorization")
+        unknown_path = lifecycle_root / "experiments/exp021/authorization/unknown.json"
+        unknown_path.write_text("{}", encoding="utf-8")
+        try:
+            load_runner_module().validate_mode_lifecycle(lifecycle_root, "static")
+        except Exception:
+            pass
+        else:
+            raise ValidationError("closed-world lifecycle validation accepts an unknown authorization artifact")
+    mapping_validator = function_node(tree, "validate_checkpoint_mapping")
+    mapping_validator_source = ast.unparse(mapping_validator)
+    if "tuple_semantics" not in mapping_validator_source or "TUPLE_SEMANTICS_FROZEN_TEXT" not in mapping_validator_source:
+        raise ValidationError("checkpoint mapping validator does not explicitly recognize tuple_semantics")
+    if "CHECKPOINT_MAPPING_METADATA_KEYS" not in mapping_validator_source:
+        raise ValidationError("checkpoint mapping validator does not enforce exact metadata schema")
+    checkpoint_mapping = authority.get("checkpoint_mapping")
+    if not isinstance(checkpoint_mapping, dict):
+        raise ValidationError("frozen authority checkpoint mapping is missing or invalid")
+    try:
+        load_runner_module().validate_checkpoint_mapping(checkpoint_mapping)
+    except Exception as exc:
+        raise ValidationError(f"static preflight cannot validate frozen checkpoint mapping: {exc}")
     if "neutral_result_path" not in ast.unparse(stage_q):
         raise ValidationError("Stage-Q neutral qualification dependency is missing")
     if "results" in source and "scientific" not in source:
