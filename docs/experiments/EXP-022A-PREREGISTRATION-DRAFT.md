@@ -112,9 +112,9 @@ Authority-resolved facts:
 - `SOURCE_SEMANTIC_CLASS` comes from `group`
 - Do NOT print formal text
 
-Exact EXP-022A FIT/EVAL ID arrays: `PENDING_STATIC_RECONCILIATION`
+Exact EXP-022A FIT/EVAL ID arrays: `RESOLVED_092B`
 
-Exact per-split record identities: `PENDING_STATIC_RECONCILIATION`
+Exact per-split record identities: `RESOLVED_092B`
 
 ## Complementary splits
 
@@ -130,7 +130,7 @@ Current proposed EXP-022A requirements:
 - four classes represented in FIT and EVAL
 - candidate exact EVAL balance: 3 records per class
 
-Exact EVAL balance: `PROPOSED_NEW_FREEZE`
+Exact EVAL balance: `RESOLVED_3_PER_CLASS`
 
 Do NOT claim `orig_01 == para_01` source family.
 
@@ -167,7 +167,7 @@ Preferred scientific notation: `L_ref`
 Do not call it an intervention layer when describing EXP-022A scientific
 measurement.
 
-Exact architecture/index reconciliation: `PENDING_STATIC_RECONCILIATION`
+Exact architecture/index reconciliation: `RESOLVED_092B`
 
 ## Depth set
 
@@ -183,8 +183,7 @@ Candidate semantics:
 - final post-RMSNorm = secondary mechanistic endpoint candidate
 - intermediate block17–block26 trajectory = secondary descriptive trajectory candidate
 
-Exact hook/hidden-state identity for every layer:
-`PENDING_STATIC_RECONCILIATION`
+Exact hook/hidden-state identity for every layer: `RESOLVED_092B`
 
 Depth roles: `PROPOSED_NEW_FREEZE`
 
@@ -240,7 +239,7 @@ Historical family:
 - `StandardScaler`
 - multinomial logistic regression
 
-Exact effective parameters: `PENDING_STATIC_RECONCILIATION`
+Exact effective parameters: `RESOLVED_092B`; explicit EXP-022A constructor values: `SOFT_NEW_FREEZE_REQUIRED`
 
 A future frozen specification must state every scientifically relevant
 effective parameter explicitly and not rely on version-dependent sklearn
@@ -635,31 +634,347 @@ EXP-022A cannot establish:
 - non-Abelian dynamics
 - universal Transformer laws
 
-## Operational constants pending static reconciliation
 
-`PENDING_STATIC_RECONCILIATION`
+## Task-092B static operational reconciliation
+
+Status: `EXP022A_STATIC_OPERATIONAL_RECONCILIATION = RESOLVED_092B`
+
+### Exact frozen split identities
+
+Authority source: `experiments/exp020/exp020_frozen_config.json` `dataset.splits`,
+verified against `experiments/exp003/prompts_controlled.json` and
+`experiments/exp021/engineering/stage_q_result.json`.
+
+`EXACT_EVAL_CLASS_BALANCE = RESOLVED_3_PER_CLASS`
+
+All four sets contain 12 unique IDs; FIT and EVAL are disjoint within each
+split; every referenced ID exists in the controlled artifact. Do not claim A/B
+statistical independence. Task-091C source-family negative remains valid.
+
+Split A FIT:
+
+```text
+logic_orig_01, logic_orig_02, logic_orig_03
+causality_orig_01, causality_orig_02, causality_orig_03
+analogy_orig_01, analogy_orig_02, analogy_orig_03
+definition_orig_01, definition_orig_02, definition_orig_03
+```
+
+Split A EVAL:
+
+```text
+logic_para_01, logic_para_02, logic_para_03
+causality_para_01, causality_para_02, causality_para_03
+analogy_para_01, analogy_para_02, analogy_para_03
+definition_para_01, definition_para_02, definition_para_03
+```
+
+Split B FIT:
+
+```text
+logic_para_01, logic_para_02, logic_para_03
+causality_para_01, causality_para_02, causality_para_03
+analogy_para_01, analogy_para_02, analogy_para_03
+definition_para_01, definition_para_02, definition_para_03
+```
+
+Split B EVAL:
+
+```text
+logic_orig_01, logic_orig_02, logic_orig_03
+causality_orig_01, causality_orig_02, causality_orig_03
+analogy_orig_01, analogy_orig_02, analogy_orig_03
+definition_orig_01, definition_orig_02, definition_orig_03
+```
+
+Split identity reuse: `REUSE_FROZEN`.
+
+### Model identity
+
+- Model: `Qwen/Qwen3-1.7B`
+- Architecture: `Qwen3ForCausalLM`
+- Model type: `qwen3`
+- Blocks: `28`
+- Hidden size: `2048`
+- Vocab size: `151936`
+- Snapshot identity: `70d244cc86ccca08cf5af4e1e306ecf908b1ad5e`
+- Historical execution dtype: `float16`
+- Historical device: `cuda:0`
+- Repository revision: `UNRECOVERED_NOT_USED_AS_EXECUTION_IDENTITY`
+- Model identity basis: frozen content/snapshot manifest
+
+### Tokenizer identity
+
+- Tokenizer class: `Qwen2Tokenizer`
+- Source: same frozen local snapshot
+- `tokenizer_config.json` SHA-256:
+  `d5d09f07b48c3086c508b30d1c9114bd1189145b74e982a265350c923acd8101`
+- `tokenizer.json` SHA-256:
+  `aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4`
+- Historical loader: `AutoTokenizer.from_pretrained(snapshot, local_files_only=True)`
+- Historical tokenizer call: `return_tensors="pt"`, `padding=False`, `truncation=False`
+- `add_special_tokens = SOFT_NEW_FREEZE_REQUIRED`
+
+### Depth and tuple semantics
+
+- `hidden_states[0]` = embedding output
+- `hidden_states[1..27]` = decoder block 0..26 outputs, pre-final-RMSNorm
+- `hidden_states[28]` = post-final-RMSNorm final normalized hidden state
+- block27 pre-final-RMSNorm output is NOT tuple-accessible; it requires the
+  frozen block27 output-hook semantics.
+
+```text
+block16 -> hs17
+block17 -> hs18
+block18 -> hs19
+block19 -> hs20
+block20 -> hs21
+block21 -> hs22
+block22 -> hs23
+block23 -> hs24
+block24 -> hs25
+block25 -> hs26
+block26 -> hs27
+block27-pre -> hook, hs index null
+block27-post -> hs28
+```
+
+### Reference and final identities
+
+- Reference `L_ref`: block `16`, `hidden_states[17]`, pre-final-RMSNorm block output.
+- Primary-final candidate operational identity: block27 pre-final-RMSNorm,
+  `hooked_block_27_output`.
+- Post-final candidate: `hidden_states[28]`, post-final-RMSNorm.
+
+Scientific endpoint roles remain `PROPOSED_NEW_FREEZE`; 092B resolved operational
+identity, not statistical/scientific endpoint choice.
+
+### Token-position semantics
+
+Historical extraction rule:
+
+- one prompt per forward
+- `padding=False`
+- `truncation=False`
+- attention mask validated all-ones
+- selected token index = `int(attention_mask[0].sum().item()) - 1`
+- representation = `tensor[0, selected_token_index, :]`
+
+This is attention-mask-derived last-valid-token selection, not blind `-1`
+selection. Status: `REUSE_FROZEN`.
+
+### Representation numeric semantics
+
+- Historical model hidden states: `torch.float16`
+- Extraction: detach, CPU, NumPy copy
+- No float32 cast before probe fitting
+- Historical stored/stacked representation arrays: `float16`
+
+Do NOT silently change EXP-022A to float32. Any change from historical float16
+must be labeled `NEW_FREEZE`.
+
+`OPEN_REVIEW_ITEM`: Should EXP-022A prospectively preserve historical float16
+probe input, or explicitly cast representations to float32 before scaler/probe
+fitting?
+
+### Historical StandardScaler semantics
+
+- Historical construction: `StandardScaler()` under pinned `scikit-learn==1.9.0`
+- Effective values: `copy=True`, `with_mean=True`, `with_std=True`
+- Historical Stage-Q fit population: 11 FIT observations inside each LOO fold
+- No historical Stage-Q full-FIT scaler exists
+
+Historical scaler semantics: `RESOLVED`.
+
+EXP-022A explicit constructor values: `SOFT_NEW_FREEZE_REQUIRED`.
+
+### Historical LogisticRegression semantics
+
+- `solver=lbfgs`
+- effective L2 behavior
+- `C=1.0`
+- `fit_intercept=True`
+- `tol=0.0001`
+- `class_weight=None`
+- `dual=False`
+- `intercept_scaling=1`
+- `l1_ratio=0.0` unused
+- `max_iter=1000`
+- `n_jobs=None`
+- `verbose=0`
+- `warm_start=False`
+- `random_state=20260812`
+
+Multinomial semantics: `EFFECTIVE_HISTORICAL_MULTINOMIAL`, not explicitly frozen
+`multi_class` keyword semantics.
+
+`random_state` effect under lbfgs: `EFFECT_NOT_AUDITED_HISTORICALLY`.
+
+EXP-022A explicit classifier constructor: `SOFT_NEW_FREEZE_REQUIRED`.
+
+### Class / probability mapping
+
+- `classifier.classes_` must uniquely contain all four frozen classes.
+- Probability columns are explicitly remapped to `logic`, `causality`,
+  `analogy`, `definition`.
+- Predicted class = frozen class order at argmax of mapped probabilities.
+- Status: `REUSE_FROZEN_IMPLEMENTATION_SEMANTICS`.
+
+### A0 / A1 / A2 static status
+
+A0:
+
+- historical representation/scaler/classifier families are reusable
+- full-FIT -> untouched-EVAL procedure is a NEW EXP-022A operation
+- `EXP022A_A0_FULL_FIT_PROCEDURE = NEW_EXP022A_FREEZE_REQUIRED`
+
+A1:
+
+- `EXP022A_A1_STATIC_SPECIFICATION = OPERATIONALLY_SPECIFIABLE`
+- fit `S_l` on layer-l FIT only
+- keep fitted `C_ref` fixed
+- transform EVAL with `S_l`
+- predict with `C_ref`
+- do not refit `C_ref`
+
+A2:
+
+- `EXP022A_A2_STATIC_SPECIFICATION = OPERATIONALLY_SPECIFIABLE`
+- fit `S_l` and `C_l` on layer-l FIT only
+- predict untouched EVAL
+- no layer-specific tuning
+
+Do not implement A0/A1/A2 in this task.
+
+### FIT / EVAL boundary
+
+- `EXP022A_FIT_BOUNDARY = STATICALLY_IDENTIFIABLE`
+- `EXP022A_EVAL_IDENTITY = STATICALLY_IDENTIFIABLE`
+
+No EVAL representation may affect scaler fitting, classifier fitting,
+hyperparameter selection, layer selection, metric selection, or threshold
+selection. EVAL may be accessed only after condition-specific fit is complete,
+and only by a future authorized protocol. Task-092BP does not authorize EVAL
+access.
+
+### Task-092B draft-conflict result
+
+`EXP022A_DRAFT_AUTHORITY_CONFLICT = false`
+
+Supported:
+
+- split IDs
+- 3-per-class balance
+- `block16/hs17`
+- block27 pre-final identity
+- post-final identity
+- full depth identity
+- last-valid-token construct
+
+Needs precision:
+
+- StandardScaler constructor
+- LogisticRegression constructor
+- effective multinomial wording
+- representation numeric dtype decision
+
+Prospective new decision:
+
+- full-FIT A0 procedure
+- `add_special_tokens` explicit value
+
+### Freeze-blocker status
+
+- `EXP022A_HARD_FREEZE_BLOCKERS_PRESENT = false`
+- `EXP022A_SOFT_NEW_FREEZE_ITEMS_PRESENT = true`
+
+Soft items include at minimum:
+
+- explicit `add_special_tokens` value
+- explicit A0 full-FIT procedure
+- explicit StandardScaler constructor
+- explicit LogisticRegression constructor/model semantics
+- representation float16 vs prospective float32 decision
+- future preregistration/config/runner/validator hashes
+
+Statistical review items remain open.
+
+### Task-092B Compliance Incident
+
+`FORMAL_PROMPT_TEXT_EXPOSED = true`
+
+Incident scope: during early Task-092B schema inspection, three controlled
+prompt strings were printed in a tool transcript before suppression.
+
+No repository file was modified. No model was run. No tokenizer was run. No
+hidden/EVAL representations were computed. No predictions or metrics were
+observed.
+
+Classification: `PREREGISTRATION_PROCESS_COMPLIANCE_INCIDENT`, not
+`SCIENTIFIC_RESULT_CONTAMINATION`.
+
+Limitation: because the 24 controlled records are reused across complementary
+FIT/EVAL roles, the project must NOT claim that EXP-022A EVAL textual content
+remained fully researcher-blind before preregistration freeze. Use instead:
+"EVAL is computationally held out from fitting/tuning." Do not use: "EVAL
+content was unseen by researchers."
+
+### POST_092B_CONTENT_EXPOSURE_GUARD
+
+The exposed prompt contents may NOT be used to:
+
+- change split identities
+- change item inclusion
+- change class definitions
+- change primary/secondary metric
+- change endpoint
+- change readout family
+- change hyperparameters
+- change statistical method because of item content
+- construct item-specific rules
+- exclude difficult/favorable items
+
+Future reviewers must not reopen or print controlled prompt text. Remaining
+protocol changes must be justified only by historical authority, generic
+statistical considerations, model architecture, pre-existing v0.1 design, or
+reproducibility/technical correctness.
+
+`EXP022A_POST_092B_CONTENT_EXPOSURE_GUARD = ACTIVE`
+
+### Static reconciliation resolved
 
 - exact Split A FIT IDs
 - exact Split A EVAL IDs
 - exact Split B FIT IDs
 - exact Split B EVAL IDs
-- exact 3-per-class balance verification
-- exact Qwen3-1.7B snapshot/revision
-- exact tokenizer identity if extraction requires it
-- exact reference-layer operational identity
-- exact block17–block27 extraction identities
-- exact final pre-RMSNorm extraction identity
-- exact final post-RMSNorm extraction identity
-- exact last-valid-token semantics
-- exact StandardScaler effective configuration
-- exact LogisticRegression effective configuration
-- exact classifier probability/class mapping
-- exact representation dtype requirements
-- exact FIT-only fitting boundaries
-- exact EVAL access boundary
-- frozen artifact hashes needed by the future config
+- exact per-split class counts
+- exact model identity/snapshot
+- tokenizer class/source/manifest identity
+- reference-layer operational identity
+- full block16-block27 depth map
+- final pre-RMSNorm identity
+- final post-RMSNorm identity
+- last-valid-token semantics
+- representation numeric semantics
+- historical StandardScaler effective semantics
+- historical LogisticRegression effective semantics
+- class/probability mapping semantics
+- FIT-only and EVAL access boundaries
+- existing frozen artifact identities/hashes
 
-`EXP022A_PREREGISTRATION_FREEZE_BLOCKED_BY_STATIC_RECONCILIATION = true`
+### Soft new-freeze pending review
+
+- explicit `add_special_tokens` value
+- representation probe dtype
+- explicit StandardScaler constructor
+- explicit LogisticRegression specification
+- full-FIT A0 procedure
+- future preregistration/config/runner/validator hashes
+
+Statistical open review items remain separate.
+
+`EXP022A_PREREGISTRATION_FREEZE_BLOCKED_BY_STATIC_RECONCILIATION = false`
+
 
 ## Review questions before v1.0
 
@@ -678,6 +993,7 @@ EXP-022A cannot establish:
 9. Is any multiplicity control needed for the pre-specified secondary set?
 10. Are all result interpretations weaker than the actual estimands?
 
+
 ## Current preregistration state flags
 
 ```text
@@ -685,7 +1001,16 @@ EXP022A_PREREGISTRATION_VERSION = v0.1
 EXP022A_PREREGISTRATION_STATUS = DRAFT
 EXP022A_PREREGISTRATION_FROZEN = false
 EXP022A_AUTHORITY_RECONCILIATION = COMPLETE_v1.0
-EXP022A_STATIC_OPERATIONAL_RECONCILIATION = PENDING_092B
+EXP022A_STATIC_OPERATIONAL_RECONCILIATION = RESOLVED_092B
+EXP022A_DRAFT_AUTHORITY_CONFLICT = false
+EXP022A_HARD_FREEZE_BLOCKERS_PRESENT = false
+EXP022A_SOFT_NEW_FREEZE_ITEMS_PRESENT = true
+EXP022A_A0_FULL_FIT_PROCEDURE = NEW_EXP022A_FREEZE_REQUIRED
+EXP022A_A1_STATIC_SPECIFICATION = OPERATIONALLY_SPECIFIABLE
+EXP022A_A2_STATIC_SPECIFICATION = OPERATIONALLY_SPECIFIABLE
+EXP022A_POST_092B_CONTENT_EXPOSURE_GUARD = ACTIVE
+EXP022A_EVAL_RESEARCHER_CONTENT_BLIND = false
+EXP022A_EVAL_COMPUTATIONALLY_HELD_OUT = true
 EXP022A_OPEN_REVIEW_ITEMS_PRESENT = true
 EXP022A_SOURCE_FAMILY_BOOTSTRAP_SUPPORTED = false
 EXP022A_SPLIT_WISE_EVAL_ITEM_INFERENCE = PROPOSED_NEW_FREEZE
@@ -693,6 +1018,9 @@ EXP022A_CONTRAST_BASED_PREREGISTRATION = PROPOSED
 EXP022A_IMPLEMENTATION_AUTHORIZED = false
 EXP022A_MODEL_EXECUTION_AUTHORIZED = false
 EXP022A_FORMAL_EVAL_ACCESS_AUTHORIZED = false
+FORMAL_PROMPT_TEXT_EXPOSED_IN_092B = true
+MODEL_LOAD_PERFORMED = false
+FORMAL_EVAL_REPRESENTATIONS_ACCESSED = false
 FROZEN_AUTHORITY_MODIFIED = false
 REAL_EXPERIMENT_EVIDENCE_MODIFIED = false
 ```

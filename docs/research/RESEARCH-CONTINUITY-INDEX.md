@@ -5,7 +5,7 @@ experimental artifacts outrank it.
 
 ## Current research phase
 
-EXP-022A preregistration draft + static operational reconciliation
+EXP-022A independent preregistration review
 
 ## Current preregistration draft
 
@@ -36,10 +36,23 @@ COMPLETE
 
 v1.0 COMPLETE
 
+## Task-092B static operational reconciliation
+
+- Status: `RESOLVED`
+- Hard static blockers: `none`
+- Soft new-freeze items: `present`
+
+## Task-092B compliance incident
+
+- Task-092B formal prompt text exposure recorded
+- `FORMAL_PROMPT_TEXT_EXPOSED = true`
+- `EXP022A_POST_092B_CONTENT_EXPOSURE_GUARD = ACTIVE`
+- No results/model/EVAL representation access occurred.
+
 ## Current next action
 
-Task 092B — read-only static operational reconciliation of EXP-022A constants.
+Task 092C — independent scientific/statistical preregistration review.
 
-Then: independent preregistration review before freeze.
+Task-092C must not access controlled prompt text.
 
 No implementation/model/EVAL execution is authorized.
