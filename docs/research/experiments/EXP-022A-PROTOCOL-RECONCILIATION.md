@@ -1,4 +1,4 @@
-﻿# EXP-022A Protocol Reconciliation
+# EXP-022A Protocol Reconciliation
 
 ## General status
 
@@ -186,7 +186,7 @@ All remain `NOT YET FROZEN`.
 - historical source-family mapping: `BLOCKED / NOT AVAILABLE`
 - source-family bootstrap: `NOT SUPPORTED FOR CURRENT DATA`
 - split-wise held-out-item clustering: `RECONCILE_THEN_FREEZE`
-- qualification-rule portability: `PENDING_091D`
+- qualification-rule portability: `RESOLVED / PARTIALLY_PORTABLE`
 - Fixed readout: `RECONCILE_THEN_FREEZE`
 - Featurewise recalibration: `NEW_FREEZE_PENDING`
 - Layer-wise refit: `NEW_FREEZE_PENDING`
@@ -201,3 +201,152 @@ All remain `NOT YET FROZEN`.
 - EXP-021 reconciliation SHA-256: `4630a253db1454c9b6cb0850bf6f99cf61781d44e48e37994cba8e1c6d47da95`
 - EXP-018 validation conditions SHA-256: `4ce4ebb1af318e7c25725980680c0dc62762e20790adcb7abf2026130f0d4169`
 - EXP-020A frozen config SHA-256: `f760f781b4b744a10938eb4de032e0cc345a021706821ecf0ca8523f5d57e667`
+
+
+## Authority Extraction D - Qualification-Rule Portability
+
+- `EXP022A_091D_QUALIFICATION_RULE_PORTABILITY_RESOLVED`
+- Overall Stage-Q ruleset portability: `PARTIALLY_PORTABLE`
+
+Portability results:
+
+- `TRUE_CLASS_SUPPORT = PORTABLE_AS_STRUCTURAL_CHECK`
+- `CLASS_MAPPING = PORTABLE_AS_TECHNICAL_VALIDITY`
+- `PREDICTED_CLASS_COVERAGE = PORTABLE_AS_SECONDARY_HISTORICAL_BENCHMARK`
+- `CORRECT_COUNT_THRESHOLD = PORTABLE_AS_SECONDARY_HISTORICAL_BENCHMARK`
+- `CP_LOWER_BOUND = PORTABLE_AS_SECONDARY_HISTORICAL_BENCHMARK`
+- `CHECKPOINT_ROLE_PORTABILITY = PARTIAL`
+- `GLOBAL_GATE = NOT_PORTABLE_STAGE_Q_SPECIFIC_GATE`
+- `NO_EVAL_RULE = NOT_PORTABLE_OUT_OF_SCOPE`
+- `NO_INTERVENTION_CONSTRUCT = COMPATIBLE_CLEAN_STATE_CONSTRUCT`
+- `CONTRAST_BASED_PREREGISTRATION = AVAILABLE`
+
+## Historical Stage-Q benchmarks
+
+`HISTORICAL_STAGE_Q_BENCHMARK_ONLY`
+`NOT_EXP022A_PRIMARY_GATE`
+
+- checkpoint correct threshold: `>= 7 / 12`
+- historical equivalent accuracy: `>= 0.583333...`
+- Clopper-Pearson: `95%` two-sided lower bound, strictly `> 0.25`
+- predicted-class coverage: all four frozen predicted classes present
+- Stage-Q checkpoint pass: coverage AND correct-count/CP rule
+- Stage-Q global qualification: all required split/checkpoint cells pass
+
+## Do-not-migrate rules
+
+The following must NOT become EXP-022A primary scientific gates:
+
+- `correct >= 7 / 12`
+- `CP lower bound > 0.25`
+- `predicted-class coverage pass`
+- `all-required-checkpoints pass`
+- `joint A/B Stage-Q qualification gate`
+- `FIT-only / no-EVAL scope`
+
+Using them as EXP-022A primary scientific gates would conflate the
+measurement-qualification estimand with the new held-out mechanism estimand.
+
+## Reusable structural/technical requirements
+
+- frozen four-class universe/order
+- complete expected class support
+- `classifier.classes_` integrity
+- explicit probability-column mapping
+- probability width = 4
+- finite probabilities
+- valid probability normalization
+- one complete prediction row per required `split x EVAL item x layer x readout condition`
+- identity/provenance consistency
+
+Historical rules remain separate from future NEW_FREEZE additions.
+
+## Authority-gate closure summary
+
+- `091A LABEL SEMANTICS = RESOLVED`
+- `091B STATE / INTERVENTION SEMANTICS = RESOLVED`
+- `091C HISTORICAL SOURCE-FAMILY MAPPING = BLOCKED / NOT AVAILABLE`
+- `091D QUALIFICATION-RULE PORTABILITY = RESOLVED`
+
+`HISTORICAL_AUTHORITY_EXTRACTION_PHASE = COMPLETE`
+
+091C BLOCKED is itself the final resolved historical conclusion: the historical
+dataset does not provide authoritative source-family pairing.
+
+
+## Current EXP-022A design boundary
+
+Scientific object:
+
+- clean, non-intervened hidden states
+
+Measurement target:
+
+- `SOURCE_SEMANTIC_CLASS`
+
+Historical source-family pairing:
+
+- `NOT AVAILABLE`
+
+Current inferential unit candidate:
+
+- held-out EVAL record within each split
+
+A/B relationship:
+
+- do not treat as 24 independent observations
+- analyze separately unless future preregistration supplies another authority-supported treatment
+
+Current readout ladder candidates:
+
+- `A0 Fixed Frame`
+- `A1 Featurewise-Affine Recalibration`
+- `A2 Layer-wise Linear Refit`
+
+All remain `NEW_FREEZE_PENDING`.
+
+## Primary scientific route
+
+EXP-022A should be preregistered around held-out paired contrasts, not around
+Stage-Q qualification pass/fail.
+
+Candidate contrasts, explicitly still `NOT FROZEN`:
+
+```text
+G_scale  = BA_recal - BA_fixed
+G_refit  = BA_refit - BA_fixed
+G_noncal = BA_refit - BA_recal
+R_refit  = BA_refit_final - BA_refit_reference
+```
+
+`CONTRAST_BASED_PREREGISTRATION_AVAILABLE`
+
+Do not select CI thresholds or significance criteria here.
+
+## NEW_FREEZE_REQUIRED checklist
+
+- exact EXP-022A FIT and EVAL record identities
+- exact per-split EVAL balance
+- reference-layer fitting procedure
+- exact Fixed definition
+- exact Featurewise-Affine Recalibration definition
+- exact Layer-wise Refit definition
+- depth/checkpoint set
+- primary endpoint
+- secondary endpoints
+- balanced-accuracy definition
+- paired estimands
+- split-wise statistical procedure
+- bootstrap or alternative inference method
+- RNG seed if applicable
+- replicate count if applicable
+- CI method
+- multiplicity policy
+- split-concordance interpretation
+- scientific outcome categories
+- technical-validity gate
+- result schema
+- stopping rule
+- authorization lifecycle
+
+Do not fill these values in Task-091DP.

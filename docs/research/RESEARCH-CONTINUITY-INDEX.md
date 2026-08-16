@@ -5,7 +5,7 @@ experimental artifacts outrank it.
 
 ## Current research phase
 
-EXP-022A protocol reconciliation
+EXP-022A preregistration preparation
 
 ## Read order
 
@@ -15,19 +15,20 @@ EXP-022A protocol reconciliation
 4. `experiments/EXP-022A-PROTOCOL-RECONCILIATION.md`
 5. canonical experiment authority/results
 
-## Resolved gates
+## Resolved historical gates
 
-- 091A label semantics = `RESOLVED`
-- 091B state/intervention semantics = `RESOLVED`
+- 091A = `RESOLVED`
+- 091B = `RESOLVED`
+- 091C = `BLOCKED / NO HISTORICAL FAMILY AUTHORITY`
+- 091D = `RESOLVED`
 
-## Blocked historical assumption
+## Historical authority extraction
 
-- 091C source-family mapping = `BLOCKED / ID_GRAMMAR_ONLY`
-
-## Remaining authority gate
-
-- 091D qualification-rule portability
+COMPLETE
 
 ## Current next action
 
-Task 091D
+Draft EXP-022A Preregistration v0.1 from reconciliation v1.0.
+
+Do not run implementation/model work before preregistration is frozen and
+independently reviewed.
