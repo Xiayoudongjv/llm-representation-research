@@ -89,9 +89,10 @@ Currently forbidden without new evidence:
 
 ## 5. Current EXP-020 State
 
-EXP-020A scientific status is `NOT_STARTED`; no formal Qwen3-4B task prompt or
-scientific representation outcome exists. Task 080 has already frozen and
-committed the confirmatory protocol at Git commit
+EXP-020A scientific status is `COMPLETED`; the recovered canonical result is
+tracked at `experiments/exp020/results/exp020a_results.json` and has primary gate
+`REPRESENTATION_REPLICATION_SUPPORTED`. Task 080 froze and committed the
+confirmatory protocol at Git commit
 `ea85fa5bfb17d8c684da619fe6cd74418c2312be`.
 
 The frozen protocol uses primary block 18 / `hidden_states[19]`, secondary
@@ -154,11 +155,9 @@ completed at `ea85fa5...`. The repository state is authoritative.
 
 ## 10. Immediate Next Gate
 
-Task 080 is complete, but EXP-020A has not run. The next gate is a separately
-authorized implementation/preflight against the already frozen protocol,
-followed by formal EXP-020A execution only under that protocol. Before any
-scientific outcome generation, the dedicated validator and every frozen
-pre-run sanity check must pass. This handoff does not authorize execution.
+Task 080 is complete, and EXP-020A has a recovered valid canonical result.
+The next gate is targeted evidence-durability rereview; no EXP-020A rerun is
+authorized. This handoff does not authorize implementation or execution.
 
 Conditional possibilities—EXP-020B behavior, downstream persistence,
 timing decomposition, a harness closed-loop pilot, or a task-functional-
@@ -184,8 +183,9 @@ not findings or automatically planned experiments.
   [canonical report](experiments/EXP-019.md)
 - EXP-020A: [frozen config](../experiments/exp020/exp020_frozen_config.json),
   [preregistration](experiments/EXP-020-PREREGISTRATION.md),
-  [validator](../experiments/exp020/validate_exp020_preregistration.py), and
-  [hardware qualification](../experiments/exp020/results/qwen3_4b_hardware_qualification.json)
+  [validator](../experiments/exp020/validate_exp020_preregistration.py),
+  [hardware qualification](../experiments/exp020/results/qwen3_4b_hardware_qualification.json), and
+  [recovered canonical result](../experiments/exp020/results/exp020a_results.json)
 - Current synthesis: [evidence map](paper/evidence_map_v0.7.md),
   [claim checklist](paper/claims_checklist_v0.7.md), and
   [project status](paper/project_status_v0.7.md)

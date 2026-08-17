@@ -5,7 +5,7 @@ experimental artifacts outrank it.
 
 ## Current research phase
 
-EXP-022A is scientifically ready to freeze; freeze deferred until repository hygiene completes. Task-093B evidence repair is complete; next is a targeted rereview.
+EXP-020A recovered canonical evidence restored. EXP-022A remains scientifically ready to freeze, deferred until repository hygiene completes.
 
 ## Current preregistration draft
 
@@ -108,15 +108,30 @@ No implementation/model/EVAL execution is authorized.
 ## Task-093B canonical evidence durability repair
 
 - Status: `CANONICAL_EVIDENCE_DURABILITY_REPAIR`
-- EXP-020A corrected status: `NO VALID SCIENTIFIC RESULT / NOT TESTED`
+- EXP-020A corrected status at Task-093B: `NO VALID SCIENTIFIC RESULT / NOT TESTED` (superseded by Task-093AY recovered canonical evidence)
 - EXP-017 sanitized canonical evidence: `DURABLE`
 - EXP-021 Q3 sanitized canonical evidence: `DURABLE`
 - EXP-021 sanitized lifecycle ledger: `DURABLE`
 - README sync: `PENDING_TASK_093D`
 - EXP-022A preregistration: `SCIENTIFICALLY_READY_TO_FREEZE`, freeze deferred until repository hygiene completes
 
+## Task-093AY EXP-020A canonical result recovery
+
+- EXP-020A canonical result recovered from original cloud persistent storage.
+- Canonical SHA: `c603b763c5b5723b002d67ce71a073beba9668bf8bc49e0a215cc54d5f82e26a`
+- Technical validity: `VALID`
+- Scientific status: `COMPLETED`
+- Primary representation gate: `REPRESENTATION_REPLICATION_SUPPORTED`
+- Run attempt: `0b95abf8-1f91-4bf2-b634-0fe1e012c653`
+- Runner commit: `163112e91bfed2576b87827672c21b49df75f0e2`
+- Local/Git durability: repaired by Task 093AY.
+- Task-093AR local-only inference `"EXP-020A never completed"` is superseded by recovered higher-authority original cloud canonical evidence.
+
 ## Durable canonical evidence links
 
+- EXP-020A:
+  - `../../experiments/exp020/results/exp020a_results.json`
+  - `../experiments/canonical/EXP-020A-CANONICAL-RESULT-RECOVERY.json`
 - EXP-017:
   - `../experiments/canonical/EXP-017-BEHAVIORAL-RESULTS-SANITIZED.csv`
   - `../experiments/canonical/EXP-017-BEHAVIORAL-RESULTS-MANIFEST.json`
