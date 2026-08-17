@@ -1,6 +1,7 @@
 # EXP-023 Runner Preflight
 
-Status: `EXP023_STATIC_PREFLIGHT_PASS` / `EXP023_SYNTHETIC_PREFLIGHT_PASS`
+Status: `EXP023_STATIC_PREFLIGHT_PASS` / `EXP023_SYNTHETIC_PREFLIGHT_PASS` /
+`EXP023_MODEL_HOOK_ENGINEERING_QUALIFIED`
 
 This document records engineering-only validation. It does not establish any
 EXP-023 scientific result, calibration replication, mean/scale mechanism, or
@@ -73,6 +74,37 @@ model-hook runtime correctness.
 - Scientific result created: `false`
 - Cross-split synthetic result: engineering-only; no scientific interpretation
 
+## Real Model / Hook Engineering Qualification
+
+- Result: `PASS`
+- Qualification status: `MODEL_HOOK_ENGINEERING_QUALIFIED`
+- Classification: `ENGINEERING_MODEL_HOOK_QUALIFICATION_ONLY`
+- Artifact: `experiments/exp023/engineering/model_hook_qualification.json`
+- Artifact SHA-256: `3adcb480a6d7da1a62b026aaac8946f914e73099444e26784045a486d49577d6`
+- Runner SHA-256: `339a69a997af7521db9c351c191bde0e9749b2cf528efedfd4f3043607830990`
+- Repository commit: `8dc252f749f2c11005e4891bea2aa20e3f947611`
+- Runtime identity: Python `3.11.9`, torch `2.12.1+cu130`, transformers `5.14.1`, CUDA `13.0`, NVIDIA GeForce RTX 5060 Laptop GPU, `cuda:0`, `torch.float16`
+- Model: `Qwen/Qwen3-1.7B`, snapshot `70d244cc86ccca08cf5af4e1e306ecf908b1ad5e`, `Qwen3ForCausalLM`, `qwen3`, 28 blocks, hidden size 2048
+- Tokenizer: `Qwen2Tokenizer`, offline snapshot, `add_special_tokens=true`
+- Hidden-state tuple length `29`: `PASS`
+- Block16 hook versus `hidden_states[17]`: `PASS`
+- Block26 hook versus `hidden_states[27]`: `PASS`
+- Block27 pre-final hook capture: `PASS`
+- Final RMSNorm oracle versus `hidden_states[28]`: `PASS`
+- Pre/post final-RMSNorm distinction: `PASS`
+- Zero-perturbation forward hooks: `PASS`
+- Hook cleanup: `PASS`
+- Last-valid-token runtime: `PASS`
+- Float32 analysis boundary: `PASS`
+- All 13 checkpoint extraction identities: `PASS`
+- Production extraction path exercised: `true`
+- Formal dataset model inference count: `0`
+- Formal prompt text exposed: `false`
+- Formal run authorized: `false`
+- Scientific result created: `false`
+- EXP-023 outcome observed: `false`
+- Neutral inputs: deterministic engineering-only; only identity hashes recorded
+
 ## Focused tests
 
 - Command: `pytest -q tests/test_exp023_runner.py`
@@ -92,16 +124,18 @@ model-hook runtime correctness.
 
 ## Boundary
 
-- `MODEL_LOAD_PERFORMED = false`
-- `TOKENIZER_LOAD_PERFORMED = false`
+- `MODEL_LOAD_PERFORMED = true`
+- `TOKENIZER_LOAD_PERFORMED = true`
 - `FORMAL_FIT_PERFORMED = false`
 - `FORMAL_EVAL_PERFORMED = false`
 - `FORMAL_BOOTSTRAP_PERFORMED = false`
+- `EXP023_MODEL_HOOK_ENGINEERING_QUALIFIED = true`
 - `EXP023_SCIENTIFIC_RESULT_CREATED = false`
 - `EXP023_OUTCOME_OBSERVED = false`
 - `EXP023_FORMAL_RUN_AUTHORIZED = false`
 
 ## Next required step
 
-`REAL MODEL/HOOK ENGINEERING QUALIFICATION` under Task 096B. Do not issue a
-formal authorization or launch EXP-023 from this preflight.
+`TASK 096C TARGETED PRODUCTION-READINESS REREVIEW`. If that rereview passes,
+issue one new single-use EXP-023 formal authorization and launch exactly once.
+Do not issue a formal authorization or launch EXP-023 from this preflight.
