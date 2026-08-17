@@ -1,0 +1,450 @@
+[
+  {
+    "record_id": "exp023_logic_001_original",
+    "source_family_id": "exp023_logic_001",
+    "SOURCE_SEMANTIC_CLASS": "logic",
+    "variant_type": "original_style",
+    "text": "If a package is left outside and rain falls, the package becomes wet."
+  },
+  {
+    "record_id": "exp023_logic_001_paraphrase",
+    "source_family_id": "exp023_logic_001",
+    "SOURCE_SEMANTIC_CLASS": "logic",
+    "variant_type": "paraphrase",
+    "text": "A package will get wet when it is left outdoors during rainfall."
+  },
+  {
+    "record_id": "exp023_logic_002_original",
+    "source_family_id": "exp023_logic_002",
+    "SOURCE_SEMANTIC_CLASS": "logic",
+    "variant_type": "original_style",
+    "text": "Every museum member qualifies for a discount, so a person holding a valid membership card can buy tickets at the reduced price."
+  },
+  {
+    "record_id": "exp023_logic_002_paraphrase",
+    "source_family_id": "exp023_logic_002",
+    "SOURCE_SEMANTIC_CLASS": "logic",
+    "variant_type": "paraphrase",
+    "text": "Because museum members are entitled to lower ticket prices, presenting a valid membership card allows a visitor to pay the discounted rate."
+  },
+  {
+    "record_id": "exp023_logic_003_original",
+    "source_family_id": "exp023_logic_003",
+    "SOURCE_SEMANTIC_CLASS": "logic",
+    "variant_type": "original_style",
+    "text": "If the engine has no fuel, it will not start."
+  },
+  {
+    "record_id": "exp023_logic_003_paraphrase",
+    "source_family_id": "exp023_logic_003",
+    "SOURCE_SEMANTIC_CLASS": "logic",
+    "variant_type": "paraphrase",
+    "text": "The engine cannot start unless it has fuel."
+  },
+  {
+    "record_id": "exp023_logic_004_original",
+    "source_family_id": "exp023_logic_004",
+    "SOURCE_SEMANTIC_CLASS": "logic",
+    "variant_type": "original_style",
+    "text": "If a whole number is divisible by six, then it is divisible by both two and three."
+  },
+  {
+    "record_id": "exp023_logic_004_paraphrase",
+    "source_family_id": "exp023_logic_004",
+    "SOURCE_SEMANTIC_CLASS": "logic",
+    "variant_type": "paraphrase",
+    "text": "Divisibility by six implies divisibility by two and by three for any whole number."
+  },
+  {
+    "record_id": "exp023_logic_005_original",
+    "source_family_id": "exp023_logic_005",
+    "SOURCE_SEMANTIC_CLASS": "logic",
+    "variant_type": "original_style",
+    "text": "Books can be borrowed only when the library is open, so a closed library prevents borrowing."
+  },
+  {
+    "record_id": "exp023_logic_005_paraphrase",
+    "source_family_id": "exp023_logic_005",
+    "SOURCE_SEMANTIC_CLASS": "logic",
+    "variant_type": "paraphrase",
+    "text": "Unless the library is open, no one can borrow books; therefore borrowing is impossible while the building is closed."
+  },
+  {
+    "record_id": "exp023_logic_006_original",
+    "source_family_id": "exp023_logic_006",
+    "SOURCE_SEMANTIC_CLASS": "logic",
+    "variant_type": "original_style",
+    "text": "If a recipe requires eggs and none remain in the kitchen, the preparation cannot proceed as written."
+  },
+  {
+    "record_id": "exp023_logic_006_paraphrase",
+    "source_family_id": "exp023_logic_006",
+    "SOURCE_SEMANTIC_CLASS": "logic",
+    "variant_type": "paraphrase",
+    "text": "When the recipe calls for eggs but the kitchen has none left, following the instructions as written is not possible."
+  },
+  {
+    "record_id": "exp023_logic_007_original",
+    "source_family_id": "exp023_logic_007",
+    "SOURCE_SEMANTIC_CLASS": "logic",
+    "variant_type": "original_style",
+    "text": "A traveler may board the train only with a valid ticket."
+  },
+  {
+    "record_id": "exp023_logic_007_paraphrase",
+    "source_family_id": "exp023_logic_007",
+    "SOURCE_SEMANTIC_CLASS": "logic",
+    "variant_type": "paraphrase",
+    "text": "Only passengers holding a valid ticket are permitted to board the train."
+  },
+  {
+    "record_id": "exp023_logic_008_original",
+    "source_family_id": "exp023_logic_008",
+    "SOURCE_SEMANTIC_CLASS": "logic",
+    "variant_type": "original_style",
+    "text": "If two statements directly contradict each other, they cannot both be true at the same time."
+  },
+  {
+    "record_id": "exp023_logic_008_paraphrase",
+    "source_family_id": "exp023_logic_008",
+    "SOURCE_SEMANTIC_CLASS": "logic",
+    "variant_type": "paraphrase",
+    "text": "Two directly contradictory statements cannot both be true simultaneously."
+  },
+  {
+    "record_id": "exp023_causality_001_original",
+    "source_family_id": "exp023_causality_001",
+    "SOURCE_SEMANTIC_CLASS": "causality",
+    "variant_type": "original_style",
+    "text": "A glass dropped onto a hard tile floor shatters because of the sudden impact."
+  },
+  {
+    "record_id": "exp023_causality_001_paraphrase",
+    "source_family_id": "exp023_causality_001",
+    "SOURCE_SEMANTIC_CLASS": "causality",
+    "variant_type": "paraphrase",
+    "text": "The sudden impact of falling onto hard tile causes a glass to break into pieces."
+  },
+  {
+    "record_id": "exp023_causality_002_original",
+    "source_family_id": "exp023_causality_002",
+    "SOURCE_SEMANTIC_CLASS": "causality",
+    "variant_type": "original_style",
+    "text": "Prolonged exposure to warm air causes an ice sculpture to melt."
+  },
+  {
+    "record_id": "exp023_causality_002_paraphrase",
+    "source_family_id": "exp023_causality_002",
+    "SOURCE_SEMANTIC_CLASS": "causality",
+    "variant_type": "paraphrase",
+    "text": "An ice sculpture melts after it remains in warm air for a long time."
+  },
+  {
+    "record_id": "exp023_causality_003_original",
+    "source_family_id": "exp023_causality_003",
+    "SOURCE_SEMANTIC_CLASS": "causality",
+    "variant_type": "original_style",
+    "text": "Insufficient sleep can reduce a person's ability to concentrate during the day."
+  },
+  {
+    "record_id": "exp023_causality_003_paraphrase",
+    "source_family_id": "exp023_causality_003",
+    "SOURCE_SEMANTIC_CLASS": "causality",
+    "variant_type": "paraphrase",
+    "text": "A person may find daytime concentration harder after getting too little sleep."
+  },
+  {
+    "record_id": "exp023_causality_004_original",
+    "source_family_id": "exp023_causality_004",
+    "SOURCE_SEMANTIC_CLASS": "causality",
+    "variant_type": "original_style",
+    "text": "With sufficient water, adding fertilizer can increase the growth of a young plant."
+  },
+  {
+    "record_id": "exp023_causality_004_paraphrase",
+    "source_family_id": "exp023_causality_004",
+    "SOURCE_SEMANTIC_CLASS": "causality",
+    "variant_type": "paraphrase",
+    "text": "A young plant may grow more when fertilizer is added and enough water is available."
+  },
+  {
+    "record_id": "exp023_causality_005_original",
+    "source_family_id": "exp023_causality_005",
+    "SOURCE_SEMANTIC_CLASS": "causality",
+    "variant_type": "original_style",
+    "text": "A strong gust of wind can knock over a lightweight garden fence."
+  },
+  {
+    "record_id": "exp023_causality_005_paraphrase",
+    "source_family_id": "exp023_causality_005",
+    "SOURCE_SEMANTIC_CLASS": "causality",
+    "variant_type": "paraphrase",
+    "text": "Lightweight garden fencing may be toppled by a strong gust of wind."
+  },
+  {
+    "record_id": "exp023_causality_006_original",
+    "source_family_id": "exp023_causality_006",
+    "SOURCE_SEMANTIC_CLASS": "causality",
+    "variant_type": "original_style",
+    "text": "When leaves block a drain, water backs up because it cannot flow away."
+  },
+  {
+    "record_id": "exp023_causality_006_paraphrase",
+    "source_family_id": "exp023_causality_006",
+    "SOURCE_SEMANTIC_CLASS": "causality",
+    "variant_type": "paraphrase",
+    "text": "Water collects and rises because leaves in the drain prevent it from flowing out."
+  },
+  {
+    "record_id": "exp023_causality_007_original",
+    "source_family_id": "exp023_causality_007",
+    "SOURCE_SEMANTIC_CLASS": "causality",
+    "variant_type": "original_style",
+    "text": "Direct sunlight can evaporate a shallow puddle over the course of a warm afternoon."
+  },
+  {
+    "record_id": "exp023_causality_007_paraphrase",
+    "source_family_id": "exp023_causality_007",
+    "SOURCE_SEMANTIC_CLASS": "causality",
+    "variant_type": "paraphrase",
+    "text": "A shallow puddle may disappear during a warm afternoon as sunlight causes the water to evaporate."
+  },
+  {
+    "record_id": "exp023_causality_008_original",
+    "source_family_id": "exp023_causality_008",
+    "SOURCE_SEMANTIC_CLASS": "causality",
+    "variant_type": "original_style",
+    "text": "Rubbing dry hands together quickly produces warmth through friction."
+  },
+  {
+    "record_id": "exp023_causality_008_paraphrase",
+    "source_family_id": "exp023_causality_008",
+    "SOURCE_SEMANTIC_CLASS": "causality",
+    "variant_type": "paraphrase",
+    "text": "Friction from quickly rubbing dry hands together makes them feel warmer."
+  },
+  {
+    "record_id": "exp023_analogy_001_original",
+    "source_family_id": "exp023_analogy_001",
+    "SOURCE_SEMANTIC_CLASS": "analogy",
+    "variant_type": "original_style",
+    "text": "Feather is to light as stone is to heavy."
+  },
+  {
+    "record_id": "exp023_analogy_001_paraphrase",
+    "source_family_id": "exp023_analogy_001",
+    "SOURCE_SEMANTIC_CLASS": "analogy",
+    "variant_type": "paraphrase",
+    "text": "Light relates to feather in the same way heavy relates to stone."
+  },
+  {
+    "record_id": "exp023_analogy_002_original",
+    "source_family_id": "exp023_analogy_002",
+    "SOURCE_SEMANTIC_CLASS": "analogy",
+    "variant_type": "original_style",
+    "text": "A key opens a lock in the way a password opens an account."
+  },
+  {
+    "record_id": "exp023_analogy_002_paraphrase",
+    "source_family_id": "exp023_analogy_002",
+    "SOURCE_SEMANTIC_CLASS": "analogy",
+    "variant_type": "paraphrase",
+    "text": "A password grants access to an account just as a key grants access to a lock."
+  },
+  {
+    "record_id": "exp023_analogy_003_original",
+    "source_family_id": "exp023_analogy_003",
+    "SOURCE_SEMANTIC_CLASS": "analogy",
+    "variant_type": "original_style",
+    "text": "A painter uses a brush much as a writer uses a pen."
+  },
+  {
+    "record_id": "exp023_analogy_003_paraphrase",
+    "source_family_id": "exp023_analogy_003",
+    "SOURCE_SEMANTIC_CLASS": "analogy",
+    "variant_type": "paraphrase",
+    "text": "Just as a writer works with a pen, a painter works with a brush."
+  },
+  {
+    "record_id": "exp023_analogy_004_original",
+    "source_family_id": "exp023_analogy_004",
+    "SOURCE_SEMANTIC_CLASS": "analogy",
+    "variant_type": "original_style",
+    "text": "A thermometer measures temperature in the way a scale measures weight."
+  },
+  {
+    "record_id": "exp023_analogy_004_paraphrase",
+    "source_family_id": "exp023_analogy_004",
+    "SOURCE_SEMANTIC_CLASS": "analogy",
+    "variant_type": "paraphrase",
+    "text": "Temperature is measured by a thermometer just as weight is measured by a scale."
+  },
+  {
+    "record_id": "exp023_analogy_005_original",
+    "source_family_id": "exp023_analogy_005",
+    "SOURCE_SEMANTIC_CLASS": "analogy",
+    "variant_type": "original_style",
+    "text": "A nest is a bird's home in the way a den is a fox's home."
+  },
+  {
+    "record_id": "exp023_analogy_005_paraphrase",
+    "source_family_id": "exp023_analogy_005",
+    "SOURCE_SEMANTIC_CLASS": "analogy",
+    "variant_type": "paraphrase",
+    "text": "A den provides a home for a fox just as a nest provides a home for a bird."
+  },
+  {
+    "record_id": "exp023_analogy_006_original",
+    "source_family_id": "exp023_analogy_006",
+    "SOURCE_SEMANTIC_CLASS": "analogy",
+    "variant_type": "original_style",
+    "text": "A wheel helps move a car in the way a propeller helps move a boat."
+  },
+  {
+    "record_id": "exp023_analogy_006_paraphrase",
+    "source_family_id": "exp023_analogy_006",
+    "SOURCE_SEMANTIC_CLASS": "analogy",
+    "variant_type": "paraphrase",
+    "text": "Just as a propeller moves a boat, a wheel moves a car."
+  },
+  {
+    "record_id": "exp023_analogy_007_original",
+    "source_family_id": "exp023_analogy_007",
+    "SOURCE_SEMANTIC_CLASS": "analogy",
+    "variant_type": "original_style",
+    "text": "A seed develops into a plant in the way an egg develops into a chicken."
+  },
+  {
+    "record_id": "exp023_analogy_007_paraphrase",
+    "source_family_id": "exp023_analogy_007",
+    "SOURCE_SEMANTIC_CLASS": "analogy",
+    "variant_type": "paraphrase",
+    "text": "An egg gives rise to a chicken just as a seed gives rise to a plant."
+  },
+  {
+    "record_id": "exp023_analogy_008_original",
+    "source_family_id": "exp023_analogy_008",
+    "SOURCE_SEMANTIC_CLASS": "analogy",
+    "variant_type": "original_style",
+    "text": "A compass shows direction in the way a clock shows time."
+  },
+  {
+    "record_id": "exp023_analogy_008_paraphrase",
+    "source_family_id": "exp023_analogy_008",
+    "SOURCE_SEMANTIC_CLASS": "analogy",
+    "variant_type": "paraphrase",
+    "text": "Direction is shown by a compass just as time is shown by a clock."
+  },
+  {
+    "record_id": "exp023_definition_001_original",
+    "source_family_id": "exp023_definition_001",
+    "SOURCE_SEMANTIC_CLASS": "definition",
+    "variant_type": "original_style",
+    "text": "A peninsula is a piece of land bordered by water on most sides while still connected to a larger landmass."
+  },
+  {
+    "record_id": "exp023_definition_001_paraphrase",
+    "source_family_id": "exp023_definition_001",
+    "SOURCE_SEMANTIC_CLASS": "definition",
+    "variant_type": "paraphrase",
+    "text": "Land connected to a larger mass but surrounded by water on most sides is called a peninsula."
+  },
+  {
+    "record_id": "exp023_definition_002_original",
+    "source_family_id": "exp023_definition_002",
+    "SOURCE_SEMANTIC_CLASS": "definition",
+    "variant_type": "original_style",
+    "text": "A herbivore is an animal that feeds mainly on plants."
+  },
+  {
+    "record_id": "exp023_definition_002_paraphrase",
+    "source_family_id": "exp023_definition_002",
+    "SOURCE_SEMANTIC_CLASS": "definition",
+    "variant_type": "paraphrase",
+    "text": "An animal whose diet consists mainly of plants is a herbivore."
+  },
+  {
+    "record_id": "exp023_definition_003_original",
+    "source_family_id": "exp023_definition_003",
+    "SOURCE_SEMANTIC_CLASS": "definition",
+    "variant_type": "original_style",
+    "text": "An archipelago is a chain or group of islands."
+  },
+  {
+    "record_id": "exp023_definition_003_paraphrase",
+    "source_family_id": "exp023_definition_003",
+    "SOURCE_SEMANTIC_CLASS": "definition",
+    "variant_type": "paraphrase",
+    "text": "A group or chain of islands is known as an archipelago."
+  },
+  {
+    "record_id": "exp023_definition_004_original",
+    "source_family_id": "exp023_definition_004",
+    "SOURCE_SEMANTIC_CLASS": "definition",
+    "variant_type": "original_style",
+    "text": "A verb is a word that expresses an action, occurrence, or state of being."
+  },
+  {
+    "record_id": "exp023_definition_004_paraphrase",
+    "source_family_id": "exp023_definition_004",
+    "SOURCE_SEMANTIC_CLASS": "definition",
+    "variant_type": "paraphrase",
+    "text": "Words that express actions, occurrences, or states of being are verbs."
+  },
+  {
+    "record_id": "exp023_definition_005_original",
+    "source_family_id": "exp023_definition_005",
+    "SOURCE_SEMANTIC_CLASS": "definition",
+    "variant_type": "original_style",
+    "text": "A triangle is a closed shape with three straight sides and three angles."
+  },
+  {
+    "record_id": "exp023_definition_005_paraphrase",
+    "source_family_id": "exp023_definition_005",
+    "SOURCE_SEMANTIC_CLASS": "definition",
+    "variant_type": "paraphrase",
+    "text": "A three-sided closed shape with three angles is a triangle."
+  },
+  {
+    "record_id": "exp023_definition_006_original",
+    "source_family_id": "exp023_definition_006",
+    "SOURCE_SEMANTIC_CLASS": "definition",
+    "variant_type": "original_style",
+    "text": "A reservoir is a natural or artificial place where water is collected and stored."
+  },
+  {
+    "record_id": "exp023_definition_006_paraphrase",
+    "source_family_id": "exp023_definition_006",
+    "SOURCE_SEMANTIC_CLASS": "definition",
+    "variant_type": "paraphrase",
+    "text": "Water collected and stored in a natural or artificial basin is called a reservoir."
+  },
+  {
+    "record_id": "exp023_definition_007_original",
+    "source_family_id": "exp023_definition_007",
+    "SOURCE_SEMANTIC_CLASS": "definition",
+    "variant_type": "original_style",
+    "text": "A fossil is the preserved remains or trace of an organism from the distant past."
+  },
+  {
+    "record_id": "exp023_definition_007_paraphrase",
+    "source_family_id": "exp023_definition_007",
+    "SOURCE_SEMANTIC_CLASS": "definition",
+    "variant_type": "paraphrase",
+    "text": "Preserved remains or traces of ancient organisms are fossils."
+  },
+  {
+    "record_id": "exp023_definition_008_original",
+    "source_family_id": "exp023_definition_008",
+    "SOURCE_SEMANTIC_CLASS": "definition",
+    "variant_type": "original_style",
+    "text": "A diary is a personal record in which a person writes about daily events and thoughts."
+  },
+  {
+    "record_id": "exp023_definition_008_paraphrase",
+    "source_family_id": "exp023_definition_008",
+    "SOURCE_SEMANTIC_CLASS": "definition",
+    "variant_type": "paraphrase",
+    "text": "A personal written record of daily events and thoughts is a diary."
+  }
+]

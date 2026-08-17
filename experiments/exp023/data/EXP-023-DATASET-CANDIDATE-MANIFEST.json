@@ -1,0 +1,27 @@
+{
+  "schema_version": "EXP023_DATASET_CANDIDATE_SCHEMA_V1",
+  "experiment": "EXP-023",
+  "status": "CANDIDATE_NOT_FROZEN",
+  "dataset_path": "experiments/exp023/data/exp023_independent_controlled.json",
+  "dataset_sha256": "9143ceceab106c71dedb806190e146401975bf6bd84cb99b3b4cb7adc75afa2a",
+  "record_count": 64,
+  "source_family_count": 32,
+  "source_families_per_class": 8,
+  "class_universe": [
+    "logic",
+    "causality",
+    "analogy",
+    "definition"
+  ],
+  "raw_variant_universe": [
+    "original_style",
+    "paraphrase"
+  ],
+  "historical_exclusion_dataset_path": "experiments/exp003/prompts_controlled.json",
+  "historical_exclusion_dataset_sha256": "72dab733e6a1639dfc80d186f3af1dbce5c6d70da4905e6d6d422cf47064c472",
+  "constructed_before_model_execution": true,
+  "model_execution_performed": false,
+  "scientific_result_observed": false,
+  "created_at_utc": "2026-08-17T15:14:15.925126+00:00",
+  "authoring_method": "PRE_OUTCOME_CONTROLLED_ITEM_AUTHORING"
+}
