@@ -13,7 +13,7 @@ not be cited as findings or moved into `CLAIM-LEDGER.md` as fact.
 - Counterevidence: Split A recovery incomplete; `G_scale` was secondary/descriptive; small controlled dataset.
 - Status: `ACTIVE_HIGH_PRIORITY`
 - Dependencies: EXP-022A canonical result; no next-experiment protocol frozen yet.
-- Next discriminating experiment: Independent or expanded held-out validation of FIT-only featurewise recalibration / diagonal affine transport.
+- Next discriminating experiment: EXP-023.
 - Claim boundary: Descriptive mechanism signal only; not a confirmed causal mechanism.
 
 ## HYP-TRANSPORT-001

@@ -339,3 +339,14 @@ No formal execution, model load, or EVAL access is authorized.
 - Origin: user neural-connection/operator question + DeepSeek proposed Geo-Fold interpretation + project independent reformulation.
 - Status: `PRESERVED_ASSET` / `NOT_ACTIVE_EXPERIMENT`.
 - Next active scientific task remains EXP-023 preregistration/design.
+
+## Task-095C EXP-023 preregistration draft
+
+- Status: `DRAFT_AWAITING_DATASET_FREEZE`
+- Experiment: `EXP-023 = INDEPENDENT_CALIBRATION_REPLICATION_DESIGN`
+- Primary: `A_mu_sigma vs A0`
+- Secondary: `mean/scale decomposition`
+- Data: `fresh dataset required`
+- Draft protocol: `docs/experiments/EXP-023-PREREGISTRATION-DRAFT.md`
+- Model execution: `false`
+- Scientific result created: `false`
