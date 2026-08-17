@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0.0",
   "experiment": "EXP-017",
-  "artifact_role": "SANITIZED_CANONICAL_SCIENTIFIC_RESULT",
-  "source_local_artifact_class": "results/exp017/behavioral_outputs.csv",
+  "artifact_role": "SANITIZED_CANONICAL_RESULT",
+  "source_artifact_class": "results/exp017/behavioral_outputs.csv",
   "source_sha256": "258cfcbd77978e12bd96a3ed0fd9c202be000997fd16de90178a4b22ae4252d5",
   "source_row_count": 320,
   "sanitized_row_count": 320,
@@ -19,7 +19,7 @@
     "repetition_flag",
     "malformed_flag"
   ],
-  "excluded_column_names": [
+  "excluded_columns": [
     "generated_text",
     "normalized_answer"
   ],
@@ -28,9 +28,10 @@
     "normalized_answer"
   ],
   "sanitization_rule_version": "1.0.0",
-  "creation_task": "Task 093B",
   "sanitized_artifact_sha256": "c4e14f3fd6cad8232bf597a10b59b9299fa4f937ef4b814202665707571d64cc",
-  "tracked_summary_authority": "docs/experiments/EXP-017.md",
+  "tracked_interpretation": "docs/experiments/EXP-017.md",
+  "creation_task": "Task 093B",
+  "reconciliation_task": "Task 093B2",
   "scientific_status": "FAILED / NOT_SUPPORTED",
   "scientific_status_fields": {
     "behavioral_effect": "FAILED",

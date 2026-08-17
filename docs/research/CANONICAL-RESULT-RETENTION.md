@@ -1,118 +1,139 @@
 # Canonical Result Retention Policy
 
-This policy defines which research artifacts must be durably retained in the
-pushed Git repository and which execution-local artifacts may remain outside
-version control.
+This policy defines which research artifacts must be durably retained in pushed
+Git or another explicitly named durable store, and which execution-local
+artifacts may remain outside version control.
 
 ## Artifact Classes
 
-### CANONICAL_SCIENTIFIC_RESULT
+### CANONICAL_RESULT
 
-A canonical scientific result is an item-level or aggregate artifact that is
-required to audit a published scientific conclusion.
+A canonical result is a byte-identical result artifact that supports a current
+scientific or engineering claim and is safe to commit to Git.
 
-- Must be preserved in pushed Git or another explicitly identified durable
-  repository.
-- If the original runtime artifact contains content unsuitable for Git, a
-  sanitized canonical derivative may be tracked instead.
-- The sanitized derivative must preserve enough evidence to audit the published
-  scientific conclusion.
-- Required provenance fields:
-  - source artifact identity or path class
-  - source SHA-256
-  - sanitization version
-  - sanitized artifact SHA-256, recorded after generation
-  - creation or reconciliation task
-  - excluded field classes
-  - row/item counts where applicable
-  - scientific-result identity
-- A sanitized artifact must not be described as byte-identical to the local raw
-  source.
+- Must be durable in pushed Git or another explicitly named durable store.
+- Preferred when the raw artifact contains no prohibited content.
+- Must preserve experiment/result identity, primary result/gate values,
+  technical/result status, and sufficient evidence to audit the claim.
+
+### CANONICAL_SANITIZED_DERIVATIVE
+
+A sanitized canonical derivative is used when the raw result contains content
+unsuitable for Git.
+
+- Must preserve the source SHA-256.
+- Must preserve experiment/result identity.
+- Must preserve row/item counts where applicable.
+- Must preserve scientifically relevant non-text fields.
+- Must preserve primary result/gate values and technical/result status.
+- Must record sanitization rule/version and excluded content classes.
+- Must provide sufficient evidence to reproduce the current tracked conclusion.
+- Must not be described as byte-identical to the raw source.
 
 ### RESULT_VALIDATION_AND_STATUS
 
-Result status and technical-validity records must be durable when they are
-required to interpret a scientific result.
+Result validation and status records must be durable when required to interpret
+a canonical result.
 
-- Must durably record scientific result status.
+- Must durably record scientific or engineering result status.
 - Must durably record technical validity.
 - Must durably record primary gate/status.
 - Must durably record canonical result hash or sanitized-source hash.
 - Must durably record validator status where applicable.
-- The result artifact and its tracked scientific interpretation must not
-  contradict one another.
+- The result artifact and its tracked interpretation must not contradict one
+  another.
 
 ### AUTHORIZATION_LIFECYCLE_EVIDENCE
 
-Raw authorization payloads may remain local when their scientific role is
-durably represented by non-sensitive lifecycle evidence.
+Authorization lifecycle evidence may be durably represented without tracking
+all raw authorization payloads.
 
-- Durable fields include:
-  - authorization ID
-  - authorization SHA-256
-  - consumption SHA-256
-  - attempt ID where applicable
-  - single-use/consumed state
-  - terminal disposition
-  - scientific-result identity
-- A sanitized lifecycle ledger may satisfy durability without tracking the raw
-  authorization payload.
+- Durable fields include authorization ID, authorization SHA-256,
+  consumption SHA-256, run attempt ID, single-use/consumed state, terminal
+  disposition, and canonical result identity.
+- Raw authorization payloads may remain local when hashed lifecycle identity is
+  sufficient for audit.
 - This policy does not require every authorization file to be committed.
 
-### EXECUTION_LOCAL_RECORD
+### EXECUTION_LOCAL_FORENSIC_RECORD
 
-Execution-local records include machine-specific paths, cache paths, raw
-authorization payloads, raw generated text, raw hidden states, raw activation
-tensors, credentials, tokens, secrets, and private keys.
+Execution-local forensic records include machine-specific paths, cache paths,
+raw authorization payloads, raw generated text, raw hidden states, raw
+activation tensors, credentials, tokens, secrets, and private keys.
 
-- These records normally remain local and must not be committed as canonical
-  scientific evidence.
+- These records normally remain local.
+- They must not be committed as canonical evidence unless separately proven
+  necessary and safe.
 - Non-sensitive identity, hash, and status derivatives may be tracked instead.
 
 ### GENERATED_DIAGNOSTIC
 
 Ordinary diagnostics, caches, temporary outputs, and regenerable development
-results may remain ignored when they are not canonical scientific evidence and
-their loss would not prevent auditing the scientific conclusion.
+results may remain ignored when they are not canonical evidence and their loss
+would not prevent auditing a scientific conclusion.
 
 - Existing `.gitignore` behavior is preserved.
-- Task-093B does not edit `.gitignore`.
+- Task-093B2 does not edit `.gitignore`.
+
+## Durability Rule
+
+A canonical result that supports a current scientific or engineering claim must
+be durable in pushed Git or another explicitly named durable store.
+
+Preferred hierarchy:
+
+1. byte-identical raw canonical artifact when Git-safe;
+2. sanitized canonical derivative when raw artifact contains prohibited content;
+3. summary-only retention is insufficient when unique item-level/result-level
+   audit evidence would otherwise be lost.
 
 ## Version-Control Content Rules
 
-Canonical sanitized artifacts may contain:
+Permitted canonical artifact content:
 
-- record/item IDs
-- class labels
-- condition/readout labels
+- item/record IDs
+- condition labels
+- semantic/class labels
 - predicted labels
 - correctness indicators
-- probabilities
-- aggregate metrics
-- test statistics
-- runtime software/device metadata
-- integrity hashes
-- non-sensitive attempt/result identifiers
+- probability vectors
+- aggregate statistics
+- bootstrap/test values
+- runtime package/device metadata
+- commit hashes
+- authorization IDs/hashes
+- attempt IDs
+- result hashes
 
-Canonical sanitized artifacts must not contain:
+Prohibited unless explicitly approved:
 
 - prompt text
-- generated free-text responses unless scientifically indispensable and
-  separately approved
+- generated free text
+- reasoning/completions
 - raw hidden states
-- raw activation tensors
-- credentials
-- API tokens
-- secrets
-- private keys
-- unnecessary absolute local filesystem paths
-- raw authorization payloads when a sanitized identity/hash record suffices
+- raw activations
+- credentials/secrets
+- unnecessary absolute local/cloud paths
+- raw authorization payloads when hashed lifecycle identity suffices
 
-## Current Canonical Sanitized Evidence
+## Current Experiment Retention State
 
-| Artifact | Role | Sanitized artifact SHA-256 | Referenced raw source SHA-256 |
+- EXP-017 = `SANITIZED_CANONICAL_REQUIRED`
+- EXP-018 = `RAW_CANONICAL_DURABLE`
+- EXP-019 = `RAW_CANONICAL_DURABLE`
+- EXP-020A = `BYTE_IDENTICAL_RAW_CANONICAL_DURABLE`
+- EXP-021 Q3 = `SANITIZED_CANONICAL_REQUIRED`
+- EXP-022A = `NOT_RUN_PROTOCOL_ONLY`
+
+## Current Canonical Evidence
+
+| Experiment | Retention state | Tracked artifact or status | Canonical artifact SHA-256 |
 | --- | --- | --- | --- |
-| `docs/experiments/canonical/EXP-017-BEHAVIORAL-RESULTS-SANITIZED.csv` | `SANITIZED_CANONICAL_SCIENTIFIC_RESULT` | `c4e14f3fd6cad8232bf597a10b59b9299fa4f937ef4b814202665707571d64cc` | `258cfcbd77978e12bd96a3ed0fd9c202be000997fd16de90178a4b22ae4252d5` |
-| `docs/experiments/canonical/EXP-017-BEHAVIORAL-RESULTS-MANIFEST.json` | `SANITIZED_CANONICAL_SCIENTIFIC_RESULT` | `bdc7d394713a8ae1958b73488631e4e15089c239d4e8fda988a289526e7e56a0` | `N/A` |
-| `docs/experiments/canonical/EXP-021-STAGE-Q-Q3-RESULT-SANITIZED.json` | `SANITIZED_CANONICAL_SCIENTIFIC_RESULT` | `672d73e61719cd328b7815667311f5e3070fd7b12b6b8dc799b00a4e46d15235` | `833002c8e8bf47883bbab2063c4dfe7d91346a1c055ac5df4d50357cb061b851` |
-| `docs/experiments/canonical/EXP-021-AUTHORIZATION-LIFECYCLE-LEDGER.json` | `SANITIZED_AUTHORIZATION_LIFECYCLE_LEDGER` | `ca0603b2951d248159b0838e58f4b1980d0b26495cc8f608a621c654047d91b7` | local lifecycle evidence set |
+| EXP-017 | `SANITIZED_CANONICAL_DURABLE` | `docs/experiments/canonical/EXP-017-BEHAVIORAL-RESULTS-SANITIZED.csv` | `c4e14f3fd6cad8232bf597a10b59b9299fa4f937ef4b814202665707571d64cc` |
+| EXP-017 | `SANITIZED_CANONICAL_DURABLE` | `docs/experiments/canonical/EXP-017-BEHAVIORAL-RESULTS-MANIFEST.json` | `37b5af173bf000eebc5135da4d8265c05182dd4cc8bcab5d10bbae6fae2b767a` |
+| EXP-018 | `RAW_CANONICAL_DURABLE` | existing tracked canonical evidence | `durable` |
+| EXP-019 | `RAW_CANONICAL_DURABLE` | existing tracked canonical evidence | `durable` |
+| EXP-020A | `BYTE_IDENTICAL_RAW_CANONICAL_DURABLE` | `experiments/exp020/results/exp020a_results.json` | `c603b763c5b5723b002d67ce71a073beba9668bf8bc49e0a215cc54d5f82e26a` |
+| EXP-021 Q3 | `SANITIZED_CANONICAL_MEASUREMENT_DURABLE` | `docs/experiments/canonical/EXP-021-STAGE-Q-Q3-RESULT-SANITIZED.json` | `763fa2b2ea54ae9e8e487d4261e611489c00c40a3c45b50a98930d7d7aa6d44e` |
+| EXP-021 lifecycle | `SANITIZED_LEDGER_DURABLE` | `docs/experiments/canonical/EXP-021-AUTHORIZATION-LIFECYCLE-LEDGER.json` | `621b4d7d0fda7a26844c9fe0ed3bdb2a03cdb8732ae75ab670ec2054f6497531` |
+| EXP-022A | `NOT_RUN_PROTOCOL_ONLY` | preregistration only | `no result` |

@@ -5,7 +5,7 @@ experimental artifacts outrank it.
 
 ## Current research phase
 
-EXP-020A recovered canonical evidence restored. EXP-022A remains scientifically ready to freeze, deferred until repository hygiene completes.
+EXP-020A recovered canonical evidence restored. EXP-017 and EXP-021 evidence are durable. EXP-022A is scientifically ready to freeze, deferred until repository hygiene rereview.
 
 ## Current preregistration draft
 
@@ -86,7 +86,7 @@ v1.0 COMPLETE
 
 Task 093C targeted evidence-durability rereview.
 
-README synchronization remains `PENDING_TASK_093D`.
+README synchronization remains `PENDING_AFTER_093C`.
 
 EXP-022A freeze remains deferred.
 
@@ -103,7 +103,7 @@ No implementation/model/EVAL execution is authorized.
 
 ## Task-093AR canonical evidence reconciliation
 
-- Status: `CANONICAL_EVIDENCE_RECONCILIATION_COMPLETE`
+- Status: `LOCAL_REPOSITORY_INFERENCE_LATER_SUPERSEDED_FOR_EXP020A`
 
 ## Task-093B canonical evidence durability repair
 
@@ -112,8 +112,18 @@ No implementation/model/EVAL execution is authorized.
 - EXP-017 sanitized canonical evidence: `DURABLE`
 - EXP-021 Q3 sanitized canonical evidence: `DURABLE`
 - EXP-021 sanitized lifecycle ledger: `DURABLE`
-- README sync: `PENDING_TASK_093D`
+- README sync: `PENDING_AFTER_093C`
 - EXP-022A preregistration: `SCIENTIFICALLY_READY_TO_FREEZE`, freeze deferred until repository hygiene completes
+
+## Task-093B2 canonical retention and remaining-gap repair
+
+- Status: `CANONICAL_RETENTION_AND_REMAINING_GAPS_REPAIRED`
+- EXP-020A = `COMPLETED / VALID / REPRESENTATION_REPLICATION_SUPPORTED`
+- EXP-017 = `SANITIZED_CANONICAL_DURABLE`
+- EXP-021 Q3 = `SANITIZED_CANONICAL_MEASUREMENT_DURABLE`
+- EXP-021 lifecycle = `SANITIZED_LEDGER_DURABLE`
+- README sync: `PENDING_AFTER_093C`
+- EXP-022A = `SCIENTIFIC_PROTOCOL_READY_TO_FREEZE`, freeze deferred until repository hygiene rereview
 
 ## Task-093AY EXP-020A canonical result recovery
 
