@@ -1,0 +1,164 @@
+{
+  "experiment": "EXP-023",
+  "focused_test_result": "49 passed",
+  "full_test_excluding_pre_existing_exp022a_collision_tests": "616 passed, 2 skipped",
+  "full_test_result": "683 passed, 2 skipped, 2 failed (2 pre-existing EXP-022A result-collision tests)",
+  "schema_version": "1.0.0",
+  "static_preflight": {
+    "canonical_result_present": false,
+    "classification": "ENGINEERING_STATIC_PREFLIGHT_ONLY",
+    "created_at": "2026-08-17T16:03:17.298280+00:00",
+    "dataset_structural_validation": "PASS",
+    "formal_prompt_text_accessed": false,
+    "formal_run_authorized": false,
+    "frozen_authority": {
+      "dataset": {
+        "path": "experiments\\exp023\\data\\exp023_independent_controlled.json",
+        "sha256": "9143ceceab106c71dedb806190e146401975bf6bd84cb99b3b4cb7adc75afa2a",
+        "status": "FROZEN"
+      },
+      "freeze_manifest": {
+        "candidate_manifest_path": "experiments/exp023/data/EXP-023-DATASET-CANDIDATE-MANIFEST.json",
+        "class_template_leakage": "MODERATE_NONBLOCKING",
+        "class_universe": [
+          "logic",
+          "causality",
+          "analogy",
+          "definition"
+        ],
+        "dataset_path": "experiments/exp023/data/exp023_independent_controlled.json",
+        "dataset_record_count": 64,
+        "dataset_review_path": "docs/experiments/EXP-023-DATASET-CANDIDATE-REVIEW.md",
+        "dataset_review_verdict": "READY_FOR_DATASET_AND_PROTOCOL_FREEZE",
+        "dataset_sha256": "9143ceceab106c71dedb806190e146401975bf6bd84cb99b3b4cb7adc75afa2a",
+        "dataset_source_families_per_class": 8,
+        "dataset_source_family_count": 32,
+        "experiment": "EXP-023",
+        "formal_run_authorized": false,
+        "frozen_at_utc": "2026-08-17T15:41:33.317470Z",
+        "historical_exclusion_dataset_sha256": "72dab733e6a1639dfc80d186f3af1dbce5c6d70da4905e6d6d422cf47064c472",
+        "independent_dataset_claim": "SUPPORTED",
+        "model_execution_performed": false,
+        "model_name": "Qwen/Qwen3-1.7B",
+        "model_snapshot": "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e",
+        "original_style_record_count": 32,
+        "paraphrase_record_count": 32,
+        "preregistration_path": "docs/experiments/EXP-023-PREREGISTRATION.md",
+        "preregistration_sha256": "11bfa984d436ba06f7f3d1b0db24b90439742e9d9a87d124880834b437749f0b",
+        "primary_checkpoint": "block27_pre_final_rmsnorm",
+        "primary_condition": "A_mu_sigma",
+        "primary_control": "A0",
+        "primary_estimand": "G_cal",
+        "raw_variant_universe": [
+          "original_style",
+          "paraphrase"
+        ],
+        "repository_commit_before_freeze": "ed53d59d5fcb80c414e11e8108779d4d9697ed33",
+        "schema_version": "1.0",
+        "scientific_result_observed": false,
+        "secondary_policy": "DESCRIPTIVE_MEAN_SCALE_DECOMPOSITION",
+        "status": "FROZEN_PROTOCOL_NOT_RUN",
+        "surface_complexity_confound": "MINOR_NONMATERIAL"
+      },
+      "historical_exclusion_dataset": {
+        "path": "experiments\\exp003\\prompts_controlled.json",
+        "sha256": "72dab733e6a1639dfc80d186f3af1dbce5c6d70da4905e6d6d422cf47064c472"
+      },
+      "preregistration": {
+        "path": "docs\\experiments\\EXP-023-PREREGISTRATION.md",
+        "sha256": "11bfa984d436ba06f7f3d1b0db24b90439742e9d9a87d124880834b437749f0b",
+        "status": "FROZEN"
+      }
+    },
+    "model_hook_engineering_qualified": false,
+    "model_loaded": false,
+    "result_schema": {
+      "atomic_no_overwrite_publication": true,
+      "authorization_required": true,
+      "bootstrap_contract": {
+        "quantiles": [
+          0.025,
+          0.975
+        ],
+        "replicates": 10000,
+        "resampling": "class_stratified_eval_paired",
+        "rng": "PCG64(20260818)",
+        "seed": 20260818
+      },
+      "checkpoint_registry": [
+        "block16_pre_final_rmsnorm",
+        "block17_pre_final_rmsnorm",
+        "block18_pre_final_rmsnorm",
+        "block19_pre_final_rmsnorm",
+        "block20_pre_final_rmsnorm",
+        "block21_pre_final_rmsnorm",
+        "block22_pre_final_rmsnorm",
+        "block23_pre_final_rmsnorm",
+        "block24_pre_final_rmsnorm",
+        "block25_pre_final_rmsnorm",
+        "block26_pre_final_rmsnorm",
+        "block27_pre_final_rmsnorm",
+        "block27_post_final_rmsnorm"
+      ],
+      "classifier_contract": {
+        "C": 1.0,
+        "class_weight": null,
+        "dual": false,
+        "fit_intercept": true,
+        "max_iter": 1000,
+        "penalty": "l2",
+        "solver": "lbfgs",
+        "tol": 0.0001,
+        "warm_start": false
+      },
+      "consumption_before_model_load": true,
+      "exclusive_consumption": true,
+      "formal_call_graph_placeholders": false,
+      "model_hook_qualification_required": true,
+      "readout_registry": [
+        "A0",
+        "A_mu",
+        "A_sigma",
+        "A_mu_sigma"
+      ],
+      "schema_version": "1.0.0",
+      "technical_failure_evidence": true
+    },
+    "runner_path": "experiments\\exp023\\run_exp023.py",
+    "runner_sha256": "339a69a997af7521db9c351c191bde0e9749b2cf528efedfd4f3043607830990",
+    "scientific_result_created": false,
+    "staging_result_present": false,
+    "status": "EXP023_STATIC_PREFLIGHT_PASS",
+    "tokenizer_loaded": false,
+    "versions": {
+      "numpy": "2.4.6",
+      "python": "3.11.9",
+      "scikit_learn": "1.9.0"
+    }
+  },
+  "synthetic_preflight": {
+    "classification": "ENGINEERING_SYNTHETIC_PREFLIGHT_ONLY",
+    "created_at": "2026-08-17T16:03:17.613298+00:00",
+    "cross_split_synthesis": {
+      "G_cal": "NO_REPLICATION"
+    },
+    "experiment": "EXP-023",
+    "formal_prompt_text_accessed": false,
+    "frozen_preregistration_sha256": "11bfa984d436ba06f7f3d1b0db24b90439742e9d9a87d124880834b437749f0b",
+    "model_loaded": false,
+    "result_schema_validated": true,
+    "scientific_result_created": false,
+    "split_a": {
+      "D_fixed_supported": true,
+      "G_cal_supported": false,
+      "technical_validity": "VALID"
+    },
+    "split_b": {
+      "D_fixed_supported": true,
+      "G_cal_supported": false,
+      "technical_validity": "VALID"
+    },
+    "status": "EXP023_SYNTHETIC_PREFLIGHT_PASS",
+    "tokenizer_loaded": false
+  }
+}
