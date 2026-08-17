@@ -323,3 +323,12 @@ No formal execution, model load, or EVAL access is authorized.
   - same-family refit rescue = not supported
 - Next phase = `scientific closeout complete; next-experiment design pending`
 - Do not begin EXP-023 design in this task.
+
+## Task-095A-EXT research asset expansion
+
+- Status = `RESEARCH_ASSET_EXPANSION_COMPLETE`
+- Research asset expansion completed.
+- Active experimental priority remains `HYP-CALIBRATION-001`.
+- Long-term assets preserved but inactive.
+- Next scientific task remains EXP-022A scientific review / EXP-023 direction selection.
+- Asset expansion does not change the active experiment automatically.

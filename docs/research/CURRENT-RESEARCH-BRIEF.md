@@ -77,3 +77,13 @@ designing a more flexible transport experiment. Do not freeze EXP-023 here.
 - Speculation must not enter the claim ledger as fact.
 - Do not modify frozen protocol after outcome.
 - Do not begin EXP-023 design without a separate closeout-review task.
+
+## 11. Long-Horizon Research Asset Map
+
+Long-horizon ideas, analogies, system-architecture inspirations, and application
+branches are indexed separately so they survive migration without being promoted
+to established claims.
+
+- Asset map: `RESEARCH-ASSET-MAP.md`
+- Hypotheses: `HYPOTHESIS-LEDGER.md`
+- Experiment chain: `EXPERIMENT-LINEAGE.md`
