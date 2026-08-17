@@ -1,0 +1,192 @@
+{
+  "block16_hs17_oracle": "PASS",
+  "block26_hs27_oracle": "PASS",
+  "block27_pre_final_hook": "PASS",
+  "checkpoint_extraction": "PASS",
+  "created_at_utc": "2026-08-17T17:29:12.798352+00:00",
+  "experiment": "EXP-023",
+  "failure_evidence_patch_affected_extraction_semantics": false,
+  "failure_evidence_patch_presence_check": "PASS",
+  "final_rmsnorm_hs28_oracle": "PASS",
+  "float32_boundary": "PASS",
+  "formal_authorization_created": false,
+  "formal_dataset_model_inference_count": 0,
+  "formal_prompt_text_exposed": false,
+  "frozen_dataset_sha256": "9143ceceab106c71dedb806190e146401975bf6bd84cb99b3b4cb7adc75afa2a",
+  "frozen_preregistration_sha256": "11bfa984d436ba06f7f3d1b0db24b90439742e9d9a87d124880834b437749f0b",
+  "hidden_size": 2048,
+  "hidden_state_tuple_length_required": 29,
+  "hidden_state_tuple_length_status": "PASS",
+  "historical_qualification_sha256": "3adcb480a6d7da1a62b026aaac8946f914e73099444e26784045a486d49577d6",
+  "hook_cleanup": "PASS",
+  "last_valid_token_device_path": "PASS",
+  "last_valid_token_runtime": "PASS",
+  "local_model_path_identity": "D:\\AI_Cache\\huggingface\\hub\\models--Qwen--Qwen3-1.7B\\snapshots\\70d244cc86ccca08cf5af4e1e306ecf908b1ad5e",
+  "model_class": "Qwen3ForCausalLM",
+  "model_name": "Qwen/Qwen3-1.7B",
+  "model_snapshot": "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e",
+  "model_type": "qwen3",
+  "neutral_input_hashes": [
+    "a1a9e3a49bb5ee0c417a245003112920e75e98b77bb64bf68bae8107b1f1bedb",
+    "ef537f25c895bfa782526529a9b63d97aa631564d5d789c2b765448c8635fb6c"
+  ],
+  "neutral_input_identity_sha256": "8b7a7a4d430cc9b94800eb3c7de1a9446008f2703ecf529df27b3b97ac06895e",
+  "number_of_transformer_blocks": 28,
+  "old_qualification_formal_status": "STALE_HISTORICAL_ONLY",
+  "per_record_evidence": [
+    {
+      "block16_oracle": {
+        "exact": true,
+        "max_abs_diff": 0.0,
+        "status": "PASS",
+        "tolerance_pass": true
+      },
+      "block26_oracle": {
+        "exact": true,
+        "max_abs_diff": 0.0,
+        "status": "PASS",
+        "tolerance_pass": true
+      },
+      "block27_pre_final_hook": {
+        "captured_pre_not_post": true,
+        "finite": true,
+        "shape": [
+          1,
+          10,
+          2048
+        ],
+        "status": "PASS"
+      },
+      "checkpoint_shape_statuses": {
+        "block16_pre_final_rmsnorm": "PASS",
+        "block17_pre_final_rmsnorm": "PASS",
+        "block18_pre_final_rmsnorm": "PASS",
+        "block19_pre_final_rmsnorm": "PASS",
+        "block20_pre_final_rmsnorm": "PASS",
+        "block21_pre_final_rmsnorm": "PASS",
+        "block22_pre_final_rmsnorm": "PASS",
+        "block23_pre_final_rmsnorm": "PASS",
+        "block24_pre_final_rmsnorm": "PASS",
+        "block25_pre_final_rmsnorm": "PASS",
+        "block26_pre_final_rmsnorm": "PASS",
+        "block27_post_final_rmsnorm": "PASS",
+        "block27_pre_final_rmsnorm": "PASS"
+      },
+      "final_rmsnorm_relationship": {
+        "max_abs_diff": 0.0,
+        "relationship_tolerance_pass": true,
+        "status": "PASS"
+      },
+      "float32_analysis_boundary": "PASS",
+      "float32_analysis_boundary_meta": {
+        "converted_checkpoint_count": 13
+      },
+      "hidden_state_tuple_length": 29,
+      "hidden_state_tuple_length_pass": true,
+      "hook_cleanup": "PASS",
+      "hook_zero_perturbation": {
+        "max_abs_diff": 0.0,
+        "status": "PASS"
+      },
+      "last_valid_token": "PASS",
+      "last_valid_token_device_path": "PASS",
+      "last_valid_token_meta": {
+        "selected_checkpoint_count": 13,
+        "selected_final_token_is_special": false
+      },
+      "neutral_input_sha256": "a1a9e3a49bb5ee0c417a245003112920e75e98b77bb64bf68bae8107b1f1bedb",
+      "pre_post_distinction": {
+        "max_abs_diff": 1442.0,
+        "status": "PASS"
+      }
+    },
+    {
+      "block16_oracle": {
+        "exact": true,
+        "max_abs_diff": 0.0,
+        "status": "PASS",
+        "tolerance_pass": true
+      },
+      "block26_oracle": {
+        "exact": true,
+        "max_abs_diff": 0.0,
+        "status": "PASS",
+        "tolerance_pass": true
+      },
+      "block27_pre_final_hook": {
+        "captured_pre_not_post": true,
+        "finite": true,
+        "shape": [
+          1,
+          10,
+          2048
+        ],
+        "status": "PASS"
+      },
+      "checkpoint_shape_statuses": {
+        "block16_pre_final_rmsnorm": "PASS",
+        "block17_pre_final_rmsnorm": "PASS",
+        "block18_pre_final_rmsnorm": "PASS",
+        "block19_pre_final_rmsnorm": "PASS",
+        "block20_pre_final_rmsnorm": "PASS",
+        "block21_pre_final_rmsnorm": "PASS",
+        "block22_pre_final_rmsnorm": "PASS",
+        "block23_pre_final_rmsnorm": "PASS",
+        "block24_pre_final_rmsnorm": "PASS",
+        "block25_pre_final_rmsnorm": "PASS",
+        "block26_pre_final_rmsnorm": "PASS",
+        "block27_post_final_rmsnorm": "PASS",
+        "block27_pre_final_rmsnorm": "PASS"
+      },
+      "final_rmsnorm_relationship": {
+        "max_abs_diff": 0.0,
+        "relationship_tolerance_pass": true,
+        "status": "PASS"
+      },
+      "float32_analysis_boundary": "PASS",
+      "float32_analysis_boundary_meta": {
+        "converted_checkpoint_count": 13
+      },
+      "hidden_state_tuple_length": 29,
+      "hidden_state_tuple_length_pass": true,
+      "hook_cleanup": "PASS",
+      "hook_zero_perturbation": {
+        "max_abs_diff": 0.0,
+        "status": "PASS"
+      },
+      "last_valid_token": "PASS",
+      "last_valid_token_device_path": "PASS",
+      "last_valid_token_meta": {
+        "selected_checkpoint_count": 13,
+        "selected_final_token_is_special": false
+      },
+      "neutral_input_sha256": "ef537f25c895bfa782526529a9b63d97aa631564d5d789c2b765448c8635fb6c",
+      "pre_post_distinction": {
+        "max_abs_diff": 1344.0,
+        "status": "PASS"
+      }
+    }
+  ],
+  "pre_post_distinction": "PASS",
+  "production_extraction_path_exercised": true,
+  "qualification_status": "MODEL_HOOK_ENGINEERING_REQUALIFIED",
+  "qualification_type": "POST_PATCH_MODEL_HOOK_REQUALIFICATION",
+  "repository_commit": "822ef2637f3602f59a47d925d59baf08fd102f6c",
+  "runner_sha256": "c774837702944b6dea47f1f97a5c8cc4a934d7b58b28c8127ab92b1768ae3f52",
+  "runtime_dtype": "torch.float16",
+  "runtime_versions": {
+    "cuda_available": true,
+    "cuda_runtime": "13.0",
+    "device": "cuda:0",
+    "gpu_name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+    "numpy": "2.4.6",
+    "python": "3.11.9",
+    "torch": "2.12.1+cu130",
+    "transformers": "5.14.1"
+  },
+  "schema_version": "1.0.0",
+  "scientific_result_created": false,
+  "status": "QUALIFIED",
+  "tokenizer_class": "Qwen2Tokenizer",
+  "zero_perturbation_hook": "PASS"
+}

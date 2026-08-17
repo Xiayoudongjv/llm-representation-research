@@ -152,6 +152,35 @@ model-hook runtime correctness.
 - Next required task: repeat real model/hook engineering qualification for the
   patched runner before any short 096C-R rereview and formal authorization.
 
+## Post-Patch Real Model / Hook Requalification
+
+- Patched runner SHA-256:
+  `c774837702944b6dea47f1f97a5c8cc4a934d7b58b28c8127ab92b1768ae3f52`.
+- New qualification artifact:
+  `experiments/exp023/engineering/model_hook_qualification_post_patch.json`.
+- New qualification SHA-256:
+  `0fcca22202624d8f0bdc697f13f3c3322af137b0d22417f6d95eea28929aa0a8`.
+- Qualification status: `MODEL_HOOK_ENGINEERING_REQUALIFIED`.
+- Runtime identity: Python `3.11.9`, torch `2.12.1+cu130`,
+  transformers `5.14.1`, CUDA `13.0`, NVIDIA GeForce RTX 5060 Laptop GPU,
+  `cuda:0`, `torch.float16`.
+- Model/tokenizer: `Qwen3ForCausalLM` / `Qwen2Tokenizer`, 28 blocks,
+  hidden size 2048.
+- Hidden-state tuple length 29: `PASS`.
+- Block16/block26/block27 and final-RMSNorm oracles: `PASS`.
+- Pre/post final-RMSNorm distinction: `PASS`.
+- Zero-perturbation hooks and hook cleanup: `PASS`.
+- Last-valid-token runtime and CUDA/device path: `PASS`.
+- Float32 analysis boundary and all 13 checkpoint extractions: `PASS`.
+- Production extraction path exercised: `true`.
+- Failure-evidence patch affected extraction semantics: `false`.
+- Formal dataset model inference count: `0`; formal prompt text exposed:
+  `false`.
+- Historical qualification remains `STALE_HISTORICAL_ONLY`.
+- Science observed: `false`; no formal authorization or scientific result
+  created.
+- Next step: `TASK 096C-R` short final production-readiness confirmation.
+
 ## Boundary
 
 - `MODEL_LOAD_PERFORMED = true`
@@ -160,15 +189,15 @@ model-hook runtime correctness.
 - `FORMAL_EVAL_PERFORMED = false`
 - `FORMAL_BOOTSTRAP_PERFORMED = false`
 - `EXP023_MODEL_HOOK_ENGINEERING_QUALIFIED = true`
+- `EXP023_MODEL_HOOK_ENGINEERING_REQUALIFIED = true`
 - `EXP023_SCIENTIFIC_RESULT_CREATED = false`
 - `EXP023_OUTCOME_OBSERVED = false`
 - `EXP023_FORMAL_RUN_AUTHORIZED = false`
 
 ## Next required step
 
-`TASK 096B-R`: repeat real model/hook engineering qualification for the
-patched runner. After that qualification, run one short `TASK 096C-R`
-rereview limited to the patched blocker and qualification binding. Then, if
-that rereview passes, issue one new single-use EXP-023 formal authorization
-and launch exactly once. Do not issue a formal authorization or launch
-EXP-023 from this preflight patch.
+`TASK 096C-R`: run one short production-readiness confirmation limited to
+the patched blocker, new qualification binding, unchanged prior PASS
+findings, and absence of formal data/science. If that passes, issue one new
+single-use EXP-023 formal authorization and launch exactly once. Do not
+issue a formal authorization or launch EXP-023 from this requalification.
