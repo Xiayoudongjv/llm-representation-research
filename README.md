@@ -1,345 +1,100 @@
 # LLM Representation Research
 
-Research on representation geometry, task-conditioned transformations and relational invariants in LLM reasoning.
+Research on representation geometry, task-conditioned transformations, and relational invariants in transformer language models.
 
-Current Stage:
+This README is a public overview and navigation surface. Canonical scientific authority lives in the linked research and experiment documents below, not in this file.
 
-EXP-011 dataset design added; no Qwen run yet
+## Project Purpose
 
-## Current Milestone: EXP-000B Hidden State Extraction
+This project asks a conservative empirical question: when a task-associated hidden-state transition can be validated at the representation level, what does that license about functional or behavioral control?
 
-Run the syntax check:
+The program works from measurable representation structure toward local manipulation, then toward transport, invariant preservation, and behavior.
 
-```bash
-python -m compileall src experiments
+## Conceptual Framework
+
+```text
+Representation -> Local Geometry -> Manipulation -> Transport -> Invariant Preservation -> Functional Binding -> Behavior
 ```
 
-Run the fallback model:
+Workflow shorthand:
 
-```bash
-python experiments/exp000/extract_hidden_states.py --use_fallback
+```text
+Identify -> Manipulate -> Transport -> Propagate -> Bind -> Realize
 ```
 
-Run Qwen:
+This framework is conceptual. Only the earlier representation/manipulation portion currently has strong local evidence; later stages are not yet established end-to-end.
 
-```bash
-python experiments/exp000/extract_hidden_states.py --model_name Qwen/Qwen3-1.7B
-```
+## Current Stage
 
-The extraction writes metadata only; full hidden-state tensors and model
-weights are not committed.
+Representation-level manipulation has replicated under frozen same-family, higher-parameter controls. Behavioral linkage remains unsupported. Clean-state layerwise readout transport diagnosis is the next preregistered step.
 
-## Current Milestone: EXP-001 Representation Geometry Baseline
+EXP-022A is scientifically ready to freeze, but it has not yet been frozen or run.
 
-Run the syntax check:
+## Experiment Progression
 
-```bash
-python -m compileall src experiments
-```
+| Experiment | Topic | Status | One-line conclusion or purpose |
+| --- | --- | --- | --- |
+| EXP-017 | Behavior-level pilot | `COMPLETED` | TASK intervention did not outperform matched-random control on overall correctness; representation-behavior link not supported. |
+| EXP-018 | Held-out representation validation | `COMPLETED` | Strong target-directed representation movement under controlled intervention; local manipulability supported, relational/invariant gate failed. |
+| EXP-019 | Independent output evaluator | `COMPLETED` | Generalization criterion failed; output-level behavioral targetness remains unresolved. |
+| EXP-020A | Same-family higher-parameter replication | `COMPLETED / VALID` | Representation replication supported under frozen controls. |
+| EXP-021 | Stage-Q clean-state layerwise source-class readout qualification | `COMPLETED` | Q3 technically valid but `QUALIFICATION_FAILED`; fixed reference readout did not remain qualified across all required clean checkpoints in both complementary splits. |
+| EXP-022A | Clean-state layerwise readout transport diagnosis | `READY_TO_FREEZE / NOT_FROZEN / NOT_RUN` | Preregistered diagnosis for whether held-out source-class readout degradation reflects fixed-frame degradation, recalibration effects, or recovery under a layerwise readout family. |
 
-Run the fallback geometry baseline:
+## Current Findings
 
-```bash
-python experiments/exp001/compute_geometry.py --use_fallback
-```
+### Supported
 
-Run with Qwen:
+- Task-associated discriminative directions are measurable.
+- Controlled hidden-state manipulation can produce strong held-out, representation-level target movement.
+- EXP-020A replicated this representation-level effect on the same model family at higher parameter scale under frozen controls.
 
-```bash
-python experiments/exp001/compute_geometry.py --model_name Qwen/Qwen3-1.7B
-```
+### Negative / failed results remain visible
 
-The geometry baseline saves compact metadata, cosine similarities, PCA
-coordinates, and a PCA plot. Full hidden-state tensors and model weights are
-not saved.
+- EXP-017 did not show task-specific correctness-level behavioral improvement over matched-random control.
+- EXP-018 did not pass the relational/invariant preservation gate.
+- EXP-019's independent evaluator did not generalize sufficiently.
+- EXP-021 Stage-Q fixed source-class readout qualification failed at required downstream clean checkpoints in one complementary split.
 
-## Current Milestone: EXP-002 Layer-wise Representation Geometry
+### Current Evidence Boundary
 
-Run the layer-wise Qwen analysis:
+Current evidence supports:
 
-```bash
-python experiments/exp002/analyze_layers.py --model_name Qwen/Qwen3-1.7B
-```
+- representation-level discriminative structure;
+- local representational manipulability;
+- same-family higher-parameter representation-level replication.
 
-EXP-002 evaluates layers 0, 4, 8, 12, 16, 20, 24, and 28 using one forward
-pass per prompt. It saves only compact metrics, diagnostics, and plots; full
-representation tensors are not saved.
+Current evidence does not yet establish:
 
-## Current Milestone: EXP-003 Lexical and Paraphrase Control
+- general behavioral control;
+- functional binding;
+- causal role of the manipulated representation;
+- universal task geometry;
+- scale invariance;
+- a general coordinate transport law.
 
-Run the controlled Qwen analysis:
+## Research Navigation
 
-```bash
-python experiments/exp003/analyze_controlled_geometry.py --model_name Qwen/Qwen3-1.7B
-```
+- [RESEARCH-SPINE](docs/research/RESEARCH-SPINE.md) — durable research architecture.
+- [CLAIM-LEDGER](docs/research/CLAIM-LEDGER.md) — current claim status.
+- [CONSTRUCT-REGISTRY](docs/research/CONSTRUCT-REGISTRY.md) — construct definitions.
+- [RESEARCH-CONTINUITY-INDEX](docs/research/RESEARCH-CONTINUITY-INDEX.md) — current research navigation and status.
+- [CANONICAL-RESULT-RETENTION](docs/research/CANONICAL-RESULT-RETENTION.md) — evidence durability policy.
+- [CURRENT-RESEARCH-HANDOFF](docs/CURRENT-RESEARCH-HANDOFF.md) — current research status snapshot.
 
-EXP-003 evaluates original-style and paraphrased prompts across the same
-selected layers. It saves compact control metrics and plots only; full hidden
-state tensors are not saved.
+For EXP-022A protocol documents, see the [preregistration draft](docs/experiments/EXP-022A-PREREGISTRATION-DRAFT.md), [independent review](docs/experiments/EXP-022A-PREREGISTRATION-REVIEW-092C.md), [rereview](docs/experiments/EXP-022A-PREREGISTRATION-REREVIEW-092E.md), and [protocol reconciliation](docs/research/experiments/EXP-022A-PROTOCOL-RECONCILIATION.md).
 
-## Current Milestone: EXP-004 Static Steering Vector Baseline
+## Canonical Evidence
 
-Run the representation-level steering baseline:
+Canonical scientific evidence is retained according to the repository's canonical-result retention policy. See `docs/research/CANONICAL-RESULT-RETENTION.md` for artifact classes and durability rules.
 
-```bash
-python experiments/exp004/static_steering.py --model_name Qwen/Qwen3-1.7B --layer 16 --source_group logic --target_group causality
-```
+## Current Next Step
 
-EXP-004 applies a normalized centroid-difference vector to source-group
-representations. It is not generation-time steering and does not save full
-hidden-state tensors.
+EXP-022A is ready to freeze but has not been frozen, run, or formally authorized for implementation. This README synchronization does not authorize model or EVAL execution.
 
-## Current Milestone: EXP-004B Calibrated Static Steering
-
-Run the calibrated representation-level steering baseline:
-
-```bash
-python experiments/exp004b/calibrated_steering.py --model_name Qwen/Qwen3-1.7B --layer 16 --source_group logic --target_group causality
-```
-
-EXP-004B scales the raw centroid-difference vector by beta and reports
-similarity movement, centroid assignments, and relative perturbation size. It
-is not generation-time steering and does not save full hidden-state tensors.
-
-## Current Milestone: EXP-005 Multi-pair Calibrated Steering Generalization
-
-Run the multi-pair steering analysis:
-
-```bash
-python experiments/exp005/multipair_steering.py --model_name Qwen/Qwen3-1.7B --layer 16
-```
-
-EXP-005 evaluates all 12 ordered transitions among the four controlled task
-groups. It saves pair summaries, asymmetry metrics, and heatmaps without saving
-full hidden-state tensors.
-
-## Current Milestone: EXP-006 Relational Invariant Score
-
-Run the relational invariant analysis:
-
-```bash
-python experiments/exp006/relational_invariant_score.py --model_name Qwen/Qwen3-1.7B --layer 16
-```
-
-EXP-006 compares source-group representation similarity matrices before and
-after calibrated steering. RSM correlation is only a proxy invariant; full
-hidden-state tensors are not saved.
-
-## Current Milestone: EXP-007 Transition Validity Frontier
-
-Run the frontier analysis over EXP-006 results:
-
-```bash
-python experiments/exp007/validity_frontier.py
-```
-
-EXP-007 summarizes the trade-off between transition success, invariant
-violation, and perturbation magnitude. Its scalar validity scores are
-exploratory and do not define a final theory.
-
-## Current Milestone: EXP-008 Invariant-constrained Steering
-
-Run the invariant-constrained selection analysis over existing EXP-006 and
-EXP-007 results:
-
-```bash
-python experiments/exp008/invariant_constrained_selection.py
-```
-
-EXP-008 selects among discrete beta candidates using assignment success,
-invariant violation, and relative perturbation penalties. It does not rerun
-Qwen, learn a transformation, or save full hidden-state tensors.
-
-## Current Milestone: EXP-009 Answer-level Reasoning Evaluation
-
-Run the normal-generation behavioral baseline:
-
-```bash
-python experiments/exp009/run_answer_eval.py --model_name Qwen/Qwen3-1.7B
-```
-
-EXP-009 evaluates concise answers on 24 deterministic prompts across logic,
-causality, analogy, and definition. It does not apply activation steering or
-save full hidden-state tensors.
-
-## Current Milestone: EXP-009B Scoring Audit and Answer Normalization
-
-Run the conservative audit over existing EXP-009 outputs:
-
-```bash
-python experiments/exp009b/audit_scoring.py
-```
-
-EXP-009B compares strict accuracy with an audited upper bound and labels
-scoring misses, partial answers, ambiguous cases, and likely wrong answers. It
-does not rerun Qwen or use an LLM judge.
-
-## Current Milestone: EXP-010 Representation Validity vs Answer Difficulty
-
-Run the exploratory group-level analysis over existing representation and
-answer-level results:
-
-```bash
-python experiments/exp010/representation_behavior_link.py
-```
-
-EXP-010 computes four-group Pearson correlations for exploratory comparison.
-It is non-causal, underpowered, and does not rerun Qwen.
-
-## Current Milestone: EXP-011 Expanded Answer-level Dataset
-
-Validate the expanded dataset without running a model:
-
-```bash
-python experiments/exp011/validate_dataset.py
-```
-
-EXP-011 adds 80 deterministic short-answer items across logic, causality,
-analogy, and definition. Run its static quality audit with:
-
-```bash
-python experiments/exp011/audit_dataset_quality.py
-```
-
-Its configured boundary-aware answer scoring was validated against short-answer
-substring false positives before the EXP-011B evaluation.
-
-## Current Milestone: EXP-011B Expanded Answer-Level Evaluation
-
-Run the deterministic Qwen evaluation on the quality-audited dataset:
-
-```bash
-python experiments/exp011b/run_expanded_answer_eval.py
-```
-
-EXP-011B uses normal generation only and boundary-aware scoring. The completed
-run scored 52/80 answers correctly (0.650); analogy remained the lowest-
-accuracy group, while group ranking differed from EXP-009.
-
-## Current Milestone: EXP-011C Expanded Answer Scoring Audit
-
-Run the offline conservative audit over the existing EXP-011B CSV:
-
-```bash
-python experiments/exp011c/audit_expanded_answers.py
-```
-
-The audit does not rerun Qwen. It raised conservative audited accuracy from
-0.650 to 0.750 through eight defensible lexical or wording misses; its 0.875
-review ceiling is not accuracy or final correctness.
-
-## Current Milestone: EXP-011D Behavioral Benchmark Freeze
-
-EXP-011D applied the eight audit-approved acceptable-answer additions and
-rescored the existing outputs offline. The provisionally frozen baseline is
-60/80 (0.750): causality 0.950, definition 0.850, logic 0.750, and analogy
-0.450. No model answers were regenerated.
-
-## Current Milestone: EXP-012 Frozen Behavioral Link Reanalysis
-
-Run the offline reanalysis with frozen EXP-011D group accuracy:
-
-```bash
-python experiments/exp012/frozen_behavior_link.py
-```
-
-EXP-012 replaces EXP-010's preliminary behavioral baseline and shows that
-some descriptive correlations are benchmark-sensitive. It remains an n=4,
-non-causal analysis and does not explain behavioral differences.
-
-## Current Milestone: EXP-013 Gemma Cross-Model Geometry Replication
-
-Run the local-cache Gemma replication with:
-
-```bash
-python experiments/exp013/gemma_geometry_replication.py
-```
-
-EXP-013 reuses EXP-003's 24 controlled prompts with raw plain-text input and
-compares normalized layer depth across Qwen and Gemma. It found replicated
-task-associated geometry and paraphrase-controlled signal in Gemma, while the
-strongest separation occurred at Gemma's final layer rather than a mid-depth
-layer. Only aggregate metrics and plots are saved.
-
-## Current Milestone: EXP-014 Gemma Steering and Relational Preservation
-
-Run the local-cache representation-level replication with:
-
-```bash
-python experiments/exp014/gemma_steering_replication.py
-```
-
-EXP-014 applies fixed centroid-difference steering at Gemma layer 26 across all
-12 ordered group transitions. All transitions reached full target assignment,
-but Gemma's exploratory operating point was beta 1.0 rather than Qwen's beta
-0.75. This is not generation-time intervention and does not assess reasoning.
-
-## Current Milestone: EXP-015 Layer-Validity Pilot
-
-Run the fixed two-model layer pilot with:
-
-```bash
-python experiments/exp015/layer_validity_pilot.py
-```
-
-EXP-015 compares fixed low, mid, and final hidden-state indices at beta 0.50,
-0.75, and 1.00. Qwen's encoding/control layer was 16 while its safe-control
-layer was 28; Gemma's encoding layer was 26 while its control/safe-control
-layer was 16. The pilot therefore recommends expanding layer-validity study
-before any generation-time intervention.
-
-## Current Milestone: EXP-016 Full Layer-Strength Validity Study
-
-Run the fixed two-model layer-strength grid with:
-
-```bash
-python experiments/exp016/full_layer_validity_study.py
-```
-
-EXP-016 sampled seven layers and six beta values per model. Qwen selected L16
-for encoding/control and L4 for safe control; Gemma selected L26 for encoding
-and L16 for control/safe control. The fixed grid supports model-specific,
-pre-behavioral layer selection for a future generation-time intervention pilot.
-
-## Project Status
-
-Experiments are complete through EXP-016. Paper Draft v0.5 and the associated
-status, results, and claims documents are available under `docs/paper`.
-Engineering utilities for IO, representation extraction, and plotting are
-covered by local tests.
-
-## Developer Checks
+## Repository Checks
 
 ```bash
 python -m compileall src experiments
 python -m pytest tests
 ```
-
-Environment Setup
-
-Roadmap
-
-EXP000
-↓
-
-Representation
-
-↓
-
-Geometry
-
-↓
-
-Steering
-
-↓
-
-Task-conditioned Transformation
-
-↓
-
-Relational Invariant
-
-↓
-
-Papers
