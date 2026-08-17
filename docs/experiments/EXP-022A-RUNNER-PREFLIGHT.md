@@ -201,13 +201,59 @@ Focused test result: `pytest -q tests/test_exp022a_runner.py` -> `54 passed`.
 
 Full test result: `PYTHONPATH=. pytest -q` -> `621 passed, 2 skipped`.
 
+## Task-094E formal readiness gate
+
+- Verdict: `FORMAL_IMPLEMENTATION_WIRING_GAP`
+- Scientific implementation: unchanged.
+- Model/hook runtime qualification: already qualified under Task-094D-R2.
+- Blocking gap: the formal-run path was still a fail-closed placeholder and did
+  not yet connect authorization, consumption, dataset, runtime extraction,
+  split analysis, result construction, validation, and publication.
+- Formal EXP-022A execution: `NOT AUTHORIZED`
+
+## Task-094E-P formal execution wiring
+
+Engineering-only patch that connects the future formal production call graph:
+
+- explicit `--formal-run --authorization-file <path>` input; no authorization
+  path still fails closed with `FORMAL_RUN_NOT_AUTHORIZED` before scientific
+  access;
+- strict single-use authorization schema and binding validation for repository
+  commit, runner SHA-256, frozen preregistration, formal dataset, model
+  identity, snapshot, and qualification artifact;
+- exclusive `O_CREAT | O_EXCL` consumption record in
+  `experiments/exp022a/results/authorization_consumption/<sha256>.json`;
+- consumption occurs before formal dataset semantic parsing, tokenizer/model
+  loading, CUDA inference, extraction, scientific RNG, or analysis;
+- formal dataset SHA gate and structural loader requiring the frozen prompt
+  artifact and `id`/`group`/`variant_type`/`text` fields;
+- local tokenizer/model loader for the qualified Qwen3-1.7B snapshot with
+  `local_files_only=true`, float16, CUDA:0, eval mode, and architecture
+  revalidation;
+- clean hidden-state extraction reusing the qualified runtime helpers and
+  checkpoint mapping;
+- Split A/B orchestration through the existing reviewed `run_split_analysis`;
+- scientific result construction, schema validation, collision check, and
+  atomic no-overwrite publication via the existing finalization path;
+- consumed-attempt technical failures are recorded in
+  `experiments/exp022a/results/technical_failure_evidence/` and do not produce
+  a fake scientific result.
+
+Formal readiness is not marked `PASS` by this task.
+
+## Current test results after Task-094E-P
+
+- Focused: `pytest -q tests/test_exp022a_runner.py` -> `66 passed`
+- Full: `PYTHONPATH=. pytest -q` -> `633 passed, 2 skipped`
+- Warnings: seven existing scikit-learn `FutureWarning` items; no new warning
+  was suppressed by this patch.
+
 ## Remaining qualification steps
 
-- Targeted independent rereview of the Task-094D-P runtime-integration patch.
-- Future Task-094D model/tokenizer/hook engineering qualification under
-  separate authorization.
-- Future formal execution authorization.
+- Targeted independent read-only Task-094E-R rereview of the formal call graph.
+- If Task-094E-R passes: create one single-use formal authorization bound to
+  the reviewed commit, then execute exactly one formal EXP-022A attempt.
 
 No model, tokenizer, controlled prompt text, formal FIT/EVAL data, formal
-hidden states, or formal scientific result was accessed or created by Task
-094B.
+hidden states, or formal scientific result was accessed or created by the
+implementation tasks described above.

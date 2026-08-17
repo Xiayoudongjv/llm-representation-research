@@ -5,7 +5,7 @@ experimental artifacts outrank it.
 
 ## Current research phase
 
-EXP-020A recovered canonical evidence restored. EXP-017 and EXP-021 evidence are durable. Canonical evidence durability rereview passed. EXP-022A preregistration is frozen v1.0 and not run. EXP-022A runner is implemented with static/synthetic preflight passing and is not model-qualified.
+EXP-020A recovered canonical evidence restored. EXP-017 and EXP-021 evidence are durable. Canonical evidence durability rereview passed. EXP-022A preregistration is frozen v1.0 and not run. EXP-022A runner is implemented with static/synthetic preflight passing, model/hook runtime qualification completed, and the formal execution call graph wired but not authorized.
 
 ## Current preregistration authority
 
@@ -238,3 +238,23 @@ No formal execution, model load, or EVAL access is authorized.
   `experiments/exp022a/engineering/model_hook_qualification.json`
 - Qualification document:
   `docs/experiments/EXP-022A-MODEL-HOOK-QUALIFICATION.md`
+
+## Task-094E formal execution readiness gate
+
+- Verdict: `FORMAL_IMPLEMENTATION_WIRING_GAP`
+- Formal EXP-022A execution = `NOT_AUTHORIZED`
+- Scientific result = `NOT_RUN`
+- Next = `formal production call-graph wiring`
+
+## Task-094E-P formal execution path wiring
+
+- Status = `EXP022A_FORMAL_EXECUTION_WIRING_IMPLEMENTED`
+- Single-use authorization validation/consumption = `IMPLEMENTED`
+- Formal dataset identity/loader = `IMPLEMENTED`
+- Qualified runtime extraction wiring = `IMPLEMENTED`
+- Formal Split A/B and A0/A1/A2 orchestration = `IMPLEMENTED`
+- Formal result finalization = `IMPLEMENTED`
+- Formal readiness = `NOT_MARKED_PASS`
+- Formal EXP-022A execution = `NOT_AUTHORIZED`
+- Scientific result = `NOT_RUN`
+- Next = `targeted formal-call-graph rereview` (Task-094E-R)

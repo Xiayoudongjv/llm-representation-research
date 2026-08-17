@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import copy
 import importlib.util
+import json
 import sys
 from pathlib import Path
 
@@ -67,6 +68,86 @@ def _tracked_analysis(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setattr(runner, "_build_prediction_rows", tracked_build_rows)
     analysis = runner.run_split_analysis(_synthetic_split())
     return analysis, scaler_objects, classifier_objects, build_calls
+
+
+AUTH_REPO_COMMIT = "a" * 40
+AUTH_RUNNER_SHA = "b" * 64
+
+
+def _synthetic_records(*, include_text: bool = True) -> list[dict[str, object]]:
+    records = []
+    for cls in runner.CLASS_UNIVERSE:
+        for index in range(1, 4):
+            for variant in ("original", "paraphrase"):
+                record = {
+                    "id": f"{cls}_{'orig' if variant == 'original' else 'para'}_{index:02d}",
+                    "group": cls,
+                    "variant_type": variant,
+                }
+                if include_text:
+                    record["text"] = f"synthetic {cls} {variant} {index}"
+                records.append(record)
+    return records
+
+
+def _base_authorization() -> dict[str, object]:
+    return {
+        "schema_version": runner.RESULT_SCHEMA_VERSION,
+        "experiment": runner.EXPERIMENT,
+        "authorization_id": "synthetic-authorization",
+        "single_use": True,
+        "authorized_repository_commit": AUTH_REPO_COMMIT,
+        "authorized_runner_sha256": AUTH_RUNNER_SHA,
+        "frozen_preregistration_sha256": runner.FROZEN_PREREGISTRATION_SHA256,
+        "formal_dataset_sha256": runner.PROMPT_FILE_SHA256,
+        "model_name": runner.FORMAL_MODEL_NAME,
+        "model_snapshot_identity": runner.FORMAL_MODEL_SNAPSHOT,
+        "model_hook_qualification_sha256": runner.FORMAL_MODEL_HOOK_QUALIFICATION_SHA256,
+        "canonical_result_path": "experiments/exp022a/results/exp022a_results.json",
+        "authorization_created_at_utc": "2026-08-17T00:00:00Z",
+    }
+
+
+def _write_authorization(tmp_path: Path, authorization: dict[str, object]) -> Path:
+    path = tmp_path / "formal_authorization.json"
+    path.write_text(
+        json.dumps(authorization, ensure_ascii=False, indent=2, sort_keys=True),
+        encoding="utf-8",
+    )
+    return path
+
+
+def _monkeypatch_authorization_identity(
+    monkeypatch: pytest.MonkeyPatch,
+    *,
+    repository_commit: str = AUTH_REPO_COMMIT,
+    runner_sha: str = AUTH_RUNNER_SHA,
+) -> None:
+    monkeypatch.setattr(runner, "_repository_commit", lambda root=runner.ROOT: repository_commit)
+    monkeypatch.setattr(runner, "_runner_sha256", lambda: runner_sha)
+
+
+def _monkeypatch_formal_preflight(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    *,
+    repository_commit: str = AUTH_REPO_COMMIT,
+    runner_sha: str = AUTH_RUNNER_SHA,
+) -> None:
+    snapshot_dir = tmp_path / "snapshot"
+    snapshot_dir.mkdir(parents=True, exist_ok=True)
+    monkeypatch.setattr(runner, "FORMAL_MODEL_SNAPSHOT_PATH", snapshot_dir)
+    monkeypatch.setattr(runner, "_repository_commit", lambda root=runner.ROOT: repository_commit)
+    monkeypatch.setattr(runner, "_runner_sha256", lambda: runner_sha)
+    monkeypatch.setattr(runner, "_tracked_tree_clean", lambda root: True)
+    monkeypatch.setattr(runner, "_staging_empty", lambda root: True)
+    monkeypatch.setattr(runner, "verify_frozen_authority", lambda root: {"status": "FROZEN"})
+    monkeypatch.setattr(
+        runner,
+        "_verify_model_hook_qualification_artifact",
+        lambda root: {"path": "synthetic", "sha256": runner.FORMAL_MODEL_HOOK_QUALIFICATION_SHA256},
+    )
+    monkeypatch.setattr(runner, "verify_no_result_collision", lambda root: None)
 
 
 class _MockDecoderBlock(torch.nn.Module):
@@ -272,21 +353,18 @@ def test_no_mode_fails_closed() -> None:
     assert exc_info.value.code != 0
 
 
-def test_production_record_validation_does_not_require_prompt_text(tmp_path: Path) -> None:
-    records = []
-    for cls in runner.CLASS_UNIVERSE:
-        for index in range(1, 4):
-            for variant in ("original", "paraphrase"):
-                records.append(
-                    {
-                        "id": f"{cls}_{'orig' if variant == 'original' else 'para'}_{index:02d}",
-                        "group": cls,
-                        "variant_type": variant,
-                    }
-                )
+def test_production_record_validation_requires_nonempty_text() -> None:
+    records = _synthetic_records(include_text=True)
     split_definitions = runner.load_split_definitions()
     metas = runner.validate_production_records(records, split_definitions)
     assert len(metas) == 24
+
+
+def test_production_record_validation_rejects_missing_text() -> None:
+    records = _synthetic_records(include_text=False)
+    split_definitions = runner.load_split_definitions()
+    with pytest.raises(runner.ProtocolIntegrityError, match="PRODUCTION_RECORD_MISSING_TEXT"):
+        runner.validate_production_records(records, split_definitions)
 
 
 def test_last_valid_token_indices() -> None:
@@ -690,6 +768,358 @@ def test_last_token_extraction_uses_same_index_across_checkpoints() -> None:
         assert tensor.shape == (2, 3)
         assert torch.equal(tensor[0], checkpoint_tensors[name][0, 1, :])
         assert torch.equal(tensor[1], checkpoint_tensors[name][1, 2, :])
+
+
+def test_build_parser_accepts_explicit_authorization_file() -> None:
+    args = runner.build_parser().parse_args(
+        ["--formal-run", "--authorization-file", "auth.json"]
+    )
+    assert args.formal_run is True
+    assert args.authorization_file == "auth.json"
+
+
+def test_formal_run_with_missing_authorization_file_fails_closed() -> None:
+    with pytest.raises(
+        runner.ProtocolIntegrityError, match="FORMAL_AUTHORIZATION_FILE_MISSING"
+    ):
+        runner.run_formal(runner.ROOT, Path("missing-authorization.json"))
+
+
+def test_authorization_validation_accepts_exact_valid_authorization(monkeypatch) -> None:
+    _monkeypatch_authorization_identity(monkeypatch)
+    authorization = _base_authorization()
+    assert runner._validate_formal_authorization(authorization, runner.ROOT) == authorization
+
+
+def test_authorization_validation_rejects_invalid_schema_and_bindings(monkeypatch) -> None:
+    _monkeypatch_authorization_identity(monkeypatch)
+    base = _base_authorization()
+    invalid = []
+
+    missing = copy.deepcopy(base)
+    missing.pop("authorization_created_at_utc")
+    invalid.append(("missing-field", missing))
+
+    extra = copy.deepcopy(base)
+    extra["unexpected"] = True
+    invalid.append(("extra-field", extra))
+
+    wrong_experiment = copy.deepcopy(base)
+    wrong_experiment["experiment"] = "EXP-021"
+    invalid.append(("wrong-experiment", wrong_experiment))
+
+    not_single_use = copy.deepcopy(base)
+    not_single_use["single_use"] = False
+    invalid.append(("not-single-use", not_single_use))
+
+    wrong_repo = copy.deepcopy(base)
+    wrong_repo["authorized_repository_commit"] = "1" * 40
+    invalid.append(("wrong-repo", wrong_repo))
+
+    wrong_runner = copy.deepcopy(base)
+    wrong_runner["authorized_runner_sha256"] = "1" * 64
+    invalid.append(("wrong-runner", wrong_runner))
+
+    wrong_prereg = copy.deepcopy(base)
+    wrong_prereg["frozen_preregistration_sha256"] = "1" * 64
+    invalid.append(("wrong-prereg", wrong_prereg))
+
+    wrong_dataset = copy.deepcopy(base)
+    wrong_dataset["formal_dataset_sha256"] = "1" * 64
+    invalid.append(("wrong-dataset", wrong_dataset))
+
+    wrong_model = copy.deepcopy(base)
+    wrong_model["model_name"] = "other/model"
+    invalid.append(("wrong-model", wrong_model))
+
+    wrong_snapshot = copy.deepcopy(base)
+    wrong_snapshot["model_snapshot_identity"] = "1" * 64
+    invalid.append(("wrong-snapshot", wrong_snapshot))
+
+    wrong_qualification = copy.deepcopy(base)
+    wrong_qualification["model_hook_qualification_sha256"] = "1" * 64
+    invalid.append(("wrong-qualification", wrong_qualification))
+
+    wrong_result_path = copy.deepcopy(base)
+    wrong_result_path["canonical_result_path"] = "wrong/result.json"
+    invalid.append(("wrong-result-path", wrong_result_path))
+
+    for label, authorization in invalid:
+        with pytest.raises(runner.ProtocolIntegrityError):
+            runner._validate_formal_authorization(authorization, runner.ROOT)
+
+    with pytest.raises(runner.ProtocolIntegrityError, match="NOT_OBJECT"):
+        runner._validate_formal_authorization([], runner.ROOT)
+
+
+def test_authorization_consumption_is_exclusive_and_single_use(tmp_path: Path) -> None:
+    authorization = _base_authorization()
+    auth_path = _write_authorization(tmp_path, authorization)
+    first = runner._consume_formal_authorization(
+        tmp_path, authorization, auth_path, "attempt-one"
+    )
+    record_path = Path(first["consumption_record_path"])
+    assert record_path.exists()
+    assert first["authorization_sha256"] == runner._sha256(auth_path)
+
+    with pytest.raises(runner.ProtocolIntegrityError, match="AUTHORIZATION_ALREADY_CONSUMED"):
+        runner._consume_formal_authorization(
+            tmp_path, authorization, auth_path, "attempt-two"
+        )
+
+
+def test_run_formal_consumes_before_scientific_access(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    authorization = _base_authorization()
+    auth_path = _write_authorization(tmp_path, authorization)
+    _monkeypatch_formal_preflight(monkeypatch, tmp_path)
+    events = []
+
+    monkeypatch.setattr(
+        runner,
+        "_pre_consumption_static_checks",
+        lambda root, auth, path: events.append("static"),
+    )
+    monkeypatch.setattr(
+        runner,
+        "_consume_formal_authorization",
+        lambda root, auth, path, attempt: events.append("consume")
+        or {
+            "authorization_sha256": runner._sha256(path),
+            "consumption_record_path": "synthetic",
+            "consumption_record_sha256": "0" * 64,
+            "run_attempt_id": attempt,
+        },
+    )
+    monkeypatch.setattr(
+        runner,
+        "_execute_formal_after_consumption",
+        lambda root, auth, consumption, attempt: events.append("execute")
+        or {"result": "synthetic"},
+    )
+    monkeypatch.setattr(
+        runner,
+        "finalize_formal_result",
+        lambda result, root=runner.ROOT: events.append("finalize")
+        or {"publication_status": "SYNTHETIC"},
+    )
+
+    runner.run_formal(tmp_path, auth_path)
+    assert events == ["static", "consume", "execute", "finalize"]
+
+
+def test_execute_formal_after_consumption_reaches_splits_and_analysis(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    events = []
+    authorization = _base_authorization()
+    consumption = {
+        "authorization_sha256": "c" * 64,
+        "consumption_record_path": "synthetic-consumption.json",
+        "consumption_record_sha256": "d" * 64,
+        "run_attempt_id": "attempt-split",
+    }
+
+    monkeypatch.setattr(
+        runner,
+        "_verify_formal_dataset_identity",
+        lambda root: events.append("dataset") or {"path": "p", "sha256": "e" * 64},
+    )
+    monkeypatch.setattr(
+        runner,
+        "_load_formal_records",
+        lambda root: events.append("records") or ([], []),
+    )
+    monkeypatch.setattr(
+        runner,
+        "_load_formal_runtime",
+        lambda root: events.append("runtime")
+        or (object(), object(), torch.device("cpu")),
+    )
+    monkeypatch.setattr(
+        runner,
+        "_extract_formal_representations",
+        lambda root, tokenizer, model, device, records: events.append("extract")
+        or {},
+    )
+
+    def fake_build(root, records, metas, representations):
+        events.append("build")
+        return {
+            "A_original_fit_paraphrase_eval": "split-a",
+            "B_paraphrase_fit_original_eval": "split-b",
+        }
+
+    monkeypatch.setattr(runner, "_build_formal_split_datasets", fake_build)
+
+    def fake_analysis(dataset):
+        events.append(f"analysis:{dataset}")
+        return {
+            "summary": {"primary": {}, "secondary": {}, "bootstrap": {}},
+            "technical_validity": "VALID",
+            "warnings": [],
+        }
+
+    monkeypatch.setattr(runner, "run_split_analysis", fake_analysis)
+    monkeypatch.setattr(
+        runner,
+        "_build_formal_result",
+        lambda *args, **kwargs: events.append("result") or {"result": "built"},
+    )
+
+    result = runner._execute_formal_after_consumption(
+        runner.ROOT, authorization, consumption, "attempt-split"
+    )
+    assert result == {"result": "built"}
+    assert events == [
+        "dataset",
+        "records",
+        "runtime",
+        "extract",
+        "build",
+        "analysis:split-a",
+        "analysis:split-b",
+        "result",
+    ]
+
+
+def test_failure_after_consumption_preserves_evidence_and_no_result(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    authorization = _base_authorization()
+    auth_path = _write_authorization(tmp_path, authorization)
+    _monkeypatch_formal_preflight(monkeypatch, tmp_path)
+    events = []
+
+    def fail_execution(root, authorization, consumption, run_attempt_id):
+        raise RuntimeError("synthetic post-consumption failure")
+
+    monkeypatch.setattr(runner, "_execute_formal_after_consumption", fail_execution)
+    monkeypatch.setattr(
+        runner,
+        "finalize_formal_result",
+        lambda result, root=runner.ROOT: events.append("finalize"),
+    )
+
+    with pytest.raises(RuntimeError, match="synthetic post-consumption failure"):
+        runner.run_formal(tmp_path, auth_path)
+
+    authorization_sha = runner._sha256(auth_path)
+    consumption_path = runner._consumption_path_for(tmp_path, authorization_sha)
+    assert consumption_path.exists()
+    evidence_dir = (
+        tmp_path
+        / runner.TECHNICAL_FAILURE_EVIDENCE_DIR.relative_to(runner.ROOT)
+    )
+    evidence_files = list(evidence_dir.glob("*.json"))
+    assert len(evidence_files) == 1
+    assert "finalize" not in events
+    canonical = tmp_path / runner.CANONICAL_RESULT_PATH.relative_to(runner.ROOT)
+    assert not canonical.exists()
+    assert not runner.staging_path_for(canonical).exists()
+
+
+def test_production_record_validation_rejects_malformed_records() -> None:
+    split_definitions = runner.load_split_definitions()
+    valid = _synthetic_records(include_text=True)
+
+    wrong_count = valid[:-1]
+    with pytest.raises(runner.ProtocolIntegrityError, match="PRODUCTION_RECORD_COUNT_MISMATCH"):
+        runner.validate_production_records(wrong_count, split_definitions)
+
+    duplicate_id = copy.deepcopy(valid)
+    duplicate_id[1]["id"] = duplicate_id[0]["id"]
+    with pytest.raises(runner.ProtocolIntegrityError, match="PRODUCTION_RECORD_ID_DUPLICATE"):
+        runner.validate_production_records(duplicate_id, split_definitions)
+
+    unexpected_group = copy.deepcopy(valid)
+    unexpected_group[0]["group"] = "mathematics"
+    with pytest.raises(runner.ProtocolIntegrityError, match="PRODUCTION_CLASS_UNIVERSE_MISMATCH"):
+        runner.validate_production_records(unexpected_group, split_definitions)
+
+    unexpected_variant = copy.deepcopy(valid)
+    unexpected_variant[0]["variant_type"] = "augmented"
+    with pytest.raises(runner.ProtocolIntegrityError, match="PRODUCTION_VARIANT_ROLE_MISMATCH"):
+        runner.validate_production_records(unexpected_variant, split_definitions)
+
+    class_imbalance = copy.deepcopy(valid)
+    class_imbalance[0]["group"] = "causality"
+    with pytest.raises(runner.ProtocolIntegrityError, match="PRODUCTION_VARIANT_CLASS_COUNT_MISMATCH"):
+        runner.validate_production_records(class_imbalance, split_definitions)
+
+    missing_group = copy.deepcopy(valid)
+    missing_group[0].pop("group")
+    with pytest.raises(runner.ProtocolIntegrityError, match="PRODUCTION_RECORD_MISSING_GROUP"):
+        runner.validate_production_records(missing_group, split_definitions)
+
+
+def test_formal_extraction_integration_uses_qualified_runtime_helpers() -> None:
+    class _Namespace:
+        pass
+
+    class _MockBlock(torch.nn.Module):
+        def forward(self, hidden):
+            return hidden * 2.0 + 1.0
+
+    class _MockModel:
+        def __init__(self):
+            self.model = _Namespace()
+            self.model.layers = [torch.nn.Identity() for _ in range(28)]
+            self.model.layers[27] = _MockBlock()
+
+        def __call__(self, input_ids, attention_mask, use_cache, output_hidden_states):
+            batch, length = input_ids.shape
+            hidden = torch.arange(
+                batch * length * 4, dtype=torch.float32
+            ).reshape(batch, length, 4)
+            _ = self.model.layers[27](hidden)
+            hidden_states = tuple(hidden + float(index) for index in range(29))
+            output = _Namespace()
+            output.hidden_states = hidden_states
+            return output
+
+    tokenizer = lambda text, return_tensors, padding, truncation, add_special_tokens: {
+        "input_ids": torch.tensor([[7, 8, 9]], dtype=torch.long),
+        "attention_mask": torch.tensor([[1, 1, 1]], dtype=torch.long),
+    }
+    model = _MockModel()
+    device = torch.device("cpu")
+    records = [{"id": "logic_orig_01", "text": "synthetic prompt"}]
+
+    representations = runner._extract_formal_representations(
+        runner.ROOT, tokenizer, model, device, records
+    )
+    assert set(representations) == {"logic_orig_01"}
+    assert set(representations["logic_orig_01"]) == set(runner.CHECKPOINT_NAMES)
+    for checkpoint, value in representations["logic_orig_01"].items():
+        assert isinstance(value, np.ndarray)
+        assert value.dtype == np.float32
+        assert value.shape == (4,)
+        assert np.isfinite(value).all()
+
+
+def test_formal_model_architecture_validation_rejects_mismatch() -> None:
+    class _Config:
+        model_type = "qwen3"
+        hidden_size = 2048
+        num_hidden_layers = 28
+
+    class _WrongClass:
+        config = _Config()
+        model = type("Model", (), {"layers": list(range(28))})()
+
+    with pytest.raises(runner.ProtocolIntegrityError, match="FORMAL_MODEL_CLASS_MISMATCH"):
+        runner._validate_formal_model_architecture(_WrongClass())
+
+    class _WrongLayers:
+        pass
+
+    _WrongLayers.__name__ = "Qwen3ForCausalLM"
+    _WrongLayers.config = _Config()
+    _WrongLayers.model = type("Model", (), {"layers": list(range(27))})()
+    with pytest.raises(runner.ProtocolIntegrityError, match="FORMAL_MODEL_TRANSFORMER_BLOCKS_MISMATCH"):
+        runner._validate_formal_model_architecture(_WrongLayers())
 
 
 def test_formal_gate_still_blocks_new_runtime_helpers(monkeypatch) -> None:

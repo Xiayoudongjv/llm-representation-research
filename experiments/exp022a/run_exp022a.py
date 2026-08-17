@@ -13,7 +13,10 @@ import hashlib
 import json
 import math
 import os
+import re
+import subprocess
 import sys
+import uuid
 import warnings
 from contextlib import contextmanager
 from dataclasses import dataclass
@@ -45,6 +48,32 @@ PROMPT_FILE_PATH = ROOT / "experiments" / "exp003" / "prompts_controlled.json"
 PROMPT_FILE_SHA256 = (
     "72dab733e6a1639dfc80d186f3af1dbce5c6d70da4905e6d6d422cf47064c472"
 )
+FORMAL_MODEL_NAME = "Qwen/Qwen3-1.7B"
+FORMAL_MODEL_SNAPSHOT = "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e"
+FORMAL_MODEL_SNAPSHOT_PATH = (
+    Path("D:/AI_Cache/huggingface/hub/models--Qwen--Qwen3-1.7B/snapshots")
+    / FORMAL_MODEL_SNAPSHOT
+)
+FORMAL_MODEL_HOOK_QUALIFICATION_SHA256 = (
+    "5f2e82180ccb1381626513758209b060f43e3f70431d08c15a1e74af0fe4ffe2"
+)
+AUTHORIZATION_CONSUMPTION_DIR = EXP_DIR / "results" / "authorization_consumption"
+TECHNICAL_FAILURE_EVIDENCE_DIR = EXP_DIR / "results" / "technical_failure_evidence"
+FORMAL_AUTHORIZATION_REQUIRED_FIELDS = {
+    "schema_version",
+    "experiment",
+    "authorization_id",
+    "single_use",
+    "authorized_repository_commit",
+    "authorized_runner_sha256",
+    "frozen_preregistration_sha256",
+    "formal_dataset_sha256",
+    "model_name",
+    "model_snapshot_identity",
+    "model_hook_qualification_sha256",
+    "canonical_result_path",
+    "authorization_created_at_utc",
+}
 EXP020_FROZEN_CONFIG_PATH = ROOT / "experiments" / "exp020" / "exp020_frozen_config.json"
 CLASS_UNIVERSE = ("logic", "causality", "analogy", "definition")
 READOUT_CONDITIONS = ("A0", "A1", "A2")
@@ -298,22 +327,35 @@ def _require_formal_authorization(root: Path) -> None:
     raise PermissionError("FORMAL_RUN_NOT_AUTHORIZED")
 
 
-def _formal_computation_placeholder(root: Path) -> dict[str, Any]:
-    """Placeholder for future authorized scientific computation."""
-    raise NotImplementedError("FORMAL_SCIENTIFIC_COMPUTATION_NOT_IMPLEMENTED")
+def run_formal(
+    root: Path = ROOT,
+    authorization_path: Path | None = None,
+) -> dict[str, Any]:
+    """Run the formal production path only when an explicit single-use authorization is supplied."""
+    if authorization_path is None:
+        verify_frozen_authority(root)
+        _require_formal_authorization(root)
 
+    auth_path = Path(authorization_path)
+    if not auth_path.is_file():
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_FILE_MISSING")
+    authorization = _read_json(auth_path)
+    _pre_consumption_static_checks(root, authorization, auth_path)
 
-def run_formal(root: Path = ROOT) -> dict[str, Any]:
-    """Expose the formal gate and downstream finalization ordering.
-
-    The authorization barrier intentionally raises before any scientific data
-    loader, tokenizer, model, CUDA, representation extraction, FIT/EVAL,
-    bootstrap, or result publication call can run.
-    """
-    verify_frozen_authority(root)
-    _require_formal_authorization(root)
-    result = _formal_computation_placeholder(root)
-    return finalize_formal_result(result, root)
+    run_attempt_id = str(uuid.uuid4())
+    consumption = _consume_formal_authorization(
+        root, authorization, auth_path, run_attempt_id
+    )
+    try:
+        result = _execute_formal_after_consumption(
+            root, authorization, consumption, run_attempt_id
+        )
+        return finalize_formal_result(result, root)
+    except Exception as exc:
+        _preserve_technical_failure_after_consumption(
+            root, authorization, consumption, run_attempt_id, exc
+        )
+        raise
 
 
 def exact_binomial_tail(favorable: int, unfavorable: int) -> float:
@@ -1112,6 +1154,18 @@ def validate_production_records(
 ) -> list[RecordMeta]:
     if len(records) != 24:
         raise ProtocolIntegrityError("PRODUCTION_RECORD_COUNT_MISMATCH")
+    for record in records:
+        for field in ("id", "group", "variant_type", "text"):
+            if field not in record:
+                raise ProtocolIntegrityError(f"PRODUCTION_RECORD_MISSING_{field.upper()}")
+        if not isinstance(record["id"], str) or not record["id"].strip():
+            raise ProtocolIntegrityError("PRODUCTION_RECORD_ID_INVALID")
+        if not isinstance(record["group"], str) or not record["group"].strip():
+            raise ProtocolIntegrityError("PRODUCTION_RECORD_GROUP_INVALID")
+        if not isinstance(record["variant_type"], str) or not record["variant_type"].strip():
+            raise ProtocolIntegrityError("PRODUCTION_RECORD_VARIANT_INVALID")
+        if not isinstance(record["text"], str) or not record["text"].strip():
+            raise ProtocolIntegrityError("PRODUCTION_RECORD_MISSING_TEXT")
     metas = [
         RecordMeta(
             record_id=str(record["id"]),
@@ -1172,6 +1226,521 @@ def load_production_dataset(
 ) -> list[RecordMeta]:
     records = _read_json(prompt_path)
     return validate_production_records(records, split_definitions)
+
+
+def _runner_sha256() -> str:
+    return _sha256(Path(__file__))
+
+
+def _repository_commit(root: Path = ROOT) -> str:
+    return subprocess.check_output(
+        ["git", "rev-parse", "HEAD"],
+        cwd=root,
+        text=True,
+    ).strip()
+
+
+def _tracked_tree_clean(root: Path = ROOT) -> bool:
+    completed = subprocess.run(
+        ["git", "diff", "--quiet"],
+        cwd=root,
+        text=True,
+        capture_output=True,
+    )
+    if completed.returncode not in (0, 1):
+        raise ProtocolIntegrityError("FORMAL_GIT_TRACKED_TREE_STATUS_UNAVAILABLE")
+    return completed.returncode == 0
+
+
+def _staging_empty(root: Path = ROOT) -> bool:
+    completed = subprocess.run(
+        ["git", "diff", "--cached", "--quiet"],
+        cwd=root,
+        text=True,
+        capture_output=True,
+    )
+    if completed.returncode not in (0, 1):
+        raise ProtocolIntegrityError("FORMAL_GIT_STAGING_STATUS_UNAVAILABLE")
+    return completed.returncode == 0
+
+
+def _is_sha256(value: Any) -> bool:
+    return isinstance(value, str) and re.fullmatch(r"[0-9a-f]{64}", value) is not None
+
+
+def _is_git_commit(value: Any) -> bool:
+    return isinstance(value, str) and re.fullmatch(r"[0-9a-f]{40}", value) is not None
+
+
+def _validate_formal_authorization(
+    authorization: Mapping[str, Any],
+    root: Path = ROOT,
+) -> Mapping[str, Any]:
+    if not isinstance(authorization, Mapping):
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_NOT_OBJECT")
+    if set(authorization) != FORMAL_AUTHORIZATION_REQUIRED_FIELDS:
+        missing = sorted(FORMAL_AUTHORIZATION_REQUIRED_FIELDS - set(authorization))
+        extra = sorted(set(authorization) - FORMAL_AUTHORIZATION_REQUIRED_FIELDS)
+        raise ProtocolIntegrityError(
+            f"FORMAL_AUTHORIZATION_FIELDS_INVALID missing={missing} extra={extra}"
+        )
+    if authorization["schema_version"] != RESULT_SCHEMA_VERSION:
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_SCHEMA_VERSION_MISMATCH")
+    if authorization["experiment"] != EXPERIMENT:
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_EXPERIMENT_MISMATCH")
+    if authorization["single_use"] is not True:
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_NOT_SINGLE_USE")
+    if not isinstance(authorization["authorization_id"], str) or not authorization["authorization_id"].strip():
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_ID_INVALID")
+    if not _is_git_commit(authorization["authorized_repository_commit"]):
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_REPOSITORY_COMMIT_INVALID")
+    if not _is_sha256(authorization["authorized_runner_sha256"]):
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_RUNNER_SHA_INVALID")
+    if not _is_sha256(authorization["frozen_preregistration_sha256"]):
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_PREREGISTRATION_SHA_INVALID")
+    if not _is_sha256(authorization["formal_dataset_sha256"]):
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_DATASET_SHA_INVALID")
+    if not _is_sha256(authorization["model_hook_qualification_sha256"]):
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_QUALIFICATION_SHA_INVALID")
+    if not isinstance(authorization["authorization_created_at_utc"], str) or not authorization["authorization_created_at_utc"]:
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_CREATED_AT_INVALID")
+
+    canonical_path = CANONICAL_RESULT_PATH.relative_to(ROOT).as_posix()
+    bindings = {
+        "authorized_repository_commit": _repository_commit(root),
+        "authorized_runner_sha256": _runner_sha256(),
+        "frozen_preregistration_sha256": FROZEN_PREREGISTRATION_SHA256,
+        "formal_dataset_sha256": PROMPT_FILE_SHA256,
+        "model_name": FORMAL_MODEL_NAME,
+        "model_snapshot_identity": FORMAL_MODEL_SNAPSHOT,
+        "model_hook_qualification_sha256": FORMAL_MODEL_HOOK_QUALIFICATION_SHA256,
+        "canonical_result_path": canonical_path,
+    }
+    for field, expected in bindings.items():
+        if authorization[field] != expected:
+            raise ProtocolIntegrityError(
+                f"FORMAL_AUTHORIZATION_BINDING_MISMATCH_{field.upper()}"
+            )
+    return authorization
+
+
+def _verify_model_hook_qualification_artifact(root: Path = ROOT) -> dict[str, Any]:
+    path = root / "experiments" / "exp022a" / "engineering" / "model_hook_qualification.json"
+    actual = _sha256(path)
+    if actual != FORMAL_MODEL_HOOK_QUALIFICATION_SHA256:
+        raise ProtocolIntegrityError("MODEL_HOOK_QUALIFICATION_SHA_MISMATCH")
+    return {
+        "path": str(path.relative_to(ROOT)),
+        "sha256": actual,
+    }
+
+
+def _pre_consumption_static_checks(
+    root: Path,
+    authorization: Mapping[str, Any],
+    authorization_path: Path,
+) -> None:
+    _validate_formal_authorization(authorization, root)
+    if not _tracked_tree_clean(root):
+        raise ProtocolIntegrityError("FORMAL_REPOSITORY_TRACKED_TREE_DIRTY")
+    if not _staging_empty(root):
+        raise ProtocolIntegrityError("FORMAL_REPOSITORY_STAGING_NOT_EMPTY")
+    verify_frozen_authority(root)
+    _verify_model_hook_qualification_artifact(root)
+    verify_no_result_collision(root)
+    if not FORMAL_MODEL_SNAPSHOT_PATH.is_dir():
+        raise ProtocolIntegrityError("FORMAL_MODEL_SNAPSHOT_UNAVAILABLE")
+
+
+def _consumption_path_for(root: Path, authorization_sha256: str) -> Path:
+    return (
+        root
+        / AUTHORIZATION_CONSUMPTION_DIR.relative_to(ROOT)
+        / f"{authorization_sha256}.json"
+    )
+
+
+def _consume_formal_authorization(
+    root: Path,
+    authorization: Mapping[str, Any],
+    authorization_path: Path,
+    run_attempt_id: str,
+) -> dict[str, Any]:
+    authorization_sha256 = _sha256(authorization_path)
+    record_path = _consumption_path_for(root, authorization_sha256)
+    record_path.parent.mkdir(parents=True, exist_ok=True)
+    record = {
+        "schema_version": RESULT_SCHEMA_VERSION,
+        "experiment": EXPERIMENT,
+        "authorization_id": authorization["authorization_id"],
+        "authorization_sha256": authorization_sha256,
+        "run_attempt_id": run_attempt_id,
+        "consumed_at_utc": datetime.now(timezone.utc).isoformat(),
+        "repository_commit": authorization["authorized_repository_commit"],
+        "runner_sha256": authorization["authorized_runner_sha256"],
+        "frozen_preregistration_sha256": authorization["frozen_preregistration_sha256"],
+        "formal_dataset_sha256": authorization["formal_dataset_sha256"],
+        "model_name": authorization["model_name"],
+        "model_snapshot_identity": authorization["model_snapshot_identity"],
+        "model_hook_qualification_sha256": authorization["model_hook_qualification_sha256"],
+        "canonical_result_path": authorization["canonical_result_path"],
+    }
+    payload = json.dumps(record, ensure_ascii=False, indent=2, sort_keys=True, allow_nan=False) + "\n"
+    try:
+        fd = os.open(str(record_path), os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o644)
+    except FileExistsError as exc:
+        raise ProtocolIntegrityError("AUTHORIZATION_ALREADY_CONSUMED") from exc
+    with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as handle:
+        handle.write(payload)
+        handle.flush()
+        os.fsync(handle.fileno())
+    return {
+        "authorization_sha256": authorization_sha256,
+        "consumption_record_path": str(record_path),
+        "consumption_record_sha256": _sha256(record_path),
+        "run_attempt_id": run_attempt_id,
+    }
+
+
+def _technical_failure_evidence_path_for(root: Path, run_attempt_id: str) -> Path:
+    return (
+        root
+        / TECHNICAL_FAILURE_EVIDENCE_DIR.relative_to(ROOT)
+        / f"{run_attempt_id}.json"
+    )
+
+
+def _preserve_technical_failure_after_consumption(
+    root: Path,
+    authorization: Mapping[str, Any],
+    consumption: Mapping[str, Any],
+    run_attempt_id: str,
+    exc: Exception,
+) -> None:
+    """Durably record a consumed formal attempt that ended before publication."""
+    record_path = _technical_failure_evidence_path_for(root, run_attempt_id)
+    record_path.parent.mkdir(parents=True, exist_ok=True)
+    record = {
+        "schema_version": RESULT_SCHEMA_VERSION,
+        "experiment": EXPERIMENT,
+        "classification": "FORMAL_RUN_TECHNICAL_FAILURE_EVIDENCE",
+        "authorization_id": authorization["authorization_id"],
+        "authorization_sha256": consumption["authorization_sha256"],
+        "consumption_record_path": consumption["consumption_record_path"],
+        "run_attempt_id": run_attempt_id,
+        "attempt_status": "TECHNICALLY_INVALID",
+        "result_status": "NO_SCIENTIFIC_RESULT",
+        "scientific_status": "NOT_OBSERVED",
+        "technical_validity": {"status": "TECHNICALLY_INVALID"},
+        "failure": {
+            "exception_type": type(exc).__name__,
+            "message": str(exc),
+        },
+        "created_at_utc": datetime.now(timezone.utc).isoformat(),
+        "prompt_text_included": False,
+        "hidden_states_included": False,
+    }
+    payload = json.dumps(
+        record, ensure_ascii=False, indent=2, sort_keys=True, allow_nan=False
+    ) + "\n"
+    try:
+        fd = os.open(str(record_path), os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o644)
+    except FileExistsError as exc2:
+        raise ProtocolIntegrityError(
+            "TECHNICAL_FAILURE_EVIDENCE_ALREADY_EXISTS"
+        ) from exc2
+    with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as handle:
+        handle.write(payload)
+        handle.flush()
+        os.fsync(handle.fileno())
+
+
+def _verify_formal_dataset_identity(root: Path = ROOT) -> dict[str, Any]:
+    path = root / PROMPT_FILE_PATH.relative_to(ROOT)
+    actual = _sha256(path)
+    if actual != PROMPT_FILE_SHA256:
+        raise ProtocolIntegrityError("FORMAL_DATASET_SHA_MISMATCH")
+    return {
+        "path": str(PROMPT_FILE_PATH.relative_to(ROOT)),
+        "sha256": actual,
+    }
+
+
+def _load_formal_records(root: Path = ROOT) -> tuple[list[Mapping[str, Any]], list[RecordMeta]]:
+    path = root / PROMPT_FILE_PATH.relative_to(ROOT)
+    records = _read_json(path)
+    split_definitions = load_split_definitions(root)
+    return records, validate_production_records(records, split_definitions)
+
+
+def _load_formal_runtime(root: Path = ROOT) -> tuple[Any, Any, torch.device]:
+    os.environ["HF_HUB_OFFLINE"] = "1"
+    os.environ["TRANSFORMERS_OFFLINE"] = "1"
+    from transformers import AutoModelForCausalLM, AutoTokenizer
+
+    tokenizer = AutoTokenizer.from_pretrained(
+        str(FORMAL_MODEL_SNAPSHOT_PATH),
+        local_files_only=True,
+    )
+    model = AutoModelForCausalLM.from_pretrained(
+        str(FORMAL_MODEL_SNAPSHOT_PATH),
+        dtype=torch.float16,
+        local_files_only=True,
+    )
+    _validate_formal_model_architecture(model)
+    device = torch.device("cuda:0")
+    model.to(device)
+    model.eval()
+    torch.set_grad_enabled(False)
+    return tokenizer, model, device
+
+
+def _validate_formal_model_architecture(model: Any) -> None:
+    """Reject a runtime model that does not match the qualified EXP-022A identity."""
+    if type(model).__name__ != "Qwen3ForCausalLM":
+        raise ProtocolIntegrityError("FORMAL_MODEL_CLASS_MISMATCH")
+    config = getattr(model, "config", None)
+    if config is None:
+        raise ProtocolIntegrityError("FORMAL_MODEL_CONFIG_MISSING")
+    if getattr(config, "model_type", None) != "qwen3":
+        raise ProtocolIntegrityError("FORMAL_MODEL_TYPE_MISMATCH")
+    if int(getattr(config, "hidden_size", -1)) != 2048:
+        raise ProtocolIntegrityError("FORMAL_MODEL_HIDDEN_SIZE_MISMATCH")
+    if int(getattr(config, "num_hidden_layers", -1)) != 28:
+        raise ProtocolIntegrityError("FORMAL_MODEL_LAYER_COUNT_MISMATCH")
+    if not hasattr(model, "model") or len(model.model.layers) != 28:
+        raise ProtocolIntegrityError("FORMAL_MODEL_TRANSFORMER_BLOCKS_MISMATCH")
+
+
+def _tokenize_formal_record(
+    tokenizer: Any,
+    text: str,
+    device: torch.device,
+) -> tuple[torch.Tensor, torch.Tensor]:
+    encoded = tokenizer(
+        text,
+        return_tensors="pt",
+        padding=False,
+        truncation=False,
+        add_special_tokens=True,
+    )
+    return encoded["input_ids"].to(device), encoded["attention_mask"].to(device)
+
+
+def _extract_formal_representations(
+    root: Path,
+    tokenizer: Any,
+    model: Any,
+    device: torch.device,
+    records: Sequence[Mapping[str, Any]],
+) -> dict[str, dict[str, np.ndarray]]:
+    representations: dict[str, dict[str, np.ndarray]] = {}
+    block27 = model.model.layers[27]
+    for record in records:
+        record_id = str(record["id"])
+        input_ids, attention_mask = _tokenize_formal_record(
+            tokenizer, str(record["text"]), device
+        )
+        capture = ForwardHookCapture()
+        with torch.inference_mode():
+            with block_output_hook_capture(block27, capture):
+                outputs = model(
+                    input_ids=input_ids,
+                    attention_mask=attention_mask,
+                    use_cache=False,
+                    output_hidden_states=True,
+                )
+        checkpoints = extract_checkpoint_tensors(outputs.hidden_states, capture.value)
+        selected = extract_last_token_representations(checkpoints, attention_mask)
+        representations[record_id] = {
+            name: to_float32_analysis_array(selected[name][0], expected_ndim=1)
+            for name in CHECKPOINT_NAMES
+        }
+    return representations
+
+
+def _build_formal_split_datasets(
+    root: Path,
+    records: Sequence[Mapping[str, Any]],
+    metas: Sequence[RecordMeta],
+    representations: Mapping[str, Mapping[str, np.ndarray]],
+) -> dict[str, SplitDataset]:
+    split_definitions = load_split_definitions(root)
+    meta_by_id = {meta.record_id: meta for meta in metas}
+    datasets: dict[str, SplitDataset] = {}
+    for split in split_definitions:
+        fit_ids = [
+            record_id
+            for class_ids in split["fit_ids"].values()
+            for record_id in class_ids
+        ]
+        eval_ids = [
+            record_id
+            for class_ids in split["evaluation_ids"].values()
+            for record_id in class_ids
+        ]
+        all_ids = fit_ids + eval_ids
+        fit_records = {
+            cls: tuple(rid for rid in fit_ids if meta_by_id[rid].source_semantic_class == cls)
+            for cls in CLASS_UNIVERSE
+        }
+        eval_records = {
+            cls: tuple(rid for rid in eval_ids if meta_by_id[rid].source_semantic_class == cls)
+            for cls in CLASS_UNIVERSE
+        }
+        datasets[split["id"]] = SplitDataset(
+            split_id=split["id"],
+            fit_records=fit_records,
+            eval_records=eval_records,
+            labels={rid: meta_by_id[rid].source_semantic_class for rid in all_ids},
+            representations={rid: dict(representations[rid]) for rid in all_ids},
+        )
+    return datasets
+
+
+def _build_formal_result(
+    root: Path,
+    authorization: Mapping[str, Any],
+    consumption: Mapping[str, Any],
+    run_attempt_id: str,
+    dataset_identity: Mapping[str, Any],
+    records: Sequence[Mapping[str, Any]],
+    metas: Sequence[RecordMeta],
+    analyses: Mapping[str, dict[str, Any]],
+) -> dict[str, Any]:
+    split_a = analyses["A_original_fit_paraphrase_eval"]["summary"]
+    split_b = analyses["B_paraphrase_fit_original_eval"]["summary"]
+    cross_split = {
+        "D_fixed": cross_split_category(
+            split_a["primary"]["D_fixed"]["supported"],
+            split_b["primary"]["D_fixed"]["supported"],
+            split_a["primary"]["D_fixed"]["estimate"],
+            split_b["primary"]["D_fixed"]["estimate"],
+            favorable_sign=-1,
+        ),
+        "G_refit": cross_split_category(
+            split_a["primary"]["G_refit"]["supported"],
+            split_b["primary"]["G_refit"]["supported"],
+            split_a["primary"]["G_refit"]["estimate"],
+            split_b["primary"]["G_refit"]["estimate"],
+            favorable_sign=1,
+        ),
+    }
+    analysis_warnings = [
+        warning for analysis in analyses.values() for warning in analysis["warnings"]
+    ]
+    validity_values = [analysis["technical_validity"] for analysis in analyses.values()]
+    if all(value == "VALID" for value in validity_values):
+        technical_validity = "VALID"
+    elif all(value in {"VALID", "VALID_WITH_WARNING"} for value in validity_values):
+        technical_validity = "VALID_WITH_WARNING"
+    else:
+        technical_validity = "TECHNICALLY_INVALID"
+    if technical_validity == "TECHNICALLY_INVALID":
+        raise TechnicalInvalidError("FORMAL_SPLIT_TECHNICALLY_INVALID")
+
+    result = {
+        "schema_version": RESULT_SCHEMA_VERSION,
+        "experiment": EXPERIMENT,
+        "classification": "FORMAL_SCIENTIFIC_RESULT",
+        "preregistration": {
+            "path": str(PREREGISTRATION_PATH.relative_to(ROOT)),
+            "sha256": FROZEN_PREREGISTRATION_SHA256,
+            "status": "FROZEN",
+        },
+        "runner": {
+            "path": str(Path(__file__).relative_to(ROOT)),
+            "sha256": _runner_sha256(),
+        },
+        "execution_mode": "formal-run",
+        "model": {
+            "model_id": FORMAL_MODEL_NAME,
+            "snapshot": FORMAL_MODEL_SNAPSHOT,
+            "local_files_only": True,
+            "architecture": "Qwen3ForCausalLM",
+            "model_type": "qwen3",
+            "blocks": 28,
+            "hidden_size": 2048,
+            "vocab_size": 151936,
+        },
+        "dataset": {
+            "prompt_file_path": str(PROMPT_FILE_PATH.relative_to(ROOT)),
+            "prompt_file_sha256": dataset_identity["sha256"],
+            "split_count": 2,
+            "fit_count_per_split": 12,
+            "evaluation_count_per_split": 12,
+            "records_per_class_per_split": 3,
+        },
+        "classes": list(CLASS_UNIVERSE),
+        "checkpoints": CHECKPOINT_NAMES,
+        "readout_definitions": {
+            "A0": "fixed full-FIT reference scaler and reference classifier",
+            "A1": "layerwise FIT featurewise scaler recalibration; reference classifier retained",
+            "A2": "layerwise FIT scaler and same-family linear classifier refit",
+        },
+        "splits": {
+            "A_original_fit_paraphrase_eval": split_a,
+            "B_paraphrase_fit_original_eval": split_b,
+        },
+        "cross_split_synthesis": cross_split,
+        "technical_validity": {"status": technical_validity},
+        "attempt_status": "FORMAL_RUN_ATTEMPT_COMPLETED",
+        "result_status": "FORMAL_RESULT",
+        "scientific_status": "FORMAL_ANALYSIS_COMPLETED",
+        "warnings": analysis_warnings,
+        "prompt_text_included": False,
+        "hidden_states_included": False,
+        "provenance": {
+            "repository_commit": _repository_commit(root),
+            "authorization": {
+                "authorization_id": authorization["authorization_id"],
+                "authorization_sha256": consumption["authorization_sha256"],
+            },
+            "consumption_record": {
+                "path": consumption["consumption_record_path"],
+                "sha256": consumption["consumption_record_sha256"],
+            },
+            "run_attempt_id": run_attempt_id,
+            "formal_dataset": dataset_identity,
+            "model": {
+                "name": FORMAL_MODEL_NAME,
+                "snapshot": FORMAL_MODEL_SNAPSHOT,
+            },
+            "model_hook_qualification_sha256": FORMAL_MODEL_HOOK_QUALIFICATION_SHA256,
+            "runtime_versions": _installed_api_versions(),
+        },
+    }
+    validate_result_schema(result, formal=True)
+    return result
+
+
+def _execute_formal_after_consumption(
+    root: Path,
+    authorization: Mapping[str, Any],
+    consumption: Mapping[str, Any],
+    run_attempt_id: str,
+) -> dict[str, Any]:
+    dataset_identity = _verify_formal_dataset_identity(root)
+    records, metas = _load_formal_records(root)
+    tokenizer, model, device = _load_formal_runtime(root)
+    representations = _extract_formal_representations(
+        root, tokenizer, model, device, records
+    )
+    datasets = _build_formal_split_datasets(root, records, metas, representations)
+    analyses = {
+        split_id: run_split_analysis(dataset)
+        for split_id, dataset in datasets.items()
+    }
+    return _build_formal_result(
+        root,
+        authorization,
+        consumption,
+        run_attempt_id,
+        dataset_identity,
+        records,
+        metas,
+        analyses,
+    )
 
 
 def last_valid_token_indices(attention_mask: Any) -> Any:
@@ -1444,6 +2013,7 @@ def build_parser() -> argparse.ArgumentParser:
     modes.add_argument("--synthetic-preflight", action="store_true")
     modes.add_argument("--formal-run", action="store_true")
     parser.add_argument("--repo-root", default=None)
+    parser.add_argument("--authorization-file", default=None)
     return parser
 
 
@@ -1456,7 +2026,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         elif args.synthetic_preflight:
             print(json.dumps(synthetic_preflight(root), ensure_ascii=False, indent=2, sort_keys=True))
         elif args.formal_run:
-            run_formal(root)
+            authorization_path = (
+                Path(args.authorization_file).resolve()
+                if args.authorization_file
+                else None
+            )
+            run_formal(root, authorization_path)
     except PermissionError as exc:
         print(str(exc), file=sys.stderr)
         return 2
