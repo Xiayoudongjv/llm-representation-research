@@ -1,0 +1,371 @@
+{
+  "artifact_role": "SANITIZED_CANONICAL_SCIENTIFIC_RESULT",
+  "source_local_artifact_class": "experiments/exp021/engineering/stage_q_result.json",
+  "creation_task": "Task 093B",
+  "raw_source_sha256": "833002c8e8bf47883bbab2063c4dfe7d91346a1c055ac5df4d50357cb061b851",
+  "consumption_sha256": "eb1fd673569c914e1a23386df021476f6c155a17b3fa7fc7b3df9e06f1abb96a",
+  "sanitization_version": "1.0.0",
+  "removed_or_normalized_field_paths": [
+    "canonical_snapshot_path",
+    "resolved_snapshot_path",
+    "model_manifest.canonical_snapshot_path",
+    "model_manifest.resolved_snapshot_path"
+  ],
+  "content_guard": {
+    "prompt_text_present": false,
+    "raw_hidden_states_present": false,
+    "raw_activations_present": false,
+    "credentials_present": false,
+    "absolute_local_paths_present": false
+  },
+  "tracked_interpretation": {
+    "result_classification": "ENGINEERING_MEASUREMENT_QUALIFICATION_ONLY",
+    "global_pass": false,
+    "qualification_outcome": "QUALIFICATION_FAILED",
+    "technical_validity": "TECHNICALLY_VALID_ADVERSE_MEASUREMENT"
+  },
+  "schema_version": "1.0.0",
+  "experiment": "EXP-021",
+  "result_classification": "ENGINEERING_MEASUREMENT_QUALIFICATION_ONLY",
+  "runner_commit": "aea3d472e40b80d338d6cfb71930f74eb32355ff",
+  "runner_sha256": "690ac255b2d40da1b51061595b67049f8d34c2056795be440f9c455f92eb7aba",
+  "implementation_hashes": {
+    "runner": "690ac255b2d40da1b51061595b67049f8d34c2056795be440f9c455f92eb7aba",
+    "validator": "9543dfdf1d21d62881a51a19cf38f5ada4acbd543a8ba716bd04e187d3750cbf"
+  },
+  "authority_hashes": {
+    "original": "2ea9c54a49c41b3c1c8e6c39b029dc333d3ee6753ae0608603d6365ae063301a",
+    "amendment": "c026587c90b74d75e9f395001f94732d41f3b550c22247e5613cc6d3cc880635",
+    "reconciliation": "4630a253db1454c9b6cb0850bf6f99cf61781d44e48e37994cba8e1c6d47da95"
+  },
+  "model_manifest": {
+    "model_id": "Qwen/Qwen3-1.7B",
+    "architecture": "Qwen3ForCausalLM",
+    "model_type": "qwen3",
+    "canonical_snapshot_path": "REDACTED_ABSOLUTE_LOCAL_PATH",
+    "resolved_snapshot_path": "REDACTED_ABSOLUTE_LOCAL_PATH",
+    "file_manifest": [
+      {
+        "file": "config.json",
+        "bytes": 726,
+        "sha256": "1ddb5b89ebc90dcb417a45c213d818577e65976454d29385c8f6140771d95197"
+      },
+      {
+        "file": "tokenizer_config.json",
+        "bytes": 9732,
+        "sha256": "d5d09f07b48c3086c508b30d1c9114bd1189145b74e982a265350c923acd8101"
+      },
+      {
+        "file": "tokenizer.json",
+        "bytes": 11422654,
+        "sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4"
+      },
+      {
+        "file": "model.safetensors.index.json",
+        "bytes": 25605,
+        "sha256": "0d660e94b165eb912669a5249dff44b83188c4777a07ddb9611fb78d91b0578d"
+      },
+      {
+        "file": "generation_config.json",
+        "bytes": 239,
+        "sha256": "2325da0f15bb848e018c5ae071b7943332e9f871d6b60e2ed22ca97d4cb993d2"
+      },
+      {
+        "file": "model-00001-of-00002.safetensors",
+        "bytes": 3441185608,
+        "sha256": "169ad53ec313c3a34b06c0809216e4fc072cce444a5d4ff2b59690d064130ed5"
+      },
+      {
+        "file": "model-00002-of-00002.safetensors",
+        "bytes": 622329984,
+        "sha256": "912becff8d60672aa8628ef08c05898d9adf17c2ad4ae3caf99b065622fdeff9"
+      }
+    ]
+  },
+  "canonical_snapshot_path": "REDACTED_ABSOLUTE_LOCAL_PATH",
+  "resolved_snapshot_path": "REDACTED_ABSOLUTE_LOCAL_PATH",
+  "neutral_result_binding": {
+    "attempt_id": "94093b3f-555f-4dff-bdf1-06aeb09a1718",
+    "authorization_id": "EXP021-NEUTRAL-db0dd23562af4af78d00b09aca263f72",
+    "authorization_hash": "835e0ff8be1d660eb02c480118f51e8107097c4d15deaa66c1a69aa7b5e8b600",
+    "runner_sha256": "eb083ccb216b6d2987cf5de217fc1bb3f6361af4cebf0f702c63560b83715259"
+  },
+  "stage_q_authorization_binding": {
+    "authorization_id": "EXP021-STAGE-Q-d2717827bbb848b9b3361bef490eb6ce",
+    "authorization_hash": "04c4f97c8acd8a8ccbef0fcc6ed3bb2ef66b76a1d3262b40410c7b58ed7cc66b",
+    "attempt_id": "be6091f5-1620-49af-b64b-a44222b43e41",
+    "scope": "EXP021_STAGE_Q_FIT_ONLY_MEASUREMENT_QUALIFICATION"
+  },
+  "split_summaries": {
+    "A_original_fit_paraphrase_eval": {
+      "fit_count": 12,
+      "fit_ids": [
+        "logic_orig_01",
+        "logic_orig_02",
+        "logic_orig_03",
+        "causality_orig_01",
+        "causality_orig_02",
+        "causality_orig_03",
+        "analogy_orig_01",
+        "analogy_orig_02",
+        "analogy_orig_03",
+        "definition_orig_01",
+        "definition_orig_02",
+        "definition_orig_03"
+      ]
+    },
+    "B_paraphrase_fit_original_eval": {
+      "fit_count": 12,
+      "fit_ids": [
+        "logic_para_01",
+        "logic_para_02",
+        "logic_para_03",
+        "causality_para_01",
+        "causality_para_02",
+        "causality_para_03",
+        "analogy_para_01",
+        "analogy_para_02",
+        "analogy_para_03",
+        "definition_para_01",
+        "definition_para_02",
+        "definition_para_03"
+      ]
+    }
+  },
+  "checkpoint_summaries": {
+    "A_original_fit_paraphrase_eval": {
+      "intervention": {
+        "split_id": "A_original_fit_paraphrase_eval",
+        "checkpoint": "intervention",
+        "n": 12,
+        "correct": 11,
+        "accuracy": 0.9166666666666666,
+        "clopper_pearson_lower_bound": 0.6152038348490559,
+        "predicted_class_coverage_pass": true,
+        "pass": true
+      },
+      "normalized_0.625": {
+        "split_id": "A_original_fit_paraphrase_eval",
+        "checkpoint": "normalized_0.625",
+        "n": 12,
+        "correct": 11,
+        "accuracy": 0.9166666666666666,
+        "clopper_pearson_lower_bound": 0.6152038348490559,
+        "predicted_class_coverage_pass": true,
+        "pass": true
+      },
+      "normalized_0.75": {
+        "split_id": "A_original_fit_paraphrase_eval",
+        "checkpoint": "normalized_0.75",
+        "n": 12,
+        "correct": 11,
+        "accuracy": 0.9166666666666666,
+        "clopper_pearson_lower_bound": 0.6152038348490559,
+        "predicted_class_coverage_pass": true,
+        "pass": true
+      },
+      "normalized_0.875": {
+        "split_id": "A_original_fit_paraphrase_eval",
+        "checkpoint": "normalized_0.875",
+        "n": 12,
+        "correct": 11,
+        "accuracy": 0.9166666666666666,
+        "clopper_pearson_lower_bound": 0.6152038348490559,
+        "predicted_class_coverage_pass": true,
+        "pass": true
+      },
+      "final_block_pre_final_rmsnorm": {
+        "split_id": "A_original_fit_paraphrase_eval",
+        "checkpoint": "final_block_pre_final_rmsnorm",
+        "n": 12,
+        "correct": 8,
+        "accuracy": 0.6666666666666666,
+        "clopper_pearson_lower_bound": 0.3488755064188155,
+        "predicted_class_coverage_pass": true,
+        "pass": true
+      },
+      "final_normalized_hidden_state": {
+        "split_id": "A_original_fit_paraphrase_eval",
+        "checkpoint": "final_normalized_hidden_state",
+        "n": 12,
+        "correct": 3,
+        "accuracy": 0.25,
+        "clopper_pearson_lower_bound": 0.054860644527992726,
+        "predicted_class_coverage_pass": false,
+        "pass": false
+      }
+    },
+    "B_paraphrase_fit_original_eval": {
+      "intervention": {
+        "split_id": "B_paraphrase_fit_original_eval",
+        "checkpoint": "intervention",
+        "n": 12,
+        "correct": 8,
+        "accuracy": 0.6666666666666666,
+        "clopper_pearson_lower_bound": 0.3488755064188155,
+        "predicted_class_coverage_pass": true,
+        "pass": true
+      },
+      "normalized_0.625": {
+        "split_id": "B_paraphrase_fit_original_eval",
+        "checkpoint": "normalized_0.625",
+        "n": 12,
+        "correct": 8,
+        "accuracy": 0.6666666666666666,
+        "clopper_pearson_lower_bound": 0.3488755064188155,
+        "predicted_class_coverage_pass": true,
+        "pass": true
+      },
+      "normalized_0.75": {
+        "split_id": "B_paraphrase_fit_original_eval",
+        "checkpoint": "normalized_0.75",
+        "n": 12,
+        "correct": 8,
+        "accuracy": 0.6666666666666666,
+        "clopper_pearson_lower_bound": 0.3488755064188155,
+        "predicted_class_coverage_pass": true,
+        "pass": true
+      },
+      "normalized_0.875": {
+        "split_id": "B_paraphrase_fit_original_eval",
+        "checkpoint": "normalized_0.875",
+        "n": 12,
+        "correct": 5,
+        "accuracy": 0.4166666666666667,
+        "clopper_pearson_lower_bound": 0.15165222980843016,
+        "predicted_class_coverage_pass": false,
+        "pass": false
+      },
+      "final_block_pre_final_rmsnorm": {
+        "split_id": "B_paraphrase_fit_original_eval",
+        "checkpoint": "final_block_pre_final_rmsnorm",
+        "n": 12,
+        "correct": 3,
+        "accuracy": 0.25,
+        "clopper_pearson_lower_bound": 0.054860644527992726,
+        "predicted_class_coverage_pass": false,
+        "pass": false
+      },
+      "final_normalized_hidden_state": {
+        "split_id": "B_paraphrase_fit_original_eval",
+        "checkpoint": "final_normalized_hidden_state",
+        "n": 12,
+        "correct": 2,
+        "accuracy": 0.16666666666666666,
+        "clopper_pearson_lower_bound": 0.020862525460092374,
+        "predicted_class_coverage_pass": false,
+        "pass": false
+      }
+    }
+  },
+  "processed_fit_ids": {
+    "A_original_fit_paraphrase_eval": [
+      "logic_orig_01",
+      "logic_orig_02",
+      "logic_orig_03",
+      "causality_orig_01",
+      "causality_orig_02",
+      "causality_orig_03",
+      "analogy_orig_01",
+      "analogy_orig_02",
+      "analogy_orig_03",
+      "definition_orig_01",
+      "definition_orig_02",
+      "definition_orig_03"
+    ],
+    "B_paraphrase_fit_original_eval": [
+      "logic_para_01",
+      "logic_para_02",
+      "logic_para_03",
+      "causality_para_01",
+      "causality_para_02",
+      "causality_para_03",
+      "analogy_para_01",
+      "analogy_para_02",
+      "analogy_para_03",
+      "definition_para_01",
+      "definition_para_02",
+      "definition_para_03"
+    ]
+  },
+  "checkpoint_mapping": {
+    "num_transformer_blocks": 28,
+    "intervention": {
+      "normalized_depth": "historical_layer_16",
+      "block_index": 16,
+      "hidden_state_index": 17,
+      "beta": 0.75,
+      "status": "FROZEN_BY_TRANSPARENT_PRE_RUN_AMENDMENT"
+    },
+    "normalized_0.625": {
+      "normalized_depth": 0.625,
+      "block_index": 17,
+      "hidden_state_index": 18
+    },
+    "normalized_0.75": {
+      "normalized_depth": 0.75,
+      "block_index": 20,
+      "hidden_state_index": 21
+    },
+    "normalized_0.875": {
+      "normalized_depth": 0.875,
+      "block_index": 24,
+      "hidden_state_index": 25
+    },
+    "final_block_pre_final_rmsnorm": {
+      "block_index": 27,
+      "hidden_state_index": null,
+      "access": "hooked_block_27_output",
+      "role": "PRIMARY_FINAL_CHECKPOINT"
+    },
+    "final_normalized_hidden_state": {
+      "block_index": 27,
+      "hidden_state_index": 28,
+      "role": "DESCRIPTIVE_ONLY",
+      "same_tensor_as_pre_final_rmsnorm": false
+    },
+    "tuple_semantics": "hidden_states[0] is embedding output; hidden_states[1..27] are decoder block outputs before final RMSNorm; hidden_states[28] is the post-final-RMSNorm last_hidden_state in the inspected Qwen3 Transformers implementation."
+  },
+  "execution_environment": {
+    "python": "3.11.9",
+    "torch": "2.12.1+cu130",
+    "transformers": "5.14.1",
+    "cuda_runtime": "13.0",
+    "nvidia_driver": "610.62",
+    "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU",
+    "dtype": "float16",
+    "device": "cuda:0",
+    "local_files_only": true,
+    "model_eval_mode": true,
+    "gradients_enabled": false,
+    "use_cache": false
+  },
+  "created_at": "2026-08-16T16:44:55.834003+00:00",
+  "eval_accessed": false,
+  "prompt_content_printed": false,
+  "stage_p_accessed": false,
+  "scientific_result_created": false,
+  "global_pass": false,
+  "descriptive_post_norm": {
+    "A_original_fit_paraphrase_eval": {
+      "split_id": "A_original_fit_paraphrase_eval",
+      "checkpoint": "final_normalized_hidden_state",
+      "n": 12,
+      "correct": 3,
+      "accuracy": 0.25,
+      "clopper_pearson_lower_bound": 0.054860644527992726,
+      "predicted_class_coverage_pass": false,
+      "pass": false
+    },
+    "B_paraphrase_fit_original_eval": {
+      "split_id": "B_paraphrase_fit_original_eval",
+      "checkpoint": "final_normalized_hidden_state",
+      "n": 12,
+      "correct": 2,
+      "accuracy": 0.16666666666666666,
+      "clopper_pearson_lower_bound": 0.020862525460092374,
+      "predicted_class_coverage_pass": false,
+      "pass": false
+    }
+  }
+}

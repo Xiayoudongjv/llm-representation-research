@@ -5,7 +5,7 @@ experimental artifacts outrank it.
 
 ## Current research phase
 
-EXP-022A v0.2 targeted diff rereview
+EXP-022A is scientifically ready to freeze; freeze deferred until repository hygiene completes. Task-093B evidence repair is complete; next is a targeted rereview.
 
 ## Current preregistration draft
 
@@ -84,8 +84,42 @@ v1.0 COMPLETE
 
 ## Current next action
 
-Task 092F ? read-only targeted rereview of the 092EP diff only.
+Task 093C targeted evidence-durability rereview.
 
-Task-092F must not access controlled prompt text.
+README synchronization remains `PENDING_TASK_093D`.
+
+EXP-022A freeze remains deferred.
 
 No implementation/model/EVAL execution is authorized.
+
+
+## Task-092F targeted diff rereview
+
+- Status: `TARGETED_DIFF_PASS_READY_FOR_REPOSITORY_HYGIENE`
+
+## Task-093A repository hygiene audit
+
+- Status: `SUBMISSION_AND_README_AUDIT_COMPLETE`
+
+## Task-093AR canonical evidence reconciliation
+
+- Status: `CANONICAL_EVIDENCE_RECONCILIATION_COMPLETE`
+
+## Task-093B canonical evidence durability repair
+
+- Status: `CANONICAL_EVIDENCE_DURABILITY_REPAIR`
+- EXP-020A corrected status: `NO VALID SCIENTIFIC RESULT / NOT TESTED`
+- EXP-017 sanitized canonical evidence: `DURABLE`
+- EXP-021 Q3 sanitized canonical evidence: `DURABLE`
+- EXP-021 sanitized lifecycle ledger: `DURABLE`
+- README sync: `PENDING_TASK_093D`
+- EXP-022A preregistration: `SCIENTIFICALLY_READY_TO_FREEZE`, freeze deferred until repository hygiene completes
+
+## Durable canonical evidence links
+
+- EXP-017:
+  - `../experiments/canonical/EXP-017-BEHAVIORAL-RESULTS-SANITIZED.csv`
+  - `../experiments/canonical/EXP-017-BEHAVIORAL-RESULTS-MANIFEST.json`
+- EXP-021:
+  - `../experiments/canonical/EXP-021-STAGE-Q-Q3-RESULT-SANITIZED.json`
+  - `../experiments/canonical/EXP-021-AUTHORIZATION-LIFECYCLE-LEDGER.json`

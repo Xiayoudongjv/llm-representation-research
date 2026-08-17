@@ -1,0 +1,181 @@
+{
+  "schema_version": "1.0.0",
+  "experiment": "EXP-021",
+  "artifact_role": "SANITIZED_AUTHORIZATION_LIFECYCLE_LEDGER",
+  "sanitization_version": "1.0.0",
+  "creation_task": "Task 093B",
+  "ledger_scope": "NEUTRAL_QUALIFICATION_AND_STAGE_Q",
+  "retention_policy": {
+    "authorization": "KEEP_LOCAL_WITH_DURABLE_HASHED_LEDGER",
+    "consumption": "SANITIZED_LEDGER_TRACKED_RAW_LOCAL",
+    "raw_authorization_payloads": "NOT_TRACKED"
+  },
+  "content_guard": {
+    "prompt_text_present": false,
+    "raw_hidden_states_present": false,
+    "raw_activations_present": false,
+    "credentials_present": false,
+    "absolute_local_paths_present": false,
+    "raw_authorization_payloads_present": false
+  },
+  "entries": [
+    {
+      "entry_id": "EXP021_NEUTRAL_SUPERSEDED_A",
+      "phase": "NEUTRAL_HOOK_ORACLE_QUALIFICATION",
+      "generation_role": "SUPERSEDED_UNCONSUMED_NONEXECUTABLE",
+      "authorization_id": "EXP021-NEUTRAL-3f7fa96e04954837946a19a42ddcf0f4",
+      "authorization_sha256": "24354add1de463052759459b2b0daae7d80b1666ceca2398e77fa9e868ae8061",
+      "consumed": false,
+      "consumption_sha256": null,
+      "attempt_id": null,
+      "attempt_status": "NOT_ATTEMPTED",
+      "result_status": "NO_RESULT",
+      "measurement_status": "NOT_OBSERVED",
+      "scientific_status": "NOT_STARTED",
+      "terminal_status": "DISPOSITIONED",
+      "result_sha256": null,
+      "original_can_never_be_consumed": true,
+      "source_local_record_hashes": {
+        "authorization_sha256": "24354add1de463052759459b2b0daae7d80b1666ceca2398e77fa9e868ae8061",
+        "disposition_sha256": "9b0ad97477148690d3576185212f2b067a6adf79c4b762844c203e4db800b8e8",
+        "disposition_journal_sha256": "a228a806df6f056e7998f29316f8157edaad05557b43fc8db28d527dc7f46113"
+      }
+    },
+    {
+      "entry_id": "EXP021_NEUTRAL_SUPERSEDED_B",
+      "phase": "NEUTRAL_HOOK_ORACLE_QUALIFICATION",
+      "generation_role": "SUPERSEDED_UNCONSUMED_NONEXECUTABLE",
+      "authorization_id": "EXP021-NEUTRAL-c8ff4a4ee8154e89ba01839d44157d4a",
+      "authorization_sha256": "5124c297c01697d80e791623a8d7bbe30d382c872bff02599411014932d611e2",
+      "consumed": false,
+      "consumption_sha256": null,
+      "attempt_id": null,
+      "attempt_status": "NOT_ATTEMPTED",
+      "result_status": "NO_RESULT",
+      "measurement_status": "NOT_OBSERVED",
+      "scientific_status": "NOT_STARTED",
+      "terminal_status": "DISPOSITIONED",
+      "result_sha256": null,
+      "original_can_never_be_consumed": true,
+      "source_local_record_hashes": {
+        "authorization_sha256": "5124c297c01697d80e791623a8d7bbe30d382c872bff02599411014932d611e2",
+        "disposition_sha256": "bef37e380aa1197a27ce3bea196406edd573c924c1eb652cef996dbc98de7238",
+        "disposition_journal_sha256": "ced69942c85f8107b76a3fff1ca0a54a11de0e0075a59d54c1591a2f5477fe0d"
+      }
+    },
+    {
+      "entry_id": "EXP021_NEUTRAL_QUALIFIED",
+      "phase": "NEUTRAL_HOOK_ORACLE_QUALIFICATION",
+      "generation_role": "CONSUMED_EXECUTED",
+      "authorization_id": "EXP021-NEUTRAL-db0dd23562af4af78d00b09aca263f72",
+      "authorization_sha256": "835e0ff8be1d660eb02c480118f51e8107097c4d15deaa66c1a69aa7b5e8b600",
+      "consumed": true,
+      "consumption_sha256": "99d4844ea78aee1fe59341911ed174648a652356e5607d939a288fbc5f9fdc8a",
+      "attempt_id": "94093b3f-555f-4dff-bdf1-06aeb09a1718",
+      "attempt_status": "COMPLETED",
+      "result_status": "ENGINEERING_NEUTRAL_HOOK_QUALIFICATION_ONLY",
+      "measurement_status": "PASS",
+      "scientific_status": "NOT_STARTED",
+      "terminal_status": "CONSUMED_RESULT_QUALIFIED",
+      "result_sha256": "0a6273050e6c9974e917ea4de4865bc8428a5b7f634a32c29d8a634ae49c9bf1",
+      "original_can_never_be_consumed": null,
+      "source_local_record_hashes": {
+        "authorization_sha256": "835e0ff8be1d660eb02c480118f51e8107097c4d15deaa66c1a69aa7b5e8b600",
+        "consumption_sha256": "99d4844ea78aee1fe59341911ed174648a652356e5607d939a288fbc5f9fdc8a",
+        "result_sha256": "0a6273050e6c9974e917ea4de4865bc8428a5b7f634a32c29d8a634ae49c9bf1"
+      }
+    },
+    {
+      "entry_id": "EXP021_STAGE_Q_SUPERSEDED",
+      "phase": "STAGE_Q_MEASUREMENT_QUALIFICATION",
+      "generation_role": "SUPERSEDED_UNCONSUMED_NONEXECUTABLE",
+      "authorization_id": "EXP021-STAGE-Q-ca75f01adc7540ca9ebc694a7b86f195",
+      "authorization_sha256": "526d4f1dba628380b9ea9967637ac4ce7bfdb4f1badc298dedef541baf3a492b",
+      "consumed": false,
+      "consumption_sha256": null,
+      "attempt_id": null,
+      "attempt_status": "NOT_ATTEMPTED",
+      "result_status": "NO_RESULT",
+      "measurement_status": "NOT_OBSERVED",
+      "scientific_status": "NOT_STARTED",
+      "terminal_status": "DISPOSITIONED",
+      "result_sha256": null,
+      "original_can_never_be_consumed": true,
+      "source_local_record_hashes": {
+        "authorization_sha256": "526d4f1dba628380b9ea9967637ac4ce7bfdb4f1badc298dedef541baf3a492b",
+        "disposition_sha256": "2124a0fea0d288acad1cd5b933bffb5bd1929b954a313ccfed61250a59012015",
+        "disposition_journal_sha256": "99493dc6feac40bfc0f63aef9ced0c525c1d5f5d2c9eaf7b0d827e89495754b0"
+      }
+    },
+    {
+      "entry_id": "EXP021_STAGE_Q_Q1",
+      "phase": "STAGE_Q_MEASUREMENT_QUALIFICATION",
+      "generation_role": "CONSUMED_EXECUTED",
+      "authorization_id": "EXP021-STAGE-Q-78f9189cbbad4be28b2f187bed438395",
+      "authorization_sha256": "bcb6af43411b93d7b954627e5165e4bae8ab92c49feb149eb28d7ac4491913ca",
+      "consumed": true,
+      "consumption_sha256": "c6f70a1958e4ba09af041ba1840dd2b4c37527154bda2854ba9285ee61da10cb",
+      "attempt_id": "4d5c8d10-eef5-42bd-9702-e16b628338bd",
+      "attempt_status": "TECHNICALLY_INVALID",
+      "result_status": "NO_CANONICAL_STAGE_Q_RESULT",
+      "measurement_status": "NOT_OBSERVED_DUE_TO_TECHNICAL_INVALIDITY",
+      "scientific_status": "NOT_STARTED",
+      "terminal_status": "ARCHIVED_TECHNICALLY_INVALID_NO_RESULT",
+      "result_sha256": null,
+      "original_can_never_be_consumed": true,
+      "source_local_record_hashes": {
+        "authorization_sha256": "bcb6af43411b93d7b954627e5165e4bae8ab92c49feb149eb28d7ac4491913ca",
+        "consumption_sha256": "c6f70a1958e4ba09af041ba1840dd2b4c37527154bda2854ba9285ee61da10cb",
+        "status_record_sha256": "4faeab13395aa43502076b930d8c300fab56f9e581f9beb6edef18e34884f79b",
+        "journal_sha256": "1c96088b5e62038bc0f537e8c5f12cd7227fe8a12123d9fae78a9cc3a5e5d531"
+      }
+    },
+    {
+      "entry_id": "EXP021_STAGE_Q_Q2",
+      "phase": "STAGE_Q_MEASUREMENT_QUALIFICATION",
+      "generation_role": "CONSUMED_EXECUTED",
+      "authorization_id": "EXP021-STAGE-Q-ec42a8c4d60d4e9c8d76776c16f65cb3",
+      "authorization_sha256": "e45c24bcdf7693ccedae965fc10bf0959e71feaf2375797b27dfc3f09ec5971e",
+      "consumed": true,
+      "consumption_sha256": "1559592554df4d85027a1c56b34edfe802af5caa67e2311ac0bfa7f66ebcdfad",
+      "attempt_id": "21f308bb-6c4e-40f2-8065-76ac7d343a35",
+      "attempt_status": "TECHNICALLY_INVALID",
+      "result_status": "NO_CANONICAL_STAGE_Q_RESULT",
+      "measurement_status": "NOT_OBSERVED_DUE_TO_TECHNICAL_INVALIDITY",
+      "scientific_status": "NOT_STARTED",
+      "terminal_status": "ARCHIVED_TECHNICALLY_INVALID_NO_RESULT",
+      "result_sha256": null,
+      "original_can_never_be_consumed": true,
+      "source_local_record_hashes": {
+        "authorization_sha256": "e45c24bcdf7693ccedae965fc10bf0959e71feaf2375797b27dfc3f09ec5971e",
+        "consumption_sha256": "1559592554df4d85027a1c56b34edfe802af5caa67e2311ac0bfa7f66ebcdfad",
+        "status_record_sha256": "2f3a8e91d002766dff9e5fd8615bc97bc7c8d5b1bd2d42f17739eac5fd525689",
+        "journal_sha256": "63a3c7ffe7ea4e57c09057381ef0469c6c276e728282857be80a5db716f8d2a8"
+      }
+    },
+    {
+      "entry_id": "EXP021_STAGE_Q_Q3",
+      "phase": "STAGE_Q_MEASUREMENT_QUALIFICATION",
+      "generation_role": "CONSUMED_EXECUTED",
+      "authorization_id": "EXP021-STAGE-Q-d2717827bbb848b9b3361bef490eb6ce",
+      "authorization_sha256": "04c4f97c8acd8a8ccbef0fcc6ed3bb2ef66b76a1d3262b40410c7b58ed7cc66b",
+      "consumed": true,
+      "consumption_sha256": "eb1fd673569c914e1a23386df021476f6c155a17b3fa7fc7b3df9e06f1abb96a",
+      "attempt_id": "be6091f5-1620-49af-b64b-a44222b43e41",
+      "attempt_status": "TECHNICALLY_VALID",
+      "result_status": "ENGINEERING_MEASUREMENT_QUALIFICATION_ONLY",
+      "measurement_status": "QUALIFICATION_FAILED",
+      "scientific_status": "NOT_STARTED",
+      "terminal_status": "CONSUMED_CANONICAL_RESULT",
+      "result_sha256": "833002c8e8bf47883bbab2063c4dfe7d91346a1c055ac5df4d50357cb061b851",
+      "global_pass": false,
+      "technical_validity": "TECHNICALLY_VALID_ADVERSE_MEASUREMENT",
+      "original_can_never_be_consumed": null,
+      "source_local_record_hashes": {
+        "authorization_sha256": "04c4f97c8acd8a8ccbef0fcc6ed3bb2ef66b76a1d3262b40410c7b58ed7cc66b",
+        "consumption_sha256": "eb1fd673569c914e1a23386df021476f6c155a17b3fa7fc7b3df9e06f1abb96a",
+        "result_sha256": "833002c8e8bf47883bbab2063c4dfe7d91346a1c055ac5df4d50357cb061b851"
+      }
+    }
+  ]
+}

@@ -4,7 +4,7 @@
 | --- | --- | --- |
 | task-associated local discriminability | SUPPORTED | EXP-003/EXP-018 representation lineage |
 | held-out target-directed local representational movement | SUPPORTED | EXP-018 |
-| same-family larger-model replication | SUPPORTED | EXP-020A; historical claim label only, does not reopen 091C |
+| same-family larger-model replication | NOT_TESTED | EXP-020A has no canonical scientific result. One prior attempt was TECHNICALLY_INVALID during model loading; `docs/experiments/EXP-020-CLEAN-STATE-LOAD-PATH-QUALIFICATION.md` records `FORMAL_FIT_EVAL_INFERENCE_PERFORMED = false` and `FORMAL_SCIENTIFIC_RESULTS_CREATED = false`; `experiments/exp020/exp020_frozen_config.json` records `scientific_status = NOT_STARTED`. |
 | relational invariant preservation | NOT_SUPPORTED / FAILED | canonical EXP-018 authority |
 | task-specific behavioral advantage | NOT_SUPPORTED | EXP-017 |
 | independent output evaluator generalization | FAILED | EXP-019 |

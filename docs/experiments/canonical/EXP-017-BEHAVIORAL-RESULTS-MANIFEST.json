@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0.0",
+  "experiment": "EXP-017",
+  "artifact_role": "SANITIZED_CANONICAL_SCIENTIFIC_RESULT",
+  "source_local_artifact_class": "results/exp017/behavioral_outputs.csv",
+  "source_sha256": "258cfcbd77978e12bd96a3ed0fd9c202be000997fd16de90178a4b22ae4252d5",
+  "source_row_count": 320,
+  "sanitized_row_count": 320,
+  "retained_columns": [
+    "item_id",
+    "source_group",
+    "target_group",
+    "condition",
+    "layer",
+    "beta",
+    "strict_correct",
+    "output_token_count",
+    "empty_answer",
+    "repetition_flag",
+    "malformed_flag"
+  ],
+  "excluded_column_names": [
+    "generated_text",
+    "normalized_answer"
+  ],
+  "excluded_content_classes": [
+    "generated_text",
+    "normalized_answer"
+  ],
+  "sanitization_rule_version": "1.0.0",
+  "creation_task": "Task 093B",
+  "sanitized_artifact_sha256": "c4e14f3fd6cad8232bf597a10b59b9299fa4f937ef4b814202665707571d64cc",
+  "tracked_summary_authority": "docs/experiments/EXP-017.md",
+  "scientific_status": "FAILED / NOT_SUPPORTED",
+  "scientific_status_fields": {
+    "behavioral_effect": "FAILED",
+    "representation_behavior_link": "NOT_SUPPORTED"
+  }
+}

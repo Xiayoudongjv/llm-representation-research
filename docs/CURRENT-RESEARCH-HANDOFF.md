@@ -178,7 +178,7 @@ not findings or automatically planned experiments.
   [probe results](../results/exp018/probe_metrics.csv)
 - EXP-017: [frozen amended conditions](../experiments/exp017/intervention_conditions_v2.json),
   [canonical report](experiments/EXP-017.md), and
-  [aggregate condition results](../results/exp017/condition_summary.csv)
+  [canonical EXP-017 authority](experiments/EXP-017.md)
 - EXP-019: [freeze manifest](../experiments/exp019/data/final200_freeze_manifest.json),
   [one-shot metrics](../experiments/exp019/results/final200_metrics.json), and
   [canonical report](experiments/EXP-019.md)
