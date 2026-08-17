@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "experiment": "EXP-022A",
+  "preregistration_version": "1.0",
+  "status": "FROZEN",
+  "freeze_date": "2026-08-17",
+  "preregistration_path": "docs/experiments/EXP-022A-PREREGISTRATION.md",
+  "preregistration_sha256": "609aab2b3cc96f4ea316b45741b2ae427e682c72c7546c8a9520201f94547698",
+  "review_base_commit": "cc2a41bfadcb2423d0ef3c8e5c3183d34b765a2a",
+  "repository_hygiene_completion_commit": "006c73da80c5491cfcf93cdf53978708be52bf60",
+  "scientific_diff_since_092F": false,
+  "canonical_evidence_durability": "COMPLETE",
+  "implementation_authorized": false,
+  "model_execution_authorized": false,
+  "formal_eval_access_authorized": false
+}

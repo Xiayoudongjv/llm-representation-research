@@ -5,12 +5,14 @@ experimental artifacts outrank it.
 
 ## Current research phase
 
-EXP-020A recovered canonical evidence restored. EXP-017 and EXP-021 evidence are durable. Canonical evidence durability rereview passed. EXP-022A is scientifically ready to freeze and remains not frozen.
+EXP-020A recovered canonical evidence restored. EXP-017 and EXP-021 evidence are durable. Canonical evidence durability rereview passed. EXP-022A preregistration is frozen v1.0 and not run.
 
-## Current preregistration draft
+## Current preregistration authority
 
-- `docs/experiments/EXP-022A-PREREGISTRATION-DRAFT.md`
-- Status: `v0.2` / `FREEZE CANDIDATE` / `NOT FROZEN`
+- Canonical frozen path: `../experiments/EXP-022A-PREREGISTRATION.md`
+- Canonical frozen SHA-256: `609aab2b3cc96f4ea316b45741b2ae427e682c72c7546c8a9520201f94547698`
+- Status: `v1.0` / `FROZEN` / `NOT RUN`
+- Historical draft: `../experiments/EXP-022A-PREREGISTRATION-DRAFT.md`
 - Independent review trail: `../experiments/EXP-022A-PREREGISTRATION-REVIEW-092C.md`
 - v0.2 rereview trail: `../experiments/EXP-022A-PREREGISTRATION-REREVIEW-092E.md`
 
@@ -20,7 +22,7 @@ EXP-020A recovered canonical evidence restored. EXP-017 and EXP-021 evidence are
 2. `CLAIM-LEDGER.md`
 3. `CONSTRUCT-REGISTRY.md`
 4. `experiments/EXP-022A-PROTOCOL-RECONCILIATION.md`
-5. `../experiments/EXP-022A-PREREGISTRATION-DRAFT.md`
+5. `../experiments/EXP-022A-PREREGISTRATION.md`
 6. `../experiments/EXP-022A-PREREGISTRATION-REVIEW-092C.md`
 7. `../experiments/EXP-022A-PREREGISTRATION-REREVIEW-092E.md`
 8. canonical experiment authority/results
@@ -84,13 +86,13 @@ v1.0 COMPLETE
 
 ## Current next action
 
-Task 093D README synchronization.
+Task 094A freeze complete.
 
-Canonical evidence durability is `COMPLETE`.
+EXP-022A status: `FROZEN_PROTOCOL_NOT_RUN`.
 
-EXP-022A freeze remains deferred.
+Next phase: runner implementation / static validation.
 
-No implementation/model/EVAL execution is authorized.
+No formal execution, model load, or EVAL access is authorized.
 
 
 ## Task-092F targeted diff rereview
@@ -155,3 +157,13 @@ No implementation/model/EVAL execution is authorized.
 - Canonical evidence durability: `COMPLETE`
 - README sync: `TASK_093D`
 - EXP-022A evidence durability blocker: `CLEARED`
+
+## Task-094A EXP-022A preregistration freeze
+
+- Task 094A = `EXP022A_PREREGISTRATION_FROZEN_v1.0`
+- EXP-022A status = `FROZEN_PROTOCOL_NOT_RUN`
+- Canonical preregistration path: `docs/experiments/EXP-022A-PREREGISTRATION.md`
+- Canonical preregistration SHA-256: `609aab2b3cc96f4ea316b45741b2ae427e682c72c7546c8a9520201f94547698`
+- Freeze manifest: `docs/experiments/EXP-022A-FREEZE-MANIFEST.json`
+- Next phase = `runner implementation / static validation`
+- Not formal execution.

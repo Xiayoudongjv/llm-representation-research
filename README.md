@@ -28,7 +28,7 @@ This framework is conceptual. Only the earlier representation/manipulation porti
 
 Representation-level manipulation has replicated under frozen same-family, higher-parameter controls. Behavioral linkage remains unsupported. Clean-state layerwise readout transport diagnosis is the next preregistered step.
 
-EXP-022A is scientifically ready to freeze, but it has not yet been frozen or run.
+EXP-022A preregistration is frozen v1.0 and has not been run.
 
 ## Experiment Progression
 
@@ -39,7 +39,7 @@ EXP-022A is scientifically ready to freeze, but it has not yet been frozen or ru
 | EXP-019 | Independent output evaluator | `COMPLETED` | Generalization criterion failed; output-level behavioral targetness remains unresolved. |
 | EXP-020A | Same-family higher-parameter replication | `COMPLETED / VALID` | Representation replication supported under frozen controls. |
 | EXP-021 | Stage-Q clean-state layerwise source-class readout qualification | `COMPLETED` | Q3 technically valid but `QUALIFICATION_FAILED`; fixed reference readout did not remain qualified across all required clean checkpoints in both complementary splits. |
-| EXP-022A | Clean-state layerwise readout transport diagnosis | `READY_TO_FREEZE / NOT_FROZEN / NOT_RUN` | Preregistered diagnosis for whether held-out source-class readout degradation reflects fixed-frame degradation, recalibration effects, or recovery under a layerwise readout family. |
+| EXP-022A | Clean-state layerwise readout transport diagnosis | `FROZEN / NOT_RUN` | Preregistered diagnosis for whether held-out source-class readout degradation reflects fixed-frame degradation, recalibration effects, or recovery under a layerwise readout family. |
 
 ## Current Findings
 
@@ -82,7 +82,7 @@ Current evidence does not yet establish:
 - [CANONICAL-RESULT-RETENTION](docs/research/CANONICAL-RESULT-RETENTION.md) — evidence durability policy.
 - [CURRENT-RESEARCH-HANDOFF](docs/CURRENT-RESEARCH-HANDOFF.md) — current research status snapshot.
 
-For EXP-022A protocol documents, see the [preregistration draft](docs/experiments/EXP-022A-PREREGISTRATION-DRAFT.md), [independent review](docs/experiments/EXP-022A-PREREGISTRATION-REVIEW-092C.md), [rereview](docs/experiments/EXP-022A-PREREGISTRATION-REREVIEW-092E.md), and [protocol reconciliation](docs/research/experiments/EXP-022A-PROTOCOL-RECONCILIATION.md).
+For EXP-022A protocol documents, see the [frozen preregistration](docs/experiments/EXP-022A-PREREGISTRATION.md), [historical draft](docs/experiments/EXP-022A-PREREGISTRATION-DRAFT.md), [independent review](docs/experiments/EXP-022A-PREREGISTRATION-REVIEW-092C.md), [rereview](docs/experiments/EXP-022A-PREREGISTRATION-REREVIEW-092E.md), and [protocol reconciliation](docs/research/experiments/EXP-022A-PROTOCOL-RECONCILIATION.md).
 
 ## Canonical Evidence
 
@@ -90,7 +90,7 @@ Canonical scientific evidence is retained according to the repository's canonica
 
 ## Current Next Step
 
-EXP-022A is ready to freeze but has not been frozen, run, or formally authorized for implementation. This README synchronization does not authorize model or EVAL execution.
+EXP-022A is frozen as v1.0 and has not been run. Next phase is runner implementation / static validation; no model or EVAL execution is authorized.
 
 ## Repository Checks
 
