@@ -1,0 +1,1068 @@
+{
+  "attempt_status": "FORMAL_RUN_ATTEMPT_COMPLETED",
+  "checkpoints": [
+    "block16_pre_final_rmsnorm",
+    "block17_pre_final_rmsnorm",
+    "block18_pre_final_rmsnorm",
+    "block19_pre_final_rmsnorm",
+    "block20_pre_final_rmsnorm",
+    "block21_pre_final_rmsnorm",
+    "block22_pre_final_rmsnorm",
+    "block23_pre_final_rmsnorm",
+    "block24_pre_final_rmsnorm",
+    "block25_pre_final_rmsnorm",
+    "block26_pre_final_rmsnorm",
+    "block27_pre_final_rmsnorm",
+    "block27_post_final_rmsnorm"
+  ],
+  "classes": [
+    "logic",
+    "causality",
+    "analogy",
+    "definition"
+  ],
+  "classification": "FORMAL_SCIENTIFIC_RESULT",
+  "cross_split_synthesis": {
+    "D_fixed": "PARTIAL_CONCORDANCE",
+    "G_refit": "SPLIT_HETEROGENEOUS"
+  },
+  "dataset": {
+    "evaluation_count_per_split": 12,
+    "fit_count_per_split": 12,
+    "prompt_file_path": "experiments\\exp003\\prompts_controlled.json",
+    "prompt_file_sha256": "72dab733e6a1639dfc80d186f3af1dbce5c6d70da4905e6d6d422cf47064c472",
+    "records_per_class_per_split": 3,
+    "split_count": 2
+  },
+  "execution_mode": "formal-run",
+  "experiment": "EXP-022A",
+  "hidden_states_included": false,
+  "model": {
+    "architecture": "Qwen3ForCausalLM",
+    "blocks": 28,
+    "hidden_size": 2048,
+    "local_files_only": true,
+    "model_id": "Qwen/Qwen3-1.7B",
+    "model_type": "qwen3",
+    "snapshot": "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e",
+    "vocab_size": 151936
+  },
+  "preregistration": {
+    "path": "docs\\experiments\\EXP-022A-PREREGISTRATION.md",
+    "sha256": "609aab2b3cc96f4ea316b45741b2ae427e682c72c7546c8a9520201f94547698",
+    "status": "FROZEN"
+  },
+  "prompt_text_included": false,
+  "provenance": {
+    "authorization": {
+      "authorization_id": "b619d39c-ef25-41f6-8b1f-c2521fc3efbd",
+      "authorization_sha256": "87fe8af5e944805dbae7c5e1527efdab1c0e050059bc0a2b53618440b62daf49"
+    },
+    "consumption_record": {
+      "path": "D:\\Research\\llm-representation-research\\experiments\\exp022a\\results\\authorization_consumption\\87fe8af5e944805dbae7c5e1527efdab1c0e050059bc0a2b53618440b62daf49.json",
+      "sha256": "b74e16afcb2932571b9fdbd350552e62a74a73f459b3714d4b3acfc52c06a8db"
+    },
+    "formal_dataset": {
+      "path": "experiments\\exp003\\prompts_controlled.json",
+      "sha256": "72dab733e6a1639dfc80d186f3af1dbce5c6d70da4905e6d6d422cf47064c472"
+    },
+    "model": {
+      "name": "Qwen/Qwen3-1.7B",
+      "snapshot": "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e"
+    },
+    "model_hook_qualification_sha256": "5f2e82180ccb1381626513758209b060f43e3f70431d08c15a1e74af0fe4ffe2",
+    "repository_commit": "f76c6cb4f6d1a4c3a7dc42446ec44610bc1a996f",
+    "run_attempt_id": "d1f56593-2ce1-48cb-8f16-aa8dea177cb6",
+    "runtime_versions": {
+      "numpy": "2.4.6",
+      "python": "3.11.9",
+      "scikit_learn": "1.9.0"
+    }
+  },
+  "readout_definitions": {
+    "A0": "fixed full-FIT reference scaler and reference classifier",
+    "A1": "layerwise FIT featurewise scaler recalibration; reference classifier retained",
+    "A2": "layerwise FIT scaler and same-family linear classifier refit"
+  },
+  "result_status": "FORMAL_RESULT",
+  "runner": {
+    "path": "experiments\\exp022a\\run_exp022a.py",
+    "sha256": "2913a087b4ce67278a37b79877c2322cfadc770a1cb03228df93aafce0cf8ebb"
+  },
+  "schema_version": "1.0.0",
+  "scientific_status": "FORMAL_ANALYSIS_COMPLETED",
+  "splits": {
+    "A_original_fit_paraphrase_eval": {
+      "bootstrap": {
+        "D_fixed": {
+          "lower": -0.41666666666666674,
+          "resamples": 10000,
+          "seed": 20260817,
+          "upper": -0.08333333333333326
+        },
+        "G_noncal": {
+          "lower": -0.4166666666666667,
+          "resamples": 10000,
+          "seed": 20260817,
+          "upper": 0.08333333333333337
+        },
+        "G_refit": {
+          "lower": -0.25,
+          "resamples": 10000,
+          "seed": 20260817,
+          "upper": 0.0
+        },
+        "G_scale": {
+          "lower": -0.16666666666666674,
+          "resamples": 10000,
+          "seed": 20260817,
+          "upper": 0.33333333333333337
+        },
+        "R_refit": {
+          "lower": -0.5833333333333334,
+          "resamples": 10000,
+          "seed": 20260817,
+          "upper": -0.08333333333333337
+        }
+      },
+      "metrics": {
+        "block16_pre_final_rmsnorm": {
+          "A0": {
+            "accuracy": 0.9166666666666666,
+            "balanced_accuracy": 0.9166666666666666,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 1.0,
+              "logic": 0.6666666666666666
+            }
+          },
+          "A1": {
+            "accuracy": 0.9166666666666666,
+            "balanced_accuracy": 0.9166666666666666,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 1.0,
+              "logic": 0.6666666666666666
+            }
+          },
+          "A2": {
+            "accuracy": 0.9166666666666666,
+            "balanced_accuracy": 0.9166666666666666,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 1.0,
+              "logic": 0.6666666666666666
+            }
+          }
+        },
+        "block17_pre_final_rmsnorm": {
+          "A0": {
+            "accuracy": 0.9166666666666666,
+            "balanced_accuracy": 0.9166666666666666,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 1.0,
+              "logic": 0.6666666666666666
+            }
+          },
+          "A1": {
+            "accuracy": 0.8333333333333334,
+            "balanced_accuracy": 0.8333333333333333,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 1.0,
+              "logic": 0.3333333333333333
+            }
+          },
+          "A2": {
+            "accuracy": 0.5,
+            "balanced_accuracy": 0.5,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 0.3333333333333333,
+              "definition": 0.6666666666666666,
+              "logic": 0.0
+            }
+          }
+        },
+        "block18_pre_final_rmsnorm": {
+          "A0": {
+            "accuracy": 0.8333333333333334,
+            "balanced_accuracy": 0.8333333333333333,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 0.6666666666666666,
+              "logic": 0.6666666666666666
+            }
+          },
+          "A1": {
+            "accuracy": 0.8333333333333334,
+            "balanced_accuracy": 0.8333333333333333,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 1.0,
+              "logic": 0.3333333333333333
+            }
+          },
+          "A2": {
+            "accuracy": 0.5833333333333334,
+            "balanced_accuracy": 0.5833333333333333,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 0.6666666666666666,
+              "definition": 0.6666666666666666,
+              "logic": 0.0
+            }
+          }
+        },
+        "block19_pre_final_rmsnorm": {
+          "A0": {
+            "accuracy": 0.9166666666666666,
+            "balanced_accuracy": 0.9166666666666666,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 0.6666666666666666,
+              "logic": 1.0
+            }
+          },
+          "A1": {
+            "accuracy": 0.8333333333333334,
+            "balanced_accuracy": 0.8333333333333333,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 0.6666666666666666,
+              "logic": 0.6666666666666666
+            }
+          },
+          "A2": {
+            "accuracy": 0.6666666666666666,
+            "balanced_accuracy": 0.6666666666666666,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 0.6666666666666666,
+              "logic": 0.0
+            }
+          }
+        },
+        "block20_pre_final_rmsnorm": {
+          "A0": {
+            "accuracy": 0.75,
+            "balanced_accuracy": 0.7499999999999999,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 0.6666666666666666,
+              "logic": 0.3333333333333333
+            }
+          },
+          "A1": {
+            "accuracy": 0.75,
+            "balanced_accuracy": 0.7499999999999999,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 0.6666666666666666,
+              "logic": 0.3333333333333333
+            }
+          },
+          "A2": {
+            "accuracy": 0.5833333333333334,
+            "balanced_accuracy": 0.5833333333333333,
+            "per_class_recall": {
+              "analogy": 0.6666666666666666,
+              "causality": 0.6666666666666666,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          }
+        },
+        "block21_pre_final_rmsnorm": {
+          "A0": {
+            "accuracy": 0.8333333333333334,
+            "balanced_accuracy": 0.8333333333333333,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 1.0,
+              "logic": 0.3333333333333333
+            }
+          },
+          "A1": {
+            "accuracy": 0.8333333333333334,
+            "balanced_accuracy": 0.8333333333333333,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 1.0,
+              "logic": 0.3333333333333333
+            }
+          },
+          "A2": {
+            "accuracy": 0.6666666666666666,
+            "balanced_accuracy": 0.6666666666666666,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 0.6666666666666666,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          }
+        },
+        "block22_pre_final_rmsnorm": {
+          "A0": {
+            "accuracy": 0.75,
+            "balanced_accuracy": 0.75,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          },
+          "A1": {
+            "accuracy": 0.8333333333333334,
+            "balanced_accuracy": 0.8333333333333333,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 1.0,
+              "logic": 0.3333333333333333
+            }
+          },
+          "A2": {
+            "accuracy": 0.5833333333333334,
+            "balanced_accuracy": 0.5833333333333333,
+            "per_class_recall": {
+              "analogy": 0.6666666666666666,
+              "causality": 0.6666666666666666,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          }
+        },
+        "block23_pre_final_rmsnorm": {
+          "A0": {
+            "accuracy": 0.75,
+            "balanced_accuracy": 0.75,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          },
+          "A1": {
+            "accuracy": 0.8333333333333334,
+            "balanced_accuracy": 0.8333333333333333,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 1.0,
+              "logic": 0.3333333333333333
+            }
+          },
+          "A2": {
+            "accuracy": 0.5833333333333334,
+            "balanced_accuracy": 0.5833333333333333,
+            "per_class_recall": {
+              "analogy": 0.6666666666666666,
+              "causality": 0.6666666666666666,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          }
+        },
+        "block24_pre_final_rmsnorm": {
+          "A0": {
+            "accuracy": 0.75,
+            "balanced_accuracy": 0.75,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          },
+          "A1": {
+            "accuracy": 0.8333333333333334,
+            "balanced_accuracy": 0.8333333333333333,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 1.0,
+              "logic": 0.3333333333333333
+            }
+          },
+          "A2": {
+            "accuracy": 0.5833333333333334,
+            "balanced_accuracy": 0.5833333333333333,
+            "per_class_recall": {
+              "analogy": 0.6666666666666666,
+              "causality": 0.6666666666666666,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          }
+        },
+        "block25_pre_final_rmsnorm": {
+          "A0": {
+            "accuracy": 0.75,
+            "balanced_accuracy": 0.75,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          },
+          "A1": {
+            "accuracy": 0.8333333333333334,
+            "balanced_accuracy": 0.8333333333333333,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 1.0,
+              "logic": 0.3333333333333333
+            }
+          },
+          "A2": {
+            "accuracy": 0.5,
+            "balanced_accuracy": 0.5,
+            "per_class_recall": {
+              "analogy": 0.3333333333333333,
+              "causality": 0.6666666666666666,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          }
+        },
+        "block26_pre_final_rmsnorm": {
+          "A0": {
+            "accuracy": 0.6666666666666666,
+            "balanced_accuracy": 0.6666666666666666,
+            "per_class_recall": {
+              "analogy": 0.6666666666666666,
+              "causality": 1.0,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          },
+          "A1": {
+            "accuracy": 0.75,
+            "balanced_accuracy": 0.75,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 0.6666666666666666,
+              "definition": 1.0,
+              "logic": 0.3333333333333333
+            }
+          },
+          "A2": {
+            "accuracy": 0.6666666666666666,
+            "balanced_accuracy": 0.6666666666666666,
+            "per_class_recall": {
+              "analogy": 0.6666666666666666,
+              "causality": 1.0,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          }
+        },
+        "block27_post_final_rmsnorm": {
+          "A0": {
+            "accuracy": 0.25,
+            "balanced_accuracy": 0.25,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 0.0,
+              "definition": 0.0,
+              "logic": 0.0
+            }
+          },
+          "A1": {
+            "accuracy": 0.75,
+            "balanced_accuracy": 0.75,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 0.6666666666666666,
+              "definition": 1.0,
+              "logic": 0.3333333333333333
+            }
+          },
+          "A2": {
+            "accuracy": 0.5833333333333334,
+            "balanced_accuracy": 0.5833333333333333,
+            "per_class_recall": {
+              "analogy": 0.3333333333333333,
+              "causality": 1.0,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          }
+        },
+        "block27_pre_final_rmsnorm": {
+          "A0": {
+            "accuracy": 0.6666666666666666,
+            "balanced_accuracy": 0.6666666666666666,
+            "per_class_recall": {
+              "analogy": 0.6666666666666666,
+              "causality": 1.0,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          },
+          "A1": {
+            "accuracy": 0.75,
+            "balanced_accuracy": 0.75,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 0.6666666666666666,
+              "definition": 1.0,
+              "logic": 0.3333333333333333
+            }
+          },
+          "A2": {
+            "accuracy": 0.5833333333333334,
+            "balanced_accuracy": 0.5833333333333333,
+            "per_class_recall": {
+              "analogy": 0.6666666666666666,
+              "causality": 1.0,
+              "definition": 0.6666666666666666,
+              "logic": 0.0
+            }
+          }
+        }
+      },
+      "primary": {
+        "D_fixed": {
+          "estimate": -0.25,
+          "exact_p": 0.125,
+          "favorable": 3,
+          "supported": false,
+          "unfavorable": 0
+        },
+        "G_refit": {
+          "estimate": -0.08333333333333337,
+          "exact_p": 1.0,
+          "favorable": 0,
+          "serial_gate": "CLOSED_D_FIXED_NOT_SUPPORTED",
+          "supported": false,
+          "unfavorable": 1
+        }
+      },
+      "secondary": {
+        "G_noncal": -0.16666666666666674,
+        "G_scale": 0.08333333333333337,
+        "R_refit": -0.33333333333333337,
+        "post_final_delta": {
+          "A0": -0.41666666666666663,
+          "A1": 0.0,
+          "A2": 0.0
+        }
+      },
+      "split_id": "A_original_fit_paraphrase_eval",
+      "technical_validity": {
+        "status": "VALID"
+      },
+      "warnings": []
+    },
+    "B_paraphrase_fit_original_eval": {
+      "bootstrap": {
+        "D_fixed": {
+          "lower": -0.5,
+          "resamples": 10000,
+          "seed": 20260817,
+          "upper": -0.5
+        },
+        "G_noncal": {
+          "lower": -0.25,
+          "resamples": 10000,
+          "seed": 20260817,
+          "upper": -0.25
+        },
+        "G_refit": {
+          "lower": 0.25,
+          "resamples": 10000,
+          "seed": 20260817,
+          "upper": 0.25
+        },
+        "G_scale": {
+          "lower": 0.5,
+          "resamples": 10000,
+          "seed": 20260817,
+          "upper": 0.5
+        },
+        "R_refit": {
+          "lower": -0.25,
+          "resamples": 10000,
+          "seed": 20260817,
+          "upper": -0.25
+        }
+      },
+      "metrics": {
+        "block16_pre_final_rmsnorm": {
+          "A0": {
+            "accuracy": 0.75,
+            "balanced_accuracy": 0.75,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          },
+          "A1": {
+            "accuracy": 0.75,
+            "balanced_accuracy": 0.75,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          },
+          "A2": {
+            "accuracy": 0.75,
+            "balanced_accuracy": 0.75,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          }
+        },
+        "block17_pre_final_rmsnorm": {
+          "A0": {
+            "accuracy": 0.6666666666666666,
+            "balanced_accuracy": 0.6666666666666666,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 0.6666666666666666,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          },
+          "A1": {
+            "accuracy": 0.6666666666666666,
+            "balanced_accuracy": 0.6666666666666666,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 0.6666666666666666,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          },
+          "A2": {
+            "accuracy": 0.6666666666666666,
+            "balanced_accuracy": 0.6666666666666666,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 0.6666666666666666,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          }
+        },
+        "block18_pre_final_rmsnorm": {
+          "A0": {
+            "accuracy": 0.75,
+            "balanced_accuracy": 0.75,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          },
+          "A1": {
+            "accuracy": 0.75,
+            "balanced_accuracy": 0.75,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          },
+          "A2": {
+            "accuracy": 0.6666666666666666,
+            "balanced_accuracy": 0.6666666666666666,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 0.6666666666666666,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          }
+        },
+        "block19_pre_final_rmsnorm": {
+          "A0": {
+            "accuracy": 0.75,
+            "balanced_accuracy": 0.75,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          },
+          "A1": {
+            "accuracy": 0.75,
+            "balanced_accuracy": 0.75,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          },
+          "A2": {
+            "accuracy": 0.75,
+            "balanced_accuracy": 0.75,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          }
+        },
+        "block20_pre_final_rmsnorm": {
+          "A0": {
+            "accuracy": 0.6666666666666666,
+            "balanced_accuracy": 0.6666666666666666,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 0.6666666666666666,
+              "logic": 0.0
+            }
+          },
+          "A1": {
+            "accuracy": 0.75,
+            "balanced_accuracy": 0.75,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          },
+          "A2": {
+            "accuracy": 0.75,
+            "balanced_accuracy": 0.75,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          }
+        },
+        "block21_pre_final_rmsnorm": {
+          "A0": {
+            "accuracy": 0.6666666666666666,
+            "balanced_accuracy": 0.6666666666666666,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 0.6666666666666666,
+              "logic": 0.0
+            }
+          },
+          "A1": {
+            "accuracy": 0.75,
+            "balanced_accuracy": 0.75,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          },
+          "A2": {
+            "accuracy": 0.75,
+            "balanced_accuracy": 0.75,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          }
+        },
+        "block22_pre_final_rmsnorm": {
+          "A0": {
+            "accuracy": 0.6666666666666666,
+            "balanced_accuracy": 0.6666666666666666,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 0.6666666666666666,
+              "logic": 0.0
+            }
+          },
+          "A1": {
+            "accuracy": 0.75,
+            "balanced_accuracy": 0.75,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          },
+          "A2": {
+            "accuracy": 0.6666666666666666,
+            "balanced_accuracy": 0.6666666666666666,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 0.6666666666666666,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          }
+        },
+        "block23_pre_final_rmsnorm": {
+          "A0": {
+            "accuracy": 0.6666666666666666,
+            "balanced_accuracy": 0.6666666666666666,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 0.6666666666666666,
+              "logic": 0.0
+            }
+          },
+          "A1": {
+            "accuracy": 0.75,
+            "balanced_accuracy": 0.75,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          },
+          "A2": {
+            "accuracy": 0.6666666666666666,
+            "balanced_accuracy": 0.6666666666666666,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 0.6666666666666666,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          }
+        },
+        "block24_pre_final_rmsnorm": {
+          "A0": {
+            "accuracy": 0.6666666666666666,
+            "balanced_accuracy": 0.6666666666666666,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 0.6666666666666666,
+              "logic": 0.0
+            }
+          },
+          "A1": {
+            "accuracy": 0.6666666666666666,
+            "balanced_accuracy": 0.6666666666666666,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 0.6666666666666666,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          },
+          "A2": {
+            "accuracy": 0.5833333333333334,
+            "balanced_accuracy": 0.5833333333333333,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 0.3333333333333333,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          }
+        },
+        "block25_pre_final_rmsnorm": {
+          "A0": {
+            "accuracy": 0.6666666666666666,
+            "balanced_accuracy": 0.6666666666666666,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 0.6666666666666666,
+              "logic": 0.0
+            }
+          },
+          "A1": {
+            "accuracy": 0.6666666666666666,
+            "balanced_accuracy": 0.6666666666666666,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 0.6666666666666666,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          },
+          "A2": {
+            "accuracy": 0.5833333333333334,
+            "balanced_accuracy": 0.5833333333333333,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 0.3333333333333333,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          }
+        },
+        "block26_pre_final_rmsnorm": {
+          "A0": {
+            "accuracy": 0.5833333333333334,
+            "balanced_accuracy": 0.5833333333333333,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 0.6666666666666666,
+              "definition": 0.6666666666666666,
+              "logic": 0.0
+            }
+          },
+          "A1": {
+            "accuracy": 0.6666666666666666,
+            "balanced_accuracy": 0.6666666666666666,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 0.6666666666666666,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          },
+          "A2": {
+            "accuracy": 0.5833333333333334,
+            "balanced_accuracy": 0.5833333333333333,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 0.3333333333333333,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          }
+        },
+        "block27_post_final_rmsnorm": {
+          "A0": {
+            "accuracy": 0.25,
+            "balanced_accuracy": 0.25,
+            "per_class_recall": {
+              "analogy": 0.0,
+              "causality": 0.0,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          },
+          "A1": {
+            "accuracy": 0.75,
+            "balanced_accuracy": 0.75,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          },
+          "A2": {
+            "accuracy": 0.5833333333333334,
+            "balanced_accuracy": 0.5833333333333333,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 0.3333333333333333,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          }
+        },
+        "block27_pre_final_rmsnorm": {
+          "A0": {
+            "accuracy": 0.25,
+            "balanced_accuracy": 0.25,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 0.0,
+              "definition": 0.0,
+              "logic": 0.0
+            }
+          },
+          "A1": {
+            "accuracy": 0.75,
+            "balanced_accuracy": 0.75,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 1.0,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          },
+          "A2": {
+            "accuracy": 0.5,
+            "balanced_accuracy": 0.5,
+            "per_class_recall": {
+              "analogy": 1.0,
+              "causality": 0.0,
+              "definition": 1.0,
+              "logic": 0.0
+            }
+          }
+        }
+      },
+      "primary": {
+        "D_fixed": {
+          "estimate": -0.5,
+          "exact_p": 0.015625,
+          "favorable": 6,
+          "supported": true,
+          "unfavorable": 0
+        },
+        "G_refit": {
+          "estimate": 0.25,
+          "exact_p": 0.125,
+          "favorable": 3,
+          "serial_gate": "OPEN",
+          "supported": false,
+          "unfavorable": 0
+        }
+      },
+      "secondary": {
+        "G_noncal": -0.25,
+        "G_scale": 0.5,
+        "R_refit": -0.25,
+        "post_final_delta": {
+          "A0": 0.0,
+          "A1": 0.0,
+          "A2": 0.08333333333333326
+        }
+      },
+      "split_id": "B_paraphrase_fit_original_eval",
+      "technical_validity": {
+        "status": "VALID"
+      },
+      "warnings": []
+    }
+  },
+  "technical_validity": {
+    "status": "VALID"
+  },
+  "warnings": []
+}

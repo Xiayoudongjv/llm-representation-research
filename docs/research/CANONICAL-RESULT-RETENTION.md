@@ -123,7 +123,7 @@ Prohibited unless explicitly approved:
 - EXP-019 = `RAW_CANONICAL_DURABLE`
 - EXP-020A = `BYTE_IDENTICAL_RAW_CANONICAL_DURABLE`
 - EXP-021 Q3 = `SANITIZED_CANONICAL_REQUIRED`
-- EXP-022A = `NOT_RUN_PROTOCOL_ONLY`
+- EXP-022A = `RAW_CANONICAL_DURABLE`
 
 ## Current Canonical Evidence
 
@@ -136,4 +136,5 @@ Prohibited unless explicitly approved:
 | EXP-020A | `BYTE_IDENTICAL_RAW_CANONICAL_DURABLE` | `experiments/exp020/results/exp020a_results.json` | `c603b763c5b5723b002d67ce71a073beba9668bf8bc49e0a215cc54d5f82e26a` |
 | EXP-021 Q3 | `SANITIZED_CANONICAL_MEASUREMENT_DURABLE` | `docs/experiments/canonical/EXP-021-STAGE-Q-Q3-RESULT-SANITIZED.json` | `763fa2b2ea54ae9e8e487d4261e611489c00c40a3c45b50a98930d7d7aa6d44e` |
 | EXP-021 lifecycle | `SANITIZED_LEDGER_DURABLE` | `docs/experiments/canonical/EXP-021-AUTHORIZATION-LIFECYCLE-LEDGER.json` | `621b4d7d0fda7a26844c9fe0ed3bdb2a03cdb8732ae75ab670ec2054f6497531` |
-| EXP-022A | `NOT_RUN_PROTOCOL_ONLY` | preregistration only | `no result` |
+| EXP-022A result | `RAW_CANONICAL_DURABLE` | `experiments/exp022a/results/exp022a_results.json` | `2a26f77116acf37aac6462b997300d890445cac0f0ec98ffc5ec710b36a975c9` |
+| EXP-022A attempt-2 lifecycle | `RAW_LIFECYCLE_EVIDENCE_DURABLE` | `experiments/exp022a/results/authorization_consumption/87fe8af5e944805dbae7c5e1527efdab1c0e050059bc0a2b53618440b62daf49.json` | `b74e16afcb2932571b9fdbd350552e62a74a73f459b3714d4b3acfc52c06a8db` |

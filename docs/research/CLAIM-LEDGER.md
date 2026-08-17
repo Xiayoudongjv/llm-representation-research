@@ -15,6 +15,11 @@
 | functional binding | NOT_TESTED | no canonical result |
 | non-Abelian transport | SPECULATIVE | no direct experiment |
 | directional packing / cognitive-folding-style compression | SPECULATIVE | no direct experiment |
+| fixed-frame deeper-layer degradation | PARTIALLY_SUPPORTED / SPLIT_DEPENDENT | EXP-021; EXP-022A |
+| featurewise recalibration rescue | DESCRIPTIVE_SIGNAL | EXP-022A A1 |
+| same-family layerwise readout refit rescue | NOT_SUPPORTED_IN_EXP022A | EXP-022A G_refit unsupported both splits |
+| coordinate transport | NOT_TESTED | no canonical result |
+| functional binding / behavioral control | NOT_SUPPORTED / NOT_TESTED_BY_EXP022A | EXP-017; EXP-022A did not directly test this claim |
 
 ## Status semantics
 
@@ -23,3 +28,7 @@
 - `FAILED`: canonical result failed an explicit test.
 - `NOT_TESTED`: no canonical result exists.
 - `SPECULATIVE`: hypothesis only.
+- `PARTIALLY_SUPPORTED / SPLIT_DEPENDENT`: some preregistered support, but not full cross-condition confirmation.
+- `DESCRIPTIVE_SIGNAL`: secondary/descriptive observation, not a primary confirmed mechanism.
+- `NOT_SUPPORTED_IN_EXP022A`: the named experiment did not provide preregistered support.
+- `NOT_TESTED_BY_EXP022A`: outside the named experiment's primary scope.

@@ -5,13 +5,13 @@ experimental artifacts outrank it.
 
 ## Current research phase
 
-EXP-020A recovered canonical evidence restored. EXP-017 and EXP-021 evidence are durable. Canonical evidence durability rereview passed. EXP-022A preregistration is frozen v1.0 and not scientifically observed. The runner is implemented and model/hook-qualified; attempt 1 was technically invalid before scientific execution due to a raw-variant adapter defect, and the production adapter has been corrected without changing frozen scientific semantics.
+EXP-020A recovered canonical evidence restored. EXP-017 and EXP-021 evidence are durable. Canonical evidence durability rereview passed. EXP-022A preregistration is frozen v1.0 and now has a valid canonical formal result. Attempt 1 was technically invalid before scientific execution due to a raw-variant adapter defect; the production adapter was corrected without changing frozen scientific semantics, and Attempt 2 completed with a valid formal result.
 
 ## Current preregistration authority
 
 - Canonical frozen path: `../experiments/EXP-022A-PREREGISTRATION.md`
 - Canonical frozen SHA-256: `609aab2b3cc96f4ea316b45741b2ae427e682c72c7546c8a9520201f94547698`
-- Status: `v1.0` / `FROZEN` / `NOT RUN`
+- Status: `v1.0` / `FROZEN` / `FORMAL_ANALYSIS_COMPLETED`
 - Historical draft: `../experiments/EXP-022A-PREREGISTRATION-DRAFT.md`
 - Independent review trail: `../experiments/EXP-022A-PREREGISTRATION-REVIEW-092C.md`
 - v0.2 rereview trail: `../experiments/EXP-022A-PREREGISTRATION-REREVIEW-092E.md`
@@ -292,3 +292,34 @@ No formal execution, model load, or EVAL access is authorized.
 - Formal execution = `NOT_AUTHORIZED`
 - Scientific result = `NO_SCIENTIFIC_RESULT`
 - Next = `targeted patch rereview before any new authorization`
+
+## Task-094H formal attempt 2
+
+- Status = `EXP022A_FORMAL_ATTEMPT_002_VALID`
+- Attempt status = `FORMAL_RUN_ATTEMPT_COMPLETED`
+- Technical validity = `VALID`
+- Result status = `FORMAL_RESULT`
+- Scientific status = `FORMAL_ANALYSIS_COMPLETED`
+- Authorization ID = `b619d39c-ef25-41f6-8b1f-c2521fc3efbd`
+- Authorization SHA-256 = `87fe8af5e944805dbae7c5e1527efdab1c0e050059bc0a2b53618440b62daf49`
+- Run attempt ID = `d1f56593-2ce1-48cb-8f16-aa8dea177cb6`
+- Consumption SHA-256 = `b74e16afcb2932571b9fdbd350552e62a74a73f459b3714d4b3acfc52c06a8db`
+- Canonical result SHA-256 = `2a26f77116acf37aac6462b997300d890445cac0f0ec98ffc5ec710b36a975c9`
+- Canonical result path = `experiments/exp022a/results/exp022a_results.json`
+- `D_fixed` = `PARTIAL_CONCORDANCE`
+- `G_refit` = `SPLIT_HETEROGENEOUS`
+- Next = `scientific closeout / research asset consolidation`
+
+## Task-095A scientific closeout
+
+- Status = `EXP022A_SCIENTIFIC_CLOSEOUT`
+- EXP-022A = `FORMAL_ANALYSIS_COMPLETED`
+- Canonical result SHA-256 = `2a26f77116acf37aac6462b997300d890445cac0f0ec98ffc5ec710b36a975c9`
+- Attempt 1 = `technical invalid, no science`
+- Attempt 2 = `valid canonical formal result`
+- Scientific synthesis:
+  - fixed-frame degradation = partial/split-dependent
+  - featurewise recalibration = descriptive high-value signal
+  - same-family refit rescue = not supported
+- Next phase = `scientific closeout complete; next-experiment design pending`
+- Do not begin EXP-023 design in this task.

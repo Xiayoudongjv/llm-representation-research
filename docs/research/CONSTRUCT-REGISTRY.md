@@ -59,6 +59,39 @@ M = representation extraction
 - `A3 structured alignment = future / outside EXP-022A primary`
 - `A4 nonlinear adaptation = future / outside EXP-022A primary`
 
+## Featurewise recalibration
+
+```text
+FIT-only per-feature location/scale adaptation applied before a fixed readout.
+```
+
+## Diagonal affine transport
+
+```text
+A constrained coordinate transformation acting independently on feature
+dimensions.
+```
+
+## Representational overlap
+
+```text
+Shared/local co-occupancy of representation regions.
+```
+
+## Destructive interference
+
+```text
+Overlap or transformation interaction that impairs task-relevant readout or
+function.
+```
+
+## Structured belief representation
+
+```text
+Representation that preserves multiple candidate latent/world states and their
+uncertainty.
+```
+
 ## Scope
 
 This file defines constructs only. It does not assign claim status or freeze an

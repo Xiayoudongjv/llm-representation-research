@@ -6,6 +6,18 @@ Identify -> Manipulate -> Transport -> Preserve -> Bind -> Realize
 
 ## Transport decomposition
 
+The simplest member of the transformation/transport ladder may be constrained
+calibration:
+
+```text
+Identity
+-> featurewise recalibration
+-> orthogonal
+-> affine
+-> low-rank
+-> nonlinear
+```
+
 ### A. Clean-state / coordinate transport
 
 ```text

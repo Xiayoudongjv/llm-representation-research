@@ -1,0 +1,16 @@
+{
+  "authorization_id": "b619d39c-ef25-41f6-8b1f-c2521fc3efbd",
+  "authorization_sha256": "87fe8af5e944805dbae7c5e1527efdab1c0e050059bc0a2b53618440b62daf49",
+  "canonical_result_path": "experiments/exp022a/results/exp022a_results.json",
+  "consumed_at_utc": "2026-08-17T13:14:28.538059+00:00",
+  "experiment": "EXP-022A",
+  "formal_dataset_sha256": "72dab733e6a1639dfc80d186f3af1dbce5c6d70da4905e6d6d422cf47064c472",
+  "frozen_preregistration_sha256": "609aab2b3cc96f4ea316b45741b2ae427e682c72c7546c8a9520201f94547698",
+  "model_hook_qualification_sha256": "5f2e82180ccb1381626513758209b060f43e3f70431d08c15a1e74af0fe4ffe2",
+  "model_name": "Qwen/Qwen3-1.7B",
+  "model_snapshot_identity": "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e",
+  "repository_commit": "f76c6cb4f6d1a4c3a7dc42446ec44610bc1a996f",
+  "run_attempt_id": "d1f56593-2ce1-48cb-8f16-aa8dea177cb6",
+  "runner_sha256": "2913a087b4ce67278a37b79877c2322cfadc770a1cb03228df93aafce0cf8ebb",
+  "schema_version": "1.0.0"
+}
