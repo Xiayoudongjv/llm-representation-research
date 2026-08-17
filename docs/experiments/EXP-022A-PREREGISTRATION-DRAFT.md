@@ -1,8 +1,8 @@
 ﻿# EXP-022A Preregistration Draft
 
-Version: v0.1
+Version: v0.2
 
-Status: DRAFT — NOT FROZEN
+Status: FREEZE CANDIDATE — NOT FROZEN
 
 Implementation authorized: false
 
@@ -234,46 +234,72 @@ No EVAL-based tuning.
 
 ## Classifier specification status
 
+`FREEZE_092C_REVISED`
+
 Historical family:
 
 - `StandardScaler`
 - multinomial logistic regression
 
-Exact effective parameters: `RESOLVED_092B`; explicit EXP-022A constructor values: `SOFT_NEW_FREEZE_REQUIRED`
+Exact effective parameters: `RESOLVED_092B`; explicit EXP-022A constructor
+values: `FROZEN_092C`.
 
-A future frozen specification must state every scientifically relevant
-effective parameter explicitly and not rely on version-dependent sklearn
-defaults.
+The frozen scientific scaler semantics are:
 
-At minimum static reconciliation must recover/decide:
+```text
+StandardScaler(with_mean=True, with_std=True)
+```
 
-- solver
-- penalty
-- C
-- fit_intercept
-- class_weight
-- max_iter
-- tol
-- multi-class behavior under installed sklearn version
-- random_state applicability
-- scaler with_mean
-- scaler with_std
+The frozen intended classifier semantics are:
 
-Do NOT fill unknown values in this draft.
+```text
+multiclass multinomial logistic regression
+L2 regularization
+solver = lbfgs
+C = 1.0
+fit_intercept = true
+tol = 1e-4
+class_weight = None
+dual = false
+max_iter = 1000
+warm_start = false
+random_state = 20260812
+```
+
+No layer-specific values. No tuning.
+
+Detailed historical semantics and implementation-only argument treatment are
+recorded in the Task-092B static operational reconciliation section below.
 
 ## Primary score
 
-`PROPOSED_NEW_FREEZE`
+`FREEZE_092C_REVISED`
 
 Primary performance metric: Balanced Accuracy.
 
-BA = mean per-class recall across the four frozen source-semantic classes.
+BA is retained as the named primary score because the four frozen
+source-semantic classes receive equal weight.
 
-With exact 3-per-class EVAL balance, observed BA equals ordinary accuracy
-numerically, but BA remains the scientific metric because all four classes
-receive equal weight.
+Each split contains exactly:
 
-Secondary reporting candidates:
+- 3 logic
+- 3 causality
+- 3 analogy
+- 3 definition
+
+Therefore, under the frozen balanced EVAL design:
+
+`BA = ordinary accuracy = correct / 12`
+
+for every layer/readout condition.
+
+Primary effects are discrete paired item-level correctness contrasts.
+
+Effect resolution: `1 / 12`.
+
+Do not describe BA in EXP-022A as a smooth/continuous performance measure.
+
+Secondary reporting candidates remain descriptive:
 
 - raw correct count
 - accuracy
@@ -281,43 +307,121 @@ Secondary reporting candidates:
 - macro-F1
 - full probability vector
 
-Do not make probability-based metrics primary in v0.1.
+Probability-based metrics must not become primary.
 
-## Primary estimand 1
+## Inferential Target and Scope
 
-`PROPOSED_NEW_FREEZE`
+`FREEZE_092C_REVISED`
+
+The primary estimands are first and foremost finite controlled-set estimands
+over the 12 preregistered EVAL records within each split.
+
+The EVAL records are not claimed to be a probability sample from a formally
+defined natural-language population.
+
+Therefore:
+
+- observed BA differences are exact descriptive effects for the frozen
+  controlled EVAL set;
+- any exact paired test adds a preregistered exchangeability-null model;
+- that test does not convert the controlled set into a probability sample.
+
+Claims must remain scoped to the controlled EXP-022A evaluation design unless
+independently replicated later.
+
+## Primary estimand 1 ? D_fixed
+
+`FREEZE_092C_REVISED`
 
 ```text
 D_fixed = BA_final^(A0) - BA_ref^(A0)
 ```
 
+Define per-EVAL-item discordant correctness changes:
+
+```text
+loss_i: reference correct AND final A0 incorrect
+gain_i: reference incorrect AND final A0 correct
+```
+
+Then:
+
+```text
+D_fixed = (number_of_gains - number_of_losses) / 12
+```
+
 Interpretation: negative values indicate held-out fixed-frame readout
 degradation between reference and primary final representation.
 
-Primary directional question: `D_fixed < 0`.
+Directional degradation corresponds to `losses > gains`.
+
+Exact primary p-value for `D_fixed`:
+
+```text
+m_D = losses + gains
+p_D = P[Binomial(m_D, 0.5) >= losses]
+```
+
+Primary support rule:
+
+```text
+D_FIXED_SUPPORTED iff D_fixed < 0 AND one-sided exact p_D <= 0.05
+Otherwise: D_FIXED_NOT_SUPPORTED
+```
+
+`D_FIXED_NOT_SUPPORTED` does NOT mean stable.
 
 Do not claim this is already known from EXP-021. EXP-021 used a different
 FIT-LOO qualification estimand.
 
-## Primary estimand 2
+## Primary estimand 2 ? G_refit
 
-`PROPOSED_NEW_FREEZE`
+`FREEZE_092C_REVISED`
 
 ```text
 G_refit = BA_final^(A2) - BA_final^(A0)
 ```
 
+Define per-EVAL-item discordant correctness changes:
+
+```text
+improvement: A0 final incorrect AND A2 final correct
+harm:        A0 final correct   AND A2 final incorrect
+```
+
+Then:
+
+```text
+G_refit = (improvements - harms) / 12
+```
+
 Interpretation: positive values indicate layer-wise linear refit rescue relative
 to the fixed frame at the primary final representation.
 
-Hierarchical rule candidate: `G_refit` becomes primary mechanism-interpretable
-only after the preregistered fixed-degradation gate is supported.
+Exact primary p-value for `G_refit`:
+
+```text
+m_G = improvements + harms
+p_G = P[Binomial(m_G, 0.5) >= improvements]
+```
+
+Primary mechanism status is gated:
+
+```text
+G_REFIT_PRIMARY_SUPPORTED iff D_FIXED_SUPPORTED
+                          AND G_refit > 0
+                          AND one-sided exact p_G <= 0.05
+```
+
+If `D_fixed` is not supported, `G_refit` MUST still be calculated and reported
+as `PRE_SPECIFIED_SECONDARY_CONTRAST`, but it cannot support the primary rescue
+claim. No outcome may suppress its reporting.
 
 Do NOT label `G_refit` as proof of coordinate remapping.
 
 ## Secondary estimands
 
-`PRE-SPECIFIED_SECONDARY_CANDIDATE`
+`FREEZE_092C_REVISED`
 
 ```text
 G_scale  = BA_final^(A1) - BA_final^(A0)
@@ -325,113 +429,46 @@ G_noncal = BA_final^(A2) - BA_final^(A1)
 R_refit  = BA_final^(A2) - BA_ref^(A2)
 ```
 
-Possible interpretation only:
+Status: `PRE_SPECIFIED_SECONDARY`
+
+Report for each secondary contrast:
+
+- point estimate
+- underlying paired item-count changes where applicable
+- class-stratified item-resampling robustness interval
+
+Interpretation only:
 
 - `G_scale`: featurewise-affine recalibration rescue
 - `G_noncal`: additional same-family linear-refit rescue beyond featurewise recalibration
-- `R_refit`: change in held-out layerwise-refit linear decodability from reference to final representation
+- `R_refit`: change in held-out performance of the preregistered linear readout family from reference to final representation
+
+Do NOT assign binary `SUPPORTED` / `NOT_SUPPORTED` labels to these secondary
+effects.
+
+Do NOT apply formal secondary p-value testing in EXP-022A.
+
+Secondary multiplicity policy: `DESCRIPTIVE_NO_BINARY_SUPPORT`.
 
 Explicitly prohibit: `R_refit` decline == information disappearance.
 
+Poor A2 performance does not establish absence of linear information under all
+possible linear classifiers.
+
 ## Evidence vector
 
-Current preferred result representation: do NOT force one mutually exclusive
-mechanism label.
+`FREEZE_092C_REVISED`
 
-Candidate evidence vector:
+Keep the non-exclusive evidence-vector architecture.
+
+Primary binary components:
 
 ```text
-FIXED_DEGRADATION
-SCALE_RESCUE
-REFIT_RESCUE
-ADDITIONAL_REFIT_RESCUE
-REFIT_RETENTION_CHANGE
-SPLIT_CONCORDANCE
+FIXED_DEGRADATION = SUPPORTED / NOT_SUPPORTED
+REFIT_RESCUE = SUPPORTED / NOT_SUPPORTED / PRIMARY_GATE_CLOSED_SECONDARY_REPORTED
 ```
 
-Status values and exact classification rules remain:
-`PROPOSED_NEW_FREEZE / NOT YET FINALIZED`
-
-## Resampling unit
-
-Task-091C constraint: historical source-family clustering is not supported.
-
-Current proposed within-split resampling unit: held-out EVAL record ID.
-
-All repeated measurements from one EVAL record must remain together across A0,
-A1, A2, and all depth checkpoints.
-
-Mark: `PROPOSED_NEW_FREEZE`
-
-Do not create original/paraphrase family pairing.
-
-## Bootstrap proposal
-
-`PROPOSED_NEW_FREEZE — NOT YET REVIEWED`
-
-Candidate:
-
-- 10,000 bootstrap replicates
-- RNG: NumPy `PCG64(20260817)`
-
-For each split separately:
-
-- within each source semantic class, sample 3 EVAL record IDs with replacement
-  from that class's 3 EVAL records
-- total per replicate: 12 EVAL records
-- use identical resampled record identities for every readout condition and
-  layer in the replicate
-
-Candidate CI:
-
-- 95% percentile interval
-- NumPy quantile method: `"linear"`
-
-This statistical choice requires preregistration review before freeze.
-
-## Hierarchical primary inference
-
-`PROPOSED_NEW_FREEZE`
-
-For each split separately:
-
-Step 1: Compute bootstrap CI for `D_fixed`.
-
-Candidate support rule:
-
-- upper endpoint of 95% CI < 0 => `FIXED_DEGRADATION_SUPPORTED`
-- otherwise => `FIXED_DEGRADATION_NOT_SUPPORTED`
-
-`NOT_SUPPORTED` does not imply evidence of stability.
-
-Step 2: Only if Step 1 is supported, interpret `G_refit` as the second primary
-contrast.
-
-Candidate support rule:
-
-- lower endpoint of 95% CI > 0 => `REFIT_RESCUE_SUPPORTED`
-- otherwise => `REFIT_RESCUE_NOT_SUPPORTED`
-
-The hierarchical gate is intended to prevent interpreting rescue when the
-held-out fixed degradation itself was not established.
-
-## Secondary inference
-
-`G_scale`, `G_noncal`, `R_refit`, and full-depth trajectories are pre-specified
-secondary candidates.
-
-They may receive CIs but may not replace a failed primary result.
-
-No layer scanning may be used to promote a secondary layer into a primary claim.
-
-Multiplicity policy beyond the hierarchical primary gate:
-`PENDING_PREREGISTRATION_REVIEW`
-
-## Cross-split concordance
-
-`PROPOSED_NEW_FREEZE`
-
-Proposed categories:
+Cross-split primary summary:
 
 ```text
 CROSS_SPLIT_SUPPORTED
@@ -440,18 +477,230 @@ SPLIT_HETEROGENEOUS
 NOT_SUPPORTED
 ```
 
-Draft definitions:
+Secondary components:
 
-- `CROSS_SPLIT_SUPPORTED`: both split-specific CIs support the same
+```text
+SCALE_RESCUE_ESTIMATE
+ADDITIONAL_REFIT_RESCUE_ESTIMATE
+REFIT_RETENTION_CHANGE_ESTIMATE
+DEPTH_TRAJECTORY
+```
+
+Do not give secondary components binary discovery labels.
+
+## Secondary item-resampling unit
+
+Task-091C constraint: historical source-family clustering is not supported.
+
+Current proposed within-split secondary bootstrap unit: held-out EVAL record ID.
+
+All repeated measurements from one EVAL record must remain together across A0,
+A1, A2, and all depth checkpoints.
+
+Mark: `FREEZE_092C_REVISED`
+
+Do not create original/paraphrase family pairing.
+
+## Secondary bootstrap robustness interval
+
+`FREEZE_092C_REVISED`
+
+Bootstrap is removed from all primary support decisions.
+
+Role: `SECONDARY_ITEM_RESAMPLING_ROBUSTNESS_SUMMARY`
+
+Frozen candidate:
+
+- 10,000 replicates
+- RNG: NumPy `PCG64(20260817)`
+- per split separately
+- stratified by `SOURCE_SEMANTIC_CLASS`
+- sample 3 records with replacement from each class's frozen 3 EVAL records
+- all readout/layer measurements for a sampled EVAL record remain paired
+- 95% percentile endpoints
+- NumPy quantile method: `"linear"`
+
+Output name:
+
+`class-stratified item-resampling robustness interval`
+
+This interval is NOT interpreted as population-sampling coverage.
+
+It cannot change any primary exact-test conclusion.
+
+## Exact conditional paired primary inference
+
+`FREEZE_092C_REVISED`
+
+Replace bootstrap-based primary inference with a one-sided exact conditional
+paired test equivalent to exact McNemar / exact sign test on discordant
+correctness pairs.
+
+For each primary comparison, define two binary correctness values per EVAL
+record.
+
+Condition on total discordant count:
+
+```text
+m = n_plus + n_minus
+```
+
+Under the directional null, discordant direction is exchangeable with
+probability `0.5`.
+
+Exact one-sided probability:
+
+```text
+p_exact = P[Binomial(m, 0.5) >= number of discordant changes in the preregistered favorable direction]
+```
+
+No asymptotic approximation.
+
+No continuity correction.
+
+No mid-p.
+
+No Monte Carlo approximation.
+
+If `m = 0`, define `p_exact = 1.0`.
+
+Interpretation label: `EXACT_CONDITIONAL_PAIRED_EVIDENCE_STATISTIC`, not
+population-sampling certainty.
+
+Prospectively freeze:
+
+```text
+alpha = 0.05
+```
+
+for each directional exact primary test. Tests are one-sided because directions
+were preregistered before formal EXP-022A execution. No alpha may be changed
+after result observation.
+
+## Exact-test discreteness
+
+`FREEZE_092C_REVISED`
+
+The exact paired test is intentionally conservative at `n=12`.
+
+For example:
+
+- 4 favorable discordant changes and 0 unfavorable discordant changes gives
+  `p_exact = 0.0625` and does NOT satisfy `alpha=0.05`.
+- 5 favorable discordant changes and 0 unfavorable discordant changes gives
+  `p_exact = 0.03125` and does satisfy `alpha=0.05`.
+- `m=0` gives `p_exact = 1.0`.
+
+This discreteness is accepted prospectively.
+
+No alternate primary method may be substituted after results are known.
+
+## Serial primary gate / multiplicity
+
+`FREEZE_092C_REVISED`
+
+Within each split, the primary sequence is:
+
+1. `D_fixed`
+2. conditional primary interpretation of `G_refit`
+
+This is a preregistered serial gate.
+
+No separate multiplicity correction is applied to the second primary claim,
+because the stronger rescue claim requires success of the upstream degradation
+claim and its own level-alpha test.
+
+Do not describe this as two unconstrained independent `alpha=0.05` discoveries.
+
+The primary rescue statement is a conjunction:
+
+`degradation established AND refit rescue established`.
+
+## Secondary inference
+
+`FREEZE_092C_REVISED`
+
+`G_scale`, `G_noncal`, `R_refit`, and full-depth trajectories are pre-specified
+secondary candidates.
+
+They may receive class-stratified item-resampling robustness intervals but may
+not replace a failed primary result.
+
+They must not receive binary `SUPPORTED` / `NOT_SUPPORTED` labels.
+
+No formal secondary p-value testing is applied.
+
+No multiplicity correction is applied to descriptive secondary contrasts.
+
+No layer scanning may be used to promote a secondary layer into a primary claim.
+
+## Cross-split concordance
+
+`FREEZE_092C_REVISED`
+
+Do NOT combine p-values.
+
+Do NOT assume split independence.
+
+For any primary directional claim:
+
+`CROSS_SPLIT_SUPPORTED` only when BOTH Split A and Split B independently
+satisfy the preregistered split-specific support criterion in the same
+direction.
+
+Describe this as a conjunction across complementary split views, not two
+independent replications.
+
+No independence assumption is required merely to demand that both component
+criteria hold.
+
+Do not derive a pooled effect or combined p-value.
+
+Revised categories:
+
+```text
+CROSS_SPLIT_SUPPORTED
+PARTIAL_CONCORDANCE
+SPLIT_HETEROGENEOUS
+NOT_SUPPORTED
+```
+
+Definitions:
+
+- `CROSS_SPLIT_SUPPORTED`: both split-specific primary criteria support the
   preregistered direction.
-- `PARTIAL_CONCORDANCE`: one split supports the direction and the other point
-  estimate has the same direction but its CI includes zero.
-- `SPLIT_HETEROGENEOUS`: point estimates have opposite signs, or one split
-  clearly supports the opposite direction.
-- `NOT_SUPPORTED`: neither supports the preregistered direction and there is no
-  clear heterogeneity.
+- `PARTIAL_CONCORDANCE`: exactly one split supports the direction, and the
+  other split's observed effect estimate has the same sign but does not meet
+  its exact support rule.
+- `SPLIT_HETEROGENEOUS`: observed split point estimates have opposite signs,
+  OR one split provides preregistered directional support while the other
+  provides support for the opposite direction, if an opposite-direction
+  diagnostic is pre-specified. Do not create an unplanned opposite-direction
+  hypothesis test merely to fill this category.
+- `NOT_SUPPORTED`: neither split supports the preregistered direction, and
+  there is no sign-defined split heterogeneity.
 
-Cross-split concordance is not two independent replications.
+These categories are concordance summaries, not independent-replication
+statistics.
+
+## Exact Paired Test Interpretation
+
+`FREEZE_092C_REVISED`
+
+The 12 EVAL records are a fixed controlled evaluation set.
+
+The observed effect itself is an exact finite-set quantity.
+
+The exact conditional paired test uses a working exchangeability null over
+discordant item directions.
+
+This assumption is an inferential model, not evidence that the EVAL items are a
+probability sample.
+
+Therefore p-values do not justify population-general claims.
+
+Independent replication on newly constructed source items is required before
+claiming broader generality.
 
 ## Historical Stage-Q benchmark
 
@@ -471,9 +720,38 @@ Global all-checkpoint Stage-Q gate: `DO_NOT_MIGRATE`
 
 FIT-only / no-EVAL Stage-Q scope: `DO_NOT_MIGRATE`
 
+## Full-depth descriptive trajectory
+
+`FREEZE_092C_REVISED`
+
+Keep block16 through block27-pre, plus block27-post, as a secondary descriptive
+trajectory.
+
+For every layer/readout condition report:
+
+- BA
+- `correct / 12`
+- per-class recall
+
+An optional preregistered class-stratified item-resampling robustness interval
+may be reported.
+
+No layer-specific hypothesis tests.
+
+No multiplicity-adjusted layer discovery.
+
+No post-hoc promotion of a layer into a primary endpoint.
+
 ## Final RMSNorm secondary analysis
 
 `SECONDARY_CANDIDATE`
+
+Keep `hidden_states[28]`, post-final-RMSNorm, as a secondary mechanistic
+endpoint.
+
+Its prospective inclusion is motivated in part by prior EXP-021 measurement
+behavior. It is not primary and cannot replace block27-pre based on EXP-022A
+outcome.
 
 For each `Ak`:
 
@@ -526,6 +804,29 @@ Valid adverse scientific outcomes include:
 These must never be converted into technical invalidity merely because they are
 scientifically unfavorable.
 
+## Probability diagnostics
+
+`FREEZE_092C_REVISED`
+
+Persist full four-class probability vectors.
+
+Pre-specify as secondary diagnostics only:
+
+- multiclass log loss
+- mean true-class probability
+
+If retained, explicitly label them:
+
+`CALIBRATION_SENSITIVE_SECONDARY_DIAGNOSTIC`
+
+They must not:
+
+- replace BA
+- alter primary support
+- rescue a failed primary result
+
+Do not add Brier score unless separately justified before freeze.
+
 ## Result artifact draft
 
 Proposed per-EVAL prediction fields:
@@ -563,7 +864,10 @@ G_refit
 G_noncal
 R_refit
 
-bootstrap_ci
+d_fixed_one_sided_exact_p
+g_refit_one_sided_exact_p
+primary_gate_status
+class_stratified_item_resampling_robustness_interval
 cross_split_status
 ```
 
@@ -577,31 +881,88 @@ Prohibit persistence of:
 
 ## Stopping rule
 
-`PROPOSED_NEW_FREEZE`
+`FREEZE_092C_REVISED`
 
 One authorized formal scientific run.
 
 After formal result generation, stop.
 
+Convergence/no-retry policy:
+
+```text
+ConvergenceWarning with finite fitted coefficients AND finite valid probabilities
+= TECHNICAL_WARNING_VALID_RESULT
+```
+
+Such warnings must be persisted in result metadata. No retry, no solver change,
+no `max_iter` increase, and no `C` change are permitted.
+
+```text
+Hard estimator fit exception
+OR nonfinite fitted coefficients
+OR nonfinite/invalid probability outputs
+= TECHNICALLY_INVALID
+```
+
+No same-experiment retry is permitted for a technically invalid run.
+
 No same-experiment result-driven:
 
+- re-run for scientific rescue
 - classifier-family change
-- hyperparameter tuning
+- hyperparameter change
 - C tuning
 - solver switching
 - nonlinear probe
 - primary-layer change
+- metric change
+- test change
+- alpha change
 - item deletion
 - original/paraphrase retroactive pairing
 - A/B pooling
 - structured alignment
 - bootstrap change
 - CI-method change
-- primary metric change
 - favorable-layer selection
 - intervention addition
 
-Any follow-up requires a new protocol / experiment.
+Any follow-up requires a new experiment / preregistration.
+
+## Preregistered claim language
+
+`FREEZE_092C_REVISED`
+
+If `D_fixed` and gated `G_refit` are supported:
+
+Allowed:
+
+"The fixed reference readout showed supported held-out degradation at the
+pre-registered final representation, while the preregistered layer-specific
+linear readout family showed supported rescue."
+
+Allowed interpretation: readout nonstationarity + linear-family refit rescue.
+
+Not allowed: coordinate remapping proven.
+
+If `D_fixed` supported and `G_refit` not supported:
+
+Allowed:
+
+"Fixed-frame degradation was supported, but the preregistered linear readout
+family did not show supported rescue."
+
+If `D_fixed` not supported:
+
+Allowed:
+
+"Held-out fixed-frame degradation was not supported. The preregistered refit
+contrast is reported as secondary."
+
+Not allowed: "representation is stable."
+
+If splits disagree, report split heterogeneity / lack of concordance, not
+replication.
 
 ## Interpretation boundary
 
@@ -713,7 +1074,8 @@ Split identity reuse: `REUSE_FROZEN`.
   `aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4`
 - Historical loader: `AutoTokenizer.from_pretrained(snapshot, local_files_only=True)`
 - Historical tokenizer call: `return_tensors="pt"`, `padding=False`, `truncation=False`
-- `add_special_tokens = SOFT_NEW_FREEZE_REQUIRED`
+- `add_special_tokens = true`
+- `EXP022A_ADD_SPECIAL_TOKENS = true`
 
 ### Depth and tuple semantics
 
@@ -746,8 +1108,12 @@ block27-post -> hs28
   `hooked_block_27_output`.
 - Post-final candidate: `hidden_states[28]`, post-final-RMSNorm.
 
-Scientific endpoint roles remain `PROPOSED_NEW_FREEZE`; 092B resolved operational
-identity, not statistical/scientific endpoint choice.
+Primary endpoint freeze: primary reference = block `16` / `hidden_states[17]`;
+primary final endpoint = block27 pre-final-RMSNorm hooked output. Justification:
+this representation boundary was established as the historical primary-final
+boundary before EXP-021 results were observed. Do not select it because of the
+observed EXP-021 trajectory. `hidden_states[28]` remains a secondary mechanistic
+endpoint.
 
 ### Token-position semantics
 
@@ -767,15 +1133,20 @@ selection. Status: `REUSE_FROZEN`.
 
 - Historical model hidden states: `torch.float16`
 - Extraction: detach, CPU, NumPy copy
-- No float32 cast before probe fitting
 - Historical stored/stacked representation arrays: `float16`
 
-Do NOT silently change EXP-022A to float32. Any change from historical float16
-must be labeled `NEW_FREEZE`.
+EXP-022A analysis freeze:
 
-`OPEN_REVIEW_ITEM`: Should EXP-022A prospectively preserve historical float16
-probe input, or explicitly cast representations to float32 before scaler/probe
-fitting?
+- model execution remains `float16`
+- historical extraction remains from `float16` hidden states
+- immediately after extraction and before scaler/probe fitting, each
+  representation vector is deterministically converted to NumPy `float32`
+- all A0/A1/A2 analysis arrays enter the readout pipeline as `float32`
+
+`EXP022A_ANALYSIS_DTYPE = FLOAT32_AFTER_FLOAT16_EXTRACTION`
+
+This is a prospective numerical-analysis precision decision, not historical
+Stage-Q behavior. Raw hidden tensors are not persisted.
 
 ### Historical StandardScaler semantics
 
@@ -786,9 +1157,22 @@ fitting?
 
 Historical scaler semantics: `RESOLVED`.
 
-EXP-022A explicit constructor values: `SOFT_NEW_FREEZE_REQUIRED`.
+EXP-022A explicit scientific scaler freeze:
+
+```text
+StandardScaler(with_mean=True, with_std=True)
+```
+
+`copy=True` may be used as the implementation setting, but it is not a
+scientific estimand and must not alter outputs.
+
+`EXP022A_STANDARD_SCALER = EXPLICIT_WITH_MEAN_TRUE_WITH_STD_TRUE`
+
+Do not rely on future sklearn defaults for `with_mean`/`with_std`.
 
 ### Historical LogisticRegression semantics
+
+Historical effective semantics:
 
 - `solver=lbfgs`
 - effective L2 behavior
@@ -805,12 +1189,32 @@ EXP-022A explicit constructor values: `SOFT_NEW_FREEZE_REQUIRED`.
 - `warm_start=False`
 - `random_state=20260812`
 
-Multinomial semantics: `EFFECTIVE_HISTORICAL_MULTINOMIAL`, not explicitly frozen
-`multi_class` keyword semantics.
+Multinomial semantics: `EFFECTIVE_HISTORICAL_MULTINOMIAL`.
 
-`random_state` effect under lbfgs: `EFFECT_NOT_AUDITED_HISTORICALLY`.
+EXP-022A intended statistical model freeze:
 
-EXP-022A explicit classifier constructor: `SOFT_NEW_FREEZE_REQUIRED`.
+```text
+multiclass multinomial logistic regression
+L2 regularization
+solver = lbfgs
+C = 1.0
+fit_intercept = true
+tol = 1e-4
+class_weight = None
+dual = false
+max_iter = 1000
+warm_start = false
+random_state = 20260812
+```
+
+`EXP022A_CLASSIFIER = EXPLICIT_MULTINOMIAL_L2_LBFGS_C1`
+
+No layer-specific values. No tuning. Implementation must use a version-pinned
+constructor that realizes these semantics under the frozen scikit-learn version.
+
+Do NOT require preservation of the historical compatibility/fallback code
+pattern if a cleaner explicit constructor realizes the same intended model.
+Record implementation-only arguments separately.
 
 ### Class / probability mapping
 
@@ -824,25 +1228,35 @@ EXP-022A explicit classifier constructor: `SOFT_NEW_FREEZE_REQUIRED`.
 
 A0:
 
-- historical representation/scaler/classifier families are reusable
-- full-FIT -> untouched-EVAL procedure is a NEW EXP-022A operation
-- `EXP022A_A0_FULL_FIT_PROCEDURE = NEW_EXP022A_FREEZE_REQUIRED`
+- `EXP022A_A0_FULL_FIT_PROCEDURE = FREEZE_092C_REVISED`
+- For each split, extract `L_ref` FIT representations.
+- Deterministically cast analysis vectors according to the frozen
+  analysis-dtype rule.
+- Fit `S_ref` on all 12 FIT records.
+- Fit `C_ref` on all 12 standardized FIT records.
+- No LOO training.
+- Apply fitted `S_ref + C_ref` unchanged to the untouched EVAL representation
+  at `L_ref` and every downstream clean EVAL representation.
+- No refitting by layer.
 
 A1:
 
-- `EXP022A_A1_STATIC_SPECIFICATION = OPERATIONALLY_SPECIFIABLE`
-- fit `S_l` on layer-l FIT only
-- keep fitted `C_ref` fixed
-- transform EVAL with `S_l`
-- predict with `C_ref`
-- do not refit `C_ref`
+- `EXP022A_A1_STATIC_SPECIFICATION = FREEZE_092C_REVISED`
+- For each layer `l`, fit `S_l` using only the 12 split FIT representations at
+  layer `l`.
+- Do not refit `C_ref`.
+- Evaluate `C_ref(S_l(EVAL_l))`.
+- Interpret only as per-feature FIT-derived mean/scale readout adaptation.
+- Do not claim preservation of the same raw-space hyperplane.
 
 A2:
 
-- `EXP022A_A2_STATIC_SPECIFICATION = OPERATIONALLY_SPECIFIABLE`
-- fit `S_l` and `C_l` on layer-l FIT only
-- predict untouched EVAL
-- no layer-specific tuning
+- `EXP022A_A2_STATIC_SPECIFICATION = FREEZE_092C_REVISED`
+- For each layer `l`, fit `S_l` on layer-l split FIT representations.
+- Fit preregistered same-family `C_l` on those standardized FIT
+  representations.
+- Evaluate untouched `EVAL_l`.
+- No hyperparameter tuning.
 
 Do not implement A0/A1/A2 in this task.
 
@@ -871,33 +1285,26 @@ Supported:
 - full depth identity
 - last-valid-token construct
 
-Needs precision:
+Resolved by Task-092C:
 
 - StandardScaler constructor
 - LogisticRegression constructor
 - effective multinomial wording
 - representation numeric dtype decision
-
-Prospective new decision:
-
 - full-FIT A0 procedure
 - `add_special_tokens` explicit value
 
 ### Freeze-blocker status
 
 - `EXP022A_HARD_FREEZE_BLOCKERS_PRESENT = false`
-- `EXP022A_SOFT_NEW_FREEZE_ITEMS_PRESENT = true`
+- `EXP022A_SOFT_NEW_FREEZE_ITEMS_PRESENT = false`
+- `EXP022A_REREVIEW_REQUIRED = true`
 
-Soft items include at minimum:
+Task-092C resolved the prior soft statistical/static items. Remaining pre-freeze
+items are limited to independent rereview of v0.2, technical consistency checks,
+and future post-freeze schema/authorization design.
 
-- explicit `add_special_tokens` value
-- explicit A0 full-FIT procedure
-- explicit StandardScaler constructor
-- explicit LogisticRegression constructor/model semantics
-- representation float16 vs prospective float32 decision
-- future preregistration/config/runner/validator hashes
-
-Statistical review items remain open.
+Implementation readiness is not claimed.
 
 ### Task-092B Compliance Incident
 
@@ -964,63 +1371,81 @@ reproducibility/technical correctness.
 
 ### Soft new-freeze pending review
 
-- explicit `add_special_tokens` value
-- representation probe dtype
-- explicit StandardScaler constructor
-- explicit LogisticRegression specification
-- full-FIT A0 procedure
-- future preregistration/config/runner/validator hashes
+None from static/statistical review.
 
-Statistical open review items remain separate.
+Remaining pre-freeze work is independent rereview of v0.2 and future
+post-freeze schema/authorization design.
 
 `EXP022A_PREREGISTRATION_FREEZE_BLOCKED_BY_STATIC_RECONCILIATION = false`
 
 
-## Review questions before v1.0
+## Pre-freeze review items
 
-`OPEN_REVIEW_ITEMS`
+`EXP022A_REREVIEW_REQUIRED = true`
 
-1. Is BA the correct primary score for n=12 balanced four-class EVAL?
-2. Is class-stratified item bootstrap with 3 items/class statistically
-   defensible as the preregistered inferential procedure?
-3. Is percentile bootstrap CI appropriate at this sample size?
-4. Should D_fixed be the sole first primary gate?
-5. Is G_refit appropriately hierarchical after D_fixed?
-6. Are G_scale/G_noncal/R_refit correctly secondary?
-7. Is block27 pre-final-RMSNorm sufficiently prior-justified as primary final
-   endpoint?
-8. Is the cross-split concordance rule sufficiently conservative?
-9. Is any multiplicity control needed for the pre-specified secondary set?
-10. Are all result interpretations weaker than the actual estimands?
+Task-092C resolved the prior scientific/statistical review questions.
+
+Remaining pre-freeze items:
+
+1. independent rereview of the v0.2 freeze candidate (Task 092E)
+2. technical consistency of exact-test definitions
+3. technical consistency of classifier constructor under frozen sklearn version
+4. schema/authorization design still to occur AFTER preregistration freeze
+
+Do not claim implementation readiness.
 
 
 ## Current preregistration state flags
 
 ```text
-EXP022A_PREREGISTRATION_VERSION = v0.1
-EXP022A_PREREGISTRATION_STATUS = DRAFT
+EXP022A_PREREGISTRATION_VERSION = v0.2
+EXP022A_PREREGISTRATION_STATUS = FREEZE_CANDIDATE_NOT_FROZEN
+EXP022A_PRIMARY_METRIC = BALANCED_ACCURACY_EQUAL_TO_ACCURACY_ON_FROZEN_BALANCED_EVAL
+EXP022A_PRIMARY_INFERENCE = ONE_SIDED_EXACT_CONDITIONAL_PAIRED
+EXP022A_PRIMARY_ALPHA = 0.05
+EXP022A_MID_P = false
+EXP022A_BOOTSTRAP_ROLE = SECONDARY_ITEM_RESAMPLING_ROBUSTNESS
+EXP022A_D_FIXED = PRIMARY
+EXP022A_G_REFIT = GATED_PRIMARY_ALWAYS_REPORTED_SECONDARY_IF_GATE_CLOSED
+EXP022A_SECONDARY_BINARY_SUPPORT = false
+EXP022A_SPLIT_POOLING = PROHIBITED
+EXP022A_CROSS_SPLIT_INDEPENDENCE_ASSUMED = false
+EXP022A_PRIMARY_ENDPOINT = BLOCK27_PRE_FINAL_RMSNORM
+EXP022A_ANALYSIS_DTYPE = FLOAT32_AFTER_FLOAT16_EXTRACTION
+EXP022A_ADD_SPECIAL_TOKENS = true
+EXP022A_STANDARD_SCALER = EXPLICIT_WITH_MEAN_TRUE_WITH_STD_TRUE
+EXP022A_CLASSIFIER = EXPLICIT_MULTINOMIAL_L2_LBFGS_C1
+EXP022A_EXACT_TEST_EXCHANGEABILITY_NULL = EXPLICITLY_DISCLOSED
+EXP022A_POPULATION_SAMPLING_CLAIM = false
+EXP022A_EVAL_RESEARCHER_CONTENT_BLIND = false
+EXP022A_EVAL_COMPUTATIONALLY_HELD_OUT = true
+EXP022A_POST_092B_CONTENT_EXPOSURE_GUARD = ACTIVE
+EXP022A_REREVIEW_REQUIRED = true
 EXP022A_PREREGISTRATION_FROZEN = false
+EXP022A_IMPLEMENTATION_AUTHORIZED = false
+EXP022A_MODEL_EXECUTION_AUTHORIZED = false
+EXP022A_FORMAL_EVAL_ACCESS_AUTHORIZED = false
+MODEL_LOAD_PERFORMED = false
+TOKENIZER_LOAD_PERFORMED = false
+CONTROLLED_PROMPT_TEXT_ACCESSED = false
+FORMAL_EVAL_REPRESENTATIONS_ACCESSED = false
+FROZEN_AUTHORITY_MODIFIED = false
+REAL_EXPERIMENT_EVIDENCE_MODIFIED = false
+COMMIT_PERFORMED = true
+PUSH_PERFORMED = true
+
 EXP022A_AUTHORITY_RECONCILIATION = COMPLETE_v1.0
 EXP022A_STATIC_OPERATIONAL_RECONCILIATION = RESOLVED_092B
 EXP022A_DRAFT_AUTHORITY_CONFLICT = false
 EXP022A_HARD_FREEZE_BLOCKERS_PRESENT = false
-EXP022A_SOFT_NEW_FREEZE_ITEMS_PRESENT = true
-EXP022A_A0_FULL_FIT_PROCEDURE = NEW_EXP022A_FREEZE_REQUIRED
-EXP022A_A1_STATIC_SPECIFICATION = OPERATIONALLY_SPECIFIABLE
-EXP022A_A2_STATIC_SPECIFICATION = OPERATIONALLY_SPECIFIABLE
-EXP022A_POST_092B_CONTENT_EXPOSURE_GUARD = ACTIVE
-EXP022A_EVAL_RESEARCHER_CONTENT_BLIND = false
-EXP022A_EVAL_COMPUTATIONALLY_HELD_OUT = true
+EXP022A_SOFT_NEW_FREEZE_ITEMS_PRESENT = false
+EXP022A_A0_FULL_FIT_PROCEDURE = FREEZE_092C_REVISED
+EXP022A_A1_STATIC_SPECIFICATION = FREEZE_092C_REVISED
+EXP022A_A2_STATIC_SPECIFICATION = FREEZE_092C_REVISED
+EXP022A_INDEPENDENT_REVIEW_092C = COMPLETE
 EXP022A_OPEN_REVIEW_ITEMS_PRESENT = true
 EXP022A_SOURCE_FAMILY_BOOTSTRAP_SUPPORTED = false
-EXP022A_SPLIT_WISE_EVAL_ITEM_INFERENCE = PROPOSED_NEW_FREEZE
-EXP022A_CONTRAST_BASED_PREREGISTRATION = PROPOSED
-EXP022A_IMPLEMENTATION_AUTHORIZED = false
-EXP022A_MODEL_EXECUTION_AUTHORIZED = false
-EXP022A_FORMAL_EVAL_ACCESS_AUTHORIZED = false
+EXP022A_SPLIT_WISE_EVAL_ITEM_INFERENCE = FREEZE_092C_REVISED
+EXP022A_CONTRAST_BASED_PREREGISTRATION = FREEZE_092C_REVISED
 FORMAL_PROMPT_TEXT_EXPOSED_IN_092B = true
-MODEL_LOAD_PERFORMED = false
-FORMAL_EVAL_REPRESENTATIONS_ACCESSED = false
-FROZEN_AUTHORITY_MODIFIED = false
-REAL_EXPERIMENT_EVIDENCE_MODIFIED = false
 ```

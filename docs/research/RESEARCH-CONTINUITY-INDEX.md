@@ -1,16 +1,17 @@
-﻿# Research Continuity Index
+# Research Continuity Index
 
 This file is navigation only. It is not scientific authority. Canonical
 experimental artifacts outrank it.
 
 ## Current research phase
 
-EXP-022A independent preregistration review
+EXP-022A preregistration v0.2 freeze-candidate rereview
 
 ## Current preregistration draft
 
 - `docs/experiments/EXP-022A-PREREGISTRATION-DRAFT.md`
-- Status: `v0.1` / `DRAFT` / `NOT FROZEN`
+- Status: `v0.2` / `FREEZE CANDIDATE` / `NOT FROZEN`
+- Independent review trail: `../experiments/EXP-022A-PREREGISTRATION-REVIEW-092C.md`
 
 ## Read order
 
@@ -19,7 +20,8 @@ EXP-022A independent preregistration review
 3. `CONSTRUCT-REGISTRY.md`
 4. `experiments/EXP-022A-PROTOCOL-RECONCILIATION.md`
 5. `../experiments/EXP-022A-PREREGISTRATION-DRAFT.md`
-6. canonical experiment authority/results
+6. `../experiments/EXP-022A-PREREGISTRATION-REVIEW-092C.md`
+7. canonical experiment authority/results
 
 ## Resolved historical gates
 
@@ -49,10 +51,25 @@ v1.0 COMPLETE
 - `EXP022A_POST_092B_CONTENT_EXPOSURE_GUARD = ACTIVE`
 - No results/model/EVAL representation access occurred.
 
+## Task-092C independent preregistration review
+
+- Status: `COMPLETE`
+- Review artifact: `docs/experiments/EXP-022A-PREREGISTRATION-REVIEW-092C.md`
+- Verdict: `READY_AFTER_REQUIRED_REVISIONS`
+- Review was prompt-content guarded and read-only.
+
+## Task-092D application of required revisions
+
+- Status: `REQUIRED REVISIONS APPLIED`
+- Draft promoted to `v0.2`
+- Status: `FREEZE CANDIDATE` / `NOT FROZEN`
+- Freeze not performed.
+- No implementation/model/EVAL execution authorized.
+
 ## Current next action
 
-Task 092C — independent scientific/statistical preregistration review.
+Task 092E ? independent rereview of the EXP-022A v0.2 freeze candidate.
 
-Task-092C must not access controlled prompt text.
+Task-092E must not access controlled prompt text.
 
 No implementation/model/EVAL execution is authorized.
