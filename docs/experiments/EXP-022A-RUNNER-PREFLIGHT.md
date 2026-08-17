@@ -1,0 +1,145 @@
+# EXP-022A Runner Static and Synthetic Preflight
+
+THIS IS NOT AN EXP-022A SCIENTIFIC RESULT.
+
+## Frozen protocol identity
+
+- Experiment: `EXP-022A — Clean-State Layerwise Readout Transport Diagnosis`
+- Preregistration: `docs/experiments/EXP-022A-PREREGISTRATION.md`
+- Preregistration SHA-256: `609aab2b3cc96f4ea316b45741b2ae427e682c72c7546c8a9520201f94547698`
+- Freeze manifest: `docs/experiments/EXP-022A-FREEZE-MANIFEST.json`
+- Protocol status: `FROZEN`
+- Scientific result status: `NOT_RUN`
+
+## Implemented components
+
+- `experiments/exp022a/run_exp022a.py`
+- CLI modes: `--static-preflight`, `--synthetic-preflight`, `--formal-run`
+- Frozen-authority hash hard fail
+- Split A/B text-free analysis contract
+- Frozen checkpoint identities
+- Attention-mask-derived last-valid-token extraction contract
+- A0, A1, and A2 readout families
+- StandardScaler and multiclass logistic regression contract
+- Probability class mapping
+- Balanced accuracy
+- Exact primary tests
+- Serial primary gate
+- Secondary estimands
+- Class-stratified item-resampling robustness intervals
+- Cross-split synthesis
+- Formal result schema validation
+- Atomic publication helper
+
+## A0 semantics
+
+A0 fits the reference scaler and classifier only on full FIT reference
+representations at block16 / `hidden_states[17]`. Both components are then
+applied unchanged to downstream EVAL checkpoints.
+
+## A1 semantics
+
+A1 fits a layer-specific `StandardScaler(with_mean=True, with_std=True)` on FIT
+representations at each checkpoint, keeps the A0 reference classifier
+unchanged, and evaluates that fixed classifier on layer-specific scaled EVAL
+representations.
+
+## A2 semantics
+
+A2 fits a layer-specific scaler and the same preregistered same-family
+multiclass linear classifier on FIT representations at each checkpoint, then
+evaluates untouched EVAL representations at that checkpoint. A2 is interpreted
+only as held-out performance of the preregistered layerwise linear readout
+family.
+
+## Primary gate implementation
+
+- Primary score: balanced accuracy.
+- Primary endpoint: block27 pre-final-RMSNorm.
+- Primary reference: block16 pre-final-RMSNorm.
+- `D_fixed = BA_final_A0 - BA_reference_A0`.
+- `D_fixed` support requires `D_fixed < 0` and one-sided exact
+  `P[Binomial(m, 0.5) >= favorable] <= 0.05`.
+- `G_refit = BA_final_A2 - BA_final_A0`.
+- `G_refit` support requires `D_fixed` support, `G_refit > 0`, and the exact
+  one-sided p-value at or below 0.05.
+- `G_refit` is always computed and reported. If the D-fixed gate is closed,
+  `G_refit` is reported with `serial_gate = CLOSED_D_FIXED_NOT_SUPPORTED` and
+  `supported = false`.
+
+## Secondary robustness implementation
+
+- `G_scale = BA_final_A1 - BA_final_A0`
+- `G_noncal = BA_final_A2 - BA_final_A1`
+- `R_refit = BA_final_A2 - BA_reference_A2`
+- Post-final-RMSNorm checkpoint is stored and reported as descriptive.
+- Bootstrap: 10,000 replicates, `numpy.random.PCG64(20260817)`, within split
+  separately, class-stratified, three records sampled with replacement per
+  class, all readout/checkpoint observations for a sampled record identity kept
+  together.
+- Quantile method: `"linear"`, 2.5th and 97.5th percentiles.
+- Output terminology: `robustness_interval`.
+
+## Deterministic bootstrap choice
+
+The frozen protocol fixes the seed but does not uniquely specify stream
+architecture. Task 094B chooses one fresh, named
+`numpy.random.Generator(numpy.random.PCG64(20260817))` stream per bootstrap
+call, with a fixed class-universe and split order. This makes repeated calls
+deterministic and independent of earlier call ordering. The choice affects only
+secondary robustness numbers and does not alter primary exact tests or
+support gates.
+
+## Synthetic fixture coverage
+
+The synthetic preflight and focused tests cover:
+
+- perfect stable readout / zero-effect behavior
+- clear fixed-frame degradation with the exact test
+- degradation plus A2 rescue
+- A2 rescue prohibited when the D-fixed gate is closed
+- A1-only and A2-beyond-A1 contrasts
+- exact discordance cases
+- missing FIT class
+- unexpected classifier class
+- non-finite representation
+- non-finite probability
+- classifier fitting exception
+- convergence-warning-compatible finite output handling
+- cross-split full concordance
+- partial concordance including the exact-zero unsupported split case
+
+## Formal-run fail-closed behavior
+
+`python experiments/exp022a/run_exp022a.py --formal-run` exits nonzero with
+`FORMAL_RUN_NOT_AUTHORIZED` before prompt/data loading, tokenizer loading, model
+loading, CUDA initialization, representation extraction, FIT/EVAL, bootstrap,
+or scientific gate calculation. No authorization artifact is created.
+
+## Known non-scientific implementation choices
+
+- JSON serialization uses UTF-8, two-space indentation, and sorted keys for
+  deterministic engineering artifacts.
+- Bootstrap uses the independent fresh-stream choice documented above.
+- Temporary atomic publication files use the canonical filename plus
+  `.staging` in the same directory.
+- Warnings are serialized as strings in the result warnings list.
+
+These choices do not change scientific hypotheses or primary gates.
+
+## Test results
+
+- Focused: `pytest -q tests/test_exp022a_runner.py` — `22 passed`
+- Full: `pytest -q` with repository root on `PYTHONPATH` — `589 passed, 2 skipped`
+- Warnings: seven existing scikit-learn `FutureWarning` items related to
+  `penalty` deprecation; no new scientific warning was suppressed.
+
+## Remaining qualification steps
+
+- Independent runner/static-preflight rereview.
+- Future model-runtime qualification under separate authorization.
+- Future formal execution authorization.
+
+No model, tokenizer, controlled prompt text, formal FIT/EVAL data, formal
+hidden states, or formal scientific result was accessed or created by Task
+094B.

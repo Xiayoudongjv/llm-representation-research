@@ -5,7 +5,7 @@ experimental artifacts outrank it.
 
 ## Current research phase
 
-EXP-020A recovered canonical evidence restored. EXP-017 and EXP-021 evidence are durable. Canonical evidence durability rereview passed. EXP-022A preregistration is frozen v1.0 and not run.
+EXP-020A recovered canonical evidence restored. EXP-017 and EXP-021 evidence are durable. Canonical evidence durability rereview passed. EXP-022A preregistration is frozen v1.0 and not run. EXP-022A runner is implemented with static/synthetic preflight passing and is not model-qualified.
 
 ## Current preregistration authority
 
@@ -86,11 +86,13 @@ v1.0 COMPLETE
 
 ## Current next action
 
-Task 094A freeze complete.
+Task 094B runner implementation and static/synthetic preflight complete.
 
 EXP-022A status: `FROZEN_PROTOCOL_NOT_RUN`.
 
-Next phase: runner implementation / static validation.
+Runner status: `IMPLEMENTED_NOT_MODEL_QUALIFIED`.
+
+Next phase: independent runner/preflight rereview.
 
 No formal execution, model load, or EVAL access is authorized.
 
@@ -167,3 +169,15 @@ No formal execution, model load, or EVAL access is authorized.
 - Freeze manifest: `docs/experiments/EXP-022A-FREEZE-MANIFEST.json`
 - Next phase = `runner implementation / static validation`
 - Not formal execution.
+
+## Task-094B EXP-022A runner implementation and static/synthetic preflight
+
+- Task 094B = `EXP022A_RUNNER_IMPLEMENTED_STATIC_SYNTHETIC_PREFLIGHT`
+- Protocol = `FROZEN`
+- Runner = `IMPLEMENTED_NOT_MODEL_QUALIFIED`
+- Static preflight = `PASS`
+- Synthetic preflight = `PASS`
+- Formal execution = `NOT_AUTHORIZED`
+- Runner path: `experiments/exp022a/run_exp022a.py`
+- Runner preflight document: `docs/experiments/EXP-022A-RUNNER-PREFLIGHT.md`
+- Next phase = `independent runner/preflight rereview`
