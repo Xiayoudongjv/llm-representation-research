@@ -201,10 +201,13 @@ No formal execution, model load, or EVAL access is authorized.
 
 ## Task-094D EXP-022A model/hook engineering qualification attempt
 
-- Task 094D = `BLOCKED_ENGINEERING_RUNTIME_PATCH_REQUIRED`
-- Block classification = `ENGINEERING_RUNTIME_INTEGRATION_GAP`
-- Model runtime qualification = `NOT YET COMPLETED`
+- Task 094D = `EXP022A_MODEL_HOOK_ENGINEERING_QUALIFIED`
+- Protocol = `FROZEN`
+- Runner = `IMPLEMENTED_AND_STATICALLY_REVIEWED`
+- Runtime measurement path = `QUALIFIED`
 - Formal EXP-022A execution = `NOT AUTHORIZED`
+- Scientific result = `NOT_RUN`
+- Next = `formal-run readiness gate`
 
 ## Task-094D-P torch/CUDA runtime integration patch
 
@@ -213,3 +216,25 @@ No formal execution, model load, or EVAL access is authorized.
 - Model runtime qualification = `NOT YET COMPLETED`
 - Formal EXP-022A execution = `NOT AUTHORIZED`
 - Next = `targeted runtime-integration patch review`
+
+## Task-094D-R2 real EXP-022A model/tokenizer/hook qualification
+
+- Task 094D-R2 = `EXP022A_MODEL_HOOK_ENGINEERING_QUALIFIED`
+- Classification = `ENGINEERING_MODEL_HOOK_QUALIFICATION_ONLY`
+- Model snapshot identity: `70d244cc86ccca08cf5af4e1e306ecf908b1ad5e`
+- Tokenizer runtime identity = `PASS`
+- Model runtime architecture = `PASS`
+- Hidden-state tuple length = `PASS`
+- Block16/26/27 hook oracles = `PASS`
+- Final RMSNorm relationship = `PASS`
+- Hook zero perturbation = `PASS`
+- Hook cleanup = `PASS`
+- Last-valid-token runtime = `PASS`
+- Float32 analysis boundary = `PASS`
+- All checkpoint runtime shapes = `PASS`
+- Formal execution = `NOT AUTHORIZED`
+- Scientific result = `NOT_RUN`
+- Engineering artifact:
+  `experiments/exp022a/engineering/model_hook_qualification.json`
+- Qualification document:
+  `docs/experiments/EXP-022A-MODEL-HOOK-QUALIFICATION.md`
