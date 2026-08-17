@@ -55,8 +55,9 @@ recalibrated or transported across layers and interventions?
 
 ## 8. Next scientific decision
 
-Replicate or stress-test FIT-only featurewise/diagonal recalibration before
-designing a more flexible transport experiment. Do not freeze EXP-023 here.
+EXP-023 is frozen and not run. Next is runner implementation plus
+static/synthetic engineering validation, followed by independent production
+and runtime rereview before any formal authorization.
 
 ## 9. Frozen authority links/hashes
 
@@ -68,6 +69,10 @@ designing a more flexible transport experiment. Do not freeze EXP-023 here.
   - SHA-256: `5f2e82180ccb1381626513758209b060f43e3f70431d08c15a1e74af0fe4ffe2`
 - Attempt-2 canonical result: `experiments/exp022a/results/exp022a_results.json`
   - SHA-256: `2a26f77116acf37aac6462b997300d890445cac0f0ec98ffc5ec710b36a975c9`
+- EXP-023 frozen preregistration: `docs/experiments/EXP-023-PREREGISTRATION.md`
+  - SHA-256: `11bfa984d436ba06f7f3d1b0db24b90439742e9d9a87d124880834b437749f0b`
+- EXP-023 frozen dataset: `experiments/exp023/data/exp023_independent_controlled.json`
+  - SHA-256: `9143ceceab106c71dedb806190e146401975bf6bd84cb99b3b4cb7adc75afa2a`
 
 ## 10. Instructions to future AI
 
@@ -76,7 +81,7 @@ designing a more flexible transport experiment. Do not freeze EXP-023 here.
 - Decodability/manipulability is not causal role.
 - Speculation must not enter the claim ledger as fact.
 - Do not modify frozen protocol after outcome.
-- Do not begin EXP-023 design without a separate closeout-review task.
+- Do not modify frozen EXP-023 protocol after outcome.
 
 ## 11. Long-Horizon Research Asset Map
 

@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "experiment": "EXP-023",
+  "status": "FROZEN_PROTOCOL_NOT_RUN",
+  "frozen_at_utc": "2026-08-17T15:41:33.317470Z",
+  "repository_commit_before_freeze": "ed53d59d5fcb80c414e11e8108779d4d9697ed33",
+  "preregistration_path": "docs/experiments/EXP-023-PREREGISTRATION.md",
+  "preregistration_sha256": "11bfa984d436ba06f7f3d1b0db24b90439742e9d9a87d124880834b437749f0b",
+  "dataset_path": "experiments/exp023/data/exp023_independent_controlled.json",
+  "dataset_sha256": "9143ceceab106c71dedb806190e146401975bf6bd84cb99b3b4cb7adc75afa2a",
+  "candidate_manifest_path": "experiments/exp023/data/EXP-023-DATASET-CANDIDATE-MANIFEST.json",
+  "dataset_review_path": "docs/experiments/EXP-023-DATASET-CANDIDATE-REVIEW.md",
+  "dataset_review_verdict": "READY_FOR_DATASET_AND_PROTOCOL_FREEZE",
+  "historical_exclusion_dataset_sha256": "72dab733e6a1639dfc80d186f3af1dbce5c6d70da4905e6d6d422cf47064c472",
+  "model_name": "Qwen/Qwen3-1.7B",
+  "model_snapshot": "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e",
+  "primary_condition": "A_mu_sigma",
+  "primary_control": "A0",
+  "primary_estimand": "G_cal",
+  "primary_checkpoint": "block27_pre_final_rmsnorm",
+  "secondary_policy": "DESCRIPTIVE_MEAN_SCALE_DECOMPOSITION",
+  "dataset_record_count": 64,
+  "dataset_source_family_count": 32,
+  "dataset_source_families_per_class": 8,
+  "original_style_record_count": 32,
+  "paraphrase_record_count": 32,
+  "class_universe": [
+    "logic",
+    "causality",
+    "analogy",
+    "definition"
+  ],
+  "raw_variant_universe": [
+    "original_style",
+    "paraphrase"
+  ],
+  "class_template_leakage": "MODERATE_NONBLOCKING",
+  "surface_complexity_confound": "MINOR_NONMATERIAL",
+  "independent_dataset_claim": "SUPPORTED",
+  "model_execution_performed": false,
+  "scientific_result_observed": false,
+  "formal_run_authorized": false
+}

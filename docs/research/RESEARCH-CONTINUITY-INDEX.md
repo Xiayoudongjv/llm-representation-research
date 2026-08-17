@@ -5,7 +5,9 @@ experimental artifacts outrank it.
 
 ## Current research phase
 
-EXP-020A recovered canonical evidence restored. EXP-017 and EXP-021 evidence are durable. Canonical evidence durability rereview passed. EXP-022A preregistration is frozen v1.0 and now has a valid canonical formal result. Attempt 1 was technically invalid before scientific execution due to a raw-variant adapter defect; the production adapter was corrected without changing frozen scientific semantics, and Attempt 2 completed with a valid formal result.
+EXP-022A has a valid canonical formal result. EXP-023 is now the active next
+experiment: its independent dataset and final preregistration are frozen, and
+no EXP-023 model execution or scientific result has occurred.
 
 ## Current preregistration authority
 
@@ -15,6 +17,13 @@ EXP-020A recovered canonical evidence restored. EXP-017 and EXP-021 evidence are
 - Historical draft: `../experiments/EXP-022A-PREREGISTRATION-DRAFT.md`
 - Independent review trail: `../experiments/EXP-022A-PREREGISTRATION-REVIEW-092C.md`
 - v0.2 rereview trail: `../experiments/EXP-022A-PREREGISTRATION-REREVIEW-092E.md`
+
+Active frozen next-experiment authority:
+
+- Frozen path: `docs/experiments/EXP-023-PREREGISTRATION.md`
+- Frozen SHA-256: `11bfa984d436ba06f7f3d1b0db24b90439742e9d9a87d124880834b437749f0b`
+- Dataset SHA-256: `9143ceceab106c71dedb806190e146401975bf6bd84cb99b3b4cb7adc75afa2a`
+- Status: `FROZEN_PROTOCOL_NOT_RUN`
 
 ## Read order
 
@@ -86,19 +95,15 @@ v1.0 COMPLETE
 
 ## Current next action
 
-Task 094C independent runner rereview complete with
-`READY_AFTER_MINOR_NONSCIENTIFIC_PATCH`.
+EXP-023 protocol status: `FROZEN_PROTOCOL_NOT_RUN`.
 
-EXP-022A status: `FROZEN_PROTOCOL_NOT_RUN`.
+EXP-023 independent dataset: frozen.
 
-Runner status: `IMPLEMENTED_NOT_MODEL_QUALIFIED`.
+Next phase: EXP-023 runner implementation, followed by static/synthetic
+engineering validation and an independent production/runtime rereview.
 
-Task 094C-P formal publication engineering patch applied.
-
-Next phase: targeted publication-patch rereview, then engineering
-model/tokenizer/hook qualification under separate authorization.
-
-No formal execution, model load, or EVAL access is authorized.
+No EXP-023 model execution, EVAL access, formal run, or scientific result is
+authorized.
 
 ## Task-094C independent runner rereview
 
@@ -360,3 +365,43 @@ No formal execution, model load, or EVAL access is authorized.
 - Neither changes active experiment priority.
 - Current active scientific program remains: EXP-023 independent featurewise calibration replication plus secondary mean/scale decomposition.
 - Next active task after asset registration remains: fresh independent EXP-023 dataset construction / freeze workflow.
+
+## Task-095D independent EXP-023 dataset candidate construction
+
+- Status: `INDEPENDENT_DATASET_CANDIDATE_COMPLETE`
+- Dataset: `experiments/exp023/data/exp023_independent_controlled.json`
+- Dataset SHA-256: `9143ceceab106c71dedb806190e146401975bf6bd84cb99b3b4cb7adc75afa2a`
+- Records: `64`
+- Source families: `32`
+- Candidate manifest status: `CANDIDATE_NOT_FROZEN`
+- Model execution: `false`
+- Scientific result created: `false`
+
+## Task-095D-R independent content, construct, and historical-independence review
+
+- Status: `DATASET_REVIEW_COMPLETE_READY_FOR_FREEZE`
+- Verdict: `READY_FOR_DATASET_AND_PROTOCOL_FREEZE`
+- Construct-valid families: `32/32`
+- Pair equivalence: `32/32`
+- Nontrivial paraphrase: `32/32`
+- Historical independence: `32/32`
+- Language quality: `32/32`
+- Material cross-class collisions: `0`
+- Class-template leakage: `MODERATE` / nonblocking
+- Surface-complexity confound: `MINOR` / non-material
+- Independent replication dataset claim: `SUPPORTED`
+- Model execution: `false`
+- Scientific result created: `false`
+
+## Task-095E EXP-023 dataset and preregistration freeze
+
+- Status: `FROZEN_PROTOCOL_NOT_RUN`
+- Frozen preregistration: `docs/experiments/EXP-023-PREREGISTRATION.md`
+- Frozen preregistration SHA-256: `11bfa984d436ba06f7f3d1b0db24b90439742e9d9a87d124880834b437749f0b`
+- Freeze manifest: `docs/experiments/EXP-023-FREEZE-MANIFEST.json`
+- Dataset SHA-256: `9143ceceab106c71dedb806190e146401975bf6bd84cb99b3b4cb7adc75afa2a`
+- Dataset changed during freeze: `false`
+- Scientific protocol drift: `false`
+- Scientific computation: `NOT_RUN`
+- Next phase: runner implementation and static/synthetic engineering validation
+- No EXP-023 formal run or scientific result is authorized.

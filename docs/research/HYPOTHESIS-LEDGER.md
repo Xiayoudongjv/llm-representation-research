@@ -12,8 +12,9 @@ not be cited as findings or moved into `CLAIM-LEDGER.md` as fact.
 - Current evidence: EXP-022A A1 > A0 at block27-pre in both splits; large recovery in Split B.
 - Counterevidence: Split A recovery incomplete; `G_scale` was secondary/descriptive; small controlled dataset.
 - Status: `ACTIVE_HIGH_PRIORITY`
-- Dependencies: EXP-022A canonical result; no next-experiment protocol frozen yet.
+- Dependencies: EXP-022A canonical result.
 - Next discriminating experiment: EXP-023.
+- EXP-023 protocol status: `FROZEN_PROTOCOL_NOT_RUN`.
 - Claim boundary: Descriptive mechanism signal only; not a confirmed causal mechanism.
 
 ## HYP-TRANSPORT-001
