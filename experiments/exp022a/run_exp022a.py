@@ -15,12 +15,14 @@ import math
 import os
 import sys
 import warnings
+from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
 import numpy as np
+import torch
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
@@ -1172,33 +1174,267 @@ def load_production_dataset(
     return validate_production_records(records, split_definitions)
 
 
-def last_valid_token_indices(attention_mask: Any) -> list[int]:
+def last_valid_token_indices(attention_mask: Any) -> Any:
+    """Return per-record last valid token indices.
+
+    NumPy input returns ``list[int]``. Torch input remains on-device and
+    returns a one-dimensional long tensor of indices.
+    """
+    if torch.is_tensor(attention_mask):
+        mask = attention_mask
+        if mask.ndim not in (1, 2):
+            raise ValueError("Attention mask must be one- or two-dimensional.")
+        if mask.numel() == 0:
+            raise ValueError("Attention mask must contain at least one token.")
+        if mask.dtype.is_complex:
+            raise TypeError("Complex attention masks are not supported.")
+        if torch.is_floating_point(mask) and not bool(torch.isfinite(mask).all()):
+            raise ValueError("Attention mask contains non-finite values.")
+        if bool(torch.any(mask < 0)):
+            raise ValueError("Attention mask contains negative values.")
+        indices = mask.sum(dim=-1, dtype=torch.long) - 1
+        indices = indices.reshape(-1)
+        if bool(torch.any(indices < 0)):
+            raise ValueError("Attention mask contains no valid token.")
+        return indices
+
     mask = np.asarray(attention_mask)
+    if mask.ndim not in (1, 2):
+        raise ValueError("Attention mask must be one- or two-dimensional.")
+    if mask.size == 0:
+        raise ValueError("Attention mask must contain at least one token.")
+    if np.iscomplexobj(mask):
+        raise TypeError("Complex attention masks are not supported.")
+    if not np.isfinite(mask).all():
+        raise ValueError("Attention mask contains non-finite values.")
+    if np.any(mask < 0):
+        raise ValueError("Attention mask contains negative values.")
     if mask.ndim == 1:
-        return [int(mask.sum()) - 1]
-    if mask.ndim == 2:
-        return [int(row.sum()) - 1 for row in mask]
-    raise ValueError("Attention mask must be one- or two-dimensional.")
+        index = int(mask.sum()) - 1
+        if index < 0:
+            raise ValueError("Attention mask contains no valid token.")
+        return [index]
+    indices = [int(row.sum()) - 1 for row in mask]
+    if any(index < 0 for index in indices):
+        raise ValueError("Attention mask contains no valid token.")
+    return indices
 
 
-def select_last_valid_token(hidden_states: Any, attention_mask: Any) -> np.ndarray:
+def _indices_to_python_list(indices: Any) -> list[int]:
+    if torch.is_tensor(indices):
+        return [int(value) for value in indices.detach().cpu().tolist()]
+    return [int(value) for value in indices]
+
+
+def _select_last_valid_token_torch(hidden_states: Any, indices: Any) -> Any:
+    if hidden_states.ndim not in (2, 3):
+        raise ValueError("Hidden states must be two- or three-dimensional.")
+
+    if torch.is_tensor(indices):
+        index_tensor = indices.to(
+            device=hidden_states.device, dtype=torch.long
+        ).reshape(-1)
+    else:
+        index_tensor = torch.as_tensor(
+            indices, dtype=torch.long, device=hidden_states.device
+        ).reshape(-1)
+
+    if hidden_states.ndim == 2:
+        if index_tensor.numel() != 1:
+            raise ValueError(
+                "Two-dimensional hidden states require exactly one valid-token index."
+            )
+        if hidden_states.shape[0] == 0:
+            raise ValueError("Hidden-state sequence dimension must be nonempty.")
+        token_index = index_tensor[0]
+        if bool(token_index < 0) or bool(token_index >= hidden_states.shape[0]):
+            raise ValueError("Valid-token index is outside hidden-state sequence bounds.")
+        return hidden_states[token_index]
+
+    if hidden_states.shape[0] == 0:
+        raise ValueError("Hidden-state batch dimension must be nonempty.")
+    if index_tensor.numel() != hidden_states.shape[0]:
+        raise ValueError("Valid-token index count must match hidden-state batch size.")
+    if bool(torch.any(index_tensor < 0)) or bool(
+        torch.any(index_tensor >= hidden_states.shape[1])
+    ):
+        raise ValueError("Valid-token index is outside hidden-state sequence bounds.")
+    batch_indices = torch.arange(
+        hidden_states.shape[0], dtype=torch.long, device=hidden_states.device
+    )
+    return hidden_states[batch_indices, index_tensor]
+
+
+def _select_last_valid_token_numpy(hidden_states: Any, indices: Any) -> np.ndarray:
     states = np.asarray(hidden_states, dtype=np.float32)
+    if states.ndim not in (2, 3):
+        raise ValueError("Hidden states must be two- or three-dimensional.")
+    index_list = _indices_to_python_list(indices)
+
+    if states.ndim == 2:
+        if len(index_list) != 1:
+            raise ValueError(
+                "Two-dimensional hidden states require exactly one valid-token index."
+            )
+        token_index = index_list[0]
+        if token_index < 0 or token_index >= states.shape[0]:
+            raise ValueError("Valid-token index is outside hidden-state sequence bounds.")
+        return states[token_index, :]
+
+    if states.shape[0] != len(index_list):
+        raise ValueError("Valid-token index count must match hidden-state batch size.")
+    if states.shape[0] == 0:
+        raise ValueError("Hidden-state batch dimension must be nonempty.")
+    for token_index in index_list:
+        if token_index < 0 or token_index >= states.shape[1]:
+            raise ValueError("Valid-token index is outside hidden-state sequence bounds.")
+    return np.stack(
+        [
+            states[batch_index, token_index, :]
+            for batch_index, token_index in enumerate(index_list)
+        ]
+    )
+
+
+def select_last_valid_token(hidden_states: Any, attention_mask: Any) -> Any:
+    """Select each record's last valid token from hidden states.
+
+    Torch selection stays in torch before any CPU conversion. NumPy input
+    retains the original NumPy selection behavior.
+    """
     indices = last_valid_token_indices(attention_mask)
-    if states.ndim == 3:
-        selected = np.stack([states[batch_index, token_index, :] for batch_index, token_index in enumerate(indices)])
-        return selected
-    if states.ndim == 2 and len(indices) == 1:
-        return states[indices[0], :]
-    raise ValueError("Unsupported hidden-state shape for attention-mask selection.")
+    return select_last_valid_token_at_indices(hidden_states, indices)
 
 
-def to_float32_analysis_array(value: Any) -> np.ndarray:
-    return np.asarray(value, dtype=np.float32)
+def select_last_valid_token_at_indices(hidden_states: Any, indices: Any) -> Any:
+    """Select hidden-state rows using already-derived valid-token indices."""
+    if torch.is_tensor(hidden_states):
+        return _select_last_valid_token_torch(hidden_states, indices)
+    return _select_last_valid_token_numpy(hidden_states, indices)
 
 
-def block27_pre_final_rmsnorm_hook(module: Any, args: Any, output: Any) -> Any:
-    """Conceptual pre-final hook boundary; production execution is not authorized."""
-    return output
+def to_float32_analysis_array(value: Any, expected_ndim: int | None = None) -> np.ndarray:
+    """Convert a torch tensor or NumPy-compatible value to finite float32 analysis data."""
+    if torch.is_tensor(value):
+        if value.dtype.is_complex:
+            raise TypeError("Complex tensors are not valid analysis arrays.")
+        array = np.asarray(value.detach().cpu().numpy(), dtype=np.float32)
+    else:
+        array = np.asarray(value, dtype=np.float32)
+    if expected_ndim is not None and array.ndim != expected_ndim:
+        raise ValueError(
+            f"Analysis array has dimension {array.ndim}, expected {expected_ndim}."
+        )
+    if not np.isfinite(array).all():
+        raise ValueError("Analysis array contains non-finite values.")
+    return array
+
+
+def extract_block_hidden_state(output: Any) -> Any:
+    """Extract a decoder-block hidden-state tensor from a supported output shape."""
+    if torch.is_tensor(output):
+        return output
+    if isinstance(output, (tuple, list)):
+        if len(output) == 0:
+            raise TypeError("UNSUPPORTED_BLOCK_OUTPUT_STRUCTURE_EMPTY")
+        return extract_block_hidden_state(output[0])
+    raise TypeError("UNSUPPORTED_BLOCK_OUTPUT_STRUCTURE")
+
+
+@dataclass
+class ForwardHookCapture:
+    """Explicit per-forward capture container for decoder-block outputs."""
+
+    _captured: Any = None
+    _capture_count: int = 0
+
+    def record(self, output: Any) -> None:
+        if self._capture_count:
+            raise RuntimeError("UNEXPECTED_MULTIPLE_HOOK_CAPTURE")
+        self._captured = extract_block_hidden_state(output)
+        self._capture_count = 1
+
+    @property
+    def value(self) -> Any:
+        if self._capture_count == 0:
+            raise RuntimeError("HOOK_CAPTURE_MISSING")
+        if self._capture_count != 1:
+            raise RuntimeError("UNEXPECTED_MULTIPLE_HOOK_CAPTURE")
+        return self._captured
+
+    def clear(self) -> None:
+        self._captured = None
+        self._capture_count = 0
+
+
+def make_block_output_hook(capture: ForwardHookCapture):
+    """Return a non-mutating forward hook that records decoder-block output."""
+
+    def hook(module: Any, args: Any, output: Any) -> None:
+        capture.record(output)
+        return None
+
+    return hook
+
+
+def block27_pre_final_rmsnorm_hook(capture: ForwardHookCapture):
+    """Return the block27 pre-final-RMSNorm forward hook factory."""
+    return make_block_output_hook(capture)
+
+
+@contextmanager
+def block_output_hook_capture(module: Any, capture: ForwardHookCapture | None = None):
+    """Register, capture, and guaranteed-remove a forward hook."""
+    capture = capture if capture is not None else ForwardHookCapture()
+    capture.clear()
+    hook = make_block_output_hook(capture)
+    handle = module.register_forward_hook(hook)
+    try:
+        yield capture
+    finally:
+        handle.remove()
+
+
+def extract_checkpoint_tensors(
+    hidden_states: Sequence[Any],
+    block27_pre_final_output: Any,
+) -> dict[str, Any]:
+    """Map production model hidden states and the block27 hook output to checkpoint names."""
+    if not isinstance(hidden_states, (tuple, list)):
+        raise TypeError("HIDDEN_STATES_SEQUENCE_REQUIRED")
+
+    checkpoint_tensors: dict[str, Any] = {}
+    for checkpoint in CHECKPOINT_SPECS:
+        if checkpoint.hidden_states_index is None:
+            tensor = extract_block_hidden_state(block27_pre_final_output)
+        else:
+            index = checkpoint.hidden_states_index
+            if index >= len(hidden_states):
+                raise ProtocolIntegrityError(
+                    f"MISSING_HIDDEN_STATE_{checkpoint.name}_{index}"
+                )
+            tensor = hidden_states[index]
+            if not torch.is_tensor(tensor):
+                raise TypeError(f"CHECKPOINT_{checkpoint.name}_NOT_TORCH_TENSOR")
+        checkpoint_tensors[checkpoint.name] = tensor
+
+    if set(checkpoint_tensors) != set(CHECKPOINT_NAMES):
+        raise ProtocolIntegrityError("CHECKPOINT_EXTRACTION_MAPPING_MISMATCH")
+    return checkpoint_tensors
+
+
+def extract_last_token_representations(
+    checkpoint_tensors: Mapping[str, Any],
+    attention_mask: Any,
+) -> dict[str, Any]:
+    """Select each checkpoint tensor using the same per-record valid-token indices."""
+    if set(checkpoint_tensors) != set(CHECKPOINT_NAMES):
+        raise ProtocolIntegrityError("CHECKPOINT_TENSOR_SET_MISMATCH")
+    indices = last_valid_token_indices(attention_mask)
+    return {
+        name: select_last_valid_token_at_indices(tensor, indices)
+        for name, tensor in checkpoint_tensors.items()
+    }
 
 
 def build_parser() -> argparse.ArgumentParser:

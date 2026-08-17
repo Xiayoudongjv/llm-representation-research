@@ -9,6 +9,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+import torch
 from sklearn.linear_model import LogisticRegression
 
 
@@ -66,6 +67,23 @@ def _tracked_analysis(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setattr(runner, "_build_prediction_rows", tracked_build_rows)
     analysis = runner.run_split_analysis(_synthetic_split())
     return analysis, scaler_objects, classifier_objects, build_calls
+
+
+class _MockDecoderBlock(torch.nn.Module):
+    def __init__(self, tuple_output: bool = False):
+        super().__init__()
+        self.tuple_output = tuple_output
+
+    def forward(self, x):
+        output = x * 2.0 + 1.0
+        if self.tuple_output:
+            return (output,)
+        return output
+
+
+class _RaisingDecoderBlock(torch.nn.Module):
+    def forward(self, x):
+        raise RuntimeError("synthetic forward failure")
 
 
 def test_exact_binomial_tail_known_cases() -> None:
@@ -475,3 +493,236 @@ def test_eval_records_never_enter_fit_calls(monkeypatch) -> None:
         assert ids in (fit_ids, eval_ids)
     assert sum(1 for _, ids in calls if ids == fit_ids) == 14
     assert sum(1 for _, ids in calls if ids == eval_ids) == 39
+
+
+def test_last_valid_token_indices_torch_cpu() -> None:
+    mask_1d = torch.tensor([1, 1, 1, 0, 0], dtype=torch.long)
+    indices_1d = runner.last_valid_token_indices(mask_1d)
+    assert torch.is_tensor(indices_1d)
+    assert indices_1d.dtype == torch.long
+    assert indices_1d.device.type == "cpu"
+    assert indices_1d.tolist() == [2]
+
+    mask_2d = torch.tensor(
+        [[1, 1, 0, 0], [1, 1, 1, 0]], dtype=torch.long
+    )
+    indices_2d = runner.last_valid_token_indices(mask_2d)
+    assert torch.is_tensor(indices_2d)
+    assert indices_2d.dtype == torch.long
+    assert indices_2d.tolist() == [1, 2]
+
+
+def test_last_valid_token_indices_torch_rejects_invalid_masks() -> None:
+    with pytest.raises(ValueError, match="no valid token"):
+        runner.last_valid_token_indices(torch.zeros(2, 3, dtype=torch.long))
+    with pytest.raises(ValueError, match="one- or two-dimensional"):
+        runner.last_valid_token_indices(torch.ones(1, 2, 3, dtype=torch.long))
+    with pytest.raises(ValueError, match="negative"):
+        runner.last_valid_token_indices(torch.tensor([1, -1], dtype=torch.long))
+
+
+def test_select_last_valid_token_torch_batch_and_two_dimensional() -> None:
+    states = torch.arange(2 * 4 * 3, dtype=torch.float32).reshape(2, 4, 3)
+    mask = torch.tensor([[1, 1, 0, 0], [1, 1, 1, 0]], dtype=torch.long)
+    selected = runner.select_last_valid_token(states, mask)
+    assert torch.is_tensor(selected)
+    assert selected.shape == (2, 3)
+    assert selected.device == states.device
+    assert torch.equal(
+        selected,
+        torch.stack([states[0, 1, :], states[1, 2, :]]),
+    )
+
+    states_2d = torch.arange(5 * 3, dtype=torch.float32).reshape(5, 3)
+    selected_2d = runner.select_last_valid_token(
+        states_2d, torch.tensor([1, 1, 1, 0, 0], dtype=torch.long)
+    )
+    assert torch.is_tensor(selected_2d)
+    assert selected_2d.shape == (3,)
+    assert torch.equal(selected_2d, states_2d[2, :])
+
+
+def test_select_last_valid_token_numpy_preserves_existing_behavior() -> None:
+    states = np.arange(2 * 4 * 3, dtype=np.float32).reshape(2, 4, 3)
+    mask = np.array([[1, 1, 0, 0], [1, 1, 1, 0]])
+    selected = runner.select_last_valid_token(states, mask)
+    assert isinstance(selected, np.ndarray)
+    assert selected.shape == (2, 3)
+    assert np.array_equal(selected, np.stack([states[0, 1, :], states[1, 2, :]]))
+
+
+def test_to_float32_analysis_array_torch_detach_cpu_float32() -> None:
+    tensor = torch.tensor([[1.0, 2.0], [3.0, 4.0]], requires_grad=True)
+    array = runner.to_float32_analysis_array(tensor)
+    assert isinstance(array, np.ndarray)
+    assert array.dtype == np.float32
+    assert array.tolist() == [[1.0, 2.0], [3.0, 4.0]]
+
+
+def test_to_float32_analysis_array_rejects_nonfinite() -> None:
+    with pytest.raises(ValueError, match="non-finite"):
+        runner.to_float32_analysis_array(torch.tensor([1.0, float("nan")]))
+    with pytest.raises(ValueError, match="non-finite"):
+        runner.to_float32_analysis_array(np.array([1.0, np.inf], dtype=np.float32))
+
+
+def test_to_float32_analysis_array_validates_expected_dimension() -> None:
+    with pytest.raises(ValueError, match="dimension"):
+        runner.to_float32_analysis_array(np.ones((2, 3), dtype=np.float32), expected_ndim=1)
+    array = runner.to_float32_analysis_array(torch.ones(2, 3), expected_ndim=2)
+    assert array.shape == (2, 3)
+
+
+def test_extract_block_hidden_state_supports_tensor_tuple_and_list() -> None:
+    tensor = torch.ones(2, 3)
+    assert runner.extract_block_hidden_state(tensor) is tensor
+    assert torch.equal(runner.extract_block_hidden_state((tensor, "meta")), tensor)
+    assert torch.equal(runner.extract_block_hidden_state([tensor]), tensor)
+    with pytest.raises(TypeError, match="UNSUPPORTED"):
+        runner.extract_block_hidden_state({"hidden": tensor})
+    with pytest.raises(TypeError, match="UNSUPPORTED"):
+        runner.extract_block_hidden_state(())
+
+
+def test_forward_hook_capture_records_output_without_replacement() -> None:
+    module = _MockDecoderBlock()
+    x = torch.tensor([[1.0, 2.0], [3.0, 4.0]])
+    capture = runner.ForwardHookCapture()
+    with runner.block_output_hook_capture(module, capture) as active:
+        output = module(x)
+        assert active is capture
+        assert torch.equal(capture.value, output)
+    assert torch.equal(output, x * 2.0 + 1.0)
+
+
+def test_hook_cleanup_after_success_and_subsequent_forward() -> None:
+    module = _MockDecoderBlock()
+    capture = runner.ForwardHookCapture()
+    x = torch.tensor([1.0, 2.0, 3.0])
+    with runner.block_output_hook_capture(module, capture):
+        first = module(x)
+        captured = capture.value
+    assert len(module._forward_hooks) == 0
+    second = module(x + 10.0)
+    assert torch.equal(capture.value, captured)
+    assert torch.equal(first, x * 2.0 + 1.0)
+    assert not torch.equal(captured, second)
+
+
+def test_hook_cleanup_after_exception() -> None:
+    module = _RaisingDecoderBlock()
+    capture = runner.ForwardHookCapture()
+    with pytest.raises(RuntimeError, match="synthetic forward failure"):
+        with runner.block_output_hook_capture(module, capture):
+            module(torch.tensor([1.0]))
+    assert len(module._forward_hooks) == 0
+
+
+def test_hook_capture_rejects_missing_and_multiple_capture() -> None:
+    capture = runner.ForwardHookCapture()
+    with pytest.raises(RuntimeError, match="MISSING"):
+        _ = capture.value
+    capture.record(torch.ones(2, 3))
+    with pytest.raises(RuntimeError, match="MULTIPLE"):
+        capture.record(torch.ones(2, 3))
+
+
+def test_mock_decoder_tuple_output_hook_captures_first_component() -> None:
+    module = _MockDecoderBlock(tuple_output=True)
+    x = torch.tensor([[1.0, 2.0]])
+    capture = runner.ForwardHookCapture()
+    with runner.block_output_hook_capture(module, capture):
+        output = module(x)
+    assert isinstance(output, tuple)
+    assert len(output) == 1
+    assert torch.equal(output[0], x * 2.0 + 1.0)
+    assert torch.equal(capture.value, output[0])
+
+
+def test_zero_perturbation_unit_with_mock_hook() -> None:
+    module = _MockDecoderBlock()
+    x = torch.tensor([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+    reference = module(x)
+    capture = runner.ForwardHookCapture()
+    with runner.block_output_hook_capture(module, capture):
+        observed = module(x)
+    assert torch.equal(observed, reference)
+    assert torch.equal(capture.value, reference)
+
+
+def test_checkpoint_extraction_maps_hidden_states_and_block27_hook() -> None:
+    hidden_states = [torch.zeros(2, 4, 3) for _ in range(29)]
+    for index in range(17, 29):
+        hidden_states[index] = torch.full((2, 4, 3), float(index))
+    block27_pre = torch.full((2, 4, 3), 270.0)
+    checkpoints = runner.extract_checkpoint_tensors(hidden_states, block27_pre)
+    assert set(checkpoints) == set(runner.CHECKPOINT_NAMES)
+    assert torch.equal(
+        checkpoints["block16_pre_final_rmsnorm"], hidden_states[17]
+    )
+    assert torch.equal(
+        checkpoints["block26_pre_final_rmsnorm"], hidden_states[27]
+    )
+    assert torch.equal(checkpoints["block27_pre_final_rmsnorm"], block27_pre)
+    assert torch.equal(
+        checkpoints["block27_post_final_rmsnorm"], hidden_states[28]
+    )
+
+
+def test_checkpoint_extraction_rejects_missing_hidden_states() -> None:
+    with pytest.raises(runner.ProtocolIntegrityError, match="MISSING_HIDDEN_STATE"):
+        runner.extract_checkpoint_tensors(
+            [torch.zeros(2, 4, 3) for _ in range(10)],
+            torch.zeros(2, 4, 3),
+        )
+
+
+def test_last_token_extraction_uses_same_index_across_checkpoints() -> None:
+    checkpoint_tensors = {
+        name: torch.arange(2 * 5 * 3, dtype=torch.float32).reshape(2, 5, 3)
+        for name in runner.CHECKPOINT_NAMES
+    }
+    mask = torch.tensor([[1, 1, 0, 0, 0], [1, 1, 1, 0, 0]], dtype=torch.long)
+    selected = runner.extract_last_token_representations(checkpoint_tensors, mask)
+    assert set(selected) == set(runner.CHECKPOINT_NAMES)
+    for name, tensor in selected.items():
+        assert torch.is_tensor(tensor)
+        assert tensor.shape == (2, 3)
+        assert torch.equal(tensor[0], checkpoint_tensors[name][0, 1, :])
+        assert torch.equal(tensor[1], checkpoint_tensors[name][1, 2, :])
+
+
+def test_formal_gate_still_blocks_new_runtime_helpers(monkeypatch) -> None:
+    def forbidden(*args, **kwargs):
+        raise AssertionError("forbidden runtime helper called")
+
+    monkeypatch.setattr(runner, "extract_checkpoint_tensors", forbidden)
+    monkeypatch.setattr(runner, "block_output_hook_capture", forbidden)
+    monkeypatch.setattr(runner, "make_block_output_hook", forbidden)
+    with pytest.raises(PermissionError, match="FORMAL_RUN_NOT_AUTHORIZED"):
+        runner.run_formal()
+
+
+@pytest.mark.skipif(
+    not torch.cuda.is_available(),
+    reason="optional CUDA tensor smoke requires a CUDA device",
+)
+def test_optional_cuda_tensor_runtime_path_smoke() -> None:
+    device = torch.device("cuda")
+    mask = torch.tensor(
+        [[1, 1, 0], [1, 1, 1]], dtype=torch.long, device=device
+    )
+    indices = runner.last_valid_token_indices(mask)
+    assert torch.is_tensor(indices)
+    assert indices.device.type == "cuda"
+
+    states = torch.arange(2 * 3 * 3, dtype=torch.float32, device=device).reshape(
+        2, 3, 3
+    )
+    selected = runner.select_last_valid_token(states, mask)
+    assert torch.is_tensor(selected)
+    assert selected.device.type == "cuda"
+
+    analysis = runner.to_float32_analysis_array(selected)
+    assert isinstance(analysis, np.ndarray)
+    assert analysis.dtype == np.float32

@@ -198,3 +198,18 @@ No formal execution, model load, or EVAL access is authorized.
 - Runner path: `experiments/exp022a/run_exp022a.py`
 - Runner preflight document: `docs/experiments/EXP-022A-RUNNER-PREFLIGHT.md`
 - Next phase = `independent runner/preflight rereview`
+
+## Task-094D EXP-022A model/hook engineering qualification attempt
+
+- Task 094D = `BLOCKED_ENGINEERING_RUNTIME_PATCH_REQUIRED`
+- Block classification = `ENGINEERING_RUNTIME_INTEGRATION_GAP`
+- Model runtime qualification = `NOT YET COMPLETED`
+- Formal EXP-022A execution = `NOT AUTHORIZED`
+
+## Task-094D-P torch/CUDA runtime integration patch
+
+- Task 094D-P = `TORCH_CUDA_RUNTIME_INTEGRATION_PATCH`
+- Scientific implementation semantics = `UNCHANGED`
+- Model runtime qualification = `NOT YET COMPLETED`
+- Formal EXP-022A execution = `NOT AUTHORIZED`
+- Next = `targeted runtime-integration patch review`

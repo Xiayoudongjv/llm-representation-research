@@ -160,10 +160,52 @@ These choices do not change scientific hypotheses or primary gates.
 - Warnings: seven existing scikit-learn `FutureWarning` items related to
   `penalty` deprecation; no new scientific warning was suppressed.
 
+## Task-094D runtime qualification blocker
+
+Task-094D was blocked before model/tokenizer load because the production
+representation helpers were NumPy-only and the block27 hook was a placeholder.
+
+- Classification: `ENGINEERING_RUNTIME_INTEGRATION_GAP`
+- Not a scientific failure.
+- Not a model failure.
+- Not an EXP-022A failure.
+- Not-yet-executed runtime qualification checks remain `NOT_OBSERVED`,
+  `NOT_EVALUATED`, or `BLOCKED_BY_RUNTIME_INTEGRATION`.
+
+## Task-094D-P torch runtime patch
+
+Engineering-only patch that adds the production PyTorch/CUDA-compatible
+representation-runtime bridge:
+
+- torch import with no CUDA initialization on module import;
+- torch-aware `last_valid_token_indices` that stays on-device;
+- torch-aware `select_last_valid_token` and
+  `select_last_valid_token_at_indices`;
+- `to_float32_analysis_array` using `detach -> CPU -> NumPy -> float32`;
+- finite-value validation at the analysis conversion boundary;
+- decoder-block output normalization for tensor and tuple/list outputs;
+- explicit `ForwardHookCapture` container with missing/multiple detection;
+- non-mutating forward-hook factory and lifecycle context manager with cleanup;
+- checkpoint extraction from `hidden_states[17]` through `hidden_states[28]`
+  plus the captured block27 pre-final output;
+- same-index last-token extraction across all checkpoints.
+
+Static and synthetic preflight remain non-runtime. The formal-run gate remains
+fail-closed before any new runtime helper is reachable.
+
+- Model runtime qualification: `NOT YET COMPLETED`
+- Formal EXP-022A execution: `NOT AUTHORIZED`
+- Scientific implementation semantics: `UNCHANGED`
+
+Focused test result: `pytest -q tests/test_exp022a_runner.py` -> `54 passed`.
+
+Full test result: `PYTHONPATH=. pytest -q` -> `621 passed, 2 skipped`.
+
 ## Remaining qualification steps
 
-- Independent runner/static-preflight rereview.
-- Future model-runtime qualification under separate authorization.
+- Targeted independent rereview of the Task-094D-P runtime-integration patch.
+- Future Task-094D model/tokenizer/hook engineering qualification under
+  separate authorization.
 - Future formal execution authorization.
 
 No model, tokenizer, controlled prompt text, formal FIT/EVAL data, formal
