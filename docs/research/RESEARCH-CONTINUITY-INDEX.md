@@ -5,13 +5,14 @@ experimental artifacts outrank it.
 
 ## Current research phase
 
-EXP-022A preregistration v0.2 freeze-candidate rereview
+EXP-022A v0.2 targeted diff rereview
 
 ## Current preregistration draft
 
 - `docs/experiments/EXP-022A-PREREGISTRATION-DRAFT.md`
 - Status: `v0.2` / `FREEZE CANDIDATE` / `NOT FROZEN`
 - Independent review trail: `../experiments/EXP-022A-PREREGISTRATION-REVIEW-092C.md`
+- v0.2 rereview trail: `../experiments/EXP-022A-PREREGISTRATION-REREVIEW-092E.md`
 
 ## Read order
 
@@ -21,7 +22,8 @@ EXP-022A preregistration v0.2 freeze-candidate rereview
 4. `experiments/EXP-022A-PROTOCOL-RECONCILIATION.md`
 5. `../experiments/EXP-022A-PREREGISTRATION-DRAFT.md`
 6. `../experiments/EXP-022A-PREREGISTRATION-REVIEW-092C.md`
-7. canonical experiment authority/results
+7. `../experiments/EXP-022A-PREREGISTRATION-REREVIEW-092E.md`
+8. canonical experiment authority/results
 
 ## Resolved historical gates
 
@@ -66,10 +68,24 @@ v1.0 COMPLETE
 - Freeze not performed.
 - No implementation/model/EVAL execution authorized.
 
+## Task-092E independent v0.2 rereview
+
+- Status: `COMPLETE`
+- Review artifact: `docs/experiments/EXP-022A-PREREGISTRATION-REREVIEW-092E.md`
+- Verdict: `READY_AFTER_MINOR_PRECISION_PATCH`
+- Sole issue: `092E-MINOR-001`
+
+## Task-092EP precision patch
+
+- `092E-MINOR-001 = PATCHED`
+- `PARTIAL_CONCORDANCE` zero-effect unsupported case classified as partial concordance.
+- Targeted diff rereview: `PENDING_092F`
+- README/public repository sync: `PENDING_SEPARATE_HYGIENE_TASK`
+
 ## Current next action
 
-Task 092E ? independent rereview of the EXP-022A v0.2 freeze candidate.
+Task 092F ? read-only targeted rereview of the 092EP diff only.
 
-Task-092E must not access controlled prompt text.
+Task-092F must not access controlled prompt text.
 
 No implementation/model/EVAL execution is authorized.

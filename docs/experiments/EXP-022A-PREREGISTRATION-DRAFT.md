@@ -670,8 +670,10 @@ Definitions:
 - `CROSS_SPLIT_SUPPORTED`: both split-specific primary criteria support the
   preregistered direction.
 - `PARTIAL_CONCORDANCE`: exactly one split supports the direction, and the
-  other split's observed effect estimate has the same sign but does not meet
-  its exact support rule.
+  other split either has an observed effect estimate in the same preregistered
+  direction without satisfying its exact support rule, or has an observed
+  effect estimate exactly equal to zero without satisfying its exact support
+  rule.
 - `SPLIT_HETEROGENEOUS`: observed split point estimates have opposite signs,
   OR one split provides preregistered directional support while the other
   provides support for the opposite direction, if an opposite-direction
@@ -1421,6 +1423,10 @@ EXP022A_EVAL_RESEARCHER_CONTENT_BLIND = false
 EXP022A_EVAL_COMPUTATIONALLY_HELD_OUT = true
 EXP022A_POST_092B_CONTENT_EXPOSURE_GUARD = ACTIVE
 EXP022A_REREVIEW_REQUIRED = true
+EXP022A_092E_MINOR_PRECISION_PATCH = APPLIED
+EXP022A_TARGETED_DIFF_REREVIEW_REQUIRED = true
+EXP022A_CROSS_SPLIT_ZERO_CASE = PARTIAL_CONCORDANCE
+EXP022A_CROSS_SPLIT_CATEGORIES_PATCHED = true
 EXP022A_PREREGISTRATION_FROZEN = false
 EXP022A_IMPLEMENTATION_AUTHORIZED = false
 EXP022A_MODEL_EXECUTION_AUTHORIZED = false
