@@ -654,6 +654,208 @@ Huang's-Law-style structural scaling inspiration -> future Representational Scal
 - Possible Paper Role: Proposed framework.
 - Verification Status: `DEPENDENT_FUTURE`
 
+## Operator-Routed Structured-State Architecture Assets
+
+### ASSET-OPERATOR-NET-001 - Operator-Routed Structured-State Neural Architecture
+
+- ID: `ASSET-OPERATOR-NET-001`
+- Name: Operator-Routed Structured-State Neural Architecture
+- Category: `LONG_TERM_ARCHITECTURE` / `REPRESENTATION_CONTROL` / `PRIOR_ART_REQUIRED`
+- Origin / Provenance: `USER_ORIGINAL_IDEA` + `DEEPSEEK_PROPOSED_INTERPRETATION` + `PROJECT_SYNTHESIS`
+- Core Insight: Nodes contain structured states rather than only scalar activations; edges implement constrained transformation families; a routing controller selects transformations; transformations compose; task-relevant invariants constrain validity.
+- Connection to Current Research: Extends the operator-vocabulary ladder into a future architectural hypothesis.
+- Connection to Experiments: Not tested. EXP-022A supplies only a descriptive diagonal-calibration candidate, not evidence for this architecture.
+- Potential Scientific Value: Potential inductive bias for symmetry, uncertainty, compositional transformation, and representation alignment.
+- Potential Engineering Value: Future modular, controllable neural systems.
+- Potential Formalization: `State + Operator + Operator Selection + Composition + Invariant Validation`.
+- Potential Testable Consequence: Future sample efficiency, compositional generalization, robustness, operator reuse, and routing tests.
+- Dependencies: `HYP-CALIBRATION-001`, `HYP-TRANSPORT-001`, `HYP-OPERATOR-001`.
+- Current Evidence: None.
+- Counterevidence / Limitations: Traditional neural networks already use matrices/linear operators; "replace scalar weights with operators" is not by itself novel.
+- Overclaim Boundary: Not empirically supported, not a new AI paradigm, not a non-Abelian network.
+- Priority: `TIER 2`/`TIER 3` long-term; not active.
+- Activation Trigger: Meaningful progress on calibration/transport and at least two empirically grounded reusable operator families.
+- Related Constructs: Operator-valued edge, structured multi-hypothesis node state, conditional operator selection.
+- Related Hypotheses: `HYP-OPERATOR-NET-001`, `HYP-OPERATOR-001`, `HYP-TRANSPORT-001`, `HYP-BELIEF-001`.
+- Related Claims: None.
+- Possible Paper Role: Future architecture proposal only after prior-art review.
+- Verification Status: `LONG_TERM_PRIOR_ART_REQUIRED_NOT_TESTED`
+
+### ASSET-STRUCTURED-NODE-001 - Structured / Multi-Hypothesis Neural State
+
+- ID: `ASSET-STRUCTURED-NODE-001`
+- Name: Structured / Multi-Hypothesis Neural State
+- Category: `LONG_TERM_ARCHITECTURE` / `REPRESENTATION_CONTROL`
+- Origin / Provenance: `USER_ORIGINAL_IDEA` ("多态叠加矩阵" historical intuition) + `PROJECT_SYNTHESIS`
+- Core Insight: A node may preserve candidate latent states with confidence weights instead of only one scalar/vector activation.
+- Connection to Current Research: Connects to `HYP-BELIEF-001` and uncertainty-preserving representation.
+- Connection to Experiments: Not tested.
+- Potential Scientific Value: Partial observability and uncertainty-aware computation.
+- Potential Engineering Value: Structured state interfaces for future architectures.
+- Potential Formalization: `B_i = {(z_i1,p_i1),...,(z_iK,p_iK)}`; candidate tensor form `B_i in R^(K x M x T x D)`.
+- Potential Testable Consequence: Future robustness under missing/noisy observations.
+- Dependencies: Belief-state formalism.
+- Current Evidence: None.
+- Counterevidence / Limitations: Historical phrase is not a complete mathematical definition; tensor-valued, multi-hypothesis, and overlap constructs are distinct.
+- Overclaim Boundary: Not quantum superposition.
+- Priority: `TIER 4`
+- Activation Trigger: Separate embodied/uncertainty research program.
+- Related Constructs: Structured belief representation.
+- Related Hypotheses: `HYP-BELIEF-001`, `HYP-OPERATOR-NET-001`.
+- Related Claims: None.
+- Possible Paper Role: Long-term construct candidate.
+- Verification Status: `SPECULATIVE`
+
+### ASSET-OPERATOR-EDGE-001 - Operator-Valued Edge
+
+- ID: `ASSET-OPERATOR-EDGE-001`
+- Name: Operator-Valued Edge
+- Category: `LONG_TERM_ARCHITECTURE`
+- Origin / Provenance: `USER_ORIGINAL_IDEA` + `PROJECT_SYNTHESIS`
+- Core Insight: Interpret a connection as `i --O_k(theta, context)--> j`, where `O_k` belongs to a constrained operator vocabulary.
+- Connection to Current Research: Generalizes the geometric-operator ladder.
+- Connection to Experiments: Not tested.
+- Potential Scientific Value: Typed/structured transformations.
+- Potential Engineering Value: More interpretable, constrained network connections.
+- Potential Formalization: Operator contract `O_k = (T_k, C_k, I_k, D_k)`.
+- Potential Testable Consequence: Future operator reuse and composition.
+- Dependencies: Operator vocabulary.
+- Current Evidence: None.
+- Counterevidence / Limitations: Ordinary weight matrices already implement linear operators; the interesting object is the structured/restricted family plus selection.
+- Overclaim Boundary: Not an established architecture principle.
+- Priority: `TIER 2`
+- Activation Trigger: After multiple grounded operator families exist.
+- Related Constructs: Geometric operator vocabulary, conditional operator selection.
+- Related Hypotheses: `HYP-OPERATOR-NET-001`, `HYP-OPERATOR-001`.
+- Related Claims: None.
+- Possible Paper Role: Future architecture formalization.
+- Verification Status: `SPECULATIVE`
+
+### ASSET-OPERATOR-SELECTION-002 - Conditional Operator Selection
+
+- ID: `ASSET-OPERATOR-SELECTION-002`
+- Name: Conditional Operator Selection
+- Category: `HIGH_VALUE_LONG_TERM_CONCEPT`
+- Origin / Provenance: `PROJECT_SYNTHESIS`
+- Core Insight: The key question is not only what transformations exist, but when to apply which transformation.
+- Connection to Current Research: Bridges representation control, Harness, and future neural routing.
+- Connection to Experiments: Not tested.
+- Potential Scientific Value: Transformation-selection policies.
+- Potential Engineering Value: Adaptive inference and control.
+- Potential Formalization: `a_ij = pi(B_i, B_j, task, context, uncertainty)`; `m_ij = O_aij(B_i)` or soft routing `sum_k p_k O_k(B_i)`.
+- Potential Testable Consequence: Future routing/separation studies.
+- Dependencies: Operator vocabulary, uncertainty/context representation.
+- Current Evidence: None.
+- Counterevidence / Limitations: Speculative.
+- Overclaim Boundary: Not tested.
+- Priority: `TIER 2`
+- Activation Trigger: After grounded operators exist.
+- Related Constructs: Operator-valued edge, representation control.
+- Related Hypotheses: `HYP-OPERATOR-001`, `HYP-OPERATOR-NET-001`.
+- Related Claims: None.
+- Possible Paper Role: Future research question.
+- Verification Status: `HIGH_VALUE_LONG_TERM_CONCEPT / NOT_TESTED`
+
+### ASSET-OPERATOR-NET-PROVENANCE-001 - Operator Network Provenance and DeepSeek Overclaim Audit
+
+- ID: `ASSET-OPERATOR-NET-PROVENANCE-001`
+- Name: Operator Network Provenance and DeepSeek Overclaim Audit
+- Category: `PROVENANCE / TERM_UNVERIFIED / OVERCLAIM_AUDIT`
+- Origin / Provenance: `USER_ORIGINAL_IDEA` + `DEEPSEEK_PROPOSED_INTERPRETATION` + `PROJECT_SYNTHESIS`
+- Core Insight: Preserve the user 2/3/4 historical operator-label inspiration and DeepSeek's proposed "Geo-Fold Network" interpretation without promoting their unsupported claims.
+- Connection to Current Research: The provisional descriptive name is `Operator-Routed Structured-State Network` or `Operator-Routed Structured-State Neural Architecture`; "Geo-Fold Network" is retained only as `DEEPSEEK_PROPOSED_NAME`.
+- Connection to Experiments: None.
+- Potential Scientific Value: Clean provenance prevents overclaim contamination.
+- Potential Engineering Value: Future naming/prior-art decisions.
+- Potential Formalization: `O = {O_1,...,O_K}`; numerical labels are not mathematical definitions.
+- Potential Testable Consequence: Prior-art comparison.
+- Dependencies: Prior-art review.
+- Current Evidence: None.
+- Counterevidence / Limitations: DeepSeek claims of phase transition, bypassing DL limits, Lie-group local-minima elimination, gradient/forgetting solutions, dimension-jump collapse repair, quantum superposition, Kakeya information recovery, and new-AI-era status are unsupported.
+- Overclaim Boundary: `DEEPSEEK_OVERCLAIM / SPECULATIVE_NOT_SUPPORTED`.
+- Priority: `TIER 5`
+- Activation Trigger: Prior-art review or architecture formalization.
+- Related Constructs: Operator-valued edge, structured node state.
+- Related Hypotheses: `HYP-OPERATOR-NET-001`.
+- Related Claims: None.
+- Possible Paper Role: Provenance appendix.
+- Verification Status: `PRIOR_ART_REQUIRED`
+
+### ASSET-OPERATOR-NET-CALIBRATION-001 - EXP-022A Calibration Operator Bridge
+
+- ID: `ASSET-OPERATOR-NET-CALIBRATION-001`
+- Name: EXP-022A Calibration Operator Bridge
+- Category: `PROJECT_SYNTHESIS`
+- Origin / Provenance: `EXPERIMENT_DERIVED` + `PROJECT_SYNTHESIS`
+- Core Insight: EXP-022A did not test general coordinate transport, but algebraic review established that A1 is operationally equivalent to a constrained diagonal-affine coordinate adaptation under the fixed reference standardized readout.
+- Connection to Current Research: `O_calibration` is the first empirically motivated candidate transformation family in the project's operator vocabulary.
+- Connection to Experiments: EXP-022A A1.
+- Potential Scientific Value: Links descriptive calibration evidence to the operator-vocabulary ladder.
+- Potential Engineering Value: Lightweight diagonal affine transformation candidate.
+- Potential Formalization: `T_l_to_ref(h) = mu_ref + sigma_ref * ((h - mu_l) / sigma_l)`.
+- Potential Testable Consequence: EXP-023 independent replication and mean/scale decomposition.
+- Dependencies: `HYP-CALIBRATION-001`.
+- Current Evidence: Descriptive only; EXP-022A coordinate transport remains `NOT_TESTED`.
+- Counterevidence / Limitations: Small split-dependent sample; no general transport claim.
+- Overclaim Boundary: Do not retroactively change EXP-022A claims.
+- Priority: `TIER 1`
+- Activation Trigger: Already informs EXP-023 design.
+- Related Constructs: Featurewise recalibration, diagonal affine transport.
+- Related Hypotheses: `HYP-CALIBRATION-001`, `HYP-TRANSPORT-001`.
+- Related Claims: Featurewise recalibration rescue is descriptive signal.
+- Possible Paper Role: Bridge from experiment to operator framework.
+- Verification Status: `ACTIVE_HYPOTHESIS`
+
+### ASSET-OPERATOR-NET-HARNESS-001 - Harness / Meta-Harness Operator Hierarchy
+
+- ID: `ASSET-OPERATOR-NET-HARNESS-001`
+- Name: Harness / Meta-Harness Operator Hierarchy
+- Category: `LONG_TERM_SYSTEM_SYNTHESIS`
+- Origin / Provenance: `PROJECT_SYNTHESIS`
+- Core Insight: Different scales of conditional transformation selection may form a hierarchy.
+- Connection to Current Research: Micro neural edge, representation-level controller, system-level Harness, and meta-system-level Meta-Harness may all select transformations at different granularities.
+- Connection to Experiments: Not tested.
+- Potential Scientific Value: Multiscale operator-selection framework.
+- Potential Engineering Value: Layered control architecture.
+- Potential Formalization: `Operator -> Representation Controller -> Harness -> Meta-Harness`.
+- Potential Testable Consequence: Future control-hierarchy studies.
+- Dependencies: Operator vocabulary, Harness architecture.
+- Current Evidence: None.
+- Counterevidence / Limitations: Speculative; not a current experiment.
+- Overclaim Boundary: `LONG_TERM_SYSTEM_SYNTHESIS` / `NOT_TESTED`.
+- Priority: `TIER 3`
+- Activation Trigger: After grounded operators and representation control exist.
+- Related Constructs: Harness, Meta-Harness, conditional operator selection.
+- Related Hypotheses: `HYP-OPERATOR-NET-001`, `HYP-OPERATOR-001`.
+- Related Claims: None.
+- Possible Paper Role: Future architecture synthesis.
+- Verification Status: `SYSTEM_ARCHITECTURE_IDEA`
+
+### ASSET-OPERATOR-NET-EMBODIED-001 - Embodied Multi-Hypothesis Operator Routing
+
+- ID: `ASSET-OPERATOR-NET-EMBODIED-001`
+- Name: Embodied Multi-Hypothesis Operator Routing
+- Category: `LONG_TERM_APPLICATION_BRANCH`
+- Origin / Provenance: `PROJECT_SYNTHESIS`
+- Core Insight: Under partial physical observation, structured multi-hypothesis states may be routed through different operators before re-weighting.
+- Connection to Current Research: Links `HYP-OPERATOR-NET-001` to `HYP-BELIEF-001`.
+- Connection to Experiments: Not tested.
+- Potential Scientific Value: Uncertainty-aware active perception.
+- Potential Engineering Value: Future embodied AI and sensor fusion.
+- Potential Formalization: `z_1 -> O_A -> z'_1`; `z_2 -> O_B -> z'_2`; then update `p'_1`, `p'_2`.
+- Potential Testable Consequence: Future partial-observation tasks.
+- Dependencies: Structured belief representation, operator selection.
+- Current Evidence: None.
+- Counterevidence / Limitations: Not current EXP-023 scope.
+- Overclaim Boundary: Do not make embodied AI part of current EXP-023.
+- Priority: `TIER 4`
+- Activation Trigger: Separate embodied research program.
+- Related Constructs: Structured multi-hypothesis node state.
+- Related Hypotheses: `HYP-BELIEF-001`, `HYP-OPERATOR-NET-001`.
+- Related Claims: None.
+- Possible Paper Role: Long-term application branch.
+- Verification Status: `APPLICATION_BRANCH`
+
 ## Mathematical and Analogy Assets
 
 ### ASSET-KAKEYA-001 - Kakeya-style direction/overlap inspiration

@@ -55,6 +55,19 @@ not be cited as findings or moved into `CLAIM-LEDGER.md` as fact.
 - Next discriminating experiment: Deferred.
 - Claim boundary: Do not assert non-Abelian structure.
 
+## HYP-OPERATOR-NET-001
+
+- ID: `HYP-OPERATOR-NET-001`
+- Title: Operator-Routed Structured-State Neural Architecture
+- Hypothesis: A neural architecture whose node states preserve structured or multiple candidate representations and whose edges apply conditionally selected, constrained transformation operators may provide a useful inductive bias for tasks involving symmetry, uncertainty, compositional transformation, or representation alignment.
+- Origin: User neural-connection/operator question + DeepSeek proposed Geo-Fold interpretation + project independent reformulation.
+- Current evidence: None; not tested.
+- Counterevidence / limitations: Traditional networks already use matrix/linear operators; novelty not established; prior-art review required.
+- Status: `LONG_TERM` / `PRIOR_ART_REQUIRED` / `NOT_TESTED`
+- Dependencies: `HYP-CALIBRATION-001`, `HYP-TRANSPORT-001`, `HYP-OPERATOR-001`.
+- Next discriminating experiment: Deferred until meaningful progress on calibration/transport and prior-art review.
+- Claim boundary: Not an established architecture, not a new AI paradigm, not a non-Abelian network, not quantum.
+
 ## HYP-BELIEF-001
 
 - ID: `HYP-BELIEF-001`

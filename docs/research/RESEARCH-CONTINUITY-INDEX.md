@@ -332,3 +332,10 @@ No formal execution, model load, or EVAL access is authorized.
 - Long-term assets preserved but inactive.
 - Next scientific task remains EXP-022A scientific review / EXP-023 direction selection.
 - Asset expansion does not change the active experiment automatically.
+
+## Task-095B-A operator-routed architecture asset
+
+- New long-horizon architecture asset registered: `HYP-OPERATOR-NET-001`.
+- Origin: user neural-connection/operator question + DeepSeek proposed Geo-Fold interpretation + project independent reformulation.
+- Status: `PRESERVED_ASSET` / `NOT_ACTIVE_EXPERIMENT`.
+- Next active scientific task remains EXP-023 preregistration/design.

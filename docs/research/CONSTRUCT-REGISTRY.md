@@ -92,6 +92,27 @@ Representation that preserves multiple candidate latent/world states and their
 uncertainty.
 ```
 
+## Operator-valued edge
+
+```text
+A typed connection that applies a member of a constrained transformation family
+to a source state before delivering a message to a destination state.
+```
+
+## Structured multi-hypothesis node state
+
+```text
+A node state that preserves multiple candidate latent states together with
+confidence or belief weights.
+```
+
+## Conditional operator selection
+
+```text
+A policy that chooses a transformation operator from a vocabulary based on
+state, context, task, or uncertainty.
+```
+
 ## Scope
 
 This file defines constructs only. It does not assign claim status or freeze an

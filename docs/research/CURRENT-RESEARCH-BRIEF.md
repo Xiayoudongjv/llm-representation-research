@@ -87,3 +87,13 @@ to established claims.
 - Asset map: `RESEARCH-ASSET-MAP.md`
 - Hypotheses: `HYPOTHESIS-LEDGER.md`
 - Experiment chain: `EXPERIMENT-LINEAGE.md`
+
+## 12. Operator-Routed Structured-State Architecture
+
+Long-horizon architecture entry. Status: `LONG_TERM / PRIOR_ART_REQUIRED / NOT_TESTED`.
+
+Core chain: structured node state + operator-valued connection + conditional
+routing + composition + invariant validation.
+
+- Hypothesis: `HYP-OPERATOR-NET-001`
+- Asset map: `RESEARCH-ASSET-MAP.md`
