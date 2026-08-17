@@ -122,6 +122,36 @@ model-hook runtime correctness.
 
 - Existing scikit-learn `FutureWarning` about the `penalty` constructor argument appears in unrelated prior-experiment tests. It is not introduced by the EXP-023 runner and is not a blocking engineering defect.
 
+## Task 096C Production-Readiness Blocker Patch
+
+- Original blocker: `TECHNICAL_FAILURE_EVIDENCE = FAIL`; the
+  post-consumption technical-failure path did not directly bind all required
+  provenance identities into the failure-evidence artifact.
+- Repaired direct bindings: `experiment`, `run_attempt_id`,
+  `authorization_id`, `authorization_sha256`, `consumption_record_path`,
+  `consumption_record_sha256`, `repository_commit`, `runner_sha256`,
+  `frozen_preregistration_sha256`, `frozen_dataset_sha256`,
+  `model_hook_qualification_sha256`, `model_name`,
+  `model_snapshot_identity`, `canonical_result_path`, `failure_stage`,
+  `failure_class`, `sanitized_exception_type`,
+  `sanitized_exception_message`, and `created_at_utc`.
+- Patch scope: engineering-only failure-evidence bindings, explicit formal
+  failure-stage propagation, byte-derived consumption-record SHA, and prompt
+  redaction helpers. Scientific semantics and consumption ordering were not
+  changed.
+- New tests: focused EXP-023 suite result is `54 passed`.
+- Static preflight: `PASS`.
+- Synthetic preflight: `PASS`.
+- Patched runner SHA-256:
+  `c774837702944b6dea47f1f97a5c8cc4a934d7b58b28c8127ab92b1768ae3f52`.
+- Historical model-hook qualification SHA-256:
+  `3adcb480a6d7da1a62b026aaac8946f914e73099444e26784045a486d49577d6`
+  is now `STALE_AFTER_RUNNER_PATCH` and applies only to the pre-patch runner.
+- No real model/tokenizer load, no formal data inference, and no scientific
+  result or outcome were produced in this patch task.
+- Next required task: repeat real model/hook engineering qualification for the
+  patched runner before any short 096C-R rereview and formal authorization.
+
 ## Boundary
 
 - `MODEL_LOAD_PERFORMED = true`
@@ -136,6 +166,9 @@ model-hook runtime correctness.
 
 ## Next required step
 
-`TASK 096C TARGETED PRODUCTION-READINESS REREVIEW`. If that rereview passes,
-issue one new single-use EXP-023 formal authorization and launch exactly once.
-Do not issue a formal authorization or launch EXP-023 from this preflight.
+`TASK 096B-R`: repeat real model/hook engineering qualification for the
+patched runner. After that qualification, run one short `TASK 096C-R`
+rereview limited to the patched blocker and qualification binding. Then, if
+that rereview passes, issue one new single-use EXP-023 formal authorization
+and launch exactly once. Do not issue a formal authorization or launch
+EXP-023 from this preflight patch.

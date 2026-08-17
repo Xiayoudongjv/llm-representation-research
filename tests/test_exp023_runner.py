@@ -29,6 +29,26 @@ def _synthetic_split(split_id: str = "A", seed: int = 1) -> runner.SplitDataset:
     return runner.make_synthetic_split(split_id, seed)
 
 
+def _failure_auth() -> dict[str, object]:
+    return {
+        "authorization_id": "auth-failure",
+        "authorized_repository_commit": "a" * 40,
+        "authorized_runner_sha256": "b" * 64,
+        "frozen_preregistration_sha256": runner.FROZEN_PREREGISTRATION_SHA256,
+        "frozen_dataset_sha256": runner.DATASET_SHA256,
+        "model_name": runner.FORMAL_MODEL_NAME,
+        "model_snapshot_identity": runner.FORMAL_MODEL_SNAPSHOT,
+        "model_hook_qualification_sha256": "c" * 64,
+        "canonical_result_path": "experiments/exp023/results/exp023_results.json",
+    }
+
+
+def _write_consumption_record(tmp_path: Path, content: str = "consumption") -> Path:
+    path = tmp_path / "consumption.json"
+    path.write_text(content, encoding="utf-8")
+    return path
+
+
 def _make_records(*, valid: bool = True) -> list[dict[str, object]]:
     records = []
     for cls in runner.CLASS_UNIVERSE:
@@ -424,29 +444,154 @@ def test_exclusive_consumption_rejects_second_use(tmp_path):
 
 
 def test_technical_failure_evidence_exclusive(tmp_path):
-    auth = {
-        "authorization_id": "auth-x",
-        "frozen_preregistration_sha256": runner.FROZEN_PREREGISTRATION_SHA256,
-        "frozen_dataset_sha256": runner.DATASET_SHA256,
-        "model_name": runner.FORMAL_MODEL_NAME,
-        "model_snapshot_identity": runner.FORMAL_MODEL_SNAPSHOT,
-        "model_hook_qualification_sha256": "b" * 64,
-        "canonical_result_path": "experiments/exp023/results/exp023_results.json",
-    }
+    auth = _failure_auth()
+    consumption_path = _write_consumption_record(tmp_path)
     consumption = {
         "authorization_sha256": "a" * 64,
-        "consumption_record_path": str(tmp_path / "consumption.json"),
-        "consumption_record_sha256": "c" * 64,
+        "consumption_record_path": str(consumption_path),
+        "consumption_record_sha256": "wrong-original-sha",
     }
     runner._preserve_technical_failure_after_consumption(
-        tmp_path, auth, consumption, "attempt-fail", RuntimeError("boom")
+        tmp_path, auth, consumption, "attempt-fail", "MODEL_LOAD", RuntimeError("boom")
     )
     path = runner._technical_failure_evidence_path_for(tmp_path, "attempt-fail")
     assert path.exists()
     with pytest.raises(runner.ProtocolIntegrityError):
         runner._preserve_technical_failure_after_consumption(
-            tmp_path, auth, consumption, "attempt-fail", RuntimeError("boom")
+            tmp_path,
+            auth,
+            consumption,
+            "attempt-fail",
+            "MODEL_LOAD",
+            RuntimeError("boom"),
         )
+
+
+def test_technical_failure_evidence_binds_all_direct_fields(tmp_path):
+    auth = _failure_auth()
+    consumption_path = _write_consumption_record(tmp_path, "consumption-bytes")
+    consumption = {
+        "authorization_sha256": "a" * 64,
+        "consumption_record_path": str(consumption_path),
+        "consumption_record_sha256": "wrong-original-sha",
+    }
+    runner._preserve_technical_failure_after_consumption(
+        tmp_path,
+        auth,
+        consumption,
+        "attempt-direct",
+        "MODEL_LOAD",
+        RuntimeError("boom"),
+    )
+    path = runner._technical_failure_evidence_path_for(tmp_path, "attempt-direct")
+    data = runner._read_json(path)
+    expected_consumption_sha = runner._sha256(consumption_path)
+    assert data["authorization_id"] == "auth-failure"
+    assert data["authorization_sha256"] == "a" * 64
+    assert data["consumption_record_path"] == str(consumption_path)
+    assert data["consumption_record_sha256"] == expected_consumption_sha
+    assert data["repository_commit"] == "a" * 40
+    assert data["runner_sha256"] == "b" * 64
+    assert data["frozen_preregistration_sha256"] == runner.FROZEN_PREREGISTRATION_SHA256
+    assert data["frozen_dataset_sha256"] == runner.DATASET_SHA256
+    assert data["model_hook_qualification_sha256"] == "c" * 64
+    assert data["model_name"] == runner.FORMAL_MODEL_NAME
+    assert data["model_snapshot_identity"] == runner.FORMAL_MODEL_SNAPSHOT
+    assert data["failure_stage"] == "MODEL_LOAD"
+    assert data["failure_class"] == "RUNTIME"
+    assert data["sanitized_exception_type"] == "RuntimeError"
+    assert data["sanitized_exception_message"] == "post_consumption_failure at MODEL_LOAD"
+    assert data["prompt_text_included"] is False
+    assert data["hidden_states_included"] is False
+
+
+def test_technical_failure_evidence_consumption_sha_tracks_bytes(tmp_path):
+    auth = _failure_auth()
+    first_path = tmp_path / "first" / "consumption.json"
+    first_path.parent.mkdir(parents=True, exist_ok=True)
+    first_path.write_text("first-consumption", encoding="utf-8")
+    second_path = tmp_path / "second" / "consumption.json"
+    second_path.parent.mkdir(parents=True, exist_ok=True)
+    second_path.write_text("second-consumption", encoding="utf-8")
+
+    first_consumption = {
+        "authorization_sha256": "a" * 64,
+        "consumption_record_path": str(first_path),
+    }
+    second_consumption = {
+        "authorization_sha256": "a" * 64,
+        "consumption_record_path": str(second_path),
+    }
+    runner._preserve_technical_failure_after_consumption(
+        tmp_path, auth, first_consumption, "attempt-a", "MODEL_LOAD", RuntimeError("a")
+    )
+    runner._preserve_technical_failure_after_consumption(
+        tmp_path, auth, second_consumption, "attempt-b", "MODEL_LOAD", RuntimeError("b")
+    )
+    first_data = runner._read_json(
+        runner._technical_failure_evidence_path_for(tmp_path, "attempt-a")
+    )
+    second_data = runner._read_json(
+        runner._technical_failure_evidence_path_for(tmp_path, "attempt-b")
+    )
+    assert first_data["consumption_record_sha256"] == runner._sha256(first_path)
+    assert second_data["consumption_record_sha256"] == runner._sha256(second_path)
+    assert first_data["consumption_record_sha256"] != second_data["consumption_record_sha256"]
+
+
+def test_failure_stage_propagation_model_load(tmp_path, monkeypatch):
+    context = runner.FormalFailureContext()
+    monkeypatch.setattr(
+        runner,
+        "_verify_formal_dataset_identity",
+        lambda root: {"path": "x", "sha256": runner.DATASET_SHA256},
+    )
+    monkeypatch.setattr(runner, "_load_formal_records", lambda root: ([], []))
+
+    def fail_runtime(root, failure_context=None):
+        if failure_context is not None:
+            failure_context.stage = "MODEL_LOAD"
+        raise RuntimeError("boom")
+
+    monkeypatch.setattr(runner, "_load_formal_runtime", fail_runtime)
+    with pytest.raises(RuntimeError):
+        runner._execute_formal_after_consumption(
+            tmp_path, {}, {}, "attempt-model", context
+        )
+    assert context.stage == "MODEL_LOAD"
+
+
+def test_failure_stage_propagation_representation_extraction(tmp_path, monkeypatch):
+    context = runner.FormalFailureContext()
+    monkeypatch.setattr(
+        runner,
+        "_verify_formal_dataset_identity",
+        lambda root: {"path": "x", "sha256": runner.DATASET_SHA256},
+    )
+    monkeypatch.setattr(runner, "_load_formal_records", lambda root: ([], []))
+    monkeypatch.setattr(runner, "_load_formal_runtime", lambda root, failure_context=None: ("tokenizer", "model", "cuda:0"))
+
+    def fail_extract(root, tokenizer, model, device, records):
+        raise RuntimeError("boom")
+
+    monkeypatch.setattr(runner, "_extract_formal_representations", fail_extract)
+    with pytest.raises(RuntimeError):
+        runner._execute_formal_after_consumption(
+            tmp_path, {}, {}, "attempt-extract", context
+        )
+    assert context.stage == "REPRESENTATION_EXTRACTION"
+
+
+def test_failure_stage_propagation_result_validation(tmp_path, monkeypatch):
+    context = runner.FormalFailureContext()
+
+    def fail_validation(result, formal=False):
+        raise RuntimeError("boom")
+
+    monkeypatch.setattr(runner, "validate_result_schema", fail_validation)
+    with pytest.raises(RuntimeError):
+        runner.finalize_formal_result({}, tmp_path, context)
+    assert context.stage == "RESULT_VALIDATION"
 
 
 def test_consumption_before_model_load_ordering(tmp_path, monkeypatch):
@@ -460,7 +605,7 @@ def test_consumption_before_model_load_ordering(tmp_path, monkeypatch):
         "consumption_record_sha256": "b" * 64,
         "run_attempt_id": attempt,
     })
-    monkeypatch.setattr(runner, "_execute_formal_after_consumption", lambda root, auth, consumption, attempt: calls.append("execute") or {
+    monkeypatch.setattr(runner, "_execute_formal_after_consumption", lambda root, auth, consumption, attempt, failure_context: calls.append("execute") or {
         "schema_version": runner.RESULT_SCHEMA_VERSION,
         "experiment": runner.EXPERIMENT,
         "classification": "TEST",
@@ -482,7 +627,7 @@ def test_consumption_before_model_load_ordering(tmp_path, monkeypatch):
         "prompt_text_included": False,
         "hidden_states_included": False,
     })
-    monkeypatch.setattr(runner, "finalize_formal_result", lambda result, root: calls.append("finalize") or {"publication_status": "PUBLISHED"})
+    monkeypatch.setattr(runner, "finalize_formal_result", lambda result, root, failure_context=None: calls.append("finalize") or {"publication_status": "PUBLISHED"})
     runner.run_formal(tmp_path, auth_path)
     assert calls == ["pre", "consume", "execute", "finalize"]
 

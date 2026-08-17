@@ -120,6 +120,13 @@ class TechnicalInvalidError(RuntimeError):
     """Raised when a computation is technically invalid under the protocol."""
 
 
+@dataclass
+class FormalFailureContext:
+    """Tracks the current post-consumption production stage for failure evidence."""
+
+    stage: str = "DATASET_LOAD"
+
+
 @dataclass(frozen=True)
 class CheckpointSpec:
     name: str
@@ -910,7 +917,10 @@ def bootstrap_contrast(
 def _bootstrap_intervals(
     dataset: SplitDataset,
     rows: Sequence[PredictionRow],
+    failure_context: FormalFailureContext | None = None,
 ) -> dict[str, dict[str, Any]]:
+    if failure_context is not None:
+        failure_context.stage = "BOOTSTRAP"
     output = {}
     for contrast in BOOTSTRAP_CONTRASTS:
         correct_a = correctness_by_class(
@@ -934,6 +944,7 @@ def _build_split_summary(
     rows: Sequence[PredictionRow],
     technical_validity: str,
     warnings_list: Sequence[str],
+    failure_context: FormalFailureContext | None = None,
 ) -> dict[str, Any]:
     metrics = _metrics_for_rows(rows)
     primary_ba = {
@@ -1010,19 +1021,26 @@ def _build_split_summary(
         "secondary": secondary,
         "trajectories": trajectories,
         "post_final_delta": post_final_delta,
-        "bootstrap": _bootstrap_intervals(dataset, rows),
+        "bootstrap": _bootstrap_intervals(dataset, rows, failure_context),
         "technical_validity": {"status": technical_validity},
         "warnings": list(warnings_list),
     }
 
 
-def run_split_analysis(dataset: SplitDataset) -> dict[str, Any]:
+def run_split_analysis(
+    dataset: SplitDataset,
+    failure_context: FormalFailureContext | None = None,
+) -> dict[str, Any]:
+    if failure_context is not None:
+        failure_context.stage = "SPLIT_ANALYSIS"
     validate_split_dataset(dataset)
     X_ref_fit, _, y_ref_fit = _stack_records(
         dataset, dataset.fit_records, PRIMARY_REFERENCE_CHECKPOINT
     )
     scaler_ref = fit_scaler(X_ref_fit)
     X_ref_fit_scaled = scaler_ref.transform(X_ref_fit)
+    if failure_context is not None:
+        failure_context.stage = "CLASSIFIER_FIT"
     classifier_ref, warning_messages = fit_classifier(X_ref_fit_scaled, y_ref_fit)
     warnings_list = list(warning_messages)
 
@@ -1057,7 +1075,15 @@ def run_split_analysis(dataset: SplitDataset) -> dict[str, Any]:
             )
 
     technical_validity = "VALID_WITH_WARNING" if warnings_list else "VALID"
-    summary = _build_split_summary(dataset, rows, technical_validity, warnings_list)
+    if failure_context is not None:
+        failure_context.stage = "STATISTICS"
+    summary = _build_split_summary(
+        dataset,
+        rows,
+        technical_validity,
+        warnings_list,
+        failure_context,
+    )
     return {
         "split_id": dataset.split_id,
         "summary": summary,
@@ -1256,8 +1282,16 @@ def atomic_publish_validated_result(result: Mapping[str, Any], root: Path = ROOT
     return atomic_write_json(canonical, result)
 
 
-def finalize_formal_result(result: Mapping[str, Any], root: Path = ROOT) -> dict[str, str]:
+def finalize_formal_result(
+    result: Mapping[str, Any],
+    root: Path = ROOT,
+    failure_context: FormalFailureContext | None = None,
+) -> dict[str, str]:
+    if failure_context is not None:
+        failure_context.stage = "RESULT_VALIDATION"
     validate_result_schema(result, formal=True)
+    if failure_context is not None:
+        failure_context.stage = "PUBLICATION"
     verify_no_result_collision(root)
     return atomic_publish_validated_result(result, root)
 
@@ -1385,17 +1419,28 @@ def run_formal(
     _pre_consumption_static_checks(root, authorization, auth_path)
 
     run_attempt_id = str(uuid.uuid4())
+    failure_context = FormalFailureContext()
     consumption = _consume_formal_authorization(
         root, authorization, auth_path, run_attempt_id
     )
     try:
         result = _execute_formal_after_consumption(
-            root, authorization, consumption, run_attempt_id
+            root,
+            authorization,
+            consumption,
+            run_attempt_id,
+            failure_context,
         )
-        return finalize_formal_result(result, root)
+        failure_context.stage = "RESULT_VALIDATION"
+        return finalize_formal_result(result, root, failure_context)
     except Exception as exc:
         _preserve_technical_failure_after_consumption(
-            root, authorization, consumption, run_attempt_id, exc
+            root,
+            authorization,
+            consumption,
+            run_attempt_id,
+            failure_context.stage,
+            exc,
         )
         raise
 
@@ -1580,31 +1625,68 @@ def _technical_failure_evidence_path_for(root: Path, run_attempt_id: str) -> Pat
     )
 
 
+def _failure_class(exc: Exception) -> str:
+    if isinstance(exc, ProtocolIntegrityError):
+        return "PROTOCOL_INTEGRITY"
+    if isinstance(exc, TechnicalInvalidError):
+        return "TECHNICAL_INVALID"
+    return "RUNTIME"
+
+
+def _sanitized_exception_type(exc: Exception) -> str:
+    return type(exc).__name__
+
+
+def _sanitized_exception_message(exc: Exception, failure_stage: str) -> str:
+    return f"post_consumption_failure at {failure_stage}"
+
+
 def _preserve_technical_failure_after_consumption(
     root: Path,
     authorization: Mapping[str, Any],
     consumption: Mapping[str, Any],
     run_attempt_id: str,
+    failure_stage: str,
     exc: Exception,
 ) -> None:
     record_path = _technical_failure_evidence_path_for(root, run_attempt_id)
     record_path.parent.mkdir(parents=True, exist_ok=True)
+    consumption_record_path = Path(consumption["consumption_record_path"])
+    if not consumption_record_path.is_file():
+        raise ProtocolIntegrityError("CONSUMPTION_RECORD_MISSING_FOR_FAILURE_EVIDENCE")
+    try:
+        consumption_record_sha256 = _sha256(consumption_record_path)
+    except OSError as exc2:
+        raise ProtocolIntegrityError(
+            "CONSUMPTION_RECORD_SHA_UNAVAILABLE_FOR_FAILURE_EVIDENCE"
+        ) from exc2
     record = {
         "schema_version": RESULT_SCHEMA_VERSION,
         "experiment": EXPERIMENT,
         "classification": "FORMAL_RUN_TECHNICAL_FAILURE_EVIDENCE",
         "authorization_id": authorization["authorization_id"],
         "authorization_sha256": consumption["authorization_sha256"],
-        "consumption_record_path": consumption["consumption_record_path"],
+        "consumption_record_path": str(consumption_record_path),
+        "consumption_record_sha256": consumption_record_sha256,
         "run_attempt_id": run_attempt_id,
+        "repository_commit": authorization["authorized_repository_commit"],
+        "runner_sha256": authorization["authorized_runner_sha256"],
+        "frozen_preregistration_sha256": authorization["frozen_preregistration_sha256"],
+        "frozen_dataset_sha256": authorization["frozen_dataset_sha256"],
+        "model_hook_qualification_sha256": authorization["model_hook_qualification_sha256"],
+        "model_name": authorization["model_name"],
+        "model_snapshot_identity": authorization["model_snapshot_identity"],
+        "canonical_result_path": authorization["canonical_result_path"],
+        "failure_stage": failure_stage,
+        "failure_class": _failure_class(exc),
+        "sanitized_exception_type": _sanitized_exception_type(exc),
+        "sanitized_exception_message": _sanitized_exception_message(
+            exc, failure_stage
+        ),
         "attempt_status": "TECHNICALLY_INVALID",
         "result_status": "NO_SCIENTIFIC_RESULT",
         "scientific_status": "NOT_OBSERVED",
         "technical_validity": {"status": "TECHNICALLY_INVALID"},
-        "failure": {
-            "exception_type": type(exc).__name__,
-            "message": str(exc),
-        },
         "created_at_utc": datetime.now(timezone.utc).isoformat(),
         "prompt_text_included": False,
         "hidden_states_included": False,
@@ -1632,14 +1714,21 @@ def _load_formal_records(root: Path = ROOT) -> tuple[list[Mapping[str, Any]], li
     return load_frozen_dataset(root)
 
 
-def _load_formal_runtime(root: Path = ROOT) -> tuple[Any, Any, torch.device]:
+def _load_formal_runtime(
+    root: Path = ROOT,
+    failure_context: FormalFailureContext | None = None,
+) -> tuple[Any, Any, torch.device]:
     os.environ["HF_HUB_OFFLINE"] = "1"
     os.environ["TRANSFORMERS_OFFLINE"] = "1"
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
+    if failure_context is not None:
+        failure_context.stage = "TOKENIZER_LOAD"
     tokenizer = AutoTokenizer.from_pretrained(
         str(FORMAL_MODEL_SNAPSHOT_PATH), local_files_only=True
     )
+    if failure_context is not None:
+        failure_context.stage = "MODEL_LOAD"
     model = AutoModelForCausalLM.from_pretrained(
         str(FORMAL_MODEL_SNAPSHOT_PATH), dtype=torch.float16, local_files_only=True
     )
@@ -1832,18 +1921,25 @@ def _execute_formal_after_consumption(
     authorization: Mapping[str, Any],
     consumption: Mapping[str, Any],
     run_attempt_id: str,
+    failure_context: FormalFailureContext | None = None,
 ) -> dict[str, Any]:
+    if failure_context is None:
+        failure_context = FormalFailureContext()
+    failure_context.stage = "DATASET_LOAD"
     dataset_identity = _verify_formal_dataset_identity(root)
     records, metas = _load_formal_records(root)
-    tokenizer, model, device = _load_formal_runtime(root)
+    tokenizer, model, device = _load_formal_runtime(root, failure_context)
+    failure_context.stage = "REPRESENTATION_EXTRACTION"
     representations = _extract_formal_representations(
         root, tokenizer, model, device, records
     )
+    failure_context.stage = "SPLIT_ANALYSIS"
     datasets = _build_formal_split_datasets(root, records, metas, representations)
     analyses = {
-        split_id: run_split_analysis(dataset)
+        split_id: run_split_analysis(dataset, failure_context)
         for split_id, dataset in datasets.items()
     }
+    failure_context.stage = "RESULT_CONSTRUCTION"
     return _build_formal_result(
         root,
         authorization,
