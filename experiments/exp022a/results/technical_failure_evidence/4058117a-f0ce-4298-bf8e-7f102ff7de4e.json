@@ -1,0 +1,22 @@
+{
+  "attempt_status": "TECHNICALLY_INVALID",
+  "authorization_id": "fc1be2e7-aa46-4bd8-bbec-d74a862d384b",
+  "authorization_sha256": "50e55539c9bce1dbc5788fb08c7dc0ba5cf9ba88bb2d0a7f6f3478bd0c9ff3e2",
+  "classification": "FORMAL_RUN_TECHNICAL_FAILURE_EVIDENCE",
+  "consumption_record_path": "D:\\Research\\llm-representation-research\\experiments\\exp022a\\results\\authorization_consumption\\50e55539c9bce1dbc5788fb08c7dc0ba5cf9ba88bb2d0a7f6f3478bd0c9ff3e2.json",
+  "created_at_utc": "2026-08-17T12:35:46.230652+00:00",
+  "experiment": "EXP-022A",
+  "failure": {
+    "exception_type": "ProtocolIntegrityError",
+    "message": "PRODUCTION_VARIANT_ROLE_MISMATCH"
+  },
+  "hidden_states_included": false,
+  "prompt_text_included": false,
+  "result_status": "NO_SCIENTIFIC_RESULT",
+  "run_attempt_id": "4058117a-f0ce-4298-bf8e-7f102ff7de4e",
+  "schema_version": "1.0.0",
+  "scientific_status": "NOT_OBSERVED",
+  "technical_validity": {
+    "status": "TECHNICALLY_INVALID"
+  }
+}

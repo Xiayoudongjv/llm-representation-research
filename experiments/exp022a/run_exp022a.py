@@ -76,6 +76,12 @@ FORMAL_AUTHORIZATION_REQUIRED_FIELDS = {
 }
 EXP020_FROZEN_CONFIG_PATH = ROOT / "experiments" / "exp020" / "exp020_frozen_config.json"
 CLASS_UNIVERSE = ("logic", "causality", "analogy", "definition")
+RAW_VARIANT_TO_CANONICAL_ROLE = {
+    "original_style": "original",
+    "paraphrase": "paraphrase",
+}
+RAW_VARIANT_UNIVERSE = frozenset(RAW_VARIANT_TO_CANONICAL_ROLE)
+CANONICAL_VARIANT_ROLES = tuple(dict.fromkeys(RAW_VARIANT_TO_CANONICAL_ROLE.values()))
 READOUT_CONDITIONS = ("A0", "A1", "A2")
 SCALER_KWARGS = {"with_mean": True, "with_std": True}
 CLASSIFIER_KWARGS = {
@@ -145,6 +151,7 @@ class RecordMeta:
     record_id: str
     source_semantic_class: str
     variant: str
+    raw_variant_type: str
 
 
 @dataclass
@@ -1164,13 +1171,16 @@ def validate_production_records(
             raise ProtocolIntegrityError("PRODUCTION_RECORD_GROUP_INVALID")
         if not isinstance(record["variant_type"], str) or not record["variant_type"].strip():
             raise ProtocolIntegrityError("PRODUCTION_RECORD_VARIANT_INVALID")
+        if record["variant_type"] not in RAW_VARIANT_TO_CANONICAL_ROLE:
+            raise ProtocolIntegrityError("PRODUCTION_RAW_VARIANT_TYPE_INVALID")
         if not isinstance(record["text"], str) or not record["text"].strip():
             raise ProtocolIntegrityError("PRODUCTION_RECORD_MISSING_TEXT")
     metas = [
         RecordMeta(
             record_id=str(record["id"]),
             source_semantic_class=str(record["group"]),
-            variant=str(record["variant_type"]),
+            variant=RAW_VARIANT_TO_CANONICAL_ROLE[record["variant_type"]],
+            raw_variant_type=str(record["variant_type"]),
         )
         for record in records
     ]
@@ -1179,7 +1189,15 @@ def validate_production_records(
         raise ProtocolIntegrityError("PRODUCTION_RECORD_ID_DUPLICATE")
     if {meta.source_semantic_class for meta in metas} != set(CLASS_UNIVERSE):
         raise ProtocolIntegrityError("PRODUCTION_CLASS_UNIVERSE_MISMATCH")
-    if {meta.variant for meta in metas} != {"original", "paraphrase"}:
+    raw_variant_counts = {
+        raw_variant: sum(1 for meta in metas if meta.raw_variant_type == raw_variant)
+        for raw_variant in RAW_VARIANT_UNIVERSE
+    }
+    if set(meta.raw_variant_type for meta in metas) != set(RAW_VARIANT_UNIVERSE):
+        raise ProtocolIntegrityError("PRODUCTION_RAW_VARIANT_UNIVERSE_MISMATCH")
+    if any(count != 12 for count in raw_variant_counts.values()):
+        raise ProtocolIntegrityError("PRODUCTION_RAW_VARIANT_COUNT_MISMATCH")
+    if {meta.variant for meta in metas} != set(CANONICAL_VARIANT_ROLES):
         raise ProtocolIntegrityError("PRODUCTION_VARIANT_ROLE_MISMATCH")
 
     for cls in CLASS_UNIVERSE:

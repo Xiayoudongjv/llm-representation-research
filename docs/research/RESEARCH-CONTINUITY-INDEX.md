@@ -5,7 +5,7 @@ experimental artifacts outrank it.
 
 ## Current research phase
 
-EXP-020A recovered canonical evidence restored. EXP-017 and EXP-021 evidence are durable. Canonical evidence durability rereview passed. EXP-022A preregistration is frozen v1.0 and not run. EXP-022A runner is implemented with static/synthetic preflight passing, model/hook runtime qualification completed, and the formal execution call graph wired but not authorized.
+EXP-020A recovered canonical evidence restored. EXP-017 and EXP-021 evidence are durable. Canonical evidence durability rereview passed. EXP-022A preregistration is frozen v1.0 and not scientifically observed. The runner is implemented and model/hook-qualified; attempt 1 was technically invalid before scientific execution due to a raw-variant adapter defect, and the production adapter has been corrected without changing frozen scientific semantics.
 
 ## Current preregistration authority
 
@@ -258,3 +258,37 @@ No formal execution, model load, or EVAL access is authorized.
 - Formal EXP-022A execution = `NOT_AUTHORIZED`
 - Scientific result = `NOT_RUN`
 - Next = `targeted formal-call-graph rereview` (Task-094E-R)
+
+## Task-094E-R formal call-graph rereview
+
+- Verdict = `FORMAL_RUN_READY_FOR_SINGLE_USE_AUTHORIZATION`
+- Formal EXP-022A execution = `NOT_AUTHORIZED`
+- Scientific result = `NOT_RUN`
+
+## Task-094F formal attempt 1
+
+- Status = `EXP022A_FORMAL_ATTEMPT_001_TECHNICALLY_INVALID`
+- Attempt status = `TECHNICALLY_INVALID`
+- Result status = `NO_SCIENTIFIC_RESULT`
+- Scientific status = `NOT_OBSERVED`
+- Authorization consumed = `true`
+- Canonical result created = `false`
+- Root cause = `PRODUCTION_SCHEMA_ADAPTER_DEFECT`
+- Failure = `PRODUCTION_VARIANT_ROLE_MISMATCH`
+- Incident: `docs/experiments/EXP-022A-FORMAL-ATTEMPT-001.md`
+- Next = `variant-role reconciliation / loader correction`
+
+## Task-094G variant-role reconciliation
+
+- Status = `EXP022A_VARIANT_ROLE_RECONCILIATION`
+- Raw variant universe = `original_style` / `paraphrase`
+- Canonical mapping = `original_style -> original`, `paraphrase -> paraphrase`
+- Attempt-1 failure class = `PRODUCTION_SCHEMA_ADAPTER_DEFECT`
+- Dataset modified = `false`
+- Frozen protocol drift = `false`
+- Scientific implementation changed = `false`
+- Scientific split semantics changed = `false`
+- New-attempt eligibility = `ELIGIBLE_AFTER_PREOUTCOME_TECHNICAL_CORRECTION`
+- Formal execution = `NOT_AUTHORIZED`
+- Scientific result = `NO_SCIENTIFIC_RESULT`
+- Next = `targeted patch rereview before any new authorization`

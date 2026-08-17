@@ -248,11 +248,42 @@ Formal readiness is not marked `PASS` by this task.
 - Warnings: seven existing scikit-learn `FutureWarning` items; no new warning
   was suppressed by this patch.
 
+## Task-094F formal attempt 1
+
+- Attempt status: `TECHNICALLY_INVALID`
+- Result status: `NO_SCIENTIFIC_RESULT`
+- Scientific status: `NOT_OBSERVED`
+- Canonical result: not created
+- Root cause: `PRODUCTION_SCHEMA_ADAPTER_DEFECT`
+- Exact failure: `PRODUCTION_VARIANT_ROLE_MISMATCH`
+- Attempt incident: `docs/experiments/EXP-022A-FORMAL-ATTEMPT-001.md`
+
+## Task-094G variant-role reconciliation
+
+Engineering-only production-schema correction:
+
+- single-source raw-to-canonical adapter:
+  `original_style -> original`, `paraphrase -> paraphrase`;
+- strict validation of the frozen raw variant universe;
+- canonical split roles remain unchanged;
+- attempt-1 consumption and failure evidence preserved;
+- no dataset, preregistration, scientific-analysis, model-qualification, or
+  authorization-semantics changes.
+
+Formal model qualification remains valid. Scientific protocol remains frozen.
+
+## Current test results after Task-094G
+
+- Focused: `pytest -q tests/test_exp022a_runner.py` -> `69 passed`
+- Full: `PYTHONPATH=. pytest -q` -> `636 passed, 2 skipped`
+- Warnings: seven existing scikit-learn `FutureWarning` items; no new warning
+  was suppressed by this patch.
+
 ## Remaining qualification steps
 
-- Targeted independent read-only Task-094E-R rereview of the formal call graph.
-- If Task-094E-R passes: create one single-use formal authorization bound to
-  the reviewed commit, then execute exactly one formal EXP-022A attempt.
+- Targeted patch rereview of Task-094G before any new authorization.
+- If that rereview passes: issue a new single-use authorization and execute
+  exactly one new formal EXP-022A attempt.
 
 No model, tokenizer, controlled prompt text, formal FIT/EVAL data, formal
 hidden states, or formal scientific result was accessed or created by the

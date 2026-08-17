@@ -78,14 +78,17 @@ def _synthetic_records(*, include_text: bool = True) -> list[dict[str, object]]:
     records = []
     for cls in runner.CLASS_UNIVERSE:
         for index in range(1, 4):
-            for variant in ("original", "paraphrase"):
+            for raw_variant, canonical_variant in (
+                ("original_style", "original"),
+                ("paraphrase", "paraphrase"),
+            ):
                 record = {
-                    "id": f"{cls}_{'orig' if variant == 'original' else 'para'}_{index:02d}",
+                    "id": f"{cls}_{'orig' if canonical_variant == 'original' else 'para'}_{index:02d}",
                     "group": cls,
-                    "variant_type": variant,
+                    "variant_type": raw_variant,
                 }
                 if include_text:
-                    record["text"] = f"synthetic {cls} {variant} {index}"
+                    record["text"] = f"synthetic {cls} {raw_variant} {index}"
                 records.append(record)
     return records
 
@@ -365,6 +368,68 @@ def test_production_record_validation_rejects_missing_text() -> None:
     split_definitions = runner.load_split_definitions()
     with pytest.raises(runner.ProtocolIntegrityError, match="PRODUCTION_RECORD_MISSING_TEXT"):
         runner.validate_production_records(records, split_definitions)
+
+
+def test_production_record_validation_maps_raw_variant_to_canonical_role() -> None:
+    records = _synthetic_records(include_text=True)
+    split_definitions = runner.load_split_definitions()
+    metas = runner.validate_production_records(records, split_definitions)
+    by_id = {meta.record_id: meta for meta in metas}
+    assert by_id["logic_orig_01"].raw_variant_type == "original_style"
+    assert by_id["logic_orig_01"].variant == "original"
+    assert by_id["logic_para_01"].raw_variant_type == "paraphrase"
+    assert by_id["logic_para_01"].variant == "paraphrase"
+
+
+def test_production_record_validation_rejects_canonical_role_as_raw_variant() -> None:
+    records = _synthetic_records(include_text=True)
+    records[0]["variant_type"] = "original"
+    split_definitions = runner.load_split_definitions()
+    with pytest.raises(
+        runner.ProtocolIntegrityError, match="PRODUCTION_RAW_VARIANT_TYPE_INVALID"
+    ):
+        runner.validate_production_records(records, split_definitions)
+
+
+def test_build_formal_split_datasets_uses_raw_to_canonical_mapping() -> None:
+    records = _synthetic_records(include_text=True)
+    split_definitions = runner.load_split_definitions()
+    metas = runner.validate_production_records(records, split_definitions)
+    representations = {
+        record["id"]: {
+            checkpoint: np.zeros(8, dtype=np.float32)
+            for checkpoint in runner.CHECKPOINT_NAMES
+        }
+        for record in records
+    }
+    datasets = runner._build_formal_split_datasets(
+        runner.ROOT, records, metas, representations
+    )
+    assert set(datasets) == {
+        "A_original_fit_paraphrase_eval",
+        "B_paraphrase_fit_original_eval",
+    }
+    meta_by_id = {meta.record_id: meta for meta in metas}
+    for split_id, dataset in datasets.items():
+        fit_ids = [
+            record_id
+            for class_ids in dataset.fit_records.values()
+            for record_id in class_ids
+        ]
+        eval_ids = [
+            record_id
+            for class_ids in dataset.eval_records.values()
+            for record_id in class_ids
+        ]
+        assert len(fit_ids) == 12
+        assert len(eval_ids) == 12
+        assert set(fit_ids).isdisjoint(eval_ids)
+        if split_id.startswith("A_"):
+            assert all(meta_by_id[rid].variant == "original" for rid in fit_ids)
+            assert all(meta_by_id[rid].variant == "paraphrase" for rid in eval_ids)
+        else:
+            assert all(meta_by_id[rid].variant == "paraphrase" for rid in fit_ids)
+            assert all(meta_by_id[rid].variant == "original" for rid in eval_ids)
 
 
 def test_last_valid_token_indices() -> None:
@@ -1040,7 +1105,7 @@ def test_production_record_validation_rejects_malformed_records() -> None:
 
     unexpected_variant = copy.deepcopy(valid)
     unexpected_variant[0]["variant_type"] = "augmented"
-    with pytest.raises(runner.ProtocolIntegrityError, match="PRODUCTION_VARIANT_ROLE_MISMATCH"):
+    with pytest.raises(runner.ProtocolIntegrityError, match="PRODUCTION_RAW_VARIANT_TYPE_INVALID"):
         runner.validate_production_records(unexpected_variant, split_definitions)
 
     class_imbalance = copy.deepcopy(valid)
