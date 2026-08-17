@@ -86,15 +86,32 @@ v1.0 COMPLETE
 
 ## Current next action
 
-Task 094B runner implementation and static/synthetic preflight complete.
+Task 094C independent runner rereview complete with
+`READY_AFTER_MINOR_NONSCIENTIFIC_PATCH`.
 
 EXP-022A status: `FROZEN_PROTOCOL_NOT_RUN`.
 
 Runner status: `IMPLEMENTED_NOT_MODEL_QUALIFIED`.
 
-Next phase: independent runner/preflight rereview.
+Task 094C-P formal publication engineering patch applied.
+
+Next phase: targeted publication-patch rereview, then engineering
+model/tokenizer/hook qualification under separate authorization.
 
 No formal execution, model load, or EVAL access is authorized.
+
+## Task-094C independent runner rereview
+
+- Verdict: `READY_AFTER_MINOR_NONSCIENTIFIC_PATCH`
+- Scientific implementation: `FAITHFUL`
+- Publication/collision engineering defects: `3`
+
+## Task-094C-P formal publication patch
+
+- Status: `FORMAL_PUBLICATION_ENGINEERING_PATCH`
+- Runner scientific semantics: `UNCHANGED`
+- Model qualification: `NOT YET PERFORMED`
+- Formal execution: `NOT AUTHORIZED`
 
 
 ## Task-092F targeted diff rereview

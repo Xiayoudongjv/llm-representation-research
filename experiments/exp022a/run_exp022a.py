@@ -37,7 +37,6 @@ EXP_DIR = Path(__file__).resolve().parent
 PREREGISTRATION_PATH = ROOT / "docs" / "experiments" / "EXP-022A-PREREGISTRATION.md"
 FREEZE_MANIFEST_PATH = ROOT / "docs" / "experiments" / "EXP-022A-FREEZE-MANIFEST.json"
 CANONICAL_RESULT_PATH = EXP_DIR / "results" / "exp022a_results.json"
-STAGING_RESULT_PATH = EXP_DIR / "results" / "exp022a_results.json.tmp"
 STATIC_PREFLIGHT_PATH = EXP_DIR / "results" / "runner_static_preflight.json"
 FORMAL_AUTHORIZATION_PATH = EXP_DIR / "exp022a_formal_run_authorization.json"
 PROMPT_FILE_PATH = ROOT / "experiments" / "exp003" / "prompts_controlled.json"
@@ -62,6 +61,14 @@ CLASSIFIER_KWARGS = {
 }
 BOOTSTRAP_SEED = 20260817
 BOOTSTRAP_REPLICATES = 10_000
+
+
+def staging_path_for(canonical_path: Path) -> Path:
+    """Return the single staging-path authority for a canonical result path."""
+    return canonical_path.with_name(canonical_path.name + ".staging")
+
+
+STAGING_RESULT_PATH = staging_path_for(CANONICAL_RESULT_PATH)
 
 
 class ProtocolIntegrityError(RuntimeError):
@@ -165,16 +172,43 @@ def _write_json(path: Path, data: Any) -> None:
     )
 
 
-def atomic_write_json(path: Path, data: Any) -> None:
-    """Write a validated JSON object through a same-directory staging file."""
+def atomic_write_json(path: Path, data: Any) -> dict[str, str]:
+    """Publish JSON through an exclusive staging file without replacing a result.
+
+    The staging path is derived only from ``staging_path_for``.  The final
+    canonical file is created with ``os.link``, which atomically fails if the
+    destination already exists instead of silently replacing it.
+    """
+    if path.exists():
+        raise FileExistsError(f"Canonical result already exists: {path}")
     path.parent.mkdir(parents=True, exist_ok=True)
-    staging = path.with_name(path.name + ".staging")
-    payload = json.dumps(data, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
-    with open(staging, "w", encoding="utf-8") as handle:
-        handle.write(payload)
-        handle.flush()
-        os.fsync(handle.fileno())
-    os.replace(staging, path)
+    staging = staging_path_for(path)
+    payload = json.dumps(
+        data, ensure_ascii=False, indent=2, sort_keys=True, allow_nan=False
+    ) + "\n"
+    staging_created = False
+    try:
+        with staging.open("x", encoding="utf-8", newline="\n") as handle:
+            staging_created = True
+            handle.write(payload)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.link(staging, path)
+    except Exception:
+        if staging_created and staging.exists():
+            staging.unlink()
+        raise
+    try:
+        staging.unlink()
+    except OSError:
+        return {
+            "publication_status": "PUBLISHED_WITH_STAGING_CLEANUP_FAILURE",
+            "canonical_result_path": str(path),
+        }
+    return {
+        "publication_status": "PUBLISHED",
+        "canonical_result_path": str(path),
+    }
 
 
 def verify_frozen_authority(root: Path = ROOT) -> dict[str, Any]:
@@ -206,7 +240,7 @@ def load_freeze_manifest(root: Path = ROOT) -> dict[str, Any]:
 
 def verify_no_result_collision(root: Path = ROOT) -> None:
     canonical = root / CANONICAL_RESULT_PATH.relative_to(ROOT)
-    staging = root / STAGING_RESULT_PATH.relative_to(ROOT)
+    staging = staging_path_for(canonical)
     if canonical.exists():
         raise ProtocolIntegrityError("EXP022A_CANONICAL_RESULT_ALREADY_EXISTS")
     if staging.exists():
@@ -257,9 +291,27 @@ def static_preflight(root: Path = ROOT) -> dict[str, Any]:
     }
 
 
-def run_formal(root: Path = ROOT) -> None:
-    """Fail closed before any scientific data/model/loader access."""
+def _require_formal_authorization(root: Path) -> None:
+    """Fail closed until a future authorization mechanism is implemented."""
     raise PermissionError("FORMAL_RUN_NOT_AUTHORIZED")
+
+
+def _formal_computation_placeholder(root: Path) -> dict[str, Any]:
+    """Placeholder for future authorized scientific computation."""
+    raise NotImplementedError("FORMAL_SCIENTIFIC_COMPUTATION_NOT_IMPLEMENTED")
+
+
+def run_formal(root: Path = ROOT) -> dict[str, Any]:
+    """Expose the formal gate and downstream finalization ordering.
+
+    The authorization barrier intentionally raises before any scientific data
+    loader, tokenizer, model, CUDA, representation extraction, FIT/EVAL,
+    bootstrap, or result publication call can run.
+    """
+    verify_frozen_authority(root)
+    _require_formal_authorization(root)
+    result = _formal_computation_placeholder(root)
+    return finalize_formal_result(result, root)
 
 
 def exact_binomial_tail(favorable: int, unfavorable: int) -> float:
@@ -1001,7 +1053,7 @@ REQUIRED_RESULT_KEYS = {
 }
 
 
-def validate_result_schema(result: Mapping[str, Any]) -> None:
+def validate_result_schema(result: Mapping[str, Any], *, formal: bool = False) -> None:
     if set(result) < REQUIRED_RESULT_KEYS:
         missing = sorted(REQUIRED_RESULT_KEYS - set(result))
         raise ProtocolIntegrityError(f"RESULT_SCHEMA_MISSING_KEYS: {missing}")
@@ -1011,8 +1063,18 @@ def validate_result_schema(result: Mapping[str, Any]) -> None:
         raise ProtocolIntegrityError("RESULT_EXPERIMENT_MISMATCH")
     if result["preregistration"]["sha256"] != FROZEN_PREREGISTRATION_SHA256:
         raise ProtocolIntegrityError("RESULT_PREREGISTRATION_SHA_MISMATCH")
-    if result["scientific_status"] != "NOT_RUN":
-        raise ProtocolIntegrityError("SYNTHETIC_RESULT_CLAIMS_NOT_RUN_VIOLATION")
+    if formal:
+        if result.get("execution_mode") != "formal-run":
+            raise ProtocolIntegrityError("FORMAL_RESULT_EXECUTION_MODE_INVALID")
+        if not isinstance(result.get("scientific_status"), str) or not result["scientific_status"]:
+            raise ProtocolIntegrityError("FORMAL_RESULT_SCIENTIFIC_STATUS_INVALID")
+        if result["scientific_status"] == "NOT_RUN":
+            raise ProtocolIntegrityError("FORMAL_RESULT_CLAIMS_NOT_RUN_VIOLATION")
+    else:
+        if result.get("execution_mode") != "synthetic-preflight":
+            raise ProtocolIntegrityError("SYNTHETIC_RESULT_EXECUTION_MODE_INVALID")
+        if result["scientific_status"] != "NOT_RUN":
+            raise ProtocolIntegrityError("SYNTHETIC_RESULT_CLAIMS_NOT_RUN_VIOLATION")
     if result.get("prompt_text_included", True) or result.get("hidden_states_included", True):
         raise ProtocolIntegrityError("RESULT_CONTAINS_PROHIBITED_CONTENT")
     for split in result["splits"].values():
@@ -1022,6 +1084,19 @@ def validate_result_schema(result: Mapping[str, Any]) -> None:
             "TECHNICALLY_INVALID",
         }:
             raise ProtocolIntegrityError("RESULT_TECHNICAL_VALIDITY_INVALID")
+
+
+def atomic_publish_validated_result(result: Mapping[str, Any], root: Path = ROOT) -> dict[str, str]:
+    """Publish an already validated result to the canonical no-overwrite path."""
+    canonical = root / CANONICAL_RESULT_PATH.relative_to(ROOT)
+    return atomic_write_json(canonical, result)
+
+
+def finalize_formal_result(result: Mapping[str, Any], root: Path = ROOT) -> dict[str, str]:
+    """Run the production formal-result finalization pipeline in fixed order."""
+    validate_result_schema(result, formal=True)
+    verify_no_result_collision(root)
+    return atomic_publish_validated_result(result, root)
 
 
 def load_split_definitions(root: Path = ROOT) -> list[dict[str, Any]]:

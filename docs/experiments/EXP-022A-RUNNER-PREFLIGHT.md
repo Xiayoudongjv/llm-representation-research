@@ -1,10 +1,10 @@
-# EXP-022A Runner Static and Synthetic Preflight
+﻿# EXP-022A Runner Static and Synthetic Preflight
 
 THIS IS NOT AN EXP-022A SCIENTIFIC RESULT.
 
 ## Frozen protocol identity
 
-- Experiment: `EXP-022A — Clean-State Layerwise Readout Transport Diagnosis`
+- Experiment: `EXP-022A 鈥?Clean-State Layerwise Readout Transport Diagnosis`
 - Preregistration: `docs/experiments/EXP-022A-PREREGISTRATION.md`
 - Preregistration SHA-256: `609aab2b3cc96f4ea316b45741b2ae427e682c72c7546c8a9520201f94547698`
 - Freeze manifest: `docs/experiments/EXP-022A-FREEZE-MANIFEST.json`
@@ -29,7 +29,8 @@ THIS IS NOT AN EXP-022A SCIENTIFIC RESULT.
 - Class-stratified item-resampling robustness intervals
 - Cross-split synthesis
 - Formal result schema validation
-- Atomic publication helper
+- Formal result finalization pipeline with single staging-path authority
+- No-overwrite atomic canonical publication
 
 ## A0 semantics
 
@@ -116,21 +117,46 @@ The synthetic preflight and focused tests cover:
 loading, CUDA initialization, representation extraction, FIT/EVAL, bootstrap,
 or scientific gate calculation. No authorization artifact is created.
 
+## Task-094C-P publication engineering patch
+
+Task-094C independently rereviewed the runner as scientifically faithful but
+identified three publication/collision engineering defects:
+
+- formal-result validation was not reachable from a production publication path;
+- atomic publication was not reachable from a production publication path;
+- collision checking used a stale `.tmp` path while the atomic writer used
+  `.staging`, so an existing actual staging file could be overwritten.
+
+Patch resolution:
+
+- single staging-path authority via `staging_path_for`;
+- collision checking and atomic writing both use `exp022a_results.json.staging`;
+- staging creation uses exclusive `open("x")` semantics;
+- canonical publication uses `os.link`, so an existing result is never replaced;
+- `finalize_formal_result` explicitly orders schema validation, collision
+  validation, and atomic publication;
+- `run_formal` exposes the intended post-authorization finalization call graph
+  while the authorization gate remains fail-closed;
+- A0/A1/A2 object-reuse, EVAL-leakage, collision, and publication tests were added.
+
+Scientific implementation semantics are unchanged. Model qualification has not
+been performed and formal execution remains unauthorized.
+
 ## Known non-scientific implementation choices
 
 - JSON serialization uses UTF-8, two-space indentation, and sorted keys for
   deterministic engineering artifacts.
 - Bootstrap uses the independent fresh-stream choice documented above.
-- Temporary atomic publication files use the canonical filename plus
-  `.staging` in the same directory.
+- Temporary atomic publication files are derived only through
+  `staging_path_for` and use the canonical filename plus `.staging`.
 - Warnings are serialized as strings in the result warnings list.
 
 These choices do not change scientific hypotheses or primary gates.
 
 ## Test results
 
-- Focused: `pytest -q tests/test_exp022a_runner.py` — `22 passed`
-- Full: `pytest -q` with repository root on `PYTHONPATH` — `589 passed, 2 skipped`
+- Focused: `pytest -q tests/test_exp022a_runner.py` 鈥?`35 passed`
+- Full: `pytest -q` with repository root on `PYTHONPATH` 鈥?`602 passed, 2 skipped`
 - Warnings: seven existing scikit-learn `FutureWarning` items related to
   `penalty` deprecation; no new scientific warning was suppressed.
 
