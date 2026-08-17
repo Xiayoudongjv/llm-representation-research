@@ -113,6 +113,36 @@ A policy that chooses a transformation operator from a vocabulary based on
 state, context, task, or uncertainty.
 ```
 
+## Representation state
+
+```text
+The current represented object or configuration, from which future transformations or readouts are computed.
+```
+
+## Transformation operator
+
+```text
+A reusable mapping from representation states to representation states.
+```
+
+## Attention–geometry coupling
+
+```text
+The potential reciprocal relation in which representation geometry influences attention routing, and attention-mediated value transport changes downstream representation geometry.
+```
+
+## Relational alignment
+
+```text
+The attention-score stage that weights relationships between positions.
+```
+
+## Attention-mediated value transport
+
+```text
+The attention-output stage that aggregates value vectors across token positions.
+```
+
 ## Scope
 
 This file defines constructs only. It does not assign claim status or freeze an

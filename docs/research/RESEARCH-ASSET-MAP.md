@@ -1512,6 +1512,267 @@ Huang's-Law-style structural scaling inspiration -> future Representational Scal
 - Possible Paper Role: Next-result candidate.
 - Verification Status: `ACTIVE_HYPOTHESIS`
 
+## Word2Vec / State-Operator Conceptual Bridge Assets
+
+### ASSET-WORD2VEC-STATEOP-001 - From Semantic Vector Geometry to State-Operator Representations
+
+- ID: `ASSET-WORD2VEC-STATEOP-001`
+- Name: From Semantic Vector Geometry to State–Operator Representations
+- Category: `HISTORICAL_CONCEPTUAL_BRIDGE` / `REPRESENTATION_THEORY` / `PRIOR_ART_REQUIRED`
+- Origin / Provenance:
+  - `USER_ORIGINAL_IDEA`: Word2Vec maps discrete lexical symbols into dense vectors whose geometric relations encode useful semantic regularities; this may connect to and help extend the project's representation/transformation theory.
+  - `DEEPSEEK_PROPOSED_INTERPRETATION`: DeepSeek proposed interpreting words themselves as 2/3/4-style geometric operators, treating language as cascaded transformations in a dynamic latent space.
+  - `PROJECT_INDEPENDENT_SYNTHESIS`: discrete symbol -> distributed vector representation -> geometric relation -> contextual representation -> reusable transformation -> operator selection / composition.
+- Core Insight: Word2Vec supports the observation that useful lexical/semantic regularities can appear geometrically in distributed vector representations.
+- Preferred Wording: `Some semantic and syntactic regularities can be expressed approximately as geometric relations among distributed lexical representations.`
+- Claim Boundary: `semantic meaning = spatial direction`, `logic = vector arithmetic`, `Word2Vec proves the project theory`, `king - man + woman is a rotation`, and `language is completely geometric` are NOT established.
+- Connection to Current Research: Historical precedent for geometric representation relations and a bounded bridge to future transformation/operator questions.
+- Connection to Experiments: Not directly tested. EXP-023 tests only featurewise calibration, not lexical semantic operators.
+- Potential Scientific Value: Controlled bridge from word-vector geometry to state/operator representations.
+- Potential Engineering Value: Future operator-oriented representation abstractions.
+- Potential Formalization: Point -> Relation -> Context -> Operator ladder.
+- Potential Testable Consequence: Future held-out transformation generalization tests, not current work.
+- Dependencies: Representation learning, latent geometry, contextual representation.
+- Current Evidence: Historical Word2Vec evidence is background; no project result.
+- Counterevidence / Limitations: Does not establish semantic completeness or fixed operator identities.
+- Overclaim Boundary: Do not assign fixed parts of speech to geometric operators or claim non-Abelian language structure.
+- Priority: `TIER 4`
+- Activation Trigger: Future lexical/contextual transformation prior-art review and formalization.
+- Related Constructs: Representation state, transformation operator, relational alignment.
+- Related Hypotheses: `HYP-LEXICAL-OPERATOR-001`.
+- Related Claims: None.
+- Possible Paper Role: Historical background / future work.
+- Verification Status: `HISTORICAL_CONCEPTUAL_BRIDGE`
+
+### ASSET-STATE-OPERATOR-DUALITY-001 - Representation-State / Transformation-Operator Duality
+
+- ID: `ASSET-STATE-OPERATOR-DUALITY-001`
+- Name: Representation-State / Transformation-Operator Duality
+- Category: `REPRESENTATION_THEORY` / `PRIOR_ART_REQUIRED`
+- Origin / Provenance: `PROJECT_INDEPENDENT_SYNTHESIS`
+- Core Insight: A representational system may require distinct objects for what is currently represented (`STATE`) and how that representation should change (`OPERATOR`).
+- Abstract Form: `z = state`, `T = transformation`, `z' = T(z)`.
+- Potential Linguistic Examples: negation, tense, relation, comparison, causal transformation, contextual disambiguation.
+- Claim Boundary: No lexical category is prospectively hard-coded to a specific geometric operator.
+- Connection to Current Research: Motivated by the broader operator vocabulary but distinct from current readout calibration.
+- Connection to Experiments: Not directly tested.
+- Potential Scientific Value: Clean state/operator separation for future transformation research.
+- Potential Engineering Value: Explicit operator/state abstractions.
+- Potential Formalization: State-to-state mappings.
+- Potential Testable Consequence: Future operator generalization tests.
+- Dependencies: Representation, transformation operator.
+- Current Evidence: None.
+- Counterevidence / Limitations: Abstract distinction does not establish empirical necessity.
+- Overclaim Boundary: Do not treat lexical categories as fixed operator labels.
+- Priority: `TIER 2`
+- Activation Trigger: Future operator formalization.
+- Related Constructs: Representation state, transformation operator.
+- Related Hypotheses: `HYP-OPERATOR-001`.
+- Related Claims: None.
+- Possible Paper Role: Future work.
+- Verification Status: `PRIOR_ART_REQUIRED`
+
+### ASSET-CONTEXTUAL-OPERATOR-MIXTURE-001 - Context-Conditioned Operator Mixture
+
+- ID: `ASSET-CONTEXTUAL-OPERATOR-MIXTURE-001`
+- Name: Context-Conditioned Operator Mixture
+- Category: `INCUBATING` / `PRIOR_ART_REQUIRED`
+- Origin / Provenance: `PROJECT_INDEPENDENT_SYNTHESIS`
+- Core Insight: Context dependence might be formalized as `P(O_k | word, context)` or as a context-conditioned transformation `T_(w,c)`.
+- Example Distinction: `apple` in food context versus `Apple` in technology context may correspond to different contextual representations and potentially different transformation dynamics.
+- Claim Boundary: This does NOT solve polysemy and must not use quantum-collapse terminology as a scientific mechanism.
+- Connection to Current Research: Extends contextual representation toward potential reusable operators.
+- Connection to Experiments: Not tested.
+- Potential Scientific Value: Future operator-mixture formalization.
+- Potential Engineering Value: Contextual transformation/control abstractions.
+- Potential Formalization: Context-conditioned transformation families.
+- Potential Testable Consequence: Future operator generalization tests.
+- Dependencies: Word2Vec state-operator bridge, contextual representation.
+- Current Evidence: None.
+- Counterevidence / Limitations: Speculative.
+- Overclaim Boundary: Not a polysemy solution; not quantum.
+- Priority: `TIER 4`
+- Activation Trigger: Future contextual-operator prior-art review.
+- Related Constructs: Representation state, transformation operator.
+- Related Hypotheses: `HYP-LEXICAL-OPERATOR-001`.
+- Related Claims: None.
+- Possible Paper Role: Future work.
+- Verification Status: `SPECULATIVE`
+
+### ASSET-LEXICAL-OPERATOR-FUTURE-001 - Future Lexical/Semantic Operator Generalization
+
+- ID: `ASSET-LEXICAL-OPERATOR-FUTURE-001`
+- Name: Future Lexical/Semantic Operator Generalization
+- Category: `FUTURE_NOT_TESTED` / `PRIOR_ART_REQUIRED`
+- Origin / Provenance: `PROJECT_INDEPENDENT_SYNTHESIS`
+- Core Insight: A transformation learned from representation changes associated with a linguistic relation may generalize across held-out contexts.
+- Candidate Progression: translation-only `T(h) = h + b`, then affine `T(h) = Ah + b`, then context-conditioned `T_c(h)`.
+- Candidate Future Semantic Phenomena: negation, tense, comparison, causal relation, analogy.
+- Claim Boundary: Do not create an experiment now; status remains future, prior-art required, not tested.
+- Connection to Current Research: Future lexical/contextual operator branch.
+- Connection to Experiments: Not tested.
+- Potential Scientific Value: Future operator generalization.
+- Potential Engineering Value: Compositional transformation libraries.
+- Potential Formalization: Transformation generalization across held-out contexts.
+- Potential Testable Consequence: Future separately preregistered protocol.
+- Dependencies: Word2Vec state-operator bridge, state-operator duality.
+- Current Evidence: None.
+- Counterevidence / Limitations: Speculative.
+- Overclaim Boundary: Not an active experiment.
+- Priority: `TIER 4`
+- Activation Trigger: Separate future protocol after prior-art review.
+- Related Constructs: Transformation operator, context-conditioned operator mixture.
+- Related Hypotheses: `HYP-LEXICAL-OPERATOR-001`.
+- Related Claims: None.
+- Possible Paper Role: Future work.
+- Verification Status: `FUTURE_NOT_TESTED`
+
+## Attention-Geometry Coupling Assets
+
+### ASSET-ATTENTION-GEOMETRY-001 - Attention-Geometry Coupling
+
+- ID: `ASSET-ATTENTION-GEOMETRY-001`
+- Name: Attention–Geometry Coupling
+- Category: `TRANSFORMER_MECHANISM_HYPOTHESIS` / `LONG_TERM` / `PRIOR_ART_REQUIRED` / `NOT_TESTED`
+- Origin / Provenance: `PROJECT_INDEPENDENT_SYNTHESIS`
+- Core Insight: Layer- and context-dependent representation states determine Q/K/V and therefore influence attention routing; attention-mediated weighted value aggregation in turn changes downstream representations.
+- Reciprocal Candidate Loop: Representation Geometry -> Attention Routing -> Value Transport -> Representation Update -> New Representation Geometry.
+- Standard Attention Correction: Standard decoder attention is already dynamic with context. Fixed learned projection rules plus dynamic contextual representations produce dynamic routing; attention is not static word-similarity lookup.
+- Attention Score Algebra: `score(i,j) = h_i^T B h_j`, with `B = W_Q^T W_K`; `B` need not be symmetric or positive-semidefinite, so the score is generally a learned bilinear interaction / learned relational kernel, not automatically a Riemannian metric tensor.
+- Transformation Bridge: For linear `T`, `score'(i,j) = h_i^T T^T B T h_j`; representation-frame transformation may systematically alter attention routing even when attention parameters remain unchanged. This is a mathematical consequence for linear transformations, not an empirical project finding.
+- Claim Boundary: Attention routing is not functional reasoning; attention score is not a metric tensor by default; dynamic contextual attention is not a dynamically learned metric tensor; multi-head attention is not inherently a 2/3/4 operator scheduler.
+- Connection to Current Research: Long-horizon reciprocal mechanism hypothesis, distinct from EXP-023 readout calibration.
+- Connection to Experiments: Not tested. EXP-023 calibrated states are not fed back into the Transformer.
+- Potential Scientific Value: Candidate framework for future representation-to-attention intervention tests.
+- Potential Engineering Value: Future attention/control interfaces.
+- Potential Formalization: Representation state -> relational alignment -> attention routing -> value transport -> downstream representation state.
+- Potential Testable Consequence: Future frozen-forward intervention tests; not current work.
+- Dependencies: `HYP-CALIBRATION-001`, `HYP-TRANSPORT-001`, potentially `HYP-OPERATOR-001`.
+- Current Evidence: None.
+- Counterevidence / Limitations: Standard attention is dynamic; metric and operator claims are unverified.
+- Overclaim Boundary: Not an empirically established spine stage.
+- Priority: `TIER 4`
+- Activation Trigger: Separate future prior-art review and protocol.
+- Related Constructs: Attention-mediated value transport, relational alignment, representation state.
+- Related Hypotheses: `HYP-ATTENTION-GEOMETRY-001`.
+- Related Claims: None.
+- Possible Paper Role: Future work.
+- Verification Status: `LONG_TERM_PRIOR_ART_REQUIRED_NOT_TESTED`
+
+### ASSET-RELATIONAL-ALIGNMENT-001 - Attention-Score Relational Alignment
+
+- ID: `ASSET-RELATIONAL-ALIGNMENT-001`
+- Name: Attention-Score Relational Alignment
+- Category: `TRANSFORMER_MECHANISM_HYPOTHESIS` / `PRIOR_ART_REQUIRED`
+- Origin / Provenance: `PROJECT_INDEPENDENT_SYNTHESIS`
+- Core Insight: The attention score stage `q_i^T k_j` selects or weights relationships between positions.
+- Working Interpretation: Relational alignment / routing.
+- Claim Boundary: Project analytical concept; not claimed as a universally accepted formal decomposition unless verified by prior art.
+- Connection to Current Research: First stage of the attention–geometry coupling loop.
+- Connection to Experiments: Not directly tested.
+- Potential Scientific Value: Clear terminology for attention-score-stage analysis.
+- Potential Engineering Value: Attention diagnostics.
+- Potential Formalization: Bilinear interaction / relational kernel.
+- Potential Testable Consequence: Future Q/K geometry measurement.
+- Dependencies: Attention score algebra.
+- Current Evidence: None.
+- Counterevidence / Limitations: `B` is not automatically a metric.
+- Overclaim Boundary: Not a metric tensor by default.
+- Priority: `TIER 4`
+- Activation Trigger: Future attention-geometry prior-art review.
+- Related Constructs: Attention–geometry coupling.
+- Related Hypotheses: `HYP-ATTENTION-GEOMETRY-001`.
+- Related Claims: None.
+- Possible Paper Role: Future work.
+- Verification Status: `PRIOR_ART_REQUIRED`
+
+### ASSET-VALUE-TRANSPORT-001 - Attention-Mediated Value Transport
+
+- ID: `ASSET-VALUE-TRANSPORT-001`
+- Name: Attention-Mediated Value Transport
+- Category: `TRANSFORMER_MECHANISM_HYPOTHESIS` / `PRIOR_ART_REQUIRED`
+- Origin / Provenance: `PROJECT_INDEPENDENT_SYNTHESIS`
+- Core Insight: The attention output stage `o_i = sum_j a_ij v_j` moves or aggregates information across token positions.
+- Working Interpretation: Attention-mediated value transport.
+- Claim Boundary: Project analytical concept; not claimed as a universally accepted formal decomposition unless verified by prior art.
+- Connection to Current Research: Second stage of the attention–geometry coupling loop.
+- Connection to Experiments: Not directly tested.
+- Potential Scientific Value: Clear terminology for attention-output-stage analysis.
+- Potential Engineering Value: Attention-flow diagnostics.
+- Potential Formalization: Weighted value aggregation.
+- Potential Testable Consequence: Future value-transport measurement.
+- Dependencies: Relational alignment.
+- Current Evidence: None.
+- Counterevidence / Limitations: Not established as functional reasoning.
+- Overclaim Boundary: Not behavioral effect.
+- Priority: `TIER 4`
+- Activation Trigger: Future attention-geometry prior-art review.
+- Related Constructs: Attention–geometry coupling.
+- Related Hypotheses: `HYP-ATTENTION-GEOMETRY-001`.
+- Related Claims: None.
+- Possible Paper Role: Future work.
+- Verification Status: `PRIOR_ART_REQUIRED`
+
+### ASSET-KV-FRAME-ALIGNMENT-001 - KV Frame Alignment
+
+- ID: `ASSET-KV-FRAME-ALIGNMENT-001`
+- Name: KV Frame Alignment
+- Category: `FUTURE_TRANSFORMER_SYSTEM_HYPOTHESIS` / `PRIOR_ART_REQUIRED`
+- Origin / Provenance: `PROJECT_INDEPENDENT_SYNTHESIS`
+- Core Insight: Cached K/V states are contextual when originally computed and then typically reused during autoregressive inference. If the effective representation/query frame changes, historical cached K/V representations might benefit from a constrained alignment transformation.
+- Abstract Candidate: `K_old -> T_(old->current)(K_old)` before current query comparison.
+- Claim Boundary: Standard KV cache is NOT a multi-state superposition matrix.
+- Connection to Current Research: Long-horizon engineering/mechanism hypothesis.
+- Connection to Experiments: Not tested.
+- Potential Scientific Value: Future KV-frame alignment study.
+- Potential Engineering Value: Cache alignment/adaptation.
+- Potential Formalization: Constrained frame alignment.
+- Potential Testable Consequence: Future inference-time cache-alignment tests.
+- Dependencies: Attention-mediated value transport, representation state.
+- Current Evidence: None.
+- Counterevidence / Limitations: Speculative.
+- Overclaim Boundary: Not multi-hypothesis belief representation.
+- Priority: `TIER 4`
+- Activation Trigger: Future prior-art review.
+- Related Constructs: Attention-mediated value transport.
+- Related Hypotheses: `HYP-ATTENTION-GEOMETRY-001`.
+- Related Claims: None.
+- Possible Paper Role: Future work.
+- Verification Status: `SPECULATIVE`
+
+### ASSET-HARNESS-ATTENTION-CONTROL-001 - Harness Attention Control
+
+- ID: `ASSET-HARNESS-ATTENTION-CONTROL-001`
+- Name: Harness Attention Control
+- Category: `LONG_TERM_SYSTEM_ARCHITECTURE`
+- Origin / Provenance: `ENGINEERING_ARCHITECTURE_INSPIRATION`
+- Core Insight: If a model exposes controllable internal representation/attention interfaces, a future Harness could select or configure representation transformations, attention modules, memory/retrieval, model components, operator modules, or evaluators.
+- Claim Boundary: Current Harness systems do NOT inherently control internal attention geometry.
+- Connection to Current Research: Future engineering integration.
+- Connection to Experiments: Not tested.
+- Potential Scientific Value: Future controllable-attention experiments.
+- Potential Engineering Value: Harness component routing.
+- Potential Formalization: Component/operator configuration.
+- Potential Testable Consequence: Future system design only.
+- Dependencies: Harness architecture, attention-geometry coupling.
+- Current Evidence: None.
+- Counterevidence / Limitations: Speculative system concept.
+- Overclaim Boundary: Not current capability.
+- Priority: `TIER 3`
+- Activation Trigger: Future Harness research.
+- Related Constructs: Harness, representation control.
+- Related Hypotheses: `HYP-OPERATOR-NET-001`, `HYP-ATTENTION-GEOMETRY-001`.
+- Related Claims: None.
+- Possible Paper Role: Future work.
+- Verification Status: `SPECULATIVE`
+
+## New Research Asset Chains
+
+- Discrete Symbols -> Distributed Representation -> Semantic Geometry -> Contextual Representation -> Representation Transformation -> Reusable Operator -> Operator Composition -> Operator Selection.
+- Representation State -> Relational Alignment -> Attention Routing -> Value Transport -> Downstream Representation State.
+- Potential future bridge: Representation Transformation -> Attention Routing Change -> Functional Consequence.
+- The future bridge remains `NOT TESTED`.
+
 ## Negative / Boundary Assets
 
 These are valuable because they constrain future claims.
@@ -1525,6 +1786,16 @@ These are valuable because they constrain future claims.
 - Kakeya analogy != latent-space theorem.
 - JEPA != proof of System-2 reasoning.
 - Multi-hypothesis representation != quantum superposition.
+- Semantic relation geometry != full semantics.
+- Context dependence != explicit operator.
+- Word order sensitivity != non-Abelian group proof.
+- Attention score != metric tensor by default.
+- Dynamic contextual attention != dynamically learned metric tensor.
+- Attention routing != functional reasoning.
+- Readout calibration != attention intervention.
+- Representation transformation != behavioral effect.
+- KV caching != multi-hypothesis belief representation.
+- Planning != causal-mask softening.
 
 ## Future Prior-Art Review Triggers
 
@@ -1537,5 +1808,14 @@ The following assets require future literature review before activation:
 - Harness / Meta-Harness architecture.
 - Representation overlap/interference metrics.
 - Representational scaling profile.
+- Contextual lexical transformations.
+- Relation/vector offsets.
+- Compositional semantic operators.
+- Neural transformation operators.
+- Attention-as-routing interpretations.
+- Dynamic / adaptive attention.
+- Attention geometry.
+- KV transformation/alignment.
+- Operator composition.
 
 No full prior-art search is performed by this task.

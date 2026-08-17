@@ -97,3 +97,10 @@ routing + composition + invariant validation.
 
 - Hypothesis: `HYP-OPERATOR-NET-001`
 - Asset map: `RESEARCH-ASSET-MAP.md`
+
+## 13. Long-Horizon Conceptual Assets: Word2Vec State-Operator and Attention-Geometry Coupling
+
+- State–Operator Duality: Word2Vec-to-contextual-transformation conceptual bridge.
+- Attention–Geometry Coupling: representation state may affect routing; attention-mediated transport may reshape later representation.
+- Status for both: `LONG_TERM` / `PRIOR_ART_REQUIRED` / `NOT_TESTED`.
+- Active scientific priority remains EXP-023 independent calibration replication.

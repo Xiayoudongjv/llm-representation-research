@@ -350,3 +350,13 @@ No formal execution, model load, or EVAL access is authorized.
 - Draft protocol: `docs/experiments/EXP-023-PREREGISTRATION-DRAFT.md`
 - Model execution: `false`
 - Scientific result created: `false`
+
+## Task-095C-A state-operator and attention-geometry asset registration
+
+- Status: `RESEARCH_ASSET_REGISTRATION_COMPLETE`
+- Two long-horizon conceptual assets registered:
+  1. Word2Vec / State–Operator bridge
+  2. Attention–Geometry Coupling
+- Neither changes active experiment priority.
+- Current active scientific program remains: EXP-023 independent featurewise calibration replication plus secondary mean/scale decomposition.
+- Next active task after asset registration remains: fresh independent EXP-023 dataset construction / freeze workflow.

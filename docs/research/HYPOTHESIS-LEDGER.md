@@ -80,3 +80,29 @@ not be cited as findings or moved into `CLAIM-LEDGER.md` as fact.
 - Dependencies: Separate future embodied or physical-state research program.
 - Next discriminating experiment: Deferred.
 - Claim boundary: Not quantum superposition; not evidence from current LLM experiments; not current EXP-022A scope.
+
+## HYP-LEXICAL-OPERATOR-001
+
+- ID: `HYP-LEXICAL-OPERATOR-001`
+- Title: Contextual Lexical/Semantic Transformations as Reusable Operators
+- Origin: Word2Vec-to-contextual-transformation historical bridge; DeepSeek speculative operator-language proposal.
+- Hypothesis: Some contextual semantic effects may be representable as reusable transformations rather than only as resulting positions; candidate operator identities should be discovered empirically from hidden-state transitions.
+- Current evidence: None; not tested.
+- Counterevidence / limitations: Fixed part-of-speech operator mappings are not supported; word order sensitivity is not a proof of non-Abelian language structure.
+- Status: `FUTURE_NOT_TESTED` / `PRIOR_ART_REQUIRED` / `NOT_ACTIVE`
+- Dependencies: `HYP-CALIBRATION-001`, `HYP-TRANSPORT-001`, potentially `HYP-OPERATOR-001`.
+- Next discriminating experiment: Deferred until prior-art review and a separately preregistered protocol.
+- Claim boundary: Not an established semantic mechanism; do not assign fixed geometric operators to lexical categories.
+
+## HYP-ATTENTION-GEOMETRY-001
+
+- ID: `HYP-ATTENTION-GEOMETRY-001`
+- Title: Representation–Attention Geometry Coupling
+- Origin: Project synthesis from attention routing, value transport, and representation geometry.
+- Hypothesis: Layer- and context-dependent changes in representation state may systematically alter attention routing, while attention-mediated value transport may reciprocally reshape downstream representation geometry.
+- Current evidence: None; not tested.
+- Counterevidence / limitations: Standard decoder attention is already dynamic with context; attention score is not automatically a metric tensor; causal-mask softening is not planning.
+- Status: `LONG_TERM` / `PRIOR_ART_REQUIRED` / `NOT_TESTED`
+- Dependencies: `HYP-CALIBRATION-001`, `HYP-TRANSPORT-001`, potentially `HYP-OPERATOR-001`.
+- Next discriminating experiment: Candidate future test would apply a preregistered representation transformation at an internal checkpoint, continue the frozen forward computation, and measure predicted changes in Q/K relations, attention matrices, value transport, downstream representations, and eventually behavior.
+- Claim boundary: Not active; no direct empirical support; EXP-023 does not test attention routing or attention–geometry coupling.
