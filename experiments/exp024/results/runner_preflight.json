@@ -1,0 +1,51 @@
+{
+  "classification": "ENGINEERING_STATIC_PREFLIGHT_ONLY",
+  "dataset": {
+    "condition_count": 10,
+    "partition_families": {
+      "DIAGNOSTIC": 320,
+      "EVAL": 320,
+      "FIT": 240
+    },
+    "record_count": 1760,
+    "semantic_class_count": 4,
+    "source_family_count": 880
+  },
+  "exact_permutation_count": 3628800,
+  "experiment": "EXP-024",
+  "formal_result_present": false,
+  "frozen_authorities": {
+    "condition_panel": {
+      "path": "experiments\\exp024\\condition_panel_spec.json",
+      "sha256": "a3b8d565a94ef6041fbe6a29d73102ab4156cc19cfc07ccaeb06206d589f7954"
+    },
+    "data_schema": {
+      "path": "experiments\\exp024\\data_schema.json",
+      "sha256": "e27c33c864c6305522aec0c92839634fb5885aeb50099372b9bf46da7f2fe3ec"
+    },
+    "dataset": {
+      "path": "experiments\\exp024\\data\\exp024_condition_panel_frozen.json",
+      "sha256": "46c832b68b6ac95704bf5143badc1431627d7f935648842a78971491b13ee404"
+    },
+    "manifest": {
+      "path": "experiments\\exp024\\exp024_frozen_manifest.json",
+      "sha256": "1409a33e300463067ffc060afa58ceb238fda8d6dc2479563c886a8474748f59"
+    },
+    "preregistration": {
+      "path": "docs\\experiments\\EXP-024-PREREGISTRATION.md",
+      "sha256": "55f9604d904fd389da28c6214082028faca081f7e3a0c87c8ba8d961f792d810"
+    }
+  },
+  "model_access": false,
+  "primary_diagnostic": "S_diag(c)",
+  "primary_outcome": "G_eval(c)",
+  "primary_scientific_unit": "condition",
+  "primary_statistic": "Spearman_rho",
+  "runner": {
+    "path": "experiments/exp024/run_exp024.py",
+    "sha256": "7a20264725c7963904c2cce12e1a68705778d3716f7ceaf09f1ab708b0798717"
+  },
+  "scientific_outcome_access": false,
+  "status": "PASS",
+  "support_rule": "rho>0_and_p<=0.05"
+}

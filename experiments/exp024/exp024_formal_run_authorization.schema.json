@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0.0",
+  "title": "EXP-024 formal-run authorization schema",
+  "experiment": "EXP-024",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "experiment",
+    "authorization_id",
+    "single_use",
+    "authorized_repository_commit",
+    "authorized_runner_sha256",
+    "frozen_manifest_sha256",
+    "frozen_dataset_sha256",
+    "preregistration_sha256",
+    "model_name",
+    "model_snapshot_identity",
+    "model_hook_qualification_sha256",
+    "canonical_result_path",
+    "authorization_created_at_utc"
+  ],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0.0"},
+    "experiment": {"type": "string", "const": "EXP-024"},
+    "authorization_id": {"type": "string"},
+    "single_use": {"type": "boolean", "const": true},
+    "authorized_repository_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "authorized_runner_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "frozen_manifest_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "frozen_dataset_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "preregistration_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "model_name": {"type": "string", "const": "Qwen/Qwen3-1.7B"},
+    "model_snapshot_identity": {"type": "string", "const": "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e"},
+    "model_hook_qualification_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "canonical_result_path": {"type": "string"},
+    "authorization_created_at_utc": {"type": "string"}
+  },
+  "additionalProperties": false
+}

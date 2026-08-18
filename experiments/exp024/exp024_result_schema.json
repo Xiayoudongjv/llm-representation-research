@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "title": "EXP-024 formal result schema",
+  "experiment": "EXP-024",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "experiment",
+    "runner",
+    "model",
+    "dataset",
+    "classes",
+    "primary",
+    "technical_validity",
+    "attempt_status",
+    "result_status",
+    "scientific_status",
+    "provenance"
+  ],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0.0"},
+    "experiment": {"type": "string", "const": "EXP-024"},
+    "runner": {"type": "object"},
+    "model": {"type": "object"},
+    "dataset": {"type": "object"},
+    "classes": {"type": "array", "items": {"type": "string"}},
+    "primary": {"type": "object"},
+    "technical_validity": {"type": "object"},
+    "attempt_status": {"type": "string"},
+    "result_status": {"type": "string"},
+    "scientific_status": {"type": "string"},
+    "provenance": {"type": "object"},
+    "hidden_states_included": {"type": "boolean", "const": false},
+    "prompt_text_included": {"type": "boolean", "const": false}
+  }
+}
