@@ -1,0 +1,146 @@
+{
+  "schema_version": "1.0",
+  "created_by": "Task 099B-0 read-only novelty/prior-art auditor",
+  "created_at_utc": "2026-08-19",
+  "repository_commit_audited": "49fcae87567d340eb4e22d62b953cb9c90ee9840",
+  "entries": [
+    {
+      "paper": "Eliciting Latent Predictions from Transformers with the Tuned Lens",
+      "year": 2023,
+      "venue_or_status": "arXiv preprint / reviewed reference in Paper-A Related Work",
+      "source_url_or_identifier": "https://arxiv.org/abs/2303.08112",
+      "overlap_dimensions": [
+        "layer-specific affine readouts",
+        "depth-wise representation mismatch",
+        "decoding across Transformer depth"
+      ],
+      "novelty_threat": "HIGH",
+      "must_cite": true,
+      "notes": "Establishes that hidden representations often require layer-specific affine readouts. Paper-A cannot claim novelty for this observation and must keep its contribution scoped to a fixed readout plus restricted FIT-only featurewise recalibration."
+    },
+    {
+      "paper": "Revisiting Model Stitching to Compare Neural Representations",
+      "year": 2021,
+      "venue_or_status": "NeurIPS 2021",
+      "source_url_or_identifier": "https://arxiv.org/abs/2106.07682",
+      "overlap_dimensions": [
+        "simple learned adapters",
+        "functional compatibility",
+        "performance recovery despite representation differences"
+      ],
+      "novelty_threat": "HIGH",
+      "must_cite": true,
+      "notes": "Shows simple learned adapters can restore task performance. Paper-A differs by working within one frozen model across depth and keeping the readout fixed, but must explicitly bound the similarity."
+    },
+    {
+      "paper": "Similarity and Matching of Neural Network Representations",
+      "year": 2021,
+      "venue_or_status": "NeurIPS 2021",
+      "source_url_or_identifier": "https://arxiv.org/abs/2110.14633",
+      "overlap_dimensions": [
+        "representation matching",
+        "functional/geometric compatibility",
+        "simple transformation between representations"
+      ],
+      "novelty_threat": "MODERATE-HIGH",
+      "must_cite": true,
+      "notes": "Broader representation-matching baseline. Paper-A's featurewise recalibration sits in this lineage and should be cited as prior art, not as an unrelated technique."
+    },
+    {
+      "paper": "Latent Space Translation via Semantic Alignment",
+      "year": 2023,
+      "venue_or_status": "arXiv preprint / prior-art anchor",
+      "source_url_or_identifier": "https://arxiv.org/abs/2311.00664",
+      "overlap_dimensions": [
+        "representation alignment",
+        "semantic readout",
+        "feature transformation"
+      ],
+      "novelty_threat": "MODERATE",
+      "must_cite": true,
+      "notes": "Aligns latent spaces via semantic supervision. Related to the alignment/recalibration family but not the exact fixed-readout preregistered condition-panel design."
+    },
+    {
+      "paper": "Functional Alignment Can Mislead: Examining Model Stitching",
+      "year": 2025,
+      "venue_or_status": "ICML 2025 Spotlight",
+      "source_url_or_identifier": "https://icml.cc/virtual/2025/poster/44458",
+      "overlap_dimensions": [
+        "functional alignment",
+        "readout recovery",
+        "representation equivalence boundary"
+      ],
+      "novelty_threat": "MODERATE",
+      "must_cite": true,
+      "notes": "Directly supports Paper-A's boundary claim that recovery under recalibration is not representation equivalence. Must be cited in the functional-alignment caution."
+    },
+    {
+      "paper": "Tracing Representation Progression",
+      "year": 2024,
+      "venue_or_status": "arXiv preprint",
+      "source_url_or_identifier": "https://arxiv.org/abs/2406.14479",
+      "overlap_dimensions": [
+        "representation progression",
+        "layerwise analysis",
+        "readout/decoder dynamics"
+      ],
+      "novelty_threat": "MODERATE",
+      "must_cite": true,
+      "notes": "Recent layerwise representation progression work. It narrows the available novelty space for broad layerwise claims but does not reproduce the Paper-A chain."
+    },
+    {
+      "paper": "Localising Failure between Representation and Readout: A Fresh-Head Probe for Parameter-Space Model Merging",
+      "year": 2025,
+      "venue_or_status": "OpenReview",
+      "source_url_or_identifier": "https://openreview.net/forum?id=230T2UcWwR",
+      "overlap_dimensions": [
+        "representation vs readout failure localization",
+        "fresh probe",
+        "layer/readout coupling"
+      ],
+      "novelty_threat": "MODERATE",
+      "must_cite": true,
+      "notes": "Post-2024 direct neighbor focused on representation/readout failure localization. Paper-A should distinguish its fixed-readout calibration protocol and preregistered negative design."
+    },
+    {
+      "paper": "Causality != Decodability",
+      "year": 2025,
+      "venue_or_status": "NeurIPS 2025",
+      "source_url_or_identifier": "https://arxiv.org/abs/2510.09794",
+      "overlap_dimensions": [
+        "decoding vs causal role",
+        "representation analysis boundary"
+      ],
+      "novelty_threat": "LOW-MODERATE",
+      "must_cite": true,
+      "notes": "Reinforces Paper-A's distinction between decodability and causal role. Cite as boundary support, not as a direct method competitor."
+    },
+    {
+      "paper": "Post-Grokking Collapse",
+      "year": 2026,
+      "venue_or_status": "arXiv preprint / 2025-2026 neighbor",
+      "source_url_or_identifier": "https://arxiv.org/abs/2608.07436",
+      "overlap_dimensions": [
+        "representation dynamics",
+        "readout/mechanism change",
+        "training-stage representation evolution"
+      ],
+      "novelty_threat": "LOW-MODERATE",
+      "must_cite": false,
+      "notes": "Recent neighbor in representation dynamics. Relevant for positioning but not a direct duplicate of the frozen fixed-readout condition panel."
+    },
+    {
+      "paper": "Two Speeds of Learning",
+      "year": 2026,
+      "venue_or_status": "arXiv preprint / 2025-2026 neighbor",
+      "source_url_or_identifier": "https://arxiv.org/abs/2605.27078",
+      "overlap_dimensions": [
+        "representation and readout learning dynamics",
+        "mechanistic interpretation"
+      ],
+      "novelty_threat": "LOW-MODERATE",
+      "must_cite": false,
+      "notes": "Nearby mechanistic prior art. Does not invalidate Paper-A's empirical design, but should be considered if the manuscript broadens its mechanism claims."
+    }
+  ]
+}

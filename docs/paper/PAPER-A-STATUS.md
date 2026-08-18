@@ -130,3 +130,18 @@ Design-level decisions:
 The bounded story remains publishable as a careful positive/negative evidence
 chain; the simple susceptibility predictor is explicitly `NOT_SUPPORTED` in
 EXP-024.
+
+
+## Task 099B-0 Novelty and Similarity Audit
+
+- `NOVELTY_SIMILARITY_AUDIT_COMPLETE = true`
+- Audit date: `2026-08-19`
+- Verdict: `DEFENSIBLE_BUT_INCREMENTAL`
+- Textual similarity risk: `LOW`
+- Title collision: `NONE`
+- Prior-art overlap blocking: `false`
+- Novelty authority:
+  - `docs/paper/PAPER-A-NOVELTY-AND-SIMILARITY-AUDIT.md`
+  - `docs/paper/PAPER-A-PRIOR-ART-OVERLAP-MATRIX.json`
+
+Task 099B must use these artifacts as the prior-art/novelty baseline.
