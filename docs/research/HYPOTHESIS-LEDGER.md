@@ -25,7 +25,7 @@ not be cited as findings or moved into `CLAIM-LEDGER.md` as fact.
 - Hypothesis: Featurewise recalibration benefit may occur primarily when a representation/readout interface exhibits independently measurable layerwise mismatch, rather than being a uniform property of all held-out conditions.
 - Current evidence: EXP-022A discovery signal and EXP-023 split heterogeneity; no independent susceptibility predictor tested.
 - Counterevidence: Split B showed little fixed-readout degradation and no recalibration rescue; direction across variant splits was not stable across EXP-022A/023.
-- Status: `ACTIVE_PROSPECTIVE_NOT_TESTED`
+- Status: `FROZEN_PROSPECTIVE_NOT_RUN`
 - Dependencies: Requires an independent diagnostic/confirmatory design.
 - Next discriminating experiment: Future design must separate a FIT-only or separate diagnostic subset from the confirmatory EVAL partition.
 - Claim boundary: Prospective hypothesis only; not tested in Task 096E.

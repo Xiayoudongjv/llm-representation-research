@@ -74,7 +74,7 @@ Do not create EXP-024 or run new models in Task 097A.
 
 ## Follow-Up Design
 
-- `FOLLOWUP_DESIGN_STATUS = PROTOCOL_DRAFTED_NOT_FROZEN`
+- `FOLLOWUP_DESIGN_STATUS = FROZEN_NOT_RUN`
 - `SELECTED_FOLLOWUP_DESIGN = B`
 - Design draft: `docs/experiments/EXP-024-DESIGN-DRAFT.md`
 - Prior-art gap note: `docs/paper/PAPER-A-PRIOR-ART-GAP-NOTE.md`
@@ -99,7 +99,7 @@ Design-level decisions:
   `G_eval_cond = BA_A_mu_sigma_EVAL(block27-pre) - BA_A0_EVAL(block27-pre)`
 - `EXP024_DESIGN_DRAFT_CREATED = true`
 - `EXP024_PREREGISTRATION_DRAFT_CREATED = true`
-- `EXP024_PREREGISTRATION_FROZEN = false`
+- `EXP024_PREREGISTRATION_FROZEN = true`
 - `EXP024_PROTOCOL_REVIEW = READY_FOR_DATASET_CONSTRUCTION`
 
 `PAPER_A_DRAFT_READINESS` remains `START_FIRST_DRAFT_NOW`. Prose drafting may
