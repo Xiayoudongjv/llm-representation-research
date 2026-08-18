@@ -145,3 +145,31 @@ Task-099C confirms the three highest-priority figure/table requirements:
 The evidence-summary table is now included in the revised manuscript at Methods
 Section 3.7. Figure production remains a next-stage task; no new analysis is
 required.
+
+## 099E Production Status
+
+Task-099E finalized the main-paper asset set. It consolidated the earlier
+seven-figure proposal into six main figures by merging the conceptual evidence
+chain and the EXP-024 broad-benefit display into the primary figure package.
+
+- `PAPER_A_099E_MAIN_FIGURE_COUNT = 6`
+- `PAPER_A_099E_MAIN_FIGURES_COMPLETE = true`
+- `PAPER_A_099E_MAIN_TABLE_COUNT = 2`
+- `PAPER_A_099E_MAIN_TABLES_COMPLETE = true`
+- `PAPER_A_099E_EXP023_NEGATIVE_VISIBLE_IN_ASSETS = true`
+- `PAPER_A_099E_EXP024_PRIMARY_NEGATIVE_VISIBLE_IN_ASSETS = true`
+- `PAPER_A_099E_EXP024_ALL_10_CONDITIONS_PLOTTED = true`
+- `PAPER_A_099E_EXP024_RHO_MATCHES_CANONICAL = true`
+- `PAPER_A_099E_EXP024_P_MATCHES_CANONICAL = true`
+- `PAPER_A_099E_NO_NEW_INFERENTIAL_TESTS = true`
+- `PAPER_A_099E_SUBMISSION_READY = false`
+
+Main figure outputs: `docs/paper/figures/fig01_framework` through
+`docs/paper/figures/fig06_exp024_broad_benefit` (PNG and SVG).
+
+Main table outputs: `docs/paper/tables/paper_a_evidence_summary.md` and
+`docs/paper/tables/exp024_condition_outcomes.md`.
+
+Figure 6 in the old proposal became the main broad-benefit panel; the old
+Figure 6 evidence synthesis is now represented by Figure 1 and the evidence
+summary table. No new experiment or inferential test was introduced.

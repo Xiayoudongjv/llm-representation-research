@@ -1,6 +1,6 @@
 # Fixed Readout Compatibility and Featurewise Recalibration Across Transformer Depth: A Controlled, Preregistered Evidence Chain with Heterogeneous and Negative Results
 
-Status: `REVISED_AFTER_099C`
+Status: `ASSETS_FINALIZED_099E`
 
 This document is a derived manuscript. Canonical experiment results, frozen
 protocols, scientific reviews, and research ledgers outrank it.
@@ -61,7 +61,10 @@ We ask four questions:
 The contribution is the controlled combination of fixed readout, deliberately
 low-capacity recalibration, held-out source-family separation, explicit
 replication/non-replication evidence, and a preregistered independent
-susceptibility test. The negative results are part of the main scientific
+susceptibility test.
+
+**Figure 1** presents the tested evidence chain and marks behavioral control,
+functional binding, and coordinate transport as outside the current boundary. The negative results are part of the main scientific
 argument, not appendix caveats.
 
 Specifically, this paper makes four prior-art-aware contributions:
@@ -284,6 +287,10 @@ only. No post-hoc test is used to replace the primary.
 
 ### 3.7 Evidence summary
 
+**Table 1** is the canonical evidence-summary table, rendered in
+`docs/paper/tables/paper_a_evidence_summary.md` from the same experiment
+results. It is summarized below:
+
 | Experiment | Scientific question | Design | Primary outcome | Interpretation | Boundary |
 | --- | --- | --- | --- | --- | --- |
 | EXP-018 | Are task-associated hidden-state directions locally manipulable? | Held-out task-directed vs matched-random/opposite probe changes | Target-directed movement consistently positive | Local representational manipulability | No behavioral control |
@@ -298,6 +305,10 @@ only. No post-hoc test is used to replace the primary.
 ## 4. Results
 
 ### 4.1 Local representational manipulability
+
+**Figure 2** (`docs/paper/figures/fig02_manipulability`) presents the
+EXP-018 frozen probe summary and EXP-020A same-family replication means with
+their canonical bootstrap intervals.
 
 EXP-018 used a held-out fit/evaluation design with task-directed,
 matched-norm random, and exact opposite interventions. Across the frozen
@@ -342,6 +353,9 @@ paper from interpreting EXP-018/EXP-020A as behavioral or functional control.
 
 ### 4.3 Fixed semantic readout compatibility degrades across depth
 
+**Figure 3** (`docs/paper/figures/fig03_fixed_readout_degradation`) plots the
+EXP-021 checkpoint-level fixed-readout accuracy for both qualification splits.
+
 EXP-021 Stage-Q used a fixed source-semantic readout across frozen
 intervention and normalized-depth checkpoints. The measurement qualification
 did not pass globally. For Split A, accuracy was `0.9167` at the intervention
@@ -365,6 +379,10 @@ Split B (`D_fixed = -0.50`, exact `p = 0.015625`) but not Split A
 `PARTIAL_CONCORDANCE`.
 
 ### 4.4 Featurewise recalibration can recover readout performance, but replication is heterogeneous
+
+**Figure 4** (`docs/paper/figures/fig04_exp023_heterogeneity`) makes the EXP-023
+Split A/Split B heterogeneity and the registered `NO_REPLICATION` outcome
+visually explicit.
 
 EXP-022A found descriptive featurewise recovery. In Split A, `A1` increased
 block27-pre balanced accuracy from `0.6667` (`A0`) to `0.7500`
@@ -391,6 +409,11 @@ explanation is therefore `NOT_SUPPORTED`; readout compatibility appears
 condition and dataset dependent.
 
 ### 4.5 Independent susceptibility prediction is not supported
+
+**Figure 5** (`docs/paper/figures/fig05_exp024_primary_scatter`) shows the
+registered EXP-024 primary scatter with all ten conditions, exact rho/p, and
+`NOT_SUPPORTED`. **Figure 6** (`docs/paper/figures/fig06_exp024_broad_benefit`)
+shows the paired descriptive panel observation.
 
 #### 4.5.1 Descriptive observation
 
@@ -546,51 +569,82 @@ mismatch govern calibration susceptibility.
 
 ## References
 
-1. N. Belrose, Z. Furman, L. Smith, D. Bau, I. Sucholutsky, and others,
-   *Eliciting Latent Predictions from Transformers with the Tuned Lens*,
-   arXiv:2303.08112.
-2. Y. Bansal, P. Nakkiran, and B. Barak, *Revisiting Model Stitching to
-   Compare Neural Representations*, NeurIPS 2021, arXiv:2106.07682.
-3. Zs. Csisz?rik, P. K?r?si-Szab?, ?. Matszangosz, G. Papp, and D. Varga,
+1. N. Belrose, Z. Furman, L. Smith, D. Halawi, I. Ostrovsky, L. McKinney,
+   S. Biderman, and J. Steinhardt, *Eliciting Latent Predictions from
+   Transformers with the Tuned Lens*, arXiv:2303.08112.
+2. Y. Bansal, P. Nakkiran, and B. Barak, *Revisiting Model Stitching to Compare
+   Neural Representations*, NeurIPS 2021, pages 225--236, arXiv:2106.07682.
+3. A. Csisz?rik, P. K?r?si-Szab?, ?. Matszangosz, G. Papp, and D. Varga,
    *Similarity and Matching of Neural Network Representations*, NeurIPS 2021,
-   arXiv:2110.14633.
+   pages 5656--5668, arXiv:2110.14633.
 4. V. Maiorca, L. Moschella, A. Norelli, M. Fumero, F. Locatello, and
    E. Rodol?, *Latent Space Translation via Semantic Alignment*, arXiv:2311.00664.
-5. *Functional Alignment Can Mislead: Examining Model Stitching*, ICML 2025
-   Spotlight, https://icml.cc/virtual/2025/poster/44458.
-6. *Representation steering and activation intervention literature*; exact
-   canonical citation pending final bibliography verification.
-7. *Tracing Representation Progression*, arXiv:2406.14479.
+5. D. Smith, H. Mannering, and A. Marcu, *Functional Alignment Can Mislead:
+   Examining Model Stitching*, ICML 2025 Spotlight,
+   https://icml.cc/virtual/2025/poster/44458.
+6. K. Li, O. Patel, F. Vi?gas, H. Pfister, and M. Wattenberg,
+   *Inference-Time Intervention: Eliciting Truthful Answers from a Language
+   Model*, NeurIPS 2023 Spotlight, arXiv:2306.03341.
+7. J. Jiang, J. Zhou, and Z. Zhu, *Tracing Representation Progression:
+   Analyzing and Enhancing Layer-Wise Similarity*, ICLR 2025 Poster,
+   arXiv:2406.14479.
 8. *Localising Failure between Representation and Readout: A Fresh-Head Probe
-   for Parameter-Space Model Merging*, OpenReview 230T2UcWwR.
-9. *Causality != Decodability*, NeurIPS 2025, arXiv:2510.09794.
-10. *Post-Grokking Collapse*, arXiv:2608.07436.
-11. *Two Speeds of Learning*, arXiv:2605.27078.
+   for Parameter-Space Model Merging*, OpenReview `230T2UcWwR`, TMLR
+   Paper8964. Full author list pending final primary-source verification.
+9. L. Huang and Y. Chang, *Causality != Decodability, and Vice Versa: Lessons
+   from Interpreting Counting ViTs*, NeurIPS 2025, arXiv:2510.09794.
+10. A. Janati, K. El Maghraoui, A. Kanavalau, and A. Belfatmi, *Post-Grokking
+    Collapse at the Representation-Readout Interface in Muon-Trained
+    Transformers*, arXiv:2608.07436.
+11. C.-N. Chou, O. Uzdelewicz, N.-C. Chiu, Y.-Y. Yang, and S. Chung, *Two
+    Speeds of Learning: A Representation-Readout Decomposition of Grokking and
+    Double Descent*, arXiv:2605.27078.
 
-Reference metadata was taken from Task-099B-0's prior-art inventory. Final
-bibliographic verification should be repeated against the primary sources
-before submission; no citation is intentionally fabricated.
+BibTeX: `docs/paper/references.bib`. Verification record:
+`docs/paper/PAPER-A-REFERENCE-VERIFICATION.md`. Ten references are verified;
+reference 8 is partial pending author-list confirmation.
 
 ## Figure and Table Placement Notes
 
-Planned main figures:
+The manuscript now uses six main figures and two main tables generated from
+canonical evidence. Vector SVG and preview PNG versions are stored in
+`docs/paper/figures/`; table artifacts are stored in `docs/paper/tables/`.
 
-- Figure 1: evidence-flow diagram from local manipulability to conditional
-  calibration, with explicit negative/boundary branches.
-- Figure 2: EXP-021 and EXP-022A depth-wise fixed-readout degradation across
-  checkpoints and splits.
-- Figure 3: EXP-023 split-level calibration heterogeneity; the caption must
-  make `NO_REPLICATION` visually and textually explicit.
-- Figure 4: EXP-024 scatter of `S_diag(c)` vs `G_eval(c)` with all ten
-  conditions labeled; the caption must report `rho = 0.28401877872187725`,
-  exact one-sided `p = 0.2115079365079365`, and `NOT_SUPPORTED`.
-- Figure 5: paired condition-level `S_diag` and `G_eval` display showing broad
-  positivity but weak rank predictiveness.
+### Main figures
 
-Planned main table:
+- **Figure 1** (`fig01_framework`): tested evidence chain from fixed semantic
+  readout through held-out recovery, replication/heterogeneity, and independent
+  susceptibility testing. The dashed boundary marks behavioral control,
+  functional binding, and coordinate transport as not established.
+- **Figure 2** (`fig02_manipulability`): EXP-018 frozen probe summary
+  (`216/216` task > matched-random; `216/216` task > opposite) and EXP-020A
+  observed means with canonical bootstrap 95% intervals. The EXP-020A gate is
+  `REPRESENTATION_REPLICATION_SUPPORTED`.
+- **Figure 3** (`fig03_fixed_readout_degradation`): EXP-021 fixed-readout
+  accuracy across qualification checkpoints for Split A and Split B.
+  Checkpoint-level predicted-class coverage failures are marked; the result is
+  engineering measurement qualification only, with `global_pass = false`.
+- **Figure 4** (`fig04_exp023_heterogeneity`): panel (a) EXP-023 final-block
+  readout performance by variant and split; panel (b) `G_cal` point estimates
+  with canonical bootstrap intervals. The caption and figure both state
+  registered cross-split outcome `NO_REPLICATION`.
+- **Figure 5** (`fig05_exp024_primary_scatter`): EXP-024 `S_diag(c)` vs
+  `G_eval(c)` for all 10 frozen conditions. The annotation reports
+  `rho = 0.28401877872187725`, exact one-sided
+  `p = 0.2115079365079365`, and registered support `NOT_SUPPORTED`. No
+  dominant trend line is used to visually inflate the association.
+- **Figure 6** (`fig06_exp024_broad_benefit`): paired condition-level
+  `S_diag(c)` and `G_eval(c)` display in frozen condition order. It shows
+  `10/10` positivity for both while labeling this as descriptive panel
+  observation only, not a new confirmatory positivity test.
 
-- Table 1: the experiment evidence-summary table in Section 3.7, with
-  scientific progression columns and explicit EXP-023/EXP-024 negative
-  outcomes.
+### Main tables
+
+- **Table 1** (`docs/paper/tables/paper_a_evidence_summary.md`): scientific
+  progression evidence summary across EXP-018, EXP-017, EXP-019, EXP-020A,
+  EXP-021, EXP-022A, EXP-023, and EXP-024.
+- **Table 2** (`docs/paper/tables/exp024_condition_outcomes.md`): all ten
+  EXP-024 condition outcomes with canonical `S_diag(c)`, `G_eval(c)`, and
+  diagnostic balanced-accuracy fields, plus the registered primary summary.
 
 The full manuscript is `NON_AUTHORITATIVE_DERIVED_FROM_CANONICAL_EVIDENCE`.

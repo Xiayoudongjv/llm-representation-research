@@ -1,0 +1,11 @@
+condition,s_diag,g_eval,A0_block16_diagnostic_BA,A0_block27_diagnostic_BA
+c01_lexical_relex,0.5,0.40625,1.0,0.5
+c02_syntactic_restructure,0.4375,0.46875,1.0,0.5625
+c03_controlled_compression,0.3125,0.34375,1.0,0.6875
+c04_controlled_elaboration,0.3125,0.5,0.8125,0.5
+c05_relation_explicit,0.5,0.4375,1.0,0.5
+c06_relation_implicit,0.4375,0.375,0.96875,0.53125
+c07_register_formal,0.3125,0.34375,1.0,0.6875
+c08_register_informal,0.34375,0.46875,1.0,0.65625
+c09_neutral_distractor_prefix,0.4375,0.46875,1.0,0.5625
+c10_anaphoric_reference,0.3125,0.3125,1.0,0.6875

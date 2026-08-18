@@ -195,3 +195,30 @@ Revision authority:
 
 Re-review authority:
 - `docs/paper/PAPER-A-POST-REVISION-REREVIEW.md`
+
+## Task 099E Figure / Table / Reference Finalization
+
+- `FIGURE_PRODUCTION_COMPLETE = true`
+- `MAIN_TABLES_COMPLETE = true`
+- `REFERENCE_VERIFICATION_COMPLETE = true`
+- `DIRECT_PRIOR_ART_REFERENCES_VERIFIED = true`
+- `FIGURE_CAPTIONS_AUDITED = true`
+- `MANUSCRIPT_FIGURE_REFERENCES_INTEGRATED = true`
+- `MANUSCRIPT_TABLE_REFERENCES_INTEGRATED = true`
+- `BIBLIOGRAPHY_METADATA_VERIFIED = true`
+- `PAPER_A_099E_MAIN_FIGURE_COUNT = 6`
+- `PAPER_A_099E_MAIN_TABLE_COUNT = 2`
+- `PAPER_A_099E_REFERENCE_COUNT = 11`
+- `PAPER_A_099E_REFERENCES_VERIFIED = 10`
+- `PAPER_A_099E_REFERENCES_PARTIAL = 1`
+- `PAPER_A_099E_REFERENCES_UNRESOLVED = 0`
+- `NEW_EXPERIMENT_REQUIRED_FOR_CORE_CLAIM = false`
+- `SUBMISSION_READY = false`
+- `NEXT_TASK = 099F_MENTOR_EXTERNAL_READER_PACKAGE_AND_SUBMISSION_READINESS`
+
+Assets: `docs/paper/figures/`, `docs/paper/tables/`,
+`docs/paper/references.bib`, and
+`docs/paper/PAPER-A-REFERENCE-VERIFICATION.md`.
+
+Reference 8 remains the only partial bibliography item because its full author
+list has not yet been independently resolved from a primary source.
