@@ -81,6 +81,8 @@ not be cited as findings or moved into `CLAIM-LEDGER.md` as fact.
 - Dependencies: At least one meaningful transport/transformation family must be empirically established first.
 - Next discriminating experiment: Deferred.
 - Claim boundary: Do not assert non-Abelian structure.
+- KAN / operator-family note: Standard KAN provides a concrete example of function-valued edges and a prospective `T0`-`T5` complexity ladder, but it does not provide evidence for this hypothesis and must not be cited as validation of the project's operator theory.
+- Deferred sub-question: Does held-out fixed-readout recovery require operator complexity beyond diagonal affine recalibration? Candidate label `HYP_OPERATOR_CAPACITY_001` is not registered as a separate active hypothesis; status `DEFERRED_BEHIND_CROSS_MODEL_REPLICATION`, evidence `NOT_TESTED`.
 
 ## HYP-OPERATOR-NET-001
 

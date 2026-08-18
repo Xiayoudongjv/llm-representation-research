@@ -71,6 +71,7 @@ JEPA -> Latent Prediction -> World Model
 World Model + Structured Belief Representation + Operator Selection -> Embodied / Active Perception
 Kakeya / Covering / Packing -> Overlap / Multiplicity inspiration -> Representation Interference questions
 Huang's-Law-style structural scaling inspiration -> future Representational Scaling Profile
+KAN / constrained operator family -> operator-complexity ladder -> future minimum sufficient alignment operator
 ```
 
 ## Foundation and Background Assets
@@ -856,6 +857,104 @@ Huang's-Law-style structural scaling inspiration -> future Representational Scal
 - Possible Paper Role: Long-term application branch.
 - Verification Status: `APPLICATION_BRANCH`
 
+## KAN / Constrained Operator-Family Inspiration Assets
+
+### ASSET-KAN-CONSTRAINED-OPERATOR-001 - KAN / Constrained Operator-Family Inspiration
+
+- ID: `ASSET-KAN-CONSTRAINED-OPERATOR-001`
+- Name: KAN / Constrained Operator-Family Inspiration
+- Category: `ARCHITECTURE_PRIOR_ART` / `MECHANISM_INSPIRATION` / `OPERATOR_FAMILY_DESIGN`
+- Origin / Provenance: `ESTABLISHED_RESEARCH_PARADIGM` + `PROJECT_SYNTHESIS`
+- Core Insight: Standard Kolmogorov-Arnold Networks use learnable univariate scalar-to-scalar functions on edges rather than scalar linear weights followed by fixed node activations, with canonical form `x_{l+1,j} = sum_i phi_{l,j,i}(x_{l,i})`.
+- Connection to Current Research: Structurally resonant with the project's state/operator direction (node = state, edge = operator), but an architectural prior rather than a theoretical equivalence or empirical validation.
+- Connection to Experiments: Not tested. It connects prospectively to the Paper-A mechanism gap: fixed semantic readout compatibility can degrade across depth; low-capacity FIT-only featurewise recalibration can recover readout performance under bounded conditions; calibration-susceptibility mechanism remains unresolved. It is not part of EXP-025 primary scope.
+- Potential Scientific Value: A concrete future operator-complexity ladder for mechanism diagnosis.
+- Potential Engineering Value: A KAN-like coordinatewise nonlinear operator can serve as the `T_diag-nonlinear` comparison arm rather than a Transformer replacement.
+- Potential Formalization: See subsections below; `k* = min { k : Delta_EVAL(T_k) >= tau }`, with `tau` unregistered.
+- Potential Testable Consequence: Future minimum-sufficient-operator diagnosis after cross-model replication.
+- Dependencies: `HYP_CALIBRATION_CONDITIONAL_002`, `HYP-TRANSPORT-001`, `HYP-OPERATOR-001`; deferred behind cross-model replication.
+- Current Evidence: Architecture prior art only.
+- Counterevidence / Limitations: KAN does not validate the project's operator theory, cognitive folding, coordinate transport, invariant reasoning, or functional binding. Standard KAN is not immune to catastrophic forgetting and does not eliminate the curse of dimensionality.
+- Overclaim Boundary: `NOT_CURRENT_PAPER_A_CLAIM`, `NOT_EMPIRICALLY_VALIDATED_BY_PROJECT`; not a new backbone or Paper-A method.
+- Priority: `TIER 2` future mechanism; current status `ACTIVE_INSPIRATION_ASSET`.
+- Activation Trigger: Only after cross-model replication evidence indicates fixed-readout degradation/calibration phenomenon merits mechanism study.
+- Related Constructs: Operator-valued edge, geometric operator vocabulary, featurewise recalibration, diagonal affine transport.
+- Related Hypotheses: `HYP-OPERATOR-001`, `HYP-TRANSPORT-001`.
+- Related Claims: None.
+- Possible Paper Role: None for Paper A; future operator-capacity paper.
+- Verification Status: `ACTIVE_INSPIRATION_ASSET` / `NOT_EMPIRICALLY_VALIDATED_BY_PROJECT`
+
+#### KAN Technical Boundary
+
+- A single KAN edge is a scalar-to-scalar learnable function, not an arbitrary high-dimensional rotation or transport operator.
+- Cross-coordinate interaction arises from multi-edge aggregation and layer composition, not from a single edge.
+- Therefore `node = state` / `edge = operator` is a structural analogy only, not a theoretical equivalence.
+
+#### Kolmogorov-Arnold Theorem Boundary
+
+- KART provides an existence result for representing multivariate continuous functions via compositions/sums of univariate functions.
+- It does not prove semantic basis folding, cognitive folding, latent-space geometry, reasoning decomposition, or invariant-preserving transport.
+- Historical term `Cognitive Folding` is retained as `HISTORICAL_METAPHOR`; recommended future formal expression is `CONSTRAINED_COMPOSITIONAL_FACTORIZATION`.
+
+#### Future Operator-Complexity Taxonomy (Not an Empirically Established Ladder)
+
+- `T0` identity
+- `T1` diagonal affine
+- `T2` coordinatewise nonlinear (KAN-like / spline-like univariate functions)
+- `T3` low-rank cross-coordinate linear
+- `T4` sparse cross-coordinate nonlinear
+- `T5` general constrained nonlinear operator
+
+This replaces the more visual historical labels (rotation, scaling, jump, folding, `234 operators`). Historical `234 operator` labels remain `HISTORICAL_OPERATOR_LABELS`; they are not mathematical dimensions or validated operator classes.
+
+#### Minimum Sufficient Alignment Operator
+
+- Status: `PROVISIONAL_RESEARCH_CONCEPT` (name not frozen).
+- Definition: Given pre-ordered/registered operator families `T_0 subset T_1 subset ... subset T_k`, find the lowest-complexity family that meets a preregistered recovery criterion under FIT-only learning and independent held-out EVAL.
+- Formal placeholder: `k* = min { k : Delta_EVAL(T_k) >= tau }`.
+- Boundary: `tau` is not registered; this is a future concept, not an active statistical hypothesis.
+
+#### Prospective Interpretation Templates
+
+- `Case A`: diagonal-affine ≈ coordinatewise-nonlinear ≈ low-rank -> very low-capacity recalibration captures most recoverable mismatch.
+- `Case B`: coordinatewise-nonlinear > diagonal-affine -> coordinatewise nonlinear distortion may contribute beyond mean/scale mismatch.
+- `Case C`: low-rank > coordinatewise-nonlinear -> cross-coordinate interactions/covariance-like structure may matter.
+- `Case D`: none provides held-out recovery -> readout degradation may not be explainable as a low-complexity frame/interface mismatch.
+
+These are `PROSPECTIVE_INTERPRETATION_TEMPLATES`, not results.
+
+#### Future Experiment Relationship
+
+- Potential future direction: `EXP-026-like Operator-Capacity Mechanism Diagnosis`.
+- `EXP-026` is not created; no protocol, dataset, or active hypothesis is created.
+- Priority: `DEFERRED_BEHIND_CROSS_MODEL_REPLICATION` (`EXP025_DIRECTION = CROSS_MODEL_REPLICATION`).
+- A KAN-like operator would be `T_diag-nonlinear`: `T(h)_i = phi_i(h_i)`, with low-degree-of-freedom spline/KAN-like basis FIT-only learned, compared fairly against `T_identity`, `T_diagonal-affine`, `T_low-rank`.
+- Purpose is `MECHANISM_DIAGNOSIS`, not performance optimization.
+
+#### Complexity-Control and Related Assets
+
+- `Transformability by an arbitrarily expressive mapping has weak scientific content.` Future transport/alignment claims require operator-complexity constraints, held-out generalization, capacity controls, and registered invariants.
+- `[[Covering / Kakeya asset]]` motivates constrained transformation classes.
+- `[[KAN operator-family asset]]` supplies concrete learnable restricted function families.
+- Shared principle: `CONSTRAINED_OPERATOR_BEFORE_TRANSPORT_CLAIM`.
+- Future transport work must also ask which registered relations remain invariant (`I_r(T(h)) ≈ I_r(h)`), not only whether readout accuracy improves. KAN literature does not establish the project's latent relational invariants; `HYP-TRANSPORT-001` status is unchanged.
+
+#### Adjacent Prior Art Boundaries
+
+- Geometry-aware / constraint-aware KAN variants show explicit constraints + learned nonlinear operators is a viable design principle; they do not validate the project's latent geometry theory.
+- KAN-like functions have been explored in attention modules, attention-free token mixing, and vision backbones; this supports composition of typed operators, not `attention = KAN operator`, `head = rotation`, or novelty of the project's operator network.
+- Local-support splines may reduce some parameter interference, but standard KAN is not immune to catastrophic forgetting and does not eliminate the curse of dimensionality.
+
+#### Representation Scaling Profile Note
+
+- Historical `Psi(N,l) = [D, M, T, I, B]`.
+- Possible future operationalization only: `T` may be refined to operator complexity/recoverability, e.g. provisional `k*(N,l)`, potentially `Psi(N,l) = [D, M, k*, I, B]`.
+- The canonical `Psi` definition is not modified here.
+
+#### Bounded Summary
+
+Kolmogorov-Arnold Networks provide a concrete architectural example of function-valued edges and compositional nonlinear operators. This is structurally relevant to the project's state/operator research direction, but does not validate the project's historical cognitive-folding, transport, or invariant claims. Its main value is as an operator-family prior for future mechanism experiments that compare the minimum complexity required to restore held-out readout compatibility.
+
 ## Mathematical and Analogy Assets
 
 ### ASSET-KAKEYA-001 - Kakeya-style direction/overlap inspiration
@@ -1239,10 +1338,13 @@ Huang's-Law-style structural scaling inspiration -> future Representational Scal
 
 - ID: `ASSET-COGNITIVE-FOLDING-001`
 - Name: Cognitive Folding
-- Category: `PROJECT_METAPHOR / SPECULATIVE`
+- Category: `PROJECT_METAPHOR / HISTORICAL_METAPHOR`
 - Origin / Provenance: `USER_ORIGINAL_IDEA`
 - Core Insight: Compression, reuse, low-dimensional organization, overlap, hierarchical representation, and coordinate transformation may be useful metaphors.
 - Connection to Current Research: Metaphor for representation organization.
+- Historical Status: `HISTORICAL_METAPHOR`
+- Future Formalization Direction: `CONSTRAINED_COMPOSITIONAL_FACTORIZATION`
+- KAN Boundary: KAN/KART provide a concrete example of univariate compositional nonlinearity; they do not validate cognitive folding.
 - Connection to Experiments: Not tested.
 - Potential Scientific Value: Creative hypothesis generation only.
 - Potential Engineering Value: Design intuition.
@@ -1258,7 +1360,7 @@ Huang's-Law-style structural scaling inspiration -> future Representational Scal
 - Related Hypotheses: None direct.
 - Related Claims: None.
 - Possible Paper Role: None unless formalized.
-- Verification Status: `SPECULATIVE`
+- Verification Status: `HISTORICAL_METAPHOR`
 
 ### ASSET-RAG-MEMORY-REP-001 - RAG / Parametric Memory / Representation
 
@@ -1796,6 +1898,7 @@ These are valuable because they constrain future claims.
 - Representation transformation != behavioral effect.
 - KV caching != multi-hypothesis belief representation.
 - Planning != causal-mask softening.
+- KAN architectural inspiration != validation of project transport, invariant, cognitive-folding, or functional-binding theory.
 
 ## Future Prior-Art Review Triggers
 
@@ -1817,5 +1920,6 @@ The following assets require future literature review before activation:
 - Attention geometry.
 - KV transformation/alignment.
 - Operator composition.
+- KAN / learnable univariate operators; geometry-aware or constraint-aware KAN variants; attention/vision KAN variants.
 
 No full prior-art search is performed by this task.
