@@ -1,0 +1,166 @@
+{
+  "schema_version": "0.1-focused-rereview",
+  "experiment": "EXP-024",
+  "review_task": "097D-R2",
+  "review_mode": "READ_ONLY",
+  "reviewed_candidate_path": "experiments/exp024/data/exp024_condition_panel_candidate.json",
+  "reviewed_candidate_sha256": "46c832b68b6ac95704bf5143badc1431627d7f935648842a78971491b13ee404",
+  "original_reviewed_candidate_sha256": "8583b57d9ed0ff98bd6d81eb3fc8f0f6c97a17d9acc63699b9d9b80e5c62eac5",
+  "repair_log_path": "experiments/exp024/data/exp024_dataset_repair_log.json",
+  "repair_log_sha256": "33d70d2526792ec255a781db72c7bff515e8dd2e9693eaec1a06d5257827987d",
+  "record_count": 1760,
+  "source_family_count": 880,
+  "condition_count": 10,
+  "semantic_class_count": 4,
+  "fit_source_families": 240,
+  "diagnostic_source_families": 320,
+  "eval_source_families": 320,
+  "changed_source_families_expected": 336,
+  "changed_source_families_reviewed": 336,
+  "changed_records_expected": 672,
+  "unlogged_changed_families": 0,
+  "logged_but_unchanged_families": 0,
+  "changed_family_classification": {
+    "PASS": 336,
+    "MINOR": 0,
+    "MODERATE_NONBLOCKING": 0,
+    "BLOCKING": 0
+  },
+  "repair_action_counts": {
+    "family_replaced": 168,
+    "definition_grammar_and_or_realization_corrected": 113,
+    "condition_realization_regenerated": 55
+  },
+  "original_blocker_classes": 5,
+  "original_blockers_resolved": 5,
+  "blocker_verdicts": [
+    {
+      "defect_id": "BLOCK-001",
+      "title": "Systematic logic subject-rule semantic incompatibility",
+      "repair_entries": 162,
+      "repair_actions": ["family_replaced"],
+      "verdict": "RESOLVED"
+    },
+    {
+      "defect_id": "BLOCK-002",
+      "title": "c03 compression grammar/coherence defects",
+      "repair_entries": 66,
+      "repair_actions": [
+        "condition_realization_regenerated",
+        "definition_grammar_and_or_realization_corrected",
+        "family_replaced"
+      ],
+      "verdict": "RESOLVED"
+    },
+    {
+      "defect_id": "BLOCK-003",
+      "title": "c07 formal transformation grammar defects",
+      "repair_entries": 44,
+      "repair_actions": [
+        "condition_realization_regenerated",
+        "family_replaced"
+      ],
+      "verdict": "RESOLVED"
+    },
+    {
+      "defect_id": "BLOCK-004",
+      "title": "Definition article/property grammar defects",
+      "repair_entries": 113,
+      "repair_actions": [
+        "definition_grammar_and_or_realization_corrected"
+      ],
+      "verdict": "RESOLVED"
+    },
+    {
+      "defect_id": "BLOCK-005",
+      "title": "Analogy same-word pair defects",
+      "repair_entries": 6,
+      "repair_actions": ["family_replaced"],
+      "verdict": "RESOLVED"
+    }
+  ],
+  "affected_condition_class_cells": 5,
+  "affected_condition_class_blockers_remaining": 0,
+  "affected_cell_verdicts": [
+    {
+      "condition": "c03_controlled_compression",
+      "semantic_class": "logic",
+      "families_reviewed": 22,
+      "verdict": "PASS"
+    },
+    {
+      "condition": "c03_controlled_compression",
+      "semantic_class": "causality",
+      "families_reviewed": 22,
+      "verdict": "PASS"
+    },
+    {
+      "condition": "c03_controlled_compression",
+      "semantic_class": "definition",
+      "families_reviewed": 22,
+      "verdict": "PASS"
+    },
+    {
+      "condition": "c07_register_formal",
+      "semantic_class": "logic",
+      "families_reviewed": 22,
+      "verdict": "PASS"
+    },
+    {
+      "condition": "c07_register_formal",
+      "semantic_class": "causality",
+      "families_reviewed": 22,
+      "verdict": "PASS"
+    }
+  ],
+  "formerly_blocking_conditions": 2,
+  "formerly_blocking_conditions_now_nonblocking": 2,
+  "formerly_blocking_condition_verdicts": [
+    {
+      "condition": "c03_controlled_compression",
+      "families_reviewed": 88,
+      "verdict": "PASS"
+    },
+    {
+      "condition": "c07_register_formal",
+      "families_reviewed": 88,
+      "verdict": "PASS"
+    }
+  ],
+  "pairing_structure": "PASS",
+  "diagnostic_eval_family_overlap": 0,
+  "diagnostic_eval_semantic_sibling_blockers": 0,
+  "cross_condition_base_content_blockers": 0,
+  "cross_condition_direct_paraphrase_blockers": 0,
+  "historical_exact_reuse": 0,
+  "historical_direct_paraphrase_blockers": 0,
+  "exact_text_duplicates": 0,
+  "normalized_text_duplicates": 0,
+  "unresolved_blocking_near_duplicates": 0,
+  "partition_style_leakage": "MINOR",
+  "class_template_leakage": "MODERATE_NONBLOCKING",
+  "analogy_template_status": "MODERATE_CONSTRUCT_INHERENT_TEMPLATE_LIMITATION",
+  "existing_nonblocking_limitations_reviewed": 4,
+  "existing_limitations_upgraded_to_blocking": 0,
+  "new_blocking_defects_introduced": 0,
+  "collapsed_condition_pairs": 0,
+  "condition_level_inference_unit_validity": "LIMITED_BUT_DEFENSIBLE",
+  "within_condition_measurement_precision": "ADEQUATE",
+  "outcome_bearing_metadata": "ABSENT",
+  "blocking_construct_defects": 0,
+  "final_verdict": "READY_FOR_DATASET_AND_PROTOCOL_FREEZE",
+  "model_load_performed": false,
+  "tokenizer_load_performed": false,
+  "representation_extraction_performed": false,
+  "s_diag_computed": false,
+  "g_eval_computed": false,
+  "scientific_outcome_observed": false,
+  "candidate_dataset_modified": false,
+  "candidate_manifest_modified": false,
+  "repair_log_modified": false,
+  "condition_panel_spec_modified": false,
+  "data_schema_modified": false,
+  "preregistration_draft_modified": false,
+  "validator_modified": false,
+  "created_at_utc": "2026-08-18T11:52:25Z"
+}
