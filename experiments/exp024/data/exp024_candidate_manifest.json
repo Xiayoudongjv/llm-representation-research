@@ -3,7 +3,7 @@
   "experiment": "EXP-024",
   "dataset_status": "CANDIDATE_NOT_FROZEN",
   "candidate_dataset_path": "experiments/exp024/data/exp024_condition_panel_candidate.json",
-  "candidate_dataset_sha256": "8583b57d9ed0ff98bd6d81eb3fc8f0f6c97a17d9acc63699b9d9b80e5c62eac5",
+  "candidate_dataset_sha256": "46c832b68b6ac95704bf5143badc1431627d7f935648842a78971491b13ee404",
   "condition_panel_version": "0.1-draft-not-frozen",
   "condition_panel_path": "experiments/exp024/condition_panel_spec.json",
   "condition_panel_sha256": "a3b8d565a94ef6041fbe6a29d73102ab4156cc19cfc07ccaeb06206d589f7954",
@@ -38,5 +38,10 @@
   "representation_extraction_performed": false,
   "scientific_outcome_observed": false,
   "preregistration_status": "DRAFT_NOT_FROZEN",
-  "review_gate": "READY_FOR_INDEPENDENT_DATASET_REVIEW"
+  "review_gate": "REPAIRED_CANDIDATE_PENDING_FOCUSED_REREVIEW",
+  "previous_candidate_sha256": "8583b57d9ed0ff98bd6d81eb3fc8f0f6c97a17d9acc63699b9d9b80e5c62eac5",
+  "repair_task": "097D-FIX",
+  "repair_log_path": "experiments/exp024/data/exp024_dataset_repair_log.json",
+  "repair_log_sha256": "33d70d2526792ec255a781db72c7bff515e8dd2e9693eaec1a06d5257827987d",
+  "repair_timestamp_utc": "2026-08-18T00:00:00Z"
 }

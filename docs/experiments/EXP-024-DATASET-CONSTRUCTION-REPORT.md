@@ -157,3 +157,34 @@ rho, or permutation test was performed.
 
 Stop candidate editing until Task-097D-R returns findings. Do not freeze the
 dataset or preregistration in this task.
+
+
+## Independent-Review Repair Cycle
+
+- Repair task: `097D-FIX`
+- Original reviewed candidate SHA: `8583b57d9ed0ff98bd6d81eb3fc8f0f6c97a17d9acc63699b9d9b80e5c62eac5`
+- Repaired candidate SHA: `46c832b68b6ac95704bf5143badc1431627d7f935648842a78971491b13ee404`
+- Repair log path: `experiments/exp024/data/exp024_dataset_repair_log.json`
+- Repair log SHA: `33d70d2526792ec255a781db72c7bff515e8dd2e9693eaec1a06d5257827987d`
+- Blocking defect classes targeted: `5`
+  - `BLOCK-001`: systematic logic subject-rule incompatibility
+  - `BLOCK-002`: c03 compression grammar/coherence defects
+  - `BLOCK-003`: c07 formal transformation grammar defects
+  - `BLOCK-004`: definition article/property grammar defects
+  - `BLOCK-005`: analogy same-word pair defects
+- Affected conditions/classes:
+  - c03 with logic, causality, definition
+  - c07 with logic, causality
+  - logic, definition, and analogy reference families as identified by Task-097D-R
+- Repair scope:
+  - Replaced semantically invalid logic families with valid subject-rule pairs.
+  - Regenerated c03 and c07 condition realizations for affected class cells.
+  - Corrected definition article/property grammar defects.
+  - Replaced analogy same-word families with valid analogical pairs.
+- Families changed: `336`
+- Records changed: `672`
+- Mechanical validation: rerun after repair.
+- Remaining acknowledged nonblocking limitations: synthetic slot-template construction, compressed analogy colon-notation concentration, systematic length differences, mechanical historical screen.
+- Model access: `false`
+- Scientific outcome access: `false`
+- Repair gate: `READY_FOR_FOCUSED_INDEPENDENT_REREVIEW`
