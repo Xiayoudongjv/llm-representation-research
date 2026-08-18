@@ -3,8 +3,10 @@
   "block26_hs27_oracle": "PASS",
   "block27_pre_final_hook": "PASS",
   "checkpoint_extraction": "PASS",
-  "created_at_utc": "2026-08-18T00:35:59.235637+00:00",
+  "created_at_utc": "2026-08-17T17:29:12.798352+00:00",
   "experiment": "EXP-023",
+  "failure_evidence_patch_affected_extraction_semantics": false,
+  "failure_evidence_patch_presence_check": "PASS",
   "final_rmsnorm_hs28_oracle": "PASS",
   "float32_boundary": "PASS",
   "formal_authorization_created": false,
@@ -15,6 +17,7 @@
   "hidden_size": 2048,
   "hidden_state_tuple_length_required": 29,
   "hidden_state_tuple_length_status": "PASS",
+  "historical_qualification_sha256": "3adcb480a6d7da1a62b026aaac8946f914e73099444e26784045a486d49577d6",
   "hook_cleanup": "PASS",
   "last_valid_token_device_path": "PASS",
   "last_valid_token_runtime": "PASS",
@@ -29,6 +32,7 @@
   ],
   "neutral_input_identity_sha256": "8b7a7a4d430cc9b94800eb3c7de1a9446008f2703ecf529df27b3b97ac06895e",
   "number_of_transformer_blocks": 28,
+  "old_qualification_formal_status": "STALE_HISTORICAL_ONLY",
   "per_record_evidence": [
     {
       "block16_oracle": {
@@ -165,17 +169,10 @@
   ],
   "pre_post_distinction": "PASS",
   "production_extraction_path_exercised": true,
-  "qualification_binding_patch_affected_extraction_semantics": false,
-  "qualification_execution_repository_commit": "1175b5d0c3c0bb21c0f6a26a8b737680be918c96",
-  "qualification_lineage": {
-    "first_post_patch_qualification_sha256": "0fcca22202624d8f0bdc697f13f3c3322af137b0d22417f6d95eea28929aa0a8",
-    "first_post_patch_qualification_status": "STALE_AFTER_QUALIFICATION_BINDING_RUNNER_PATCH",
-    "pre_patch_qualification_sha256": "3adcb480a6d7da1a62b026aaac8946f914e73099444e26784045a486d49577d6",
-    "pre_patch_qualification_status": "STALE_HISTORICAL_ONLY"
-  },
   "qualification_status": "MODEL_HOOK_ENGINEERING_REQUALIFIED",
-  "qualification_type": "POST_BINDING_PATCH_MODEL_HOOK_REQUALIFICATION",
-  "runner_sha256": "9c8d5e10ac1ad6f349c9daf26571ec1a49d0241487122bc934a7e47903f82e0b",
+  "qualification_type": "POST_PATCH_MODEL_HOOK_REQUALIFICATION",
+  "repository_commit": "822ef2637f3602f59a47d925d59baf08fd102f6c",
+  "runner_sha256": "c774837702944b6dea47f1f97a5c8cc4a934d7b58b28c8127ab92b1768ae3f52",
   "runtime_dtype": "torch.float16",
   "runtime_versions": {
     "cuda_available": true,

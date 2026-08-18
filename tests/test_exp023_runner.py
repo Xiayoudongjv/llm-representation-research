@@ -664,7 +664,8 @@ def test_formal_qualification_path_is_post_patch_authority():
 def test_formal_qualification_helper_hashes_canonical_post_patch_artifact():
     qualification = runner._verify_model_hook_qualification_artifact(runner.ROOT)
     assert qualification["path"] == "experiments/exp023/engineering/model_hook_qualification_post_patch.json"
-    assert qualification["sha256"] == "0fcca22202624d8f0bdc697f13f3c3322af137b0d22417f6d95eea28929aa0a8"
+    canonical_path = runner.ROOT / runner.MODEL_HOOK_QUALIFICATION_PATH.relative_to(runner.ROOT)
+    assert qualification["sha256"] == runner._sha256(canonical_path)
 
 
 def test_old_qualification_sha_is_rejected_by_formal_binding():
@@ -676,23 +677,17 @@ def test_old_qualification_sha_is_rejected_by_formal_binding():
     assert "QUALIFICATION_SHA_BINDING_MISMATCH" in str(exc.value)
 
 
-def test_existing_post_patch_qualification_is_runner_stale_after_binding_patch():
+def test_current_post_patch_qualification_is_current_after_r2():
     qualification = runner._verify_model_hook_qualification_artifact(runner.ROOT)
     artifact = qualification["artifact"]
-    assert artifact["runner_sha256"] == "c774837702944b6dea47f1f97a5c8cc4a934d7b58b28c8127ab92b1768ae3f52"
-    assert artifact["runner_sha256"] != runner._runner_sha256()
-    with pytest.raises(runner.ProtocolIntegrityError) as exc:
-        runner._verify_model_hook_qualification_current(artifact)
-    assert "RUNNER_STALE" in str(exc.value)
+    assert artifact["runner_sha256"] == runner._runner_sha256()
+    runner._verify_model_hook_qualification_current(artifact)
 
 
-def test_formal_authorization_with_existing_artifact_is_rejected_until_requalification():
-    auth = _formal_authorization(
-        "0fcca22202624d8f0bdc697f13f3c3322af137b0d22417f6d95eea28929aa0a8"
-    )
-    with pytest.raises(runner.ProtocolIntegrityError) as exc:
-        runner._validate_formal_authorization(auth, runner.ROOT)
-    assert "RUNNER_STALE" in str(exc.value)
+def test_formal_authorization_accepts_current_canonical_qualification():
+    qualification = runner._verify_model_hook_qualification_artifact(runner.ROOT)
+    auth = _formal_authorization(qualification["sha256"])
+    assert runner._validate_formal_authorization(auth, runner.ROOT) == auth
 
 
 def test_last_valid_token_indices_numpy_and_torch():

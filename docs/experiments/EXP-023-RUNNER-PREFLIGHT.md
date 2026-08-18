@@ -209,6 +209,37 @@ model-hook runtime correctness.
 - Next required step: `TASK 096B-R2` minimal real model/hook requalification
   for the qualification-binding-patched runner.
 
+## Binding-Patch Real Model Requalification
+
+- Current runner SHA-256:
+  `9c8d5e10ac1ad6f349c9daf26571ec1a49d0241487122bc934a7e47903f82e0b`.
+- Canonical formal qualification path:
+  `experiments/exp023/engineering/model_hook_qualification_post_patch.json`.
+- New R2 qualification SHA-256:
+  `5297d1ae185d5cacfbbd4a71cff0803a75c37c1d83e2c9a5077201ff79a3dc52`.
+- Qualification type:
+  `POST_BINDING_PATCH_MODEL_HOOK_REQUALIFICATION`.
+- Qualification status: `MODEL_HOOK_ENGINEERING_REQUALIFIED`.
+- Historical pre-patch qualification SHA
+  `3adcb480a6d7da1a62b026aaac8946f914e73099444e26784045a486d49577d6`
+  remains `STALE_HISTORICAL_ONLY`.
+- Historical first post-patch qualification SHA
+  `0fcca22202624d8f0bdc697f13f3c3322af137b0d22417f6d95eea28929aa0a8`
+  remains `STALE_AFTER_QUALIFICATION_BINDING_RUNNER_PATCH` and is archived
+  under `experiments/exp023/engineering/qualification_history/`.
+- Runtime/model/tokenizer identity unchanged: `Qwen3ForCausalLM`,
+  `Qwen2Tokenizer`, 28 blocks, hidden size 2048, `torch.float16`.
+- All hook/oracle checks `PASS`; hidden-state tuple length 29 `PASS`.
+- Last-valid-token runtime/device path, float32 boundary, and all 13
+  checkpoint extractions `PASS`.
+- Production extraction path exercised: `true`.
+- Qualification-binding patch affected extraction semantics: `false`.
+- Formal dataset model inference count: `0`; formal prompt text exposed:
+  `false`.
+- Science observed: `false`; no formal authorization or scientific result
+  created.
+- Next step: `TASK 096C-R2` ultra-short final binding confirmation.
+
 ## Boundary
 
 - `MODEL_LOAD_PERFORMED = true`
@@ -218,15 +249,13 @@ model-hook runtime correctness.
 - `FORMAL_BOOTSTRAP_PERFORMED = false`
 - `EXP023_MODEL_HOOK_ENGINEERING_QUALIFIED = true`
 - `EXP023_MODEL_HOOK_ENGINEERING_REQUALIFIED = true`
-- `EXP023_CURRENT_FORMALLY_USABLE_QUALIFICATION = NONE_PENDING_REQUALIFICATION`
+- `EXP023_CURRENT_FORMALLY_USABLE_QUALIFICATION = 5297d1ae185d5cacfbbd4a71cff0803a75c37c1d83e2c9a5077201ff79a3dc52`
 - `EXP023_SCIENTIFIC_RESULT_CREATED = false`
 - `EXP023_OUTCOME_OBSERVED = false`
 - `EXP023_FORMAL_RUN_AUTHORIZED = false`
 
 ## Next required step
 
-`TASK 096B-R2`: run a minimal real model/hook requalification for the
-qualification-binding-patched runner. After that, run the ultra-short
-`TASK 096C-R2` verification. Only if that passes may EXP-023 receive one
-single-use formal authorization and one launch. Do not authorize or launch
-from this binding patch.
+`TASK 096C-R2`: run only the ultra-short final binding confirmation. If that
+passes, issue one single-use EXP-023 formal authorization and launch exactly
+once. Do not authorize or launch from this requalification.
