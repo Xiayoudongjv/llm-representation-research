@@ -161,7 +161,7 @@
     "repeatability": "PASS",
     "representation_finite": "PASS"
   },
-  "created_at_utc": "2026-08-18T14:35:48.054120+00:00",
+  "created_at_utc": "2026-08-18T14:21:37.867602+00:00",
   "experiment": "EXP-024",
   "formal_authorization_consumed": false,
   "formal_authorization_created": false,
@@ -232,7 +232,7 @@
   "primary_permutation_test_performed": false,
   "primary_spearman_computed": false,
   "qualification_type": "NON_FORMAL_MODEL_TOKENIZER_HOOK",
-  "qualified_runner_commit": "1f5082e0d8246432157cb43832430ac3214e846a",
+  "qualified_runner_commit": "0c9162cd054b5ffc07272b522225d25e4ad1ada7",
   "repeatability": {
     "block16_pre_final_rmsnorm": {
       "match": true,
@@ -250,7 +250,7 @@
       "tolerance": 1e-06
     }
   },
-  "runner_sha256": "709572c77110eab497d3851f0e998a0c330b5422e8e7cdea5ec9195fae99da76",
+  "runner_sha256": "4690115d2a322e8d89bfb3a21fa32e2c5ca758a26fa5e07c40df88af8648885e",
   "s_diag_computed": false,
   "schema_version": "1.0.0",
   "status": "QUALIFICATION_PASSED",

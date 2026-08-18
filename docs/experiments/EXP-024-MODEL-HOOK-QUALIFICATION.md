@@ -1,6 +1,97 @@
 # EXP-024 Model / Tokenizer / Checkpoint-Hook Qualification
 
-Status: `QUALIFICATION_PASSED`
+Status: `PATCHED_RUNNER_REAL_QUALIFICATION_PASSED`
+
+## Current Authorization-Eligible Qualification (Task 098B-R4)
+
+This is the only qualification evidence eligible for the current patched
+EXP-024 runner.
+
+- Patched runner commit:
+  `1f5082e0d8246432157cb43832430ac3214e846a`
+- Patched runner SHA-256:
+  `709572c77110eab497d3851f0e998a0c330b5422e8e7cdea5ec9195fae99da76`
+- Fresh qualification artifact path:
+  `experiments/exp024/engineering/model_hook_qualification.json`
+- Fresh qualification artifact SHA-256:
+  `be1388b8a8e8b73f0589984e0da2cad1c17cc08c93cad7427446469089ec7463`
+- Qualification status: `QUALIFICATION_PASSED`
+- CLI exit code: `0`
+- Frozen authority validation: `PASS`
+- Focused runner tests: `86 passed`
+- Standalone qualification validator: `PASS`
+- Production qualification consumer: `PASS`
+- Formal authorization dry verification: `PASS`
+- Formal result present: `false`
+- Formal authorization present: `false`
+
+Runtime identity observed by this fresh real qualification:
+
+- Model: `Qwen/Qwen3-1.7B`
+- Model snapshot: `70d244cc86ccca08cf5af4e1e306ecf908b1ad5e`
+- Model class: `Qwen3ForCausalLM`
+- Model type: `qwen3`
+- Transformer blocks: `28`
+- Hidden size: `2048`
+- Device: `cuda:0`
+- Runtime dtype: `float16`
+- Tokenizer class: `Qwen2Tokenizer`
+
+Required checkpoint/hook checks all `PASS`:
+
+- Reference checkpoint: `block16_pre_final_rmsnorm`
+- Final checkpoint: `block27_pre_final_rmsnorm`
+- Hook firing cardinality: `PASS`
+- EXP-024-owned hook cleanup: `PASS`
+- Owned hooks remaining: `0`
+- Repeatability: `PASS` with max absolute difference `0.0`
+- Representation finite check: `PASS`
+- Representation output dtype: `float32`
+
+Formal/scientific firewall:
+
+- Formal dataset hash verified: `true`
+- Formal dataset record content used: `false`
+- Formal dataset text tokenized: `false`
+- Classifier fit: `false`
+- Recalibration: `false`
+- Balanced accuracy: `false`
+- `S_diag` computed: `false`
+- `G_eval` computed: `false`
+- Primary Spearman computed: `false`
+- Primary permutation test performed: `false`
+- Formal authorization created/consumed: `false`
+- Formal result created: `false`
+- Scientific outcome observed: `false`
+
+## Chronology
+
+1. Historical failed real qualification: false-positive total-hook-count
+   cleanup criterion.
+2. Historical successful qualification: old runner
+   `07fd3dd2b9980a69f2e35a07245240b8ca7b61a50ca944392922499500239379`.
+3. R3 qualification: runner
+   `4690115d2a322e8d89bfb3a21fa32e2c5ca758a26fa5e07c40df88af8648885e`,
+   runtime `QUALIFICATION_PASSED`, but blocked by the consumer model-binding
+   field-location defect.
+4. Current R4 qualification: patched runner
+   `709572c77110eab497d3851f0e998a0c330b5422e8e7cdea5ec9195fae99da76`,
+   full runtime and production consumer verification passed.
+
+Only item 4 is authorization-eligible for the current patched runner.
+
+### Historical R3 Blocked Qualification
+
+- R3 artifact SHA:
+  `ea29a6b1a2841a98e2f9559731d7f418cbfa13eaab3253967faad86c364429aa`
+- Archived path:
+  `experiments/exp024/engineering/qualification_history/model_hook_qualification_0c9162c_4690115d_passed_consumer_blocked.json`
+- R4 authorization eligibility: `false`
+- Defect corrected in R4: the production consumer now reads
+  `model.model_name` and `model.model_snapshot` and fail-closes when the
+  nested model object is missing.
+
+## Historical Successful Qualification (Task 098B-R2)
 
 ## Qualification Identity
 
@@ -136,7 +227,7 @@ Historical artifact SHA-256:
 Authorization eligibility:
 `false`
 
-## Final Technical Verdict
+## Final Technical Verdict (Historical Task 098B-R2)
 
 `EXP024_098B_R2_MODEL_TOKENIZER_HOOK_QUALIFICATION_COMPLETE`
 
