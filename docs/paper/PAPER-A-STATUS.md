@@ -74,10 +74,13 @@ Do not create EXP-024 or run new models in Task 097A.
 
 ## Follow-Up Design
 
-- `FOLLOWUP_DESIGN_STATUS = SELECTED_NOT_FROZEN`
+- `FOLLOWUP_DESIGN_STATUS = PROTOCOL_DRAFTED_NOT_FROZEN`
 - `SELECTED_FOLLOWUP_DESIGN = B`
 - Design draft: `docs/experiments/EXP-024-DESIGN-DRAFT.md`
 - Prior-art gap note: `docs/paper/PAPER-A-PRIOR-ART-GAP-NOTE.md`
+- Preregistration draft: `docs/experiments/EXP-024-PREREGISTRATION-DRAFT.md`
+- Protocol review: `docs/experiments/EXP-024-PROTOCOL-DESIGN-REVIEW.md`
+- Dataset schema spec: `docs/experiments/EXP-024-DATASET-SPEC.md`
 
 Selected evidence gap:
 
@@ -95,7 +98,9 @@ Design-level decisions:
 - Primary confirmatory endpoint:
   `G_eval_cond = BA_A_mu_sigma_EVAL(block27-pre) - BA_A0_EVAL(block27-pre)`
 - `EXP024_DESIGN_DRAFT_CREATED = true`
+- `EXP024_PREREGISTRATION_DRAFT_CREATED = true`
 - `EXP024_PREREGISTRATION_FROZEN = false`
+- `EXP024_PROTOCOL_REVIEW = READY_FOR_DATASET_CONSTRUCTION`
 
 `PAPER_A_DRAFT_READINESS` remains `START_FIRST_DRAFT_NOW`. Prose drafting may
-continue in parallel with Task-097C dataset/protocol design.
+continue in parallel with Task-097D dataset construction and review.

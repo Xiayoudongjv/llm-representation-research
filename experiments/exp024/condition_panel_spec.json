@@ -1,0 +1,267 @@
+{
+  "experiment": "EXP-024",
+  "panel_version": "0.1-draft-not-frozen",
+  "status": "DRAFT_NOT_FROZEN",
+  "panel_purpose": "Prospectively defined surface/realization condition panel for independent condition-level calibration susceptibility testing.",
+  "n_conditions": 10,
+  "semantic_classes": [
+    "logic",
+    "causality",
+    "analogy",
+    "definition"
+  ],
+  "reference_condition_policy": "Canonical/original expression is a separate fixed-readout reference basis and is not one of the ten panel units.",
+  "cross_condition_family_policy": "A source family belongs to exactly one condition*partition cell. No source family may be reused across conditions.",
+  "conditions": [
+    {
+      "condition_id": "c01_lexical_relex",
+      "name": "Controlled lexical re-expression",
+      "transformation_rule": "Replace non-class-critical content words with common synonyms while preserving grammatical relations and the semantic class.",
+      "construct_rationale": "Introduces lexical variation without changing propositional content or task class.",
+      "allowed_edits": [
+        "common synonym substitution",
+        "minor fluency-preserving word-order adjustments"
+      ],
+      "forbidden_edits": [
+        "changing logical/causal/analogical/definitional relation markers",
+        "changing truth conditions",
+        "inserting or removing negation",
+        "changing entities or properties"
+      ],
+      "semantic_equivalence_criteria": [
+        "same propositional content",
+        "same semantic class",
+        "no new evidence or condition"
+      ],
+      "expected_applicability_across_classes": "All four classes",
+      "known_confounds": [
+        "synonym choice may alter surface frequency but is intended to be neutral"
+      ]
+    },
+    {
+      "condition_id": "c02_syntactic_restructure",
+      "name": "Syntactic restructuring",
+      "transformation_rule": "Change phrase or clause ordering while preserving scope, truth conditions, and semantic relations.",
+      "construct_rationale": "Varies syntax while retaining the underlying logical/causal/analogical/definitional structure.",
+      "allowed_edits": [
+        "reordering constituents",
+        "voice changes when agent is recoverable",
+        "relativization"
+      ],
+      "forbidden_edits": [
+        "altering logical scope",
+        "changing quantifiers or connectives",
+        "dropping arguments",
+        "changing relation direction"
+      ],
+      "semantic_equivalence_criteria": [
+        "same truth conditions",
+        "same argument structure",
+        "same semantic class"
+      ],
+      "expected_applicability_across_classes": "All four classes",
+      "known_confounds": [
+        "reordering may affect last-token position, which is explicitly handled by last-valid-token semantics"
+      ]
+    },
+    {
+      "condition_id": "c03_controlled_compression",
+      "name": "Controlled compression",
+      "transformation_rule": "Remove optional modifiers and redundant subordinate phrases while retaining all class-critical relations and truth conditions.",
+      "construct_rationale": "Tests whether lower surface redundancy changes readout compatibility without changing content.",
+      "allowed_edits": [
+        "delete optional adjectives/adverbs",
+        "delete optional relative clauses",
+        "merge redundant phrases"
+      ],
+      "forbidden_edits": [
+        "removing class markers",
+        "removing quantifiers or negation",
+        "removing core relations",
+        "changing truth value"
+      ],
+      "semantic_equivalence_criteria": [
+        "class-critical relations preserved",
+        "truth value unchanged",
+        "semantic class unchanged"
+      ],
+      "expected_applicability_across_classes": "All four classes",
+      "known_confounds": [
+        "compression may interact with class complexity if applied too aggressively; equivalence review required"
+      ]
+    },
+    {
+      "condition_id": "c04_controlled_elaboration",
+      "name": "Controlled elaboration",
+      "transformation_rule": "Add semantically redundant clarifying phrases or appositives that do not introduce new entities, conditions, or evidence.",
+      "construct_rationale": "Tests whether redundant elaboration changes readout compatibility without changing semantic content.",
+      "allowed_edits": [
+        "add neutral filler clauses",
+        "add appositive definitions",
+        "repeat a referent phrase"
+      ],
+      "forbidden_edits": [
+        "adding new examples or conditions",
+        "altering truth value",
+        "shifting semantic class"
+      ],
+      "semantic_equivalence_criteria": [
+        "same propositional content",
+        "no new truth-relevant information",
+        "same semantic class"
+      ],
+      "expected_applicability_across_classes": "All four classes",
+      "known_confounds": [
+        "elaboration may increase token length; the analysis uses last-valid-token selection"
+      ]
+    },
+    {
+      "condition_id": "c05_relation_explicit",
+      "name": "Relation-explicit wording",
+      "transformation_rule": "Make implicit relations overt using explicit logical/causal/analogical/definitional connectives appropriate to the semantic class.",
+      "construct_rationale": "Varies explicitness of relation cues while preserving the underlying class relation.",
+      "allowed_edits": [
+        "insert if-then",
+        "insert because",
+        "insert just as",
+        "insert is defined as where appropriate"
+      ],
+      "forbidden_edits": [
+        "changing relation direction",
+        "introducing unsupported relations",
+        "changing truth value"
+      ],
+      "semantic_equivalence_criteria": [
+        "relation type preserved",
+        "truth conditions preserved",
+        "semantic class unchanged"
+      ],
+      "expected_applicability_across_classes": "All four classes",
+      "known_confounds": [
+        "explicit markers may make class easier to recognize; this is a panel condition, not a difficulty-selected condition"
+      ]
+    },
+    {
+      "condition_id": "c06_relation_implicit",
+      "name": "Relation-implicit wording",
+      "transformation_rule": "Remove or compact overt relation markers only where the relation remains unambiguously recoverable from content.",
+      "construct_rationale": "Varies surface relation marking without changing the underlying semantic relation.",
+      "allowed_edits": [
+        "delete recoverable connectives",
+        "compact connective phrases"
+      ],
+      "forbidden_edits": [
+        "removing relation if ambiguity arises",
+        "changing truth value",
+        "changing semantic class"
+      ],
+      "semantic_equivalence_criteria": [
+        "relation remains recoverable",
+        "truth value unchanged",
+        "semantic class unchanged"
+      ],
+      "expected_applicability_across_classes": "All four classes",
+      "known_confounds": [
+        "some implicit forms may be judged ambiguous; ambiguous cases are blocking"
+      ]
+    },
+    {
+      "condition_id": "c07_register_formal",
+      "name": "Formal-register shift",
+      "transformation_rule": "Shift to a formal or academic register using nominalizations and formal vocabulary while preserving meaning.",
+      "construct_rationale": "Varies stylistic register without changing content or class.",
+      "allowed_edits": [
+        "replace colloquial forms",
+        "adjust pronoun/anaphora",
+        "use formal synonyms"
+      ],
+      "forbidden_edits": [
+        "changing semantic content or class",
+        "materially increasing task difficulty through opaque jargon"
+      ],
+      "semantic_equivalence_criteria": [
+        "same semantic content",
+        "same class",
+        "register changed only"
+      ],
+      "expected_applicability_across_classes": "All four classes",
+      "known_confounds": [
+        "formal register may interact with tokenization but should remain semantically neutral"
+      ]
+    },
+    {
+      "condition_id": "c08_register_informal",
+      "name": "Informal-register shift",
+      "transformation_rule": "Shift to a simple conversational register using everyday vocabulary, contractions, and simpler clauses while preserving content.",
+      "construct_rationale": "Varies stylistic register without changing content or class.",
+      "allowed_edits": [
+        "use everyday vocabulary",
+        "use contractions",
+        "split complex clauses into simpler clauses where scope is preserved"
+      ],
+      "forbidden_edits": [
+        "introducing ambiguity",
+        "changing semantic class",
+        "using idioms that alter meaning"
+      ],
+      "semantic_equivalence_criteria": [
+        "same semantic content",
+        "same class",
+        "register changed only"
+      ],
+      "expected_applicability_across_classes": "All four classes",
+      "known_confounds": [
+        "informal wording may lower precision if not reviewed"
+      ]
+    },
+    {
+      "condition_id": "c09_neutral_distractor_prefix",
+      "name": "Neutral distractor prefix",
+      "transformation_rule": "Prepend a short neutral framing clause that does not provide task-relevant evidence and does not change the target proposition.",
+      "construct_rationale": "Tests whether a neutral context prefix changes fixed-readout compatibility without changing semantic class.",
+      "allowed_edits": [
+        "add one neutral framing clause",
+        "add a neutral metadata-style introducer"
+      ],
+      "forbidden_edits": [
+        "adding task labels or hints",
+        "changing the target proposition",
+        "adding class-relevant evidence"
+      ],
+      "semantic_equivalence_criteria": [
+        "target proposition unchanged",
+        "no task-relevant information added",
+        "semantic class unchanged"
+      ],
+      "expected_applicability_across_classes": "All four classes",
+      "known_confounds": [
+        "prefix position affects token positions; last-valid-token selection is defined to avoid off-by-one errors"
+      ]
+    },
+    {
+      "condition_id": "c10_anaphoric_reference",
+      "name": "Anaphoric reference variation",
+      "transformation_rule": "Replace a repeated referent with an unambiguous pronoun or explicit definite description, or expand a pronoun into an explicit noun phrase, while preserving coreference.",
+      "construct_rationale": "Varies referential surface form without changing semantic content or class.",
+      "allowed_edits": [
+        "pronominalization of unambiguous referents",
+        "expansion of pronouns to explicit noun phrases",
+        "replacement with clear definite descriptions"
+      ],
+      "forbidden_edits": [
+        "introducing ambiguous coreference",
+        "changing truth conditions",
+        "changing semantic class"
+      ],
+      "semantic_equivalence_criteria": [
+        "coreference preserved",
+        "truth value unchanged",
+        "semantic class unchanged"
+      ],
+      "expected_applicability_across_classes": "All four classes",
+      "known_confounds": [
+        "anaphora may create ambiguity; ambiguous cases are blocking"
+      ]
+    }
+  ]
+}

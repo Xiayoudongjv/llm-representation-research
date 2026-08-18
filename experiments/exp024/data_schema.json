@@ -1,0 +1,190 @@
+{
+  "schema_version": "0.1-draft-not-frozen",
+  "experiment": "EXP-024",
+  "status": "DRAFT_NOT_FROZEN",
+  "purpose": "Structural and provenance validation contract for the prospective EXP-024 controlled dataset. This is not the formal dataset.",
+  "allocation": {
+    "n_conditions": 10,
+    "semantic_classes": [
+      "logic",
+      "causality",
+      "analogy",
+      "definition"
+    ],
+    "fit_families_per_class_per_condition": 6,
+    "diagnostic_families_per_class_per_condition": 8,
+    "eval_families_per_class_per_condition": 8,
+    "total_source_families": 880,
+    "record_roles": [
+      "reference_form",
+      "condition_realization"
+    ],
+    "total_records": 1760
+  },
+  "record_required_fields": [
+    "record_id",
+    "source_family_id",
+    "semantic_class",
+    "condition_id",
+    "partition",
+    "record_role",
+    "base_content_identity",
+    "transformation_rule_id",
+    "text",
+    "independence_group",
+    "review_status",
+    "provenance"
+  ],
+  "field_definitions": {
+    "record_id": {
+      "type": "string",
+      "description": "Globally unique record identifier.",
+      "required": true
+    },
+    "source_family_id": {
+      "type": "string",
+      "description": "Unique source-family identifier. Must be invariant within a source family and must not cross partitions or conditions.",
+      "required": true
+    },
+    "semantic_class": {
+      "type": "string",
+      "enum": [
+        "logic",
+        "causality",
+        "analogy",
+        "definition"
+      ],
+      "required": true
+    },
+    "condition_id": {
+      "type": "string",
+      "description": "Must match an ID in condition_panel_spec.json.",
+      "required": true
+    },
+    "partition": {
+      "type": "string",
+      "enum": [
+        "FIT",
+        "DIAGNOSTIC",
+        "EVAL"
+      ],
+      "required": true
+    },
+    "record_role": {
+      "type": "string",
+      "enum": [
+        "reference_form",
+        "condition_realization"
+      ],
+      "required": true
+    },
+    "base_content_identity": {
+      "type": "string",
+      "description": "Deterministic content identity hash or stable canonical ID for the underlying semantic content.",
+      "required": true
+    },
+    "transformation_rule_id": {
+      "type": "string",
+      "description": "Must match the condition transformation rule ID.",
+      "required": true
+    },
+    "text": {
+      "type": "string",
+      "description": "The actual model-input text for the record role.",
+      "required": true
+    },
+    "independence_group": {
+      "type": "string",
+      "description": "Optional grouping used to audit paraphrase/lineage independence.",
+      "required": false
+    },
+    "review_status": {
+      "type": "string",
+      "enum": [
+        "PASS",
+        "MODERATE_NONBLOCKING_LIMITATION",
+        "BLOCKING_CONSTRUCT_DEFECT"
+      ],
+      "required": true
+    },
+    "provenance": {
+      "type": "object",
+      "description": "Creation/review provenance object. Must include creator_task, reviewer_task, created_at_utc, frozen_sha256 when frozen.",
+      "required": true
+    }
+  },
+  "validation_rules": {
+    "family_uniqueness": {
+      "rule": "Each source_family_id must appear in exactly one condition*partition cell.",
+      "expected_cross_partition_overlap": 0,
+      "expected_cross_condition_overlap": 0
+    },
+    "class_balance": {
+      "rule": "Within each condition*partition cell, every semantic class must have the exact allocated family count.",
+      "expected_counts": {
+        "FIT": 6,
+        "DIAGNOSTIC": 8,
+        "EVAL": 8
+      }
+    },
+    "condition_balance": {
+      "rule": "Each condition must contain all four semantic classes and all three partitions."
+    },
+    "partition_balance": {
+      "rule": "Across the dataset, each condition must contain exactly 22 families per semantic class across partitions: 6 FIT + 8 DIAGNOSTIC + 8 EVAL."
+    },
+    "record_role_balance": {
+      "rule": "Each source family must contain exactly one reference_form record and exactly one condition_realization record."
+    },
+    "no_outcome_fields": {
+      "rule": "The dataset must not contain future scientific outcome fields such as hidden_state, prediction, balanced_accuracy, S_diag, G_eval, or calibration result."
+    },
+    "provenance_required": {
+      "rule": "Every record must include creation provenance and review provenance; frozen dataset must include a dataset-level SHA-256."
+    },
+    "text_nonempty": {
+      "rule": "Every text field must be nonempty and must not equal the text of another unrelated family unless independently justified."
+    },
+    "condition_id_known": {
+      "rule": "Every condition_id must exist in condition_panel_spec.json."
+    },
+    "transformation_rule_id_known": {
+      "rule": "Every transformation_rule_id must match the condition_id transformation rule."
+    }
+  },
+  "family_id_contract": {
+    "format": "exp024_<condition_id>_<partition>_<class>_<zero_padded_index>",
+    "example": "exp024_c03_controlled_compression_EVAL_logic_0001",
+    "requirements": [
+      "Deterministic and unique",
+      "Does not change across record roles",
+      "Encodes condition and partition for mechanical leakage checks",
+      "Does not rely on filename conventions alone"
+    ]
+  },
+  "review_status_contract": {
+    "PASS": "Condition construct and record pass all prospective semantic and leakage checks.",
+    "MODERATE_NONBLOCKING_LIMITATION": "Nonfatal limitation is recorded and must remain visible.",
+    "BLOCKING_CONSTRUCT_DEFECT": "Record or condition must be corrected or replaced before freeze."
+  },
+  "freeze_requirements": [
+    "All allocation counts must validate",
+    "All condition review statuses must be PASS or MODERATE_NONBLOCKING_LIMITATION",
+    "No BLOCKING_CONSTRUCT_DEFECT may remain",
+    "No cross-partition or forbidden cross-condition family overlap",
+    "Dataset SHA-256 must be computed and recorded",
+    "Preregistration must be frozen with matching dataset SHA-256"
+  ],
+  "prohibited_fields": [
+    "hidden_state",
+    "representation",
+    "prediction",
+    "balanced_accuracy",
+    "S_diag",
+    "G_eval",
+    "G_mu",
+    "G_sigma",
+    "calibration_result",
+    "scientific_outcome"
+  ]
+}
