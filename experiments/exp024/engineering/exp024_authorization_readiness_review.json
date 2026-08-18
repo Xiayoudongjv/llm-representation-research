@@ -1,0 +1,84 @@
+{
+  "schema_version": "1.0.0",
+  "experiment": "EXP-024",
+  "review_type": "AUTHORIZATION_AND_FORMAL_RUN_READINESS",
+  "review_timestamp_utc": "2026-08-18T14:47:00+00:00",
+  "reviewed_head": "6fd91876b1d708b98fefc23a32e81493680c1b78",
+  "runner_patch_commit": "1f5082e0d8246432157cb43832430ac3214e846a",
+  "runner_sha256": "709572c77110eab497d3851f0e998a0c330b5422e8e7cdea5ec9195fae99da76",
+  "qualification_storage_commit": "6fd91876b1d708b98fefc23a32e81493680c1b78",
+  "qualification_artifact_path": "experiments/exp024/engineering/model_hook_qualification.json",
+  "qualification_artifact_sha256": "be1388b8a8e8b73f0589984e0da2cad1c17cc08c93cad7427446469089ec7463",
+  "qualification_status": "QUALIFICATION_PASSED",
+  "canonical_model_metadata_location": [
+    "model.model_name",
+    "model.model_snapshot"
+  ],
+  "frozen_authorities": {
+    "preregistration_sha256": "55f9604d904fd389da28c6214082028faca081f7e3a0c87c8ba8d961f792d810",
+    "dataset_sha256": "46c832b68b6ac95704bf5143badc1431627d7f935648842a78971491b13ee404",
+    "condition_panel_sha256": "a3b8d565a94ef6041fbe6a29d73102ab4156cc19cfc07ccaeb06206d589f7954",
+    "data_schema_sha256": "e27c33c864c6305522aec0c92839634fb5885aeb50099372b9bf46da7f2fe3ec",
+    "manifest_sha256": "1409a33e300463067ffc060afa58ceb238fda8d6dc2479563c886a8474748f59",
+    "model_name": "Qwen/Qwen3-1.7B",
+    "model_snapshot": "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e"
+  },
+  "primary_analysis": {
+    "reference_checkpoint": "block16_pre_final_rmsnorm",
+    "final_checkpoint": "block27_pre_final_rmsnorm",
+    "primary_unit": "condition",
+    "n_conditions": 10,
+    "primary_diagnostic": "S_diag(c)",
+    "primary_outcome": "G_eval(c)",
+    "primary_statistic": "Spearman_rho",
+    "primary_test": "exact_one_sided_condition_permutation",
+    "permutation_count": 3628800,
+    "alpha": 0.05,
+    "support_rule": "rho>0_and_p<=0.05",
+    "tie_handling": "average_ranks",
+    "posthoc_primary_escape_hatch": "NONE"
+  },
+  "gates": {
+    "frozen_authority_consistency": "PASS",
+    "qualification_identity": "PASS",
+    "standalone_qualification_validator": "PASS",
+    "production_qualification_verifier": "PASS",
+    "authorization_path_dry_verification": "PASS",
+    "runner_bytes_unchanged_since_qualification": true,
+    "authorization_schema_readiness": "PASS",
+    "single_use_schema": "PASS",
+    "consumption_order": "PASS",
+    "repeat_use_protection": "PASS",
+    "prior_formal_state": "CLEAR",
+    "primary_analysis_binding": "PASS",
+    "result_publication_gate": "PASS",
+    "formal_runtime_execution": "BLOCKED"
+  },
+  "preexisting_state": {
+    "formal_authorization_exists": false,
+    "authorization_consumption_exists": false,
+    "formal_result_exists": false,
+    "result_staging_exists": false
+  },
+  "tests": {
+    "focused_exp024_tests": "86 passed, 2 warnings"
+  },
+  "blockers": [
+    {
+      "id": "EXP024_FORMAL_RUNTIME_NOT_QUALIFIED_IN_098A",
+      "severity": "BLOCKING",
+      "summary": "_execute_formal_after_consumption is a fail-closed placeholder and no production formal scientific execution path is implemented.",
+      "consequence": "An authorization would be consumed before the formal runtime fails, without producing a canonical formal result."
+    }
+  ],
+  "final_verdict": "ENGINEERING_AUTHORIZATION_GATE_BLOCKED",
+  "model_load_performed": false,
+  "tokenizer_load_performed": false,
+  "formal_dataset_text_used": false,
+  "scientific_endpoint_computed": false,
+  "formal_authorization_created": false,
+  "formal_authorization_consumed": false,
+  "formal_run_performed": false,
+  "formal_result_created": false,
+  "scientific_outcome_observed": false
+}
