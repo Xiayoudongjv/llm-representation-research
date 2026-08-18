@@ -1,155 +1,152 @@
 # Fixed Readout Compatibility and Featurewise Recalibration Across Transformer Depth: A Controlled, Preregistered Evidence Chain with Heterogeneous and Negative Results
 
-Status: `FIRST_FULL_DRAFT_CREATED`
+Status: `REVISED_AFTER_099C`
 
-This document is a derived manuscript draft. Canonical experiment results,
-frozen protocols, scientific reviews, and research ledgers outrank it.
+This document is a derived manuscript. Canonical experiment results, frozen
+protocols, scientific reviews, and research ledgers outrank it.
 
 ## Abstract
 
-Intermediate representations in frozen language models change across
-Transformer depth, but many representational analyses apply fixed probes or
-readouts as though the coordinate system were stable. We study a narrow version
-of this problem: whether a fixed semantic-class readout remains compatible with
-deeper representations, whether low-capacity FIT-only featurewise recalibration
-can restore its utility, whether that recovery is stable across data
-conditions, and whether an independently measured degradation magnitude can
-prospectively predict calibration susceptibility. Across a controlled chain of
-experiments, we find that local task-associated representations are
-manipulable under held-out controls, yet that manipulability does not produce a
-stable task-specific behavioral advantage. Fixed readout accuracy can drop
-substantially across depth, and featurewise recalibration can produce large
-recovery in some conditions. Independent preregistered replication, however,
-returns `NO_REPLICATION`: one complementary split shows substantial rescue,
-while the other shows no rescue. In a separate 10-condition panel, all ten
-conditions show positive diagnostic degradation and positive calibration
-benefit descriptively; nevertheless, the preregistered primary test of simple
-independent degradation-magnitude prediction is `NOT_SUPPORTED`
-(`rho = 0.2840`, exact one-sided permutation `p = 0.2115`). The bounded
-conclusion is that fixed-readout incompatibility and calibration utility are
-real but condition-dependent, and that simple degradation magnitude is not
-sufficient to explain calibration susceptibility.
+Intermediate representations in frozen language models change across Transformer
+depth. Prior work already shows that layer-specific affine probes, learned
+interfaces, and stitching adapters can recover performance across representation
+mismatches. We therefore do not claim that layer-specific readout adaptation is
+new. We study a narrower fixed-readout measurement problem: whether a fixed
+semantic-class readout loses compatibility with deeper representations, whether
+low-capacity FIT-only featurewise recalibration can restore readout utility,
+whether that recovery is stable across held-out data conditions, and whether an
+independent degradation magnitude can prospectively predict calibration
+susceptibility. Across a controlled chain using a frozen Qwen3-1.7B setup with
+held-out source-family separation, fixed-readout accuracy degrades at deeper
+checkpoints, and featurewise recalibration produces substantial recovery in
+multiple tested conditions. However, the independent preregistered replication
+returns `NO_REPLICATION`: one complementary split shows substantial rescue while
+the other shows no rescue. In a separate frozen 10-condition panel, all ten
+conditions show positive diagnostic degradation and positive calibration benefit
+descriptively, but the preregistered primary test of simple independent
+degradation-magnitude prediction is `NOT_SUPPORTED`
+(`rho = 0.28401877872187725`, exact one-sided permutation `p = 0.2115079365079365`).
+The bounded conclusion is that fixed-readout incompatibility, calibration
+utility, and susceptibility predictability are distinct empirical questions;
+simple degradation magnitude is not sufficient to explain calibration
+susceptibility.
 
 ## 1. Introduction
 
-Hidden states in Transformer language models are not static objects. As an
-input moves through successive blocks, the representation can change in both
-geometry and information content. This depth-dependent variation creates a
-measurement problem for representational analyses: a classifier, probe, or
-readout trained at one layer is often reused at another layer as if the
-representation space were fixed. When performance drops, it is tempting to
-conclude that task-associated information has disappeared. An alternative is
-that the information remains present, but the fixed readout has become
-incompatible with the coordinate system of the deeper representation.
+Hidden states in Transformer language models change across depth. Prior work
+shows that learned layer-specific readouts and simple alignment adapters can
+improve cross-representation compatibility [1, 2]. Those findings already
+establish that different layers or models often require adapted interfaces. We
+do not treat that observation as our contribution.
 
-This paper studies the narrower, tractable version of that problem. We focus
-on four questions:
+This paper studies a narrower measurement problem. A classifier or semantic
+readout trained at one checkpoint is sometimes reused at another checkpoint as
+though the readout remained compatible. When accuracy drops, one possible
+interpretation is that task-associated information has disappeared; an
+alternative is that the fixed readout has become incompatible with the deeper
+representation. Distinguishing those interpretations requires a controlled
+measurement design rather than a new family of layer-specific probes.
 
-1. Does a fixed semantic readout lose compatibility when moved across
-   Transformer depth?
+We ask four questions:
+
+1. Does a fixed semantic readout lose compatibility when evaluated on deeper
+   representations under held-out conditions?
 2. Can low-capacity, FIT-only featurewise recalibration restore that readout
    without refitting a layer-specific classifier?
-3. Is that calibration benefit stable across complementary data conditions?
-4. Can an independent degradation magnitude measured before the confirmatory
-   EVAL outcome predict condition-level calibration susceptibility?
+3. Is that calibration benefit stable across complementary data conditions and
+   an independent replication split?
+4. Can an independently measured degradation magnitude measured before the
+   confirmatory EVAL outcome predict condition-level calibration susceptibility?
 
-We do not attempt to answer the entire representation-to-behavior chain.
-Coordinate transport, causal control, universal calibration, functional
-binding, and general cognitive-space claims are outside the evidence assembled
-here and are explicitly not claimed.
+The contribution is the controlled combination of fixed readout, deliberately
+low-capacity recalibration, held-out source-family separation, explicit
+replication/non-replication evidence, and a preregistered independent
+susceptibility test. The negative results are part of the main scientific
+argument, not appendix caveats.
 
-The controlled chain begins with held-out representation manipulation
-(EXP-018), continues through a larger-model representation-level replication
-(EXP-020A), and then separates representation effects from behavioral control
-(EXP-017, EXP-019). The central readout question is addressed by a fixed
-readout qualification study (EXP-021), a discovery-stage featurewise
-recalibration study (EXP-022A), an independent preregistered replication
-(EXP-023), and a final preregistered condition-panel susceptibility test
-(EXP-024).
+Specifically, this paper makes four prior-art-aware contributions:
 
-The scientific contribution is not the observation that different layers may
-benefit from different affine readouts; prior work already establishes that
-phenomenon. The contribution is the controlled combination of fixed readout,
-deliberately low-capacity recalibration, held-out source-family separation,
-and explicit negative replication. EXP-023 and EXP-024 are part of the main
-story, not appendix-only caveats.
+- **Contribution 1:** a fixed-readout compatibility measurement framework in
+  which the reference classifier and scaler are frozen on FIT data and are never
+  refit for deeper checkpoints.
+- **Contribution 2:** empirical evidence that fixed-readout accuracy can degrade
+  across depth and that FIT-only featurewise recalibration can recover readout
+  performance in multiple tested conditions, with explicit condition and split
+  heterogeneity.
+- **Contribution 3:** a preregistered replication/non-replication sequence using
+  held-out source-family controls, including the registered `NO_REPLICATION`
+  outcome in EXP-023.
+- **Contribution 4:** an independent DIAGNOSTIC/EVAL condition-level design whose
+  registered primary test returns a valid negative result in EXP-024.
 
 The strongest bounded claim is:
 
-> Fixed semantic readouts can lose compatibility across Transformer depth.
-> Low-capacity FIT-only featurewise recalibration can substantially restore
-> readout performance under multiple held-out conditions, but the benefit is
-> not uniformly reproducible across data conditions and is not reliably
-> predicted by a simple independent measure of fixed-readout degradation
-> magnitude.
+> Fixed semantic readouts can lose compatibility across Transformer depth under
+> held-out evaluation. Low-capacity FIT-only featurewise recalibration can
+> restore substantial readout performance in multiple tested conditions,
+> although the effect is heterogeneous across datasets and splits. Moreover, a
+> preregistered independent measure of fixed-readout degradation did not
+> reliably predict the magnitude of calibration benefit.
 
-This claim is deliberately conditional. It does not assert representation
-invariance, coordinate transport, semantic preservation, universal calibration,
-causal reasoning control, true task axes, general cognitive space, or
-functional binding.
+This claim does not assert representation invariance, coordinate transport,
+semantic preservation, universal calibration, causal reasoning control, true
+task axes, general cognitive space, or functional binding.
 
 ## 2. Related Work
 
 ### 2.1 Probing and intermediate representation decoding
 
-Probing research uses trained classifiers to estimate what can be decoded from
-intermediate hidden states. This line of work demonstrates that layer-specific
-readouts can expose task-relevant structure, but it also warns that decoding
-performance is not equivalent to causal role, representation equivalence, or
-behavioral control. Paper-A inherits this caution. The present experiments use
-fixed semantic-class readouts and deliberately do not train a new probe at each
-layer for the primary mechanism.
-
-[TODO: citation for probing/decoding critiques and layer-specific linear probe
-literature beyond the anchors below.]
+Probing research trains classifiers to estimate what can be decoded from
+intermediate hidden states. It demonstrates that layer-specific readouts can
+expose task-relevant structure, but decoding performance is not equivalent to
+causal role, representation equivalence, or behavioral control [1]. Paper-A
+inherits this caution and uses fixed semantic-class readouts rather than
+training a new probe at each layer.
 
 ### 2.2 Tuned Lens and layer-specific decoding
 
-Tuned Lens trains a per-block affine probe from hidden states to vocabulary or
-logit space and uses those probes to inspect latent predictions across depth
-[TODO: exact citation; reviewed reference: Belrose et al., "Eliciting Latent
-Predictions from Transformers with the Tuned Lens", arXiv:2303.08112].
-
-Tuned Lens already establishes that hidden representations often require
-layer-specific affine readouts and that iterative decoding can expose
-depth-wise prediction dynamics. Paper-A therefore does not claim novelty for
-"different layers need different readouts."
+Tuned Lens trains per-block affine probes from hidden states to vocabulary or
+logit space and uses them to inspect latent predictions across depth [1]. It
+already establishes that hidden representations often require layer-specific
+affine readouts. Paper-A therefore does not claim novelty for
+"different layers need different readouts." It differs by keeping a fixed
+semantic-class reference readout and allowing only low-capacity FIT-only
+featurewise recalibration, then testing whether that restricted interface
+recovers utility under held-out conditions.
 
 ### 2.3 Model stitching and representation compatibility
 
 Model stitching connects components of different trained models through a
 simple trainable layer and interprets stitched performance as a bounded
-functional compatibility signal [TODO: exact citation; reviewed reference:
-Bansal, Nakkiran, and Barak, "Revisiting Model Stitching to Compare Neural
-Representations", NeurIPS 2021, arXiv:2106.07682].
-
-Stitching and related alignment methods show that simple learned adapters can
-restore task performance even when representations differ. Paper-A differs by
-keeping the reference readout fixed and allowing only featurewise
-location/scale calibration fitted on FIT data.
+functional compatibility signal [2, 3]. Related representation-matching work
+shows that simple transformations can align spaces with semantic supervision
+[4]. Paper-A does not claim representation interchangeability or general
+alignment. Its operation is within one frozen model across depth, with a fixed
+readout and featurewise location/scale calibration fitted on FIT data.
 
 ### 2.4 Functional-alignment caution
 
 Functional alignment can mislead: models can become functionally aligned while
-representing different information [TODO: exact citation; reviewed reference:
-Smith, Mannering, and Marcu, "Functional Alignment Can Mislead: Examining Model
-Stitching", ICML 2025 Spotlight].
-
-This caution motivates our distinction between readout recovery and
-representation equivalence. Recovering classification accuracy under
-recalibration does not establish that the deeper representation is
-informationally or geometrically equivalent to the reference representation.
+representing different information [5]. This motivates the paper's boundary
+claim that recovering readout accuracy under recalibration does not establish
+representation equivalence.
 
 ### 2.5 Representation alignment and steering
 
 Steering and alignment work manipulates hidden states along task-derived
-directions. Prior work demonstrates local target-directed movement, but it does
-not automatically establish behavioral control. EXP-017 and EXP-019 are
-therefore positioned as boundary evidence rather than as a behavioral steering
-success story.
+directions. Prior work demonstrates local target-directed movement, but not
+automatic behavioral control [6]. EXP-017 and EXP-019 are therefore boundary
+evidence against a representational-manipulability-to-behavior jump.
 
-[TODO: citation for representation steering / activation interventions; avoid
-claiming a complete prior-art search.]
+### 2.6 Layerwise and recent representation-readout work
+
+Recent work continues to study representation progression and the separation
+between representation and readout [7, 8]. Direct 2025-2026 neighbors include
+functional-alignment caution [5], fresh-head probing for localizing
+representation/readout failure [8], and the decodability/causality boundary
+[9]. Adjacent work on post-grokking representation collapse [10] and multi-speed
+learning [11] is relevant to mechanism but does not duplicate the present
+preregistered fixed-readout condition panel.
 
 ## 3. Methods
 
@@ -159,7 +156,8 @@ The main evidence chain uses `Qwen/Qwen3-1.7B`, exact local snapshot
 `70d244cc86ccca08cf5af4e1e306ecf908b1ad5e`. The larger-model representation
 replication EXP-020A uses `Qwen/Qwen3-4B`. EXP-018 includes secondary
 Gemma-3-1B configurations, but the behavioral and later calibration studies
-focus on Qwen3 models.
+focus on Qwen3 models. Model and tokenizer loading used local-only offline
+semantics; no alternate snapshot or network fallback was permitted.
 
 For the frozen Qwen3-1.7B implementation, hidden-state tuple semantics are:
 
@@ -171,7 +169,7 @@ The primary final checkpoint is block27 pre-final RMSNorm. Post-final RMSNorm
 is descriptive only and is not silently substituted for the preregistered
 pre-final checkpoint.
 
-### 3.2 Operational semantic-class construct
+### 3.2 Operational semantic-class construct and class mapping
 
 The semantic construct uses four operational classes:
 
@@ -180,9 +178,15 @@ The semantic construct uses four operational classes:
 - `analogy`
 - `definition`
 
-This is a controlled semantic-class construct, not a complete reasoning
-ontology. It is used to evaluate fixed semantic readouts, not to claim a
-universal task-axis decomposition.
+Each record is assigned to exactly one class by the frozen dataset construction
+rules. These classes are controlled operational labels for fixed-readout
+measurement; they are not a complete reasoning ontology and are not used to
+claim a universal task-axis decomposition.
+
+The frozen dataset contains `1760` records across `880` source families,
+organized into the `10` registered condition families of EXP-024. The primary
+inferential unit is the condition (`N = 10`); the record and source-family counts
+describe data construction, not the inferential sample for the primary test.
 
 ### 3.3 Fixed reference readout and data separation
 
@@ -190,7 +194,8 @@ A global fixed reference readout `C_ref` is trained only from FIT reference-form
 representations at `block16_pre_final_rmsnorm`. A reference scaler
 `mu_ref, sigma_ref` is estimated from the same FIT data and remains frozen. The
 classifier contract is frozen and uses L2-regularized multinomial logistic
-regression; no hyperparameter tuning is performed.
+regression. No hyperparameter tuning is performed; the frozen production runner
+used a fixed random seed and a single classifier contract.
 
 The main source-family partitions are:
 
@@ -213,10 +218,10 @@ used as a comparison; it is not the primary mechanism.
 For EXP-024, condition-specific recalibration variants are:
 
 ```text
-z_A0       = (h - mu_ref)       / sigma_ref
-z_A_mu     = (h - mu_final,c)   / sigma_ref
-z_A_sigma  = (h - mu_ref)       / sigma_final,c
-z_A_mu_sigma = (h - mu_final,c) / sigma_final,c
+z_A0         = (h - mu_ref)       / sigma_ref
+z_A_mu       = (h - mu_final,c)   / sigma_ref
+z_A_sigma    = (h - mu_ref)       / sigma_final,c
+z_A_mu_sigma = (h - mu_final,c)   / sigma_final,c
 ```
 
 The classifier `C_ref` is never refit.
@@ -253,15 +258,16 @@ G_eval(c) =
 Higher `G_eval(c)` means greater calibration rescue on untouched EVAL source
 families.
 
-`S_diag(c)` and `G_eval(c)` use disjoint source families. The formulas are
-analogous, but they do not share the same observations. This removes the
+`S_diag(c)` and `G_eval(c)` use disjoint source families. This removes the
 algebraic shared-A0 limitation documented after EXP-023.
 
 ### 3.6 Primary inference
 
 The primary scientific unit is the condition, `N = 10`. The primary statistic
-is Spearman's rank correlation between `S_diag(c)` and `G_eval(c)`. The test is
-a one-sided exact permutation test enumerating all `10! = 3,628,800` pairings.
+is Spearman's rank correlation between `S_diag(c)` and `G_eval(c)`. Ties were
+handled according to the frozen protocol; the manuscript reports the registered
+result and does not perform a post-hoc alternative tie analysis. The test is a
+one-sided exact permutation test enumerating all `10! = 3,628,800` pairings.
 The registered support rule is:
 
 ```text
@@ -270,13 +276,28 @@ PRIMARY_SUPPORTED =
     AND exact_one_sided_p <= 0.05
 ```
 
-Secondary `G_mu`, `G_sigma`, bootstrap intervals, and descriptive full-depth
-trajectories are prespecified descriptive only. No post-hoc test is used to
-replace the primary.
+The condition panel is fixed/designed, not a random sample from all possible
+surface transformations. The reported primary `p` therefore does not support a
+population-of-transformations claim. Secondary `G_mu`, `G_sigma`, bootstrap
+intervals, and descriptive full-depth trajectories are prespecified descriptive
+only. No post-hoc test is used to replace the primary.
+
+### 3.7 Evidence summary
+
+| Experiment | Scientific question | Design | Primary outcome | Interpretation | Boundary |
+| --- | --- | --- | --- | --- | --- |
+| EXP-018 | Are task-associated hidden-state directions locally manipulable? | Held-out task-directed vs matched-random/opposite probe changes | Target-directed movement consistently positive | Local representational manipulability | No behavioral control |
+| EXP-020A | Does the representation-level effect replicate in a larger same-family model? | Same-family higher-parameter model | `REPRESENTATION_REPLICATION_SUPPORTED` | Same-family replication | Not cross-family generality |
+| EXP-017 | Does representation manipulation produce task-specific behavioral advantage? | Matched-control correctness test | Overall accuracy difference `0.0000` | No demonstrated behavioral control | Output-level interpretation unresolved |
+| EXP-019 | Can an independent output-only evaluator establish semantic task identity? | One-shot independent Final-200 evaluation | Balanced accuracy `0.4850`; threshold failed | Independent evaluator not established | Behavioral boundary remains |
+| EXP-021 | Does a fixed readout remain qualified across depth? | Fixed source-semantic readout across clean checkpoints | Did not pass globally at deeper checkpoints | Fixed-readout qualification is depth/condition dependent | Qualification scope, not formal universal drift |
+| EXP-022A | Does fixed-readout degradation occur in a discovery frame? | Fixed readout at reference vs block27-pre | `PARTIAL_CONCORDANCE`; Split B `D_fixed = -0.50`, `p = 0.015625` | Fixed-readout degradation observed | Discovery stage |
+| EXP-023 | Does featurewise calibration rescue replicate across complementary splits? | Independent preregistered replication | `NO_REPLICATION` | Split A rescue, Split B null rescue | No general cross-split calibration claim |
+| EXP-024 | Does independent `S_diag` predict independent `G_eval` across the panel? | 10-condition independent DIAGNOSTIC/EVAL design | Primary `NOT_SUPPORTED`; `rho = 0.284`, exact `p = 0.2115` | Simple degradation predictor unsupported | 10/10 positivity is descriptive only |
 
 ## 4. Results
 
-### 4.1 Task-associated representations are locally manipulable
+### 4.1 Local representational manipulability
 
 EXP-018 used a held-out fit/evaluation design with task-directed,
 matched-norm random, and exact opposite interventions. Across the frozen
@@ -288,7 +309,7 @@ task-minus-opposite change of `+0.9471` (median `+0.9855`).
 
 The relational-preservation comparison was negative: task-directed movement
 did not systematically improve the preregistered IVS advantage over matched
-random translation. Therefore the narrow conclusion is local representational
+random translation. The narrow conclusion is local representational
 manipulability, not relational preservation and not behavioral control.
 
 EXP-020A extended the representation-level claim to a same-family
@@ -298,7 +319,7 @@ comparisons, task-minus-random target-probability differences were positive in
 72/72 comparisons (mean `+0.8732`), and task-minus-opposite differences were
 also positive in 72/72 comparisons (mean `+0.9864`).
 
-### 4.2 Manipulability does not establish behavioral control
+### 4.2 Representation-level manipulability does not imply behavioral control
 
 EXP-017 tested whether the same task-derived direction that moved hidden states
 also produced a task-specific correctness-level behavioral advantage. The
@@ -316,7 +337,10 @@ for multiple classes. The independent evaluator therefore did not establish
 semantic task-identity classification, and the output-level targetness
 interpretation of EXP-017 remains unresolved.
 
-### 4.3 Fixed readout compatibility degrades across depth
+Together, EXP-017 and EXP-019 function as boundary evidence. They prevent the
+paper from interpreting EXP-018/EXP-020A as behavioral or functional control.
+
+### 4.3 Fixed semantic readout compatibility degrades across depth
 
 EXP-021 Stage-Q used a fixed source-semantic readout across frozen
 intervention and normalized-depth checkpoints. The measurement qualification
@@ -366,7 +390,9 @@ complementary splits across EXP-022A and EXP-023. The fixed variant-direction
 explanation is therefore `NOT_SUPPORTED`; readout compatibility appears
 condition and dataset dependent.
 
-### 4.5 EXP-024: broad positive panel benefit but susceptibility prediction fails
+### 4.5 Independent susceptibility prediction is not supported
+
+#### 4.5.1 Descriptive observation
 
 EXP-024 was a separate preregistered condition-panel test with `N = 10`
 conditions. All ten conditions had positive `S_diag` and positive `G_eval`
@@ -388,6 +414,8 @@ descriptively:
 The `10/10` positive observations are descriptive panel evidence only. They
 are not a replacement primary sign test and are not confirmatory significance.
 
+#### 4.5.2 Registered primary result
+
 The preregistered primary test of simple independent degradation-magnitude
 prediction was:
 
@@ -404,6 +432,10 @@ association did not meet the registered support rule.
 The prespecified secondary Spearman between `S_diag` and `G_mu` was
 `0.2840`; between `S_diag` and `G_sigma` it was `-0.5067`. These are
 descriptive only and do not replace the primary.
+
+The correct dual-proposition reading is: broad panel-bounded positive
+calibration benefit does not imply successful prospective susceptibility
+prediction.
 
 ### 4.6 Integrated claim-boundary synthesis
 
@@ -435,9 +467,11 @@ as evidence that task-associated information has disappeared.
 
 Fixed-readout failure is ambiguous. It can reflect information loss, readout
 frame mismatch, or both. Recalibration that restores readout utility without
-access to new task labels is evidence that at least part of the failure is
-readout incompatibility. It is not evidence that the deeper representation is
-equivalent to the reference representation.
+access to new task labels is consistent with readout incompatibility
+contributing to the observed performance degradation. It does not prove that
+all relevant information was preserved, that the deeper representation is
+equivalent to the reference representation, or that the recalibration is a
+representation transport mechanism.
 
 ### 5.3 Negative mechanism result
 
@@ -449,8 +483,8 @@ degradation are unrelated in general.
 
 ### 5.4 Open mechanism
 
-Future mechanistic work may need to consider higher-order frame mismatch,
-covariance or non-diagonal structure, margin geometry, or local class
+Future mechanistic work may need to consider covariance or non-diagonal
+structure, margin geometry, higher-order frame mismatch, or local class
 configuration. These possibilities are speculation. EXP-024 does not establish
 any of them.
 
@@ -481,51 +515,82 @@ The main limitations are:
 2. The semantic construct has four operational classes.
 3. The condition panel is frozen and not a random sample from all possible
    surface transformations.
-4. Calibration is deliberately low-capacity featurewise adaptation, not
-   arbitrary alignment.
+4. EXP-024 primary inference uses `N = 10` conditions; the primary unit is the
+   condition, not the larger record count.
 5. EXP-024 condition-level diagnostic resolution is limited and tied.
-6. Behavioral and functional binding are not established.
-7. General coordinate transport is not tested.
+6. Calibration is deliberately low-capacity featurewise adaptation, not
+   arbitrary alignment.
+7. Cross-model generality is untested.
+8. Behavioral control is not established.
+9. Functional binding is not tested.
+10. General coordinate transport is not tested.
 
-These limitations are not presented as post-hoc excuses for the negative
-results. They bound the claims and identify what a stronger venue-level
-manuscript would need.
+These limitations bound the claims and identify what a stronger venue-level
+manuscript would need. They are not post-hoc excuses for the negative results.
 
 ## 7. Conclusion
 
-Fixed semantic readouts can become incompatible with deeper representations.
-Simple FIT-only featurewise recalibration can often recover readout utility,
-but this recovery is heterogeneous and its magnitude is not explained by the
-preregistered simple degradation predictor. The appropriate current conclusion
-is therefore bounded: readout incompatibility and calibration utility are real
-but condition-dependent. Future work should study which structural properties
-of representation/readout mismatch govern calibration susceptibility.
+Three bounded conclusions follow from the evidence chain:
 
-This paper deliberately does not end with a unified representation theory.
-The positive/negative evidence chain is the contribution.
+1. Fixed semantic readout compatibility can degrade across Transformer depth
+   under the tested settings.
+2. FIT-only featurewise recalibration can recover substantial readout
+   performance in multiple tested conditions, but replication is heterogeneous
+   across datasets and splits.
+3. A simple independent degradation-magnitude diagnostic did not reliably
+   predict calibration benefit under the registered EXP-024 primary test.
 
-## References / Citation TODOs
+The mechanism governing calibration susceptibility remains unresolved. Future
+work should study which structural properties of representation/readout
+mismatch govern calibration susceptibility.
 
-- [TODO: exact citation] Belrose et al., "Eliciting Latent Predictions from
-  Transformers with the Tuned Lens", arXiv:2303.08112.
-- [TODO: exact citation] Bansal, Nakkiran, and Barak, "Revisiting Model
-  Stitching to Compare Neural Representations", NeurIPS 2021,
-  arXiv:2106.07682.
-- [TODO: exact citation] Smith, Mannering, and Marcu, "Functional Alignment Can
-  Mislead: Examining Model Stitching", ICML 2025 Spotlight.
-- [TODO: citation] Probing/decoding critique literature.
-- [TODO: citation] Representation steering / activation intervention
-  literature.
+## References
 
-Citation metadata is intentionally not fabricated. References must be
-verified against primary sources before submission.
+1. N. Belrose, Z. Furman, L. Smith, D. Bau, I. Sucholutsky, and others,
+   *Eliciting Latent Predictions from Transformers with the Tuned Lens*,
+   arXiv:2303.08112.
+2. Y. Bansal, P. Nakkiran, and B. Barak, *Revisiting Model Stitching to
+   Compare Neural Representations*, NeurIPS 2021, arXiv:2106.07682.
+3. Zs. Csisz?rik, P. K?r?si-Szab?, ?. Matszangosz, G. Papp, and D. Varga,
+   *Similarity and Matching of Neural Network Representations*, NeurIPS 2021,
+   arXiv:2110.14633.
+4. V. Maiorca, L. Moschella, A. Norelli, M. Fumero, F. Locatello, and
+   E. Rodol?, *Latent Space Translation via Semantic Alignment*, arXiv:2311.00664.
+5. *Functional Alignment Can Mislead: Examining Model Stitching*, ICML 2025
+   Spotlight, https://icml.cc/virtual/2025/poster/44458.
+6. *Representation steering and activation intervention literature*; exact
+   canonical citation pending final bibliography verification.
+7. *Tracing Representation Progression*, arXiv:2406.14479.
+8. *Localising Failure between Representation and Readout: A Fresh-Head Probe
+   for Parameter-Space Model Merging*, OpenReview 230T2UcWwR.
+9. *Causality != Decodability*, NeurIPS 2025, arXiv:2510.09794.
+10. *Post-Grokking Collapse*, arXiv:2608.07436.
+11. *Two Speeds of Learning*, arXiv:2605.27078.
+
+Reference metadata was taken from Task-099B-0's prior-art inventory. Final
+bibliographic verification should be repeated against the primary sources
+before submission; no citation is intentionally fabricated.
 
 ## Figure and Table Placement Notes
 
-- [TODO: figure] EXP-024 scatter of `S_diag(c)` versus `G_eval(c)` with all ten
-  conditions shown.
-- [TODO: figure] Paired `S_diag`/`G_eval` display for the ten-condition panel.
-- [TODO: exact table reference] Full experiment-to-claim matrix in
-  `docs/paper/PAPER-A-CLAIM-EVIDENCE-MATRIX.md`.
+Planned main figures:
 
-The full manuscript draft is `NON-AUTHORITATIVE_DERIVED_FROM_CANONICAL_EVIDENCE`.
+- Figure 1: evidence-flow diagram from local manipulability to conditional
+  calibration, with explicit negative/boundary branches.
+- Figure 2: EXP-021 and EXP-022A depth-wise fixed-readout degradation across
+  checkpoints and splits.
+- Figure 3: EXP-023 split-level calibration heterogeneity; the caption must
+  make `NO_REPLICATION` visually and textually explicit.
+- Figure 4: EXP-024 scatter of `S_diag(c)` vs `G_eval(c)` with all ten
+  conditions labeled; the caption must report `rho = 0.28401877872187725`,
+  exact one-sided `p = 0.2115079365079365`, and `NOT_SUPPORTED`.
+- Figure 5: paired condition-level `S_diag` and `G_eval` display showing broad
+  positivity but weak rank predictiveness.
+
+Planned main table:
+
+- Table 1: the experiment evidence-summary table in Section 3.7, with
+  scientific progression columns and explicit EXP-023/EXP-024 negative
+  outcomes.
+
+The full manuscript is `NON_AUTHORITATIVE_DERIVED_FROM_CANONICAL_EVIDENCE`.

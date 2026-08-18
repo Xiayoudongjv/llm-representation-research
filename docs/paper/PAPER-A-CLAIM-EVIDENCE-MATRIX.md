@@ -169,3 +169,16 @@ This matrix is a manuscript guardrail. Canonical experiment results and
 | C10 | functional binding not tested | `NOT_TESTED` | none | no binding result | 5.4 |
 | C11 | panel-bounded calibration benefit observed descriptively | `SUPPORTED_DESCRIPTIVELY` | EXP-024 10/10 G_eval positive | descriptive only | 4.6 |
 | C12 | simple degradation-magnitude susceptibility prediction | `NOT_SUPPORTED` | EXP-024 rho=0.284, p=0.2115 | one panel, low resolution | 4.6/5.3/5.7 |
+
+
+## 099C Revision Alignment
+
+- Revised central claim is locked in `docs/paper/PAPER-A-FIRST-FULL-DRAFT.md`.
+- Evidence statuses in this matrix are unchanged; Task-099C did not reanalyze
+  or recalculate any experiment.
+- The revised manuscript explicitly separates formal support from descriptive
+  evidence for EXP-022A, EXP-023, and EXP-024.
+- EXP-023 remains `NO_REPLICATION`.
+- EXP-024 primary remains `NOT_SUPPORTED_BY_EXP024_PRIMARY_TEST`.
+- Behavioral, functional-binding, and coordinate-transport boundaries remain
+  unsupported and are not claimed.

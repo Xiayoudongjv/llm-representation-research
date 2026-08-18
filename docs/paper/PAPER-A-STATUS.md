@@ -160,3 +160,22 @@ Task 099B must use these artifacts as the prior-art/novelty baseline.
 
 Review authority:
 - `docs/paper/PAPER-A-ADVERSARIAL-REVIEW.md`
+
+
+## Task 099C Manuscript Revision
+
+- `FIRST_FULL_DRAFT_CREATED = true`
+- `ADVERSARIAL_REVIEW_COMPLETE = true`
+- `099C_REVISION_COMPLETE = true`
+- `CORE_CLAIM_SCOPE_LOCKED = true`
+- `NOVELTY_POSITIONING = STABLE`
+- `NEGATIVE_RESULT_FRAMING = CLEAR`
+- `METHODS_REPRODUCIBILITY = ADEQUATE`
+- `FIGURE_PLAN = READY`
+- `REFERENCES = PARTIAL`
+- `NEW_EXPERIMENT_REQUIRED_FOR_CORE_CLAIM = false`
+- `SUBMISSION_READY = false`
+- `NEXT_TASK = 099D_POST_REVISION_REREVIEW`
+
+Revision authority:
+- `docs/paper/PAPER-A-099C-REVISION-RESPONSE.md`

@@ -127,3 +127,21 @@ figure must come from existing canonical data or documented constructs.
 - Main paper candidate figures: 1, 2, 3, 4, 5, 6, 7.
 - If page limits require cuts, Figure 6 or Figure 7 can move to appendix.
 - Do not fabricate plots from nonexistent results.
+
+
+## 099C Revision Changes
+
+Task-099C confirms the three highest-priority figure/table requirements:
+
+- EXP-023 must visually show Split A rescue, Split B null rescue, and the
+  explicit `NO_REPLICATION` label.
+- EXP-024 must show a scatter of `S_diag(c)` vs `G_eval(c)` with all 10
+  conditions labeled; the caption must include `rho = 0.28401877872187725`,
+  exact one-sided `p = 0.2115079365079365`, and `NOT_SUPPORTED`.
+- EXP-024 should include a paired condition-level `S_diag`/`G_eval` display
+  showing broad panel-bounded positivity without hiding weak rank
+  predictiveness.
+
+The evidence-summary table is now included in the revised manuscript at Methods
+Section 3.7. Figure production remains a next-stage task; no new analysis is
+required.
