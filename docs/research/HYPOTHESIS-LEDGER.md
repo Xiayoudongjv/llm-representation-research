@@ -9,13 +9,39 @@ not be cited as findings or moved into `CLAIM-LEDGER.md` as fact.
 - Title: Layer-dependent featurewise calibration may explain part of fixed-readout degradation
 - Origin: EXP-022A A0/A1 ladder
 - Hypothesis: A substantial component of deeper-layer fixed-readout degradation can be reduced by a constrained diagonal/featurewise recalibration learned using FIT-only statistics.
-- Current evidence: EXP-022A A1 > A0 at block27-pre in both splits; large recovery in Split B.
-- Counterevidence: Split A recovery incomplete; `G_scale` was secondary/descriptive; small controlled dataset.
-- Status: `ACTIVE_HIGH_PRIORITY`
-- Dependencies: EXP-022A canonical result.
-- Next discriminating experiment: EXP-023.
-- EXP-023 protocol status: `FROZEN_PROTOCOL_NOT_RUN`.
-- Claim boundary: Descriptive mechanism signal only; not a confirmed causal mechanism.
+- Current evidence: EXP-022A discovery-stage A1 > A0 signal; EXP-023 independent preregistered `NO_REPLICATION`, with strong Split-A rescue and Split-B null result.
+- Counterevidence: Split B `G_cal = 0` and unsupported; general cross-split replication failed; controlled dataset remains small.
+- Status: `NOT_SUPPORTED_AS_GENERAL_CROSS_SPLIT_REPLICATION`
+- Dependencies: EXP-022A and EXP-023 canonical results.
+- Next discriminating experiment: Conditional susceptibility test using an independent diagnostic that does not share the confirmatory `G_cal` outcome.
+- EXP-023 protocol status: `FORMAL_ANALYSIS_COMPLETED`
+- Claim boundary: Conditional, hypothesis-generating signal only; not a general calibration mechanism.
+
+## HYP_CALIBRATION_CONDITIONAL_002
+
+- ID: `HYP_CALIBRATION_CONDITIONAL_002`
+- Title: Featurewise recalibration benefit may be conditional on independently measurable readout mismatch
+- Origin: EXP-023 `NO_REPLICATION` with strong Split-A rescue and Split-B null; EXP-022A complementary split pattern.
+- Hypothesis: Featurewise recalibration benefit may occur primarily when a representation/readout interface exhibits independently measurable layerwise mismatch, rather than being a uniform property of all held-out conditions.
+- Current evidence: EXP-022A discovery signal and EXP-023 split heterogeneity; no independent susceptibility predictor tested.
+- Counterevidence: Split B showed little fixed-readout degradation and no recalibration rescue; direction across variant splits was not stable across EXP-022A/023.
+- Status: `ACTIVE_PROSPECTIVE_NOT_TESTED`
+- Dependencies: Requires an independent diagnostic/confirmatory design.
+- Next discriminating experiment: Future design must separate a FIT-only or separate diagnostic subset from the confirmatory EVAL partition.
+- Claim boundary: Prospective hypothesis only; not tested in Task 096E.
+
+## HYP_MEAN_CALIBRATION_001
+
+- ID: `HYP_MEAN_CALIBRATION_001`
+- Title: Mean/location recalibration may dominate scale recalibration under conditional degradation
+- Origin: EXP-023 Split-A secondary mean/scale decomposition.
+- Hypothesis: When featurewise recalibration is beneficial, mean/location correction may account for more of the rescue than scale correction.
+- Current evidence: EXP-023 Split A `G_mu = +0.3125`, `G_sigma = +0.21875`; descriptive only.
+- Counterevidence: Single supported split; Split B null; secondary descriptive design.
+- Status: `HYPOTHESIS_GENERATING_ONLY`
+- Dependencies: `HYP_CALIBRATION_CONDITIONAL_002`.
+- Next discriminating experiment: Deferred behind conditional susceptibility design.
+- Claim boundary: Secondary descriptive signal; not an established mechanism and not promoted above `HYP_CALIBRATION_CONDITIONAL_002`.
 
 ## HYP-TRANSPORT-001
 

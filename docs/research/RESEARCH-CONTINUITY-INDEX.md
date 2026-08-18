@@ -5,9 +5,8 @@ experimental artifacts outrank it.
 
 ## Current research phase
 
-EXP-022A has a valid canonical formal result. EXP-023 is now the active next
-experiment: its independent dataset and final preregistration are frozen, and
-no EXP-023 model execution or scientific result has occurred.
+EXP-022A has a valid canonical formal result. EXP-023 has completed with one
+valid canonical formal result: `EXP023_REGISTERED_OUTCOME = NO_REPLICATION`.
 
 ## Current preregistration authority
 
@@ -23,7 +22,10 @@ Active frozen next-experiment authority:
 - Frozen path: `docs/experiments/EXP-023-PREREGISTRATION.md`
 - Frozen SHA-256: `11bfa984d436ba06f7f3d1b0db24b90439742e9d9a87d124880834b437749f0b`
 - Dataset SHA-256: `9143ceceab106c71dedb806190e146401975bf6bd84cb99b3b4cb7adc75afa2a`
-- Status: `FROZEN_PROTOCOL_NOT_RUN`
+- Status: `FORMAL_ANALYSIS_COMPLETED`
+- Canonical result path: `experiments/exp023/results/exp023_results.json`
+- Canonical result SHA-256: `f30591ad942e82a322e594695ce1d5023586261fd7b8bccaa208b0d46f388000`
+- Registered outcome: `NO_REPLICATION`
 
 ## Read order
 
@@ -404,4 +406,56 @@ authorized.
 - Scientific protocol drift: `false`
 - Scientific computation: `NOT_RUN`
 - Next phase: runner implementation and static/synthetic engineering validation
-- No EXP-023 formal run or scientific result is authorized.
+
+## Task-096A EXP-023 runner implementation
+
+- Status: `EXP023_RUNNER_IMPLEMENTED`
+- Runner: `experiments/exp023/run_exp023.py`
+- Static preflight: `PASS`
+- Synthetic preflight: `PASS`
+- Formal execution: `NOT_AUTHORIZED`
+
+## Task-096B EXP-023 real model/hook engineering qualification
+
+- Status: `EXP023_MODEL_HOOK_ENGINEERING_QUALIFIED`
+- Model: `Qwen/Qwen3-1.7B`
+- Model snapshot: `70d244cc86ccca08cf5af4e1e306ecf908b1ad5e`
+- Formal execution: `NOT_AUTHORIZED`
+- Scientific result: `NOT_RUN`
+
+## Task-096C EXP-023 production-readiness rereview and binding patches
+
+- Final binding confirmation verdict: `READY_FOR_SINGLE_USE_FORMAL_AUTHORIZATION`
+- Canonical qualification:
+  `experiments/exp023/engineering/model_hook_qualification_post_patch.json`
+- Qualification SHA-256:
+  `5297d1ae185d5cacfbbd4a71cff0803a75c37c1d83e2c9a5077201ff79a3dc52`
+- Focused tests: `59 passed`
+- Formal execution: `NOT_AUTHORIZED`
+
+## Task-096D EXP-023 formal attempt
+
+- Status = `EXP023_096D_FORMAL_RUN_COMPLETE_VALID_RESULT`
+- Attempt status = `FORMAL_RUN_ATTEMPT_COMPLETED`
+- Technical validity = `VALID`
+- Result status = `FORMAL_RESULT`
+- Scientific status = `FORMAL_ANALYSIS_COMPLETED`
+- Authorization ID = `9ca46d07-570a-494a-b785-01d6f7fdbeac`
+- Authorization SHA-256 = `ccdce00b246b733976d23987a3f488aabf8d36f7ccb25fe0e1fcc7b81f0932bd`
+- Run attempt ID = `c52d3aec-f8f3-402e-a2f1-bf14d0087b57`
+- Consumption SHA-256 = `46d4edafba8e7f9375a6011f4b423777ca538c981cb664a6cbb4a9532422394b`
+- Canonical result SHA-256 = `f30591ad942e82a322e594695ce1d5023586261fd7b8bccaa208b0d46f388000`
+- Registered outcome = `NO_REPLICATION`
+
+## Task-096E EXP-023 scientific closeout
+
+- Status = `EXP023_096E_SCIENTIFIC_REVIEW_AND_PAPER_ASSESSMENT_COMPLETE`
+- Scientific review:
+  `docs/experiments/EXP-023-SCIENTIFIC-REVIEW.md`
+- `GENERAL_CROSS_SPLIT_CALIBRATION_REPLICATION = NOT_SUPPORTED`
+- `CONDITIONAL_CALIBRATION_SIGNAL = OBSERVED_HYPOTHESIS_GENERATING`
+- `PAPER_A_CORE_CLAIM = SUPPORTED_WITH_SCOPE_LIMITATIONS`
+- `PAPER_A_DRAFT_READINESS = START_FIRST_DRAFT_NOW`
+- `PAPER_A_SUBMISSION_READINESS = ONE_TARGETED_FOLLOWUP_RECOMMENDED`
+- `ONE_TARGETED_FOLLOWUP_RECOMMENDED = true`
+- New prospective hypothesis: `HYP_CALIBRATION_CONDITIONAL_002`

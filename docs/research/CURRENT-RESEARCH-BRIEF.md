@@ -20,6 +20,7 @@ recalibrated or transported across layers and interventions?
 - EXP-021 and EXP-022A show fixed-frame readout degradation across deeper clean checkpoints.
 - EXP-022A shows descriptive featurewise-recalibration recovery, especially in Split B.
 - EXP-022A does not support same-family layerwise readout refit rescue.
+- EXP-023 independently returns `NO_REPLICATION`: strong Split-A rescue, null Split B.
 
 ## 4. Current claim boundaries
 
@@ -27,6 +28,7 @@ recalibrated or transported across layers and interventions?
 - Speculation must not enter the claim ledger as fact.
 - EXP-022A evidence is partial and split-dependent for the primary fixed-frame criterion.
 - Featurewise recalibration is currently descriptive, not a confirmed mechanism.
+- EXP-023 shows calibration rescue is conditional, not general cross-split replication.
 - Coordinate transport is not tested.
 
 ## 5. EXP-022A exact scientific synthesis
@@ -39,9 +41,20 @@ recalibrated or transported across layers and interventions?
 - Featurewise recalibration: descriptive high-value signal.
 - Same-family refit rescue: not supported.
 
+## 5a. EXP-023 exact scientific synthesis
+
+- Canonical result SHA-256: `f30591ad942e82a322e594695ce1d5023586261fd7b8bccaa208b0d46f388000`
+- `EXP023_REGISTERED_OUTCOME = NO_REPLICATION`
+- Split A `G_cal = +0.25`, supported.
+- Split B `G_cal = 0.0`, unsupported.
+- `D_fixed`: substantial in Split A, little in Split B.
+- Secondary mean/scale signal: `G_mu > G_sigma` in Split A; descriptive only.
+
 ## 6. Active hypotheses
 
-- `HYP-CALIBRATION-001`: `ACTIVE_HIGH_PRIORITY`
+- `HYP-CALIBRATION-001`: `NOT_SUPPORTED_AS_GENERAL_CROSS_SPLIT_REPLICATION`
+- `HYP_CALIBRATION_CONDITIONAL_002`: `ACTIVE_PROSPECTIVE_NOT_TESTED`
+- `HYP_MEAN_CALIBRATION_001`: `HYPOTHESIS_GENERATING_ONLY`
 - `HYP-TRANSPORT-001`: `ACTIVE_BUT_DEFERRED_BEHIND_CALIBRATION`
 - `HYP-COVER-001`: `INCUBATING_CONCEPTUAL`
 - `HYP-OPERATOR-001`: `DEPENDENT_FUTURE`
@@ -55,9 +68,10 @@ recalibrated or transported across layers and interventions?
 
 ## 8. Next scientific decision
 
-EXP-023 is frozen and not run. Next is runner implementation plus
-static/synthetic engineering validation, followed by independent production
-and runtime rereview before any formal authorization.
+EXP-023 is closed with a valid `NO_REPLICATION` canonical result. The next
+high-information question is whether an independent FIT-only or separately
+held-out diagnostic can predict fixed-readout degradation and recalibration
+benefit. Do not automatically launch a generic replication or EXP-024.
 
 ## 9. Frozen authority links/hashes
 
@@ -73,6 +87,8 @@ and runtime rereview before any formal authorization.
   - SHA-256: `11bfa984d436ba06f7f3d1b0db24b90439742e9d9a87d124880834b437749f0b`
 - EXP-023 frozen dataset: `experiments/exp023/data/exp023_independent_controlled.json`
   - SHA-256: `9143ceceab106c71dedb806190e146401975bf6bd84cb99b3b4cb7adc75afa2a`
+- EXP-023 canonical result: `experiments/exp023/results/exp023_results.json`
+  - SHA-256: `f30591ad942e82a322e594695ce1d5023586261fd7b8bccaa208b0d46f388000`
 
 ## 10. Instructions to future AI
 
