@@ -5,7 +5,7 @@
   "repair_status": "COMPLETE",
   "original_candidate_sha256": "8583b57d9ed0ff98bd6d81eb3fc8f0f6c97a17d9acc63699b9d9b80e5c62eac5",
   "repaired_candidate_sha256": "46c832b68b6ac95704bf5143badc1431627d7f935648842a78971491b13ee404",
-  "repair_log_sha256": "33d70d2526792ec255a781db72c7bff515e8dd2e9693eaec1a06d5257827987d",
+  "repair_log_sha256": null,
   "blocking_defect_classes_targeted": 5,
   "blocking_defect_classes_constructor_resolved": 5,
   "blocking_conditions_targeted": 2,
