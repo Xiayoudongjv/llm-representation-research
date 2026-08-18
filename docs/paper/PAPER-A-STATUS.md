@@ -145,3 +145,18 @@ EXP-024.
   - `docs/paper/PAPER-A-PRIOR-ART-OVERLAP-MATRIX.json`
 
 Task 099B must use these artifacts as the prior-art/novelty baseline.
+
+
+## Task 099B Adversarial Scientific Review
+
+- `ADVERSARIAL_REVIEW_COMPLETE = true`
+- `CURRENT_DRAFT_VERDICT = WEAK_REJECT`
+- `BLOCKING_ISSUE_COUNT = 0`
+- `MAJOR_ISSUE_COUNT = 5`
+- `MINOR_ISSUE_COUNT = 4`
+- `NEW_EXPERIMENT_REQUIRED_FOR_CORE_CLAIM = false`
+- `SECOND_MODEL_STATUS = OPTIONAL_FOR_BREADTH`
+- `NEXT_TASK = 099C_MANUSCRIPT_REVISION`
+
+Review authority:
+- `docs/paper/PAPER-A-ADVERSARIAL-REVIEW.md`
