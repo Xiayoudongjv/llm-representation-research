@@ -21,6 +21,7 @@ recalibrated or transported across layers and interventions?
 - EXP-022A shows descriptive featurewise-recalibration recovery, especially in Split B.
 - EXP-022A does not support same-family layerwise readout refit rescue.
 - EXP-023 independently returns `NO_REPLICATION`: strong Split-A rescue, null Split B.
+- EXP-024 returns a valid condition-panel primary `NOT_SUPPORTED` for the simple degradation-magnitude predictor, while 10/10 conditions show positive `S_diag` and `G_eval` descriptively.
 
 ## 4. Current claim boundaries
 
@@ -29,6 +30,7 @@ recalibrated or transported across layers and interventions?
 - EXP-022A evidence is partial and split-dependent for the primary fixed-frame criterion.
 - Featurewise recalibration is currently descriptive, not a confirmed mechanism.
 - EXP-023 shows calibration rescue is conditional, not general cross-split replication.
+- EXP-024 shows broad panel-level calibration benefit descriptively, but the simple independent degradation-magnitude predictor is not supported.
 - Coordinate transport is not tested.
 
 ## 5. EXP-022A exact scientific synthesis
@@ -50,10 +52,22 @@ recalibrated or transported across layers and interventions?
 - `D_fixed`: substantial in Split A, little in Split B.
 - Secondary mean/scale signal: `G_mu > G_sigma` in Split A; descriptive only.
 
+## 5b. EXP-024 exact scientific synthesis
+
+- Canonical result SHA-256: `50a6ea72dbb9c33ae8ec15d0e2ad31b32ebe0cf299679875fe7b34fb6cabcb69`
+- `EXP024_REGISTERED_OUTCOME = NOT_SUPPORTED_BY_EXP024_PRIMARY_TEST`
+- Primary `rho = 0.28401877872187725`.
+- Exact one-sided permutation `p = 0.2115079365079365`.
+- Registered support rule: `rho > 0 AND p <= 0.05`; not satisfied.
+- `S_diag > 0`: 10/10 conditions.
+- `G_eval > 0`: 10/10 conditions.
+- Design improvement: DIAGNOSTIC predictor and EVAL outcome use independent
+  source families; `EXP024_SHARED_EVAL_A0_ALGEBRAIC_DEPENDENCY = false`.
+
 ## 6. Active hypotheses
 
 - `HYP-CALIBRATION-001`: `NOT_SUPPORTED_AS_GENERAL_CROSS_SPLIT_REPLICATION`
-- `HYP_CALIBRATION_CONDITIONAL_002`: `FROZEN_PROSPECTIVE_NOT_RUN`
+- `HYP_CALIBRATION_CONDITIONAL_002`: `NOT_SUPPORTED_BY_EXP024_PRIMARY_TEST`
 - `HYP_MEAN_CALIBRATION_001`: `HYPOTHESIS_GENERATING_ONLY`
 - `HYP-TRANSPORT-001`: `ACTIVE_BUT_DEFERRED_BEHIND_CALIBRATION`
 - `HYP-COVER-001`: `INCUBATING_CONCEPTUAL`
@@ -68,10 +82,11 @@ recalibrated or transported across layers and interventions?
 
 ## 8. Next scientific decision
 
-EXP-023 is closed with a valid `NO_REPLICATION` canonical result. The next
-high-information question is whether an independent FIT-only or separately
-held-out diagnostic can predict fixed-readout degradation and recalibration
-benefit. Do not automatically launch a generic replication or EXP-024.
+EXP-024 is closed with a valid `NOT_SUPPORTED_BY_EXP024_PRIMARY_TEST` canonical
+result. The immediate next step is a bounded Paper-A full prose draft using the
+current positive/negative evidence chain. Do not automatically launch EXP-025,
+a replacement authorization, or a second-model replication rescue; second-model
+breadth is optional/venue-uplift only.
 
 ## 9. Frozen authority links/hashes
 
@@ -90,6 +105,15 @@ benefit. Do not automatically launch a generic replication or EXP-024.
 - EXP-023 canonical result: `experiments/exp023/results/exp023_results.json`
   - SHA-256: `f30591ad942e82a322e594695ce1d5023586261fd7b8bccaa208b0d46f388000`
 
+- EXP-024 frozen preregistration: `docs/experiments/EXP-024-PREREGISTRATION.md`
+  - SHA-256: `55f9604d904fd389da28c6214082028faca081f7e3a0c87c8ba8d961f792d810`
+- EXP-024 frozen dataset: `experiments/exp024/data/exp024_condition_panel_frozen.json`
+  - SHA-256: `46c832b68b6ac95704bf5143badc1431627d7f935648842a78971491b13ee404`
+- EXP-024 model/hook qualification: `experiments/exp024/engineering/model_hook_qualification.json`
+  - SHA-256: `72e7f48d68a022819cfed5045061af5b0d6d84de659a49e056487b9d20da8d8f`
+- EXP-024 canonical result: `experiments/exp024/results/exp024_results.json`
+  - SHA-256: `50a6ea72dbb9c33ae8ec15d0e2ad31b32ebe0cf299679875fe7b34fb6cabcb69`
+
 ## 10. Instructions to future AI
 
 - Canonical artifacts outrank chat summaries.
@@ -98,6 +122,7 @@ benefit. Do not automatically launch a generic replication or EXP-024.
 - Speculation must not enter the claim ledger as fact.
 - Do not modify frozen protocol after outcome.
 - Do not modify frozen EXP-023 protocol after outcome.
+- Do not modify frozen EXP-024 protocol after outcome.
 
 ## 11. Long-Horizon Research Asset Map
 
@@ -124,4 +149,4 @@ routing + composition + invariant validation.
 - State–Operator Duality: Word2Vec-to-contextual-transformation conceptual bridge.
 - Attention–Geometry Coupling: representation state may affect routing; attention-mediated transport may reshape later representation.
 - Status for both: `LONG_TERM` / `PRIOR_ART_REQUIRED` / `NOT_TESTED`.
-- Active scientific priority remains EXP-023 independent calibration replication.
+- Active scientific priority is now a bounded Paper-A full draft; EXP-024 completed the susceptibility follow-up with a valid negative primary.

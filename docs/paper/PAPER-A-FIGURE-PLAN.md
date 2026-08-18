@@ -88,10 +88,11 @@ figure must come from existing canonical data or documented constructs.
 
 ## Figure 6: Evidence synthesis and claim-boundary diagram
 
-- Question: What does the complete EXP-017 through EXP-023 chain support and
+- Question: What does the complete EXP-017 through EXP-024 chain support and
   what remains untested?
 - Source artifact(s): `docs/paper/PAPER-A-CLAIM-EVIDENCE-MATRIX.md`;
-  `docs/research/CLAIM-LEDGER.md`; `docs/research/EXPERIMENT-LINEAGE.md`.
+  `docs/research/CLAIM-LEDGER.md`; `docs/research/EXPERIMENT-LINEAGE.md`;
+  `docs/experiments/EXP-024-SCIENTIFIC-REVIEW.md`.
 - Panel plan: evidence-flow diagram from local manipulability to conditional
   calibration, with explicit negative/boundary branches.
 - Required data: none beyond existing claim statuses.
@@ -102,8 +103,27 @@ figure must come from existing canonical data or documented constructs.
   untested or unsupported.
 - Ready/not ready: `READY_TO_DRAFT_FROM_LEDGERS`.
 
+## Figure 7: EXP-024 condition-level susceptibility panel
+
+- Question: Does independent `S_diag(c)` predict independent `G_eval(c)` across
+  the frozen 10-condition panel?
+- Source artifact(s): `experiments/exp024/results/exp024_results.json`;
+  `docs/experiments/EXP-024-SCIENTIFIC-REVIEW.md`.
+- Panel plan:
+  - Panel A: scatter of `S_diag(c)` versus `G_eval(c)` with all 10 registered
+    conditions labeled; no conditions omitted.
+  - Panel B: paired condition-level `S_diag` and `G_eval` display showing broad
+    positivity but weak rank predictiveness.
+- Required data: existing condition-level values and registered primary test.
+- Caption thesis: all conditions show positive diagnostic degradation and
+  positive calibration benefit, but the simple rank association is not
+  supported by the exact permutation test.
+- Interpretation boundary: descriptive panel observation only; do not claim a
+  new positivity test, trend significance, or power-adjusted support.
+- Ready/not ready: `READY_FROM_EXISTING_RESULT`.
+
 ## Main/Appendix Placement
 
-- Main paper candidate figures: 1, 2, 3, 4, 5, 6.
-- If page limits require cuts, Figure 6 can move to appendix.
+- Main paper candidate figures: 1, 2, 3, 4, 5, 6, 7.
+- If page limits require cuts, Figure 6 or Figure 7 can move to appendix.
 - Do not fabricate plots from nonexistent results.

@@ -65,11 +65,11 @@ Paper A does **not** claim:
 
 ## Evidence Hierarchy
 
-- Primary paper evidence: EXP-018, EXP-021, EXP-022A, EXP-023.
+- Primary paper evidence: EXP-018, EXP-021, EXP-022A, EXP-023, EXP-024.
 - Supporting evidence: EXP-020A.
 - Boundary/negative evidence: EXP-017, EXP-019.
 - Hypothesis-generating evidence: EXP-023 mean/scale decomposition and the
-  conditional-calibration signal.
+  EXP-024 panel-level descriptive calibration signal.
 - Background/historical evidence: earlier representation-lineage work cited
   only for orientation.
 
@@ -86,6 +86,8 @@ Paper A does **not** claim:
 - EXP-022A: generate/discover the featurewise recalibration rescue signal.
 - EXP-023: perform independent preregistered replication and expose
   heterogeneity/`NO_REPLICATION`.
+- EXP-024: perform the prospectively reserved condition-panel susceptibility
+  test; primary predictor `NOT_SUPPORTED`, with broad descriptive panel benefit.
 
 ## Paper Narrative
 
@@ -97,8 +99,9 @@ Paper A does **not** claim:
   performance in some conditions.
 - Part V: Independent preregistered replication shows the rescue is
   heterogeneous rather than uniformly reproducible.
-- Part VI: This motivates conditional readout susceptibility as the next
-  mechanism-level question.
+- Part VI: EXP-024 directly tests the condition-panel susceptibility question;
+  a simple degradation-magnitude predictor is not supported, so the mechanism
+  remains unresolved.
 
 The narrative is a scientific tension, not a success ladder.
 
@@ -179,10 +182,15 @@ reproducibility.
   - Source: EXP-022A
 - 4.5 Independent replication reveals split-dependent calibration effects
   - Source: EXP-023
-- 4.6 What the combined evidence supports and does not support
+- 4.6 EXP-024 condition-panel susceptibility test: broad positive panel
+  benefit but simple predictor not supported
+  - Source: EXP-024 canonical result and EXP-024 scientific review
+- 4.7 What the combined evidence supports and does not support
   - Integrated claim-boundary synthesis
 
 EXP-023 must be titled as non-replication, not successful replication.
+EXP-024 must be titled as a negative primary with a descriptive panel benefit,
+not as support for the simple susceptibility predictor.
 
 ## Discussion Outline
 
@@ -192,7 +200,7 @@ EXP-023 must be titled as non-replication, not successful replication.
 - 5.4 Relation to coordinate transport: what remains untested
 - 5.5 Implications for representation interventions
 - 5.6 Limitations
-- 5.7 Future conditional-susceptibility test
+- 5.7 Mechanism gap after condition-panel susceptibility test
 
 Do not present operator/attention theories as findings.
 
@@ -207,14 +215,14 @@ Do not present operator/attention theories as findings.
 | readout-level rather than functional/behavioral endpoint | nonfatal | boundary is explicit |
 | calibration heterogeneity | follow-up-addressable | central unresolved gap |
 | exploratory origin of EXP-022A mechanism signal | nonfatal | requires confirmatory framing |
-| lack of independent susceptibility diagnostic | follow-up-addressable | highest-priority gap |
+| simple susceptibility diagnostic not predictive; mechanism remains unresolved | follow-up-addressable | highest-priority gap |
 | no proof of general coordinate transport | nonfatal | must not be claimed |
 | no causal binding evidence | nonfatal | must not be claimed |
 | potentially limited ecological validity | follow-up-addressable | not addressed here |
 
 ## Figures
 
-See `PAPER-A-FIGURE-PLAN.md`. Approximately six main figures are proposed from
+See `PAPER-A-FIGURE-PLAN.md`. Approximately seven main figures are proposed from
 existing canonical data only.
 
 ## Tables
@@ -236,6 +244,12 @@ existing canonical data only.
 The strongest affected split flips between EXP-022A and EXP-023. Permitted
 interpretation: simple fixed variant-direction explanation is not supported.
 
+EXP-024 is a separate condition-panel test (`N = 10`). Its primary Spearman
+`rho = 0.28401877872187725`, exact one-sided `p = 0.2115079365079365`, and
+registered support is `false`; all 10 conditions had `S_diag > 0` and
+`G_eval > 0` descriptively. It is not added to the split-level EXP-022A/EXP-023
+table above.
+
 ## Claim-Evidence Matrix
 
 See `PAPER-A-CLAIM-EVIDENCE-MATRIX.md`.
@@ -246,19 +260,18 @@ See `PAPER-A-STATUS.md`. No acceptance probabilities are assigned.
 
 ## Missing Evidence
 
-- Independent prediction of calibration susceptibility.
 - Cross-model and larger-model calibration replication.
-- A susceptibility diagnostic separate from confirmatory `G_cal`.
+- A mechanistic condition-level susceptibility model beyond simple independent
+  degradation magnitude.
 
 ## Next Follow-Up Slot
 
-Reserve exactly one follow-up slot:
+EXP-024 completed the prospectively reserved susceptibility follow-up. Its
+preregistered primary predictor was `NOT_SUPPORTED`, while the broad
+panel-level calibration benefit remains descriptive.
 
-> Can a FIT-only or separately held-out diagnostic predict deep readout
-> mismatch and subsequent calibration benefit on untouched EVAL data?
-
-The future design must not use the same final-EVAL `A0` quantity in the
-susceptibility predictor and the confirmatory `G_cal` endpoint.
+No new confirmatory follow-up is authorized unless it addresses a materially
+different preregistered question.
 
 ## Open Writing Questions
 
@@ -272,6 +285,7 @@ susceptibility predictor and the confirmatory `G_cal` endpoint.
 ## Source Authority
 
 - Canonical scientific review: `docs/experiments/EXP-023-SCIENTIFIC-REVIEW.md`
+- Canonical scientific review: `docs/experiments/EXP-024-SCIENTIFIC-REVIEW.md`
 - Claim ledger: `docs/research/CLAIM-LEDGER.md`
 - Hypothesis ledger: `docs/research/HYPOTHESIS-LEDGER.md`
 - Experiment lineage: `docs/research/EXPERIMENT-LINEAGE.md`

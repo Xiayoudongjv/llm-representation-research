@@ -15,32 +15,33 @@ visible negative and heterogeneous results.
 
 ## Submission Readiness
 
-- `PAPER_A_SUBMISSION_READINESS = ONE_TARGETED_FOLLOWUP_RECOMMENDED`
+- `PAPER_A_SUBMISSION_READINESS = NOT_READY_TO_SUBMIT_YET`
 
-Rationale: the largest remaining evidence gap is the absence of an independent
-susceptibility predictor. This gap is material for a mechanism-level claim.
+Rationale: the full prose draft and citation/prior-art completion remain. The
+targeted susceptibility predictor has now been tested by EXP-024 with a valid
+negative primary, so it is no longer an open prospective gap. A second model
+would broaden but is not required to start or finish the bounded draft.
 
 ## Central Unresolved Scientific Gap
 
-Can a FIT-only or separately held-out diagnostic predict which held-out
-conditions will exhibit deep fixed-readout degradation and therefore benefit
-from featurewise recalibration?
+EXP-024 directly tested the previously open question:
 
-The existing experiments cannot answer this because:
+> Can an independent DIAGNOSTIC degradation magnitude predict confirmatory
+> EVAL calibration benefit at the condition level?
 
-- EXP-022A generated the recalibration signal in a discovery context;
-- EXP-023 independently showed `NO_REPLICATION`;
-- the diagnostic used in the current chain algebraically shares the
-  confirmatory `A0_final` quantity with `G_cal`;
-- no experiment separated a susceptibility predictor from the confirmatory
-  EVAL partition.
+Registered result: primary support `false`.
+
+The remaining scientific gap is not the absence of a susceptibility test. It is
+that a simple independent degradation-magnitude measure is insufficient to
+explain condition-level calibration benefit, while the actual mechanism remains
+unresolved. Cross-model generality also remains untested.
 
 ## Venue Readiness
 
 | Venue | Current fit | Main strength | Main weakness | Minimum additional evidence needed |
 | --- | --- | --- | --- | --- |
-| TMLR | conditional | transparent negative result and reproducibility controls | no independent susceptibility predictor | targeted follow-up or clearly bounded claim |
-| Neural Networks | conditional | layerwise readout + calibration analysis | one model family, controlled data | cross-model or susceptibility diagnostic |
+| TMLR | conditional | transparent negative result and reproducibility controls | simple susceptibility predictor not supported; mechanism unresolved | clearly bounded claim; optional cross-model breadth |
+| Neural Networks | conditional | layerwise readout + calibration analysis | one model family, controlled data | cross-model generality or mechanistic condition-level diagnostic |
 | ICLR | cautious | clean controlled chain and negative evidence | small evidence breadth | stronger mechanistic or generalization evidence |
 | NeurIPS | cautious | interesting negative/heterogeneous result | no causal/functional mechanism | independent predictor and broader validation |
 | ICML | cautious | controlled methodology | limited theoretical/functional contribution | clear mechanism-level advance |
@@ -53,7 +54,10 @@ No acceptance probabilities are assigned.
 - EXP-017 and EXP-019 negative/boundary evidence must remain visible.
 - General transport, functional binding, and universal calibration claims are
   forbidden in current manuscript language.
-- The targeted follow-up slot is reserved for `HYP_CALIBRATION_CONDITIONAL_002`.
+- The targeted follow-up slot for `HYP_CALIBRATION_CONDITIONAL_002` has been
+  executed by EXP-024; its primary result is `NOT_SUPPORTED`.
+- EXP-024's 10/10 positive `S_diag`/`G_eval` values are descriptive only and
+  must not be presented as a new confirmatory positivity test.
 
 ## Current Files
 
@@ -64,18 +68,16 @@ No acceptance probabilities are assigned.
 
 ## Next Step
 
-Choose between:
+Proceed to `Task 097A-W`: begin the actual Paper-A prose draft with the
+bounded story and the EXP-024 negative primary explicitly visible.
 
-- `Task 097A-W`: begin actual Paper-A prose drafting; or
-- `Task 097B`: design the targeted follow-up for
-  `HYP_CALIBRATION_CONDITIONAL_002`.
-
-Do not create EXP-024 or run new models in Task 097A.
+Do not automatically create EXP-025, create a replacement authorization, or
+launch a second-model replication rescue.
 
 ## Follow-Up Design
 
-- `FOLLOWUP_DESIGN_STATUS = FROZEN_NOT_RUN`
-- `SELECTED_FOLLOWUP_DESIGN = B`
+- `FOLLOWUP_DESIGN_STATUS = COMPLETED_NEGATIVE_PRIMARY`
+- `SELECTED_FOLLOWUP_DESIGN = B` (executed as EXP-024)
 - Design draft: `docs/experiments/EXP-024-DESIGN-DRAFT.md`
 - Prior-art gap note: `docs/paper/PAPER-A-PRIOR-ART-GAP-NOTE.md`
 - Preregistration draft: `docs/experiments/EXP-024-PREREGISTRATION-DRAFT.md`
@@ -101,6 +103,15 @@ Design-level decisions:
 - `EXP024_PREREGISTRATION_DRAFT_CREATED = true`
 - `EXP024_PREREGISTRATION_FROZEN = true`
 - `EXP024_PROTOCOL_REVIEW = READY_FOR_DATASET_CONSTRUCTION`
+- `EXP024_PRIMARY_RESULT = NOT_SUPPORTED_BY_EXP024_PRIMARY_TEST`
+- `EXP024_PRIMARY_RHO = 0.28401877872187725`
+- `EXP024_PRIMARY_EXACT_P = 0.2115079365079365`
+- `EXP024_PANEL_POSITIVE_DESCRIPTIVE = 10/10 S_diag, 10/10 G_eval`
 
-`PAPER_A_DRAFT_READINESS` remains `START_FIRST_DRAFT_NOW`. Prose drafting may
-continue in parallel with Task-097D dataset construction and review.
+`PAPER_A_DRAFT_READINESS` remains `START_FIRST_DRAFT_NOW`.
+
+`PAPER_A_CORE_CLAIM = SUPPORTED_WITH_SCOPE_LIMITATIONS_AND_NEGATIVE_SUSCEPTIBILITY`
+
+The bounded story remains publishable as a careful positive/negative evidence
+chain; the simple susceptibility predictor is explicitly `NOT_SUPPORTED` in
+EXP-024.

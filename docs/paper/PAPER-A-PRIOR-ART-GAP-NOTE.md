@@ -77,7 +77,7 @@ Paper-A's working distinction:
 - Only low-capacity FIT-only featurewise recalibration is allowed.
 - No layer-specific classifier refitting is used for the primary mechanism.
 - Independent replication revealed heterogeneous rather than uniform rescue.
-- The next question is whether susceptibility to that rescue can be predicted
+- EXP-024 has now tested whether that susceptibility can be predicted
   independently before confirmatory EVAL outcomes are observed.
 
 Prospective EXP-024 question:
@@ -87,6 +87,20 @@ Prospective EXP-024 question:
 > becomes incompatible at block27-pre, and does that diagnostic predict
 > FIT-only featurewise recalibration benefit on source-family-independent EVAL
 > families?
+
+## EXP-024 Outcome
+
+EXP-024 completed with a valid canonical result:
+
+- Primary `rho = 0.28401877872187725`.
+- Exact one-sided permutation `p = 0.2115079365079365`.
+- Registered support rule `rho > 0 AND p <= 0.05`: not satisfied.
+- `S_diag > 0` and `G_eval > 0` in all 10/10 panel conditions, descriptively.
+
+Scientific positioning: the fixed-readout plus low-capacity recalibration
+distinction remains the Paper-A contribution. The simple susceptibility
+predictor is not supported, so the novelty claim must remain on the bounded
+positive/negative evidence chain rather than a mechanism-level prediction.
 
 ## Remaining Novelty Risk
 
@@ -120,5 +134,6 @@ Status:
 - `TUNED_LENS_POSITIONING_COMPLETE = true`
 - `MODEL_STITCHING_POSITIONING_COMPLETE = true`
 - `AFFINE_ALIGNMENT_NOVELTY_CLAIM = NOT_CLAIMED`
+- `EXP024_SUSCEPTIBILITY_OUTCOME = NOT_SUPPORTED_BY_EXP024_PRIMARY_TEST`
 - `PRIOR_ART_TARGETED_REVIEW_COMPLETE = true` for the three required anchors.
 - `PRIOR_ART_SEARCH_REQUIRED = PARTIAL` for the broader surrounding literature.

@@ -59,7 +59,7 @@ This matrix is a manuscript guardrail. Canonical experiment results and
 - Statement: FIT-only featurewise recalibration can substantially restore fixed
   readout performance in some degraded held-out conditions.
 - Status: `CONDITIONAL_SIGNAL`
-- Supporting evidence: EXP-022A A1 recovery; EXP-023 Split A strong `G_cal`.
+- Supporting evidence: EXP-022A A1 recovery; EXP-023 Split A strong `G_cal`; EXP-024 10/10 positive `G_eval` descriptive panel observation.
 - Limiting evidence: EXP-023 Split B null; discovery-stage origin.
 - Allowed wording: candidate recovery mechanism observed in specific
   conditions.
@@ -79,13 +79,18 @@ This matrix is a manuscript guardrail. Canonical experiment results and
 
 ## C7: Calibration susceptibility may be conditional
 
-- Statement: Featurewise calibration benefit may depend on conditions or
-  representations not yet independently measured.
-- Status: `HYPOTHESIS_GENERATING`
-- Supporting evidence: EXP-022A and EXP-023 split heterogeneity.
-- Limiting evidence: no independent susceptibility predictor; small splits.
-- Allowed wording: conditional-susceptibility hypothesis.
-- Forbidden wording: known mechanism, causal predictor, established condition.
+- Statement: Featurewise calibration benefit varies by condition, but a simple
+  independent degradation-magnitude diagnostic does not prospectively rank it
+  under the registered EXP-024 primary test.
+- Status: `HYPOTHESIS_GENERATING / SIMPLE_PREDICTOR_NOT_SUPPORTED`
+- Supporting evidence: EXP-022A and EXP-023 split heterogeneity; EXP-024
+  positive descriptive panel benefit in all 10 conditions.
+- Limiting evidence: EXP-024 primary `p = 0.2115079365079365`, support false;
+  limited condition-level diagnostic resolution; fixed panel/model.
+- Allowed wording: conditional heterogeneity remains; simple predictor not
+  supported.
+- Forbidden wording: known causal mechanism, established predictor, or
+  conditioning factor.
 - Paper section: Discussion 5.3 and 5.7.
 
 ## C8: Mean-only signal is secondary/hypothesis-generating
@@ -119,6 +124,35 @@ This matrix is a manuscript guardrail. Canonical experiment results and
 - Forbidden wording: functional binding demonstrated.
 - Paper section: Discussion 5.4.
 
+## C11: Panel-bounded featurewise calibration benefit is observed descriptively
+
+- Statement: Within the frozen EXP-024 10-condition panel, FIT-only featurewise
+  recalibration produced positive `G_eval` in all 10 registered conditions.
+- Status: `OBSERVED_DESCRIPTIVE`
+- Supporting evidence: EXP-024 canonical result `G_eval > 0` in 10/10
+  conditions.
+- Limiting evidence: descriptive panel observation only; no preregistered
+  cross-condition positivity test; fixed model and controlled dataset.
+- Allowed wording: panel-bounded descriptive calibration benefit.
+- Forbidden wording: universal calibration, population-wide guarantee,
+  cross-model generality, causal mechanism.
+- Paper section: Results 4.6.
+
+## C12: Simple independent degradation-magnitude susceptibility prediction is not supported
+
+- Statement: The preregistered EXP-024 primary test did not support the
+  prediction that larger independent `S_diag(c)` ranks larger confirmatory
+  `G_eval(c)`.
+- Status: `NOT_SUPPORTED`
+- Supporting evidence: EXP-024 canonical primary `rho = 0.28401877872187725`,
+  exact one-sided `p = 0.2115079365079365`, support false.
+- Limiting evidence: one panel; limited condition-level predictor resolution
+  and substantial ties; fixed model.
+- Allowed wording: simple susceptibility predictor not supported.
+- Forbidden wording: calibration unrelated in general; predictor failure as
+  universal mechanism denial.
+- Paper section: Results 4.6 and Discussion 5.3/5.7.
+
 ## Matrix Summary
 
 | ID | Statement | Status | Supporting | Limiting | Paper section |
@@ -133,3 +167,5 @@ This matrix is a manuscript guardrail. Canonical experiment results and
 | C8 | mean-only signal is secondary | `SECONDARY_DESCRIPTIVE` | EXP-023 Split A | Split B null | 4.5 |
 | C9 | general coordinate transport not tested | `NOT_TESTED` | none | no transport result | 5.4 |
 | C10 | functional binding not tested | `NOT_TESTED` | none | no binding result | 5.4 |
+| C11 | panel-bounded calibration benefit observed descriptively | `OBSERVED_DESCRIPTIVE` | EXP-024 10/10 G_eval positive | descriptive only | 4.6 |
+| C12 | simple degradation-magnitude susceptibility prediction | `NOT_SUPPORTED` | EXP-024 rho=0.284, p=0.2115 | one panel, low resolution | 4.6/5.3/5.7 |
