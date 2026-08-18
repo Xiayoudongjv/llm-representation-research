@@ -1,0 +1,112 @@
+{
+  "schema_version": "0.1-independent-review",
+  "experiment": "EXP-024",
+  "review_task": "097D-R",
+  "review_mode": "READ_ONLY",
+  "reviewed_candidate_path": "experiments/exp024/data/exp024_condition_panel_candidate.json",
+  "reviewed_candidate_sha256": "8583b57d9ed0ff98bd6d81eb3fc8f0f6c97a17d9acc63699b9d9b80e5c62eac5",
+  "reviewed_record_count": 1760,
+  "reviewed_source_family_count": 880,
+  "pairing_structure": "PASS",
+  "semantic_family_reviewed": 880,
+  "condition_count": 10,
+  "conditions_pass": 5,
+  "conditions_moderate_limitation": 3,
+  "conditions_blocking": 2,
+  "collapsed_condition_pairs": 0,
+  "condition_class_blocking_interactions": 5,
+  "partition_style_leakage": "MINOR",
+  "class_template_leakage": "MODERATE",
+  "analogy_template_status": "MODERATE_CONSTRUCT_INHERENT_TEMPLATE_LIMITATION",
+  "existing_moderate_limitations_reviewed": 4,
+  "existing_limitations_upgraded_to_blocking": 0,
+  "diagnostic_eval_family_overlap": 0,
+  "diagnostic_eval_semantic_sibling_blockers": 0,
+  "cross_condition_base_content_blockers": 0,
+  "historical_exact_reuse": 0,
+  "historical_direct_paraphrase_blockers": 0,
+  "condition_level_inference_unit_validity": "LIMITED_BUT_DEFENSIBLE",
+  "within_condition_measurement_precision": "ADEQUATE",
+  "outcome_bearing_metadata": "ABSENT",
+  "blocking_construct_defects": 5,
+  "nonblocking_limitations": 4,
+  "independent_review_verdict": "DATASET_REPAIR_REQUIRED",
+  "blocking_defects": [
+    {
+      "defect_id": "BLOCK-001",
+      "title": "Systematic logic subject-rule semantic incompatibility",
+      "affected_count_minimum": 146,
+      "affected_classes": [
+        "logic"
+      ],
+      "representative_family_ids": [
+        "exp024_c01_lexical_relex_FIT_logic_0218",
+        "exp024_c01_lexical_relex_FIT_logic_0050",
+        "exp024_c01_lexical_relex_FIT_logic_0064"
+      ]
+    },
+    {
+      "defect_id": "BLOCK-002",
+      "title": "c03 compression grammar/coherence defects",
+      "affected_count": 66,
+      "affected_classes": [
+        "logic",
+        "causality",
+        "definition"
+      ],
+      "representative_family_ids": [
+        "exp024_c03_controlled_compression_FIT_logic_0032",
+        "exp024_c03_controlled_compression_FIT_logic_0013"
+      ]
+    },
+    {
+      "defect_id": "BLOCK-003",
+      "title": "c07 formal transformation grammar defects",
+      "affected_count": 44,
+      "affected_classes": [
+        "logic",
+        "causality"
+      ],
+      "representative_family_ids": [
+        "exp024_c07_register_formal_FIT_logic_0127",
+        "exp024_c07_register_formal_FIT_logic_0017"
+      ]
+    },
+    {
+      "defect_id": "BLOCK-004",
+      "title": "Definition article/property grammar defects",
+      "affected_count_minimum": 94,
+      "affected_classes": [
+        "definition"
+      ],
+      "representative_family_ids": [
+        "exp024_c01_lexical_relex_FIT_definition_0093",
+        "exp024_c01_lexical_relex_FIT_definition_0059"
+      ]
+    },
+    {
+      "defect_id": "BLOCK-005",
+      "title": "Analogy same-word pair defects",
+      "affected_count": 6,
+      "affected_classes": [
+        "analogy"
+      ],
+      "representative_family_ids": [
+        "exp024_c02_syntactic_restructure_DIAGNOSTIC_analogy_0061",
+        "exp024_c04_controlled_elaboration_EVAL_analogy_0145"
+      ]
+    }
+  ],
+  "model_load_performed": false,
+  "tokenizer_load_performed": false,
+  "representation_extraction_performed": false,
+  "s_diag_computed": false,
+  "g_eval_computed": false,
+  "scientific_outcome_observed": false,
+  "candidate_dataset_modified": false,
+  "candidate_manifest_modified": false,
+  "condition_panel_spec_modified": false,
+  "data_schema_modified": false,
+  "preregistration_draft_modified": false,
+  "validator_modified": false
+}
