@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import importlib.util
 import json
 import math
@@ -900,3 +901,260 @@ def test_qualification_validator_failure_prevents_publication(tmp_path, monkeypa
 def test_no_mode_fails_closed():
     with pytest.raises(SystemExit):
         runner.main([])
+
+
+def _synthetic_formal_records() -> list[dict[str, object]]:
+    records: list[dict[str, object]] = []
+    for condition in runner.CONDITION_ORDER:
+        for partition in runner.PARTITIONS:
+            for semantic_class in runner.CLASS_ORDER:
+                for family_index in range(runner.ALLOCATION[partition]):
+                    family_id = (
+                        f"syn_{condition}_{partition}_{semantic_class}_{family_index:04d}"
+                    )
+                    for record_role in runner.RECORD_ROLES:
+                        records.append(
+                            {
+                                "record_id": f"{family_id}_{record_role}",
+                                "source_family_id": family_id,
+                                "semantic_class": semantic_class,
+                                "condition_id": condition,
+                                "partition": partition,
+                                "record_role": record_role,
+                                "text": (
+                                    f"neutral synthetic {condition} {partition} "
+                                    f"{semantic_class} {record_role} {family_index}"
+                                ),
+                                "base_content_identity": family_id,
+                                "transformation_rule_id": condition,
+                                "independence_group": family_id,
+                                "review_status": "PASS",
+                                "provenance": {},
+                            }
+                        )
+    return records
+
+
+def _synthetic_formal_forward(tokenizer, model, device, text):
+    class_index = next(
+        index
+        for index, semantic_class in enumerate(runner.CLASS_ORDER)
+        if semantic_class in text
+    )
+    digest = hashlib.sha256(text.encode("utf-8")).digest()
+    noise_scale = 0.02
+    arrays = {}
+    for checkpoint_index, checkpoint in enumerate(runner.QUALIFICATION_CHECKPOINT_NAMES):
+        rng = np.random.default_rng(int.from_bytes(digest[:8], "big") + checkpoint_index)
+        vector = np.zeros((4,), dtype=np.float32)
+        vector[class_index] = 1.0
+        vector += rng.normal(0.0, noise_scale, size=(4,)).astype(np.float32)
+        arrays[checkpoint] = vector
+    return {
+        "input_ids": torch.tensor([[0, 2, 1]], dtype=torch.long, device=device),
+        "attention_mask": torch.ones((1, 3), dtype=torch.long, device=device),
+        "representations": arrays,
+        "hook_firing_count": 1,
+        "hook_cleanup_verified": True,
+        "exp024_hooks_remaining": 0,
+        "foreign_hooks_remaining": 0,
+    }
+
+
+def test_formal_runtime_synthetic_production_execution(tmp_path, monkeypatch):
+    records = _synthetic_formal_records()
+    monkeypatch.setattr(runner, "verify_frozen_authority", lambda root=None: {})
+    monkeypatch.setattr(runner, "verify_no_result_collision", lambda root=None: None)
+    monkeypatch.setattr(runner, "_repository_commit", lambda root=None: "a" * 40)
+    monkeypatch.setattr(
+        runner,
+        "exact_one_sided_permutation_p",
+        lambda x, y, alternative="greater": {
+            "rho": 0.5,
+            "p": 0.04,
+            "count_ge": 1,
+            "total": runner.PERMUTATION_COUNT,
+        },
+    )
+    runtime = (FakeTokenizer(), FakeModel(), torch.device("cpu"))
+    result = runner._execute_formal_analysis(
+        tmp_path,
+        {"authorization_id": "synthetic-auth"},
+        {
+            "authorization_sha256": "a" * 64,
+            "consumption_record_sha256": "b" * 64,
+        },
+        "synthetic-attempt",
+        condition_order=runner.CONDITION_ORDER,
+        records_loader=lambda root=None: (records, []),
+        runtime_loader=lambda root=None: runtime,
+        record_extractor=_synthetic_formal_forward,
+    )
+    runner.validate_result_schema(result, formal=True)
+    assert result["result_status"] == "FORMAL_RESULT"
+    assert result["scientific_status"] == "FORMAL_ANALYSIS_COMPLETED"
+    assert result["primary"]["permutation_count"] == runner.PERMUTATION_COUNT
+    assert result["primary"]["supported"] is True
+    assert len(result["condition_level"]["s_diag"]) == 10
+    assert len(result["condition_level"]["g_eval"]) == 10
+    assert result["hidden_states_included"] is False
+    assert result["prompt_text_included"] is False
+
+
+def test_formal_runtime_call_graph_reaches_analysis_and_publication(tmp_path, monkeypatch):
+    calls: list[str] = []
+    monkeypatch.setattr(
+        runner,
+        "_pre_consumption_static_checks",
+        lambda *args, **kwargs: calls.append("pre_checks") or None,
+    )
+    monkeypatch.setattr(
+        runner,
+        "_consume_formal_authorization",
+        lambda *args, **kwargs: calls.append("consume")
+        or {
+            "authorization_sha256": "a" * 64,
+            "consumption_record_sha256": "b" * 64,
+        },
+    )
+    monkeypatch.setattr(
+        runner,
+        "_execute_formal_analysis",
+        lambda *args, **kwargs: calls.append("execute") or _valid_result(),
+    )
+    monkeypatch.setattr(
+        runner,
+        "finalize_formal_result",
+        lambda result, root=None: calls.append("finalize")
+        or {"path": "x", "sha256": "c" * 64},
+    )
+    auth_path = tmp_path / "synthetic_auth.json"
+    runner.write_json(auth_path, _authorization())
+    runner.run_formal(tmp_path, auth_path)
+    assert calls == ["pre_checks", "consume", "execute", "finalize"]
+
+
+def test_formal_runtime_failure_does_not_publish_canonical_result(tmp_path, monkeypatch):
+    monkeypatch.setattr(
+        runner,
+        "_pre_consumption_static_checks",
+        lambda *args, **kwargs: None,
+    )
+    monkeypatch.setattr(
+        runner,
+        "_consume_formal_authorization",
+        lambda *args, **kwargs: {
+            "authorization_sha256": "a" * 64,
+            "consumption_record_sha256": "b" * 64,
+        },
+    )
+
+    def fail_analysis(*args, **kwargs):
+        raise runner.ProtocolIntegrityError("FORMAL_ANALYSIS_TEST_FAILURE")
+
+    monkeypatch.setattr(runner, "_execute_formal_analysis", fail_analysis)
+    auth_path = tmp_path / "synthetic_auth.json"
+    runner.write_json(auth_path, _authorization())
+    with pytest.raises(runner.ProtocolIntegrityError):
+        runner.run_formal(tmp_path, auth_path)
+    canonical = tmp_path / runner.CANONICAL_RESULT_PATH.relative_to(runner.ROOT)
+    assert not canonical.exists()
+
+
+def test_formal_result_atomic_publication_uses_tmp_path(tmp_path, monkeypatch):
+    records = _synthetic_formal_records()
+    monkeypatch.setattr(runner, "verify_frozen_authority", lambda root=None: {})
+    monkeypatch.setattr(runner, "verify_no_result_collision", lambda root=None: None)
+    monkeypatch.setattr(runner, "_repository_commit", lambda root=None: "a" * 40)
+    monkeypatch.setattr(
+        runner,
+        "exact_one_sided_permutation_p",
+        lambda x, y, alternative="greater": {
+            "rho": 0.5,
+            "p": 0.04,
+            "count_ge": 1,
+            "total": runner.PERMUTATION_COUNT,
+        },
+    )
+    runtime = (FakeTokenizer(), FakeModel(), torch.device("cpu"))
+    result = runner._execute_formal_analysis(
+        tmp_path,
+        {"authorization_id": "synthetic-auth"},
+        {
+            "authorization_sha256": "a" * 64,
+            "consumption_record_sha256": "b" * 64,
+        },
+        "synthetic-attempt",
+        condition_order=runner.CONDITION_ORDER,
+        records_loader=lambda root=None: (records, []),
+        runtime_loader=lambda root=None: runtime,
+        record_extractor=_synthetic_formal_forward,
+    )
+    published = runner.atomic_publish_validated_result(result, tmp_path)
+    assert published["sha256"]
+    assert (tmp_path / runner.CANONICAL_RESULT_PATH.relative_to(runner.ROOT)).is_file()
+
+
+@pytest.mark.parametrize(
+    "mutator",
+    [
+        lambda rows: _mutate_partition_family(rows, "FIT", "DIAGNOSTIC"),
+        lambda rows: _mutate_partition_family(rows, "FIT", "EVAL"),
+        lambda rows: _mutate_partition_family(rows, "DIAGNOSTIC", "EVAL"),
+        lambda rows: _mutate_field(rows, "condition_id", "unexpected_condition"),
+        lambda rows: _mutate_field(rows, "semantic_class", "invalid_class"),
+        lambda rows: _duplicate_record_id(rows),
+    ],
+)
+def test_formal_partition_integrity_fails_closed(mutator):
+    records = _synthetic_formal_records()
+    mutator(records)
+    with pytest.raises(runner.ProtocolIntegrityError):
+        runner._validate_formal_partition_integrity(
+            records, runner.CONDITION_ORDER, strict_counts=True
+        )
+
+
+def test_formal_partition_integrity_rejects_missing_semantic_class():
+    records = [
+        row
+        for row in _synthetic_formal_records()
+        if row["semantic_class"] != "definition"
+    ]
+    with pytest.raises(runner.ProtocolIntegrityError):
+        runner._validate_formal_partition_integrity(
+            records, runner.CONDITION_ORDER, strict_counts=True
+        )
+
+
+def test_formal_partition_integrity_rejects_wrong_condition_count():
+    records = _synthetic_formal_records()
+    with pytest.raises(runner.ProtocolIntegrityError):
+        runner._validate_formal_partition_integrity(
+            records, runner.CONDITION_ORDER[:-1], strict_counts=True
+        )
+
+
+def _mutate_partition_family(records, source_partition, target_partition):
+    source = next(
+        row
+        for row in records
+        if row["partition"] == source_partition
+        and row["record_role"] == "reference_form"
+    )
+    target_rows = [
+        row
+        for row in records
+        if row["partition"] == target_partition
+        and row["record_role"] == "reference_form"
+    ]
+    for row in target_rows[:2]:
+        row["source_family_id"] = source["source_family_id"]
+
+
+def _mutate_field(records, field, value):
+    records[0][field] = value
+
+
+def _duplicate_record_id(records):
+    records[1]["record_id"] = records[0]["record_id"]

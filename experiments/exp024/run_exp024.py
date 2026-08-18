@@ -77,6 +77,19 @@ PARTITIONS = ("FIT", "DIAGNOSTIC", "EVAL")
 RECORD_ROLES = ("reference_form", "condition_realization")
 ALLOCATION = {"FIT": 6, "DIAGNOSTIC": 8, "EVAL": 8}
 N_CONDITIONS = 10
+CONDITION_ORDER = (
+    "c01_lexical_relex",
+    "c02_syntactic_restructure",
+    "c03_controlled_compression",
+    "c04_controlled_elaboration",
+    "c05_relation_explicit",
+    "c06_relation_implicit",
+    "c07_register_formal",
+    "c08_register_informal",
+    "c09_neutral_distractor_prefix",
+    "c10_anaphoric_reference",
+)
+CONDITION_UNIVERSE = frozenset(CONDITION_ORDER)
 PERMUTATION_COUNT = math.factorial(N_CONDITIONS)
 SUPPORT_RULE = "rho>0_and_p<=0.05"
 
@@ -1102,6 +1115,512 @@ def partition_records(records: Sequence[Mapping[str, Any]]) -> dict[str, list[Ma
     return partitions
 
 
+def formal_condition_order(root: Path = ROOT) -> list[str]:
+    verify_frozen_authority(root)
+    panel = read_json(root / CONDITION_PANEL_PATH.relative_to(ROOT))
+    observed = tuple(item["condition_id"] for item in panel["conditions"])
+    if observed != CONDITION_ORDER:
+        raise ProtocolIntegrityError("CONDITION_PANEL_ORDER_MISMATCH")
+    return list(observed)
+
+
+def _validate_formal_partition_integrity(
+    records: Sequence[Mapping[str, Any]],
+    condition_order: Sequence[str],
+    *,
+    strict_counts: bool = True,
+) -> dict[str, Any]:
+    if not isinstance(records, list):
+        raise ProtocolIntegrityError("FORMAL_DATASET_TOP_LEVEL_NOT_ARRAY")
+    expected_conditions = set(condition_order)
+    if len(expected_conditions) != N_CONDITIONS:
+        raise ProtocolIntegrityError("FORMAL_CONDITION_COUNT_MISMATCH")
+    if expected_conditions != CONDITION_UNIVERSE:
+        raise ProtocolIntegrityError("FORMAL_CONDITION_SET_MISMATCH")
+
+    required_fields = {
+        "record_id",
+        "source_family_id",
+        "semantic_class",
+        "condition_id",
+        "partition",
+        "record_role",
+        "text",
+    }
+    family_rows: dict[str, list[Mapping[str, Any]]] = {}
+    record_ids: set[str] = set()
+    partition_family_ids: dict[str, set[str]] = {partition: set() for partition in PARTITIONS}
+    cell_family_ids: dict[tuple[str, str, str], set[str]] = {}
+    seen_classes: set[str] = set()
+    seen_conditions: set[str] = set()
+
+    for record in records:
+        if not isinstance(record, Mapping):
+            raise ProtocolIntegrityError("FORMAL_DATASET_RECORD_NOT_OBJECT")
+        missing = required_fields - set(record)
+        if missing:
+            raise ProtocolIntegrityError(f"FORMAL_DATASET_RECORD_MISSING_FIELDS: {sorted(missing)}")
+        if not isinstance(record["text"], str) or not record["text"].strip():
+            raise ProtocolIntegrityError("FORMAL_DATASET_RECORD_TEXT_EMPTY")
+        if record["condition_id"] not in expected_conditions:
+            raise ProtocolIntegrityError("FORMAL_DATASET_UNEXPECTED_CONDITION")
+        if record["semantic_class"] not in CLASS_UNIVERSE:
+            raise ProtocolIntegrityError("FORMAL_DATASET_INVALID_SEMANTIC_CLASS")
+        if record["partition"] not in PARTITIONS:
+            raise ProtocolIntegrityError("FORMAL_DATASET_INVALID_PARTITION")
+        if record["record_role"] not in RECORD_ROLES:
+            raise ProtocolIntegrityError("FORMAL_DATASET_INVALID_ROLE")
+        record_id = str(record["record_id"])
+        if record_id in record_ids:
+            raise ProtocolIntegrityError("FORMAL_DATASET_DUPLICATE_RECORD_ID")
+        record_ids.add(record_id)
+        family_id = str(record["source_family_id"])
+        family_rows.setdefault(family_id, []).append(record)
+        partition_family_ids[record["partition"]].add(family_id)
+        cell_family_ids.setdefault(
+            (record["condition_id"], record["partition"], record["semantic_class"]),
+            set(),
+        ).add(family_id)
+        seen_classes.add(record["semantic_class"])
+        seen_conditions.add(record["condition_id"])
+
+    if seen_classes != CLASS_UNIVERSE:
+        raise ProtocolIntegrityError("FORMAL_DATASET_SEMANTIC_CLASS_MISSING")
+    if seen_conditions != expected_conditions:
+        raise ProtocolIntegrityError("FORMAL_DATASET_CONDITION_MISSING")
+
+    for family_id, rows in family_rows.items():
+        if len(rows) != 2:
+            raise ProtocolIntegrityError("FORMAL_DATASET_FAMILY_RECORD_COUNT_NOT_TWO")
+        roles = {row["record_role"] for row in rows}
+        if roles != set(RECORD_ROLES):
+            raise ProtocolIntegrityError("FORMAL_DATASET_FAMILY_ROLE_PAIR_MISMATCH")
+        first = rows[0]
+        for row in rows[1:]:
+            for field in ("source_family_id", "semantic_class", "condition_id", "partition"):
+                if row.get(field) != first.get(field):
+                    raise ProtocolIntegrityError("FORMAL_DATASET_FAMILY_METADATA_INCONSISTENT")
+
+    overlaps = {
+        ("FIT", "DIAGNOSTIC"): partition_family_ids["FIT"] & partition_family_ids["DIAGNOSTIC"],
+        ("FIT", "EVAL"): partition_family_ids["FIT"] & partition_family_ids["EVAL"],
+        ("DIAGNOSTIC", "EVAL"): partition_family_ids["DIAGNOSTIC"] & partition_family_ids["EVAL"],
+    }
+    if any(overlaps.values()):
+        raise ProtocolIntegrityError("FORMAL_DATASET_PARTITION_FAMILY_OVERLAP")
+
+    for condition_id in condition_order:
+        for partition in PARTITIONS:
+            for semantic_class in CLASS_ORDER:
+                family_ids = cell_family_ids.get(
+                    (condition_id, partition, semantic_class), set()
+                )
+                if not family_ids:
+                    raise ProtocolIntegrityError("FORMAL_DATASET_CELL_MISSING")
+                if strict_counts and len(family_ids) != ALLOCATION[partition]:
+                    raise ProtocolIntegrityError("FORMAL_DATASET_CELL_COUNT_MISMATCH")
+
+    return {
+        "condition_count": len(expected_conditions),
+        "semantic_class_count": len(seen_classes),
+        "source_family_count": len(family_rows),
+        "record_count": len(records),
+        "partition_family_ids": {
+            partition: sorted(family_ids)
+            for partition, family_ids in partition_family_ids.items()
+        },
+        "partition_overlap": {key: sorted(value) for key, value in overlaps.items()},
+    }
+
+
+def _formal_records_by_partition_role(
+    records: Sequence[Mapping[str, Any]], partition: str, record_role: str
+) -> list[Mapping[str, Any]]:
+    return [
+        record
+        for record in records
+        if record["partition"] == partition and record["record_role"] == record_role
+    ]
+
+
+def _group_records_by_condition(
+    records: Sequence[Mapping[str, Any]], condition_order: Sequence[str]
+) -> dict[str, list[Mapping[str, Any]]]:
+    grouped = {condition: [] for condition in condition_order}
+    for record in records:
+        if record["condition_id"] in grouped:
+            grouped[record["condition_id"]].append(record)
+    return grouped
+
+
+def _extract_formal_group_arrays(
+    records: Sequence[Mapping[str, Any]],
+    tokenizer: Any,
+    model: Any,
+    device: Any,
+    extractor: Any,
+    checkpoints: Sequence[str],
+) -> tuple[dict[str, np.ndarray], list[str], list[str]]:
+    arrays = {checkpoint: [] for checkpoint in checkpoints}
+    labels: list[str] = []
+    record_ids: list[str] = []
+    for record in records:
+        forward = extractor(tokenizer, model, device, record["text"])
+        representations = forward["representations"]
+        missing = set(checkpoints) - set(representations)
+        if missing:
+            raise ProtocolIntegrityError(
+                f"FORMAL_EXTRACTION_MISSING_CHECKPOINTS: {sorted(missing)}"
+            )
+        for checkpoint in checkpoints:
+            arrays[checkpoint].append(
+                to_float32_analysis_array(
+                    representations[checkpoint], expected_ndim=1
+                )
+            )
+        labels.append(str(record["semantic_class"]))
+        record_ids.append(str(record["record_id"]))
+    if not record_ids:
+        raise ProtocolIntegrityError("FORMAL_EXTRACTION_GROUP_EMPTY")
+    return (
+        {
+            checkpoint: np.stack(values).astype(np.float32)
+            for checkpoint, values in arrays.items()
+        },
+        labels,
+        record_ids,
+    )
+
+
+def _fit_reference_readout(
+    X: np.ndarray, y: Sequence[str]
+) -> tuple[Any, np.ndarray, np.ndarray, list[str]]:
+    if set(y) != CLASS_UNIVERSE:
+        raise ProtocolIntegrityError("FORMAL_REFERENCE_LABELS_MISSING_CLASS")
+    scaler = fit_scaler(X)
+    reference_mean = np.asarray(scaler.mean_, dtype=float)
+    reference_scale = np.asarray(scaler.scale_, dtype=float)
+    if not np.isfinite(reference_mean).all() or not np.isfinite(reference_scale).all():
+        raise TechnicalInvalidError("NONFINITE_REFERENCE_SCALER")
+    X_scaled = transform_with_stats(X, reference_mean, reference_scale)
+    classifier, labels = fit_classifier(X_scaled, list(y))
+    if set(labels) != CLASS_UNIVERSE:
+        raise ProtocolIntegrityError("FORMAL_REFERENCE_CLASSIFIER_LABEL_MISMATCH")
+    return classifier, reference_mean, reference_scale, labels
+
+
+def _condition_calibration_stats(
+    X: np.ndarray,
+) -> tuple[np.ndarray, np.ndarray]:
+    scaler = fit_scaler(X)
+    mean = np.asarray(scaler.mean_, dtype=float)
+    scale = np.asarray(scaler.scale_, dtype=float)
+    if not np.isfinite(mean).all() or not np.isfinite(scale).all():
+        raise TechnicalInvalidError("NONFINITE_CONDITION_CALIBRATION")
+    return mean, scale
+
+
+def _prediction_balanced_accuracy(
+    y_true: Sequence[str], predictions: Sequence[str]
+) -> float:
+    if len(y_true) != len(predictions):
+        raise ProtocolIntegrityError("FORMAL_PREDICTION_LENGTH_MISMATCH")
+    if set(y_true) != CLASS_UNIVERSE:
+        raise ProtocolIntegrityError("FORMAL_PREDICTION_LABELS_MISSING_CLASS")
+    if set(predictions) - CLASS_UNIVERSE:
+        raise ProtocolIntegrityError("FORMAL_PREDICTION_UNEXPECTED_CLASS")
+    return balanced_accuracy(y_true, predictions)
+
+
+def _condition_ordered_metric(
+    values: Mapping[str, float], condition_order: Sequence[str]
+) -> list[float]:
+    return [float(values[condition]) for condition in condition_order]
+
+
+def _execute_formal_analysis(
+    root: Path,
+    authorization: Mapping[str, Any],
+    consumption: Mapping[str, Any],
+    run_attempt_id: str,
+    *,
+    condition_order: Sequence[str] | None = None,
+    records_loader: Any | None = None,
+    runtime_loader: Any | None = None,
+    record_extractor: Any | None = None,
+) -> dict[str, Any]:
+    verify_frozen_authority(root)
+    verify_no_result_collision(root)
+
+    if condition_order is None:
+        condition_order = formal_condition_order(root)
+    else:
+        condition_order = list(condition_order)
+    condition_order = list(condition_order)
+    if tuple(condition_order) != CONDITION_ORDER:
+        raise ProtocolIntegrityError("FORMAL_CONDITION_ORDER_MISMATCH")
+
+    records, _ = (records_loader or load_frozen_dataset)(root)
+    partition_integrity = _validate_formal_partition_integrity(
+        records, condition_order, strict_counts=True
+    )
+
+    tokenizer, model, device = (runtime_loader or _load_qualification_runtime)(root)
+    extractor = record_extractor or _run_qualification_forward
+
+    fit_reference_records = _formal_records_by_partition_role(
+        records, "FIT", "reference_form"
+    )
+    fit_realization_records = _formal_records_by_partition_role(
+        records, "FIT", "condition_realization"
+    )
+    diagnostic_records = _formal_records_by_partition_role(
+        records, "DIAGNOSTIC", "condition_realization"
+    )
+    eval_records = _formal_records_by_partition_role(
+        records, "EVAL", "condition_realization"
+    )
+
+    fit_reference_arrays, fit_reference_labels, _ = _extract_formal_group_arrays(
+        fit_reference_records,
+        tokenizer,
+        model,
+        device,
+        extractor,
+        ("block16_pre_final_rmsnorm",),
+    )
+    X_fit_reference = fit_reference_arrays["block16_pre_final_rmsnorm"]
+    classifier, reference_mean, reference_scale, _ = _fit_reference_readout(
+        X_fit_reference, fit_reference_labels
+    )
+
+    fit_realization_by_condition = _group_records_by_condition(
+        fit_realization_records, condition_order
+    )
+    diagnostic_by_condition = _group_records_by_condition(
+        diagnostic_records, condition_order
+    )
+    eval_by_condition = _group_records_by_condition(eval_records, condition_order)
+
+    condition_calibration: dict[str, dict[str, np.ndarray]] = {}
+    for condition in condition_order:
+        rows = fit_realization_by_condition[condition]
+        arrays, labels, _ = _extract_formal_group_arrays(
+            rows,
+            tokenizer,
+            model,
+            device,
+            extractor,
+            ("block27_pre_final_rmsnorm",),
+        )
+        if set(labels) != CLASS_UNIVERSE:
+            raise ProtocolIntegrityError("FORMAL_FIT_REALIZATION_LABELS_MISSING_CLASS")
+        mean, scale = _condition_calibration_stats(
+            arrays["block27_pre_final_rmsnorm"]
+        )
+        condition_calibration[condition] = {"mean": mean, "scale": scale}
+
+    s_diag: dict[str, float] = {}
+    diag_ba: dict[str, dict[str, float]] = {}
+    for condition in condition_order:
+        rows = diagnostic_by_condition[condition]
+        arrays, labels, _ = _extract_formal_group_arrays(
+            rows,
+            tokenizer,
+            model,
+            device,
+            extractor,
+            ("block16_pre_final_rmsnorm", "block27_pre_final_rmsnorm"),
+        )
+        a0_reference_pred = predict_with_classifier(
+            classifier,
+            transform_with_stats(
+                arrays["block16_pre_final_rmsnorm"],
+                reference_mean,
+                reference_scale,
+            ),
+        )
+        a0_final_pred = predict_with_classifier(
+            classifier,
+            transform_with_stats(
+                arrays["block27_pre_final_rmsnorm"],
+                reference_mean,
+                reference_scale,
+            ),
+        )
+        ba_a0_reference = _prediction_balanced_accuracy(labels, a0_reference_pred)
+        ba_a0_final = _prediction_balanced_accuracy(labels, a0_final_pred)
+        diag_ba[condition] = {
+            "A0_block16": ba_a0_reference,
+            "A0_block27": ba_a0_final,
+        }
+        s_diag[condition] = ba_a0_reference - ba_a0_final
+
+    g_eval: dict[str, float] = {}
+    g_mu: dict[str, float] = {}
+    g_sigma: dict[str, float] = {}
+    g_joint_over_mu: dict[str, float] = {}
+    g_joint_over_sigma: dict[str, float] = {}
+    eval_ba: dict[str, dict[str, float]] = {}
+    for condition in condition_order:
+        rows = eval_by_condition[condition]
+        arrays, labels, _ = _extract_formal_group_arrays(
+            rows,
+            tokenizer,
+            model,
+            device,
+            extractor,
+            ("block27_pre_final_rmsnorm",),
+        )
+        calibration = condition_calibration[condition]
+        predictions = calibration_condition_predictions(
+            arrays["block27_pre_final_rmsnorm"],
+            reference_mean,
+            reference_scale,
+            calibration["mean"],
+            calibration["scale"],
+            classifier,
+        )
+        ba_values = {
+            variant: _prediction_balanced_accuracy(labels, predictions[variant])
+            for variant in ("A0", "A_mu", "A_sigma", "A_mu_sigma")
+        }
+        eval_ba[condition] = ba_values
+        g_eval[condition] = ba_values["A_mu_sigma"] - ba_values["A0"]
+        g_mu[condition] = ba_values["A_mu"] - ba_values["A0"]
+        g_sigma[condition] = ba_values["A_sigma"] - ba_values["A0"]
+        g_joint_over_mu[condition] = (
+            ba_values["A_mu_sigma"] - ba_values["A_mu"]
+        )
+        g_joint_over_sigma[condition] = (
+            ba_values["A_mu_sigma"] - ba_values["A_sigma"]
+        )
+
+    reference_ba_by_condition: dict[str, float] = {}
+    for condition in condition_order:
+        rows = [
+            record
+            for record in fit_reference_records
+            if record["condition_id"] == condition
+        ]
+        arrays, labels, _ = _extract_formal_group_arrays(
+            rows,
+            tokenizer,
+            model,
+            device,
+            extractor,
+            ("block16_pre_final_rmsnorm",),
+        )
+        predictions = predict_with_classifier(
+            classifier,
+            transform_with_stats(
+                arrays["block16_pre_final_rmsnorm"],
+                reference_mean,
+                reference_scale,
+            ),
+        )
+        reference_ba_by_condition[condition] = _prediction_balanced_accuracy(
+            labels, predictions
+        )
+
+    s_values = _condition_ordered_metric(s_diag, condition_order)
+    g_values = _condition_ordered_metric(g_eval, condition_order)
+    permutation = exact_one_sided_permutation_p(s_values, g_values)
+    rho = float(permutation["rho"])
+    exact_p = float(permutation["p"])
+    supported = primary_support_rule(rho, exact_p)
+
+    descriptive_spearman = {
+        "s_diag_vs_g_mu": spearman_rho(
+            s_values, _condition_ordered_metric(g_mu, condition_order)
+        ),
+        "s_diag_vs_g_sigma": spearman_rho(
+            s_values, _condition_ordered_metric(g_sigma, condition_order)
+        ),
+    }
+
+    model_identity = _model_runtime_identity(model, device)
+    result = {
+        "schema_version": RESULT_SCHEMA_VERSION,
+        "experiment": EXPERIMENT,
+        "runner": {
+            "path": Path(__file__).relative_to(ROOT).as_posix(),
+            "sha256": _runner_sha256(),
+            "repository_commit": _repository_commit(root),
+        },
+        "model": {
+            "model_id": FORMAL_MODEL_NAME,
+            "snapshot": FORMAL_MODEL_SNAPSHOT,
+            "model_class": model_identity["model_class"],
+            "model_type": model_identity["model_type"],
+            "block_count": model_identity["block_count"],
+            "hidden_size": model_identity["hidden_size"],
+            "device": model_identity["device"],
+            "runtime_dtype": model_identity["runtime_dtype"],
+        },
+        "dataset": {
+            "path": FROZEN_DATASET_PATH.relative_to(ROOT).as_posix(),
+            "sha256": FROZEN_DATASET_SHA256,
+            "record_count": partition_integrity["record_count"],
+            "source_family_count": partition_integrity["source_family_count"],
+        },
+        "classes": list(CLASS_ORDER),
+        "primary": {
+            "scientific_unit": "condition",
+            "diagnostic": "S_diag(c)",
+            "outcome": "G_eval(c)",
+            "statistic": "Spearman_rho",
+            "rho": rho,
+            "alternative": "greater",
+            "exact_one_sided_p": exact_p,
+            "count_ge": int(permutation["count_ge"]),
+            "permutation_count": int(permutation["total"]),
+            "support_rule": SUPPORT_RULE,
+            "supported": supported,
+            "alpha": 0.05,
+        },
+        "condition_level": {
+            "condition_order": condition_order,
+            "s_diag": s_diag,
+            "g_eval": g_eval,
+            "g_mu": g_mu,
+            "g_sigma": g_sigma,
+            "g_joint_over_mu": g_joint_over_mu,
+            "g_joint_over_sigma": g_joint_over_sigma,
+            "diagnostic_balanced_accuracy": diag_ba,
+            "eval_balanced_accuracy": eval_ba,
+            "reference_balanced_accuracy": reference_ba_by_condition,
+        },
+        "secondary": {
+            "classification": "PRESPECIFIED_DESCRIPTIVE_ONLY",
+            "descriptive_spearman": descriptive_spearman,
+            "primary_unaffected": True,
+        },
+        "technical_validity": {"status": "VALID"},
+        "attempt_status": "FORMAL_RUN_ATTEMPT_COMPLETED",
+        "result_status": "FORMAL_RESULT",
+        "scientific_status": "FORMAL_ANALYSIS_COMPLETED",
+        "provenance": {
+            "run_attempt_id": run_attempt_id,
+            "authorization_id": authorization.get("authorization_id"),
+            "authorization_sha256": consumption.get("authorization_sha256"),
+            "consumption_record_sha256": consumption.get(
+                "consumption_record_sha256"
+            ),
+            "authorized_repository_commit": authorization.get(
+                "authorized_repository_commit"
+            ),
+            "authorized_runner_sha256": authorization.get(
+                "authorized_runner_sha256"
+            ),
+        },
+        "hidden_states_included": False,
+        "prompt_text_included": False,
+    }
+    validate_result_schema(result, formal=True)
+    return result
+
+
 def average_rank(data: Sequence[float]) -> list[float]:
     array = np.asarray(data, dtype=float)
     order = np.argsort(array, kind="mergesort")
@@ -1459,7 +1978,9 @@ def _execute_formal_after_consumption(
     consumption: Mapping[str, Any],
     run_attempt_id: str,
 ) -> dict[str, Any]:
-    raise TechnicalInvalidError("EXP024_FORMAL_RUNTIME_NOT_QUALIFIED_IN_098A")
+    return _execute_formal_analysis(
+        root, authorization, consumption, run_attempt_id
+    )
 
 
 def run_formal(
