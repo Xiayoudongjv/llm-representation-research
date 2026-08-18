@@ -1428,9 +1428,12 @@ def _verify_model_hook_qualification_artifact(root: Path = ROOT) -> dict[str, An
         raise ProtocolIntegrityError("EXP024_MODEL_HOOK_QUALIFICATION_EXPERIMENT_MISMATCH")
     if artifact.get("status") != "QUALIFICATION_PASSED":
         raise ProtocolIntegrityError("EXP024_MODEL_HOOK_QUALIFICATION_NOT_PASSED")
-    if artifact.get("model_name") != FORMAL_MODEL_NAME:
+    model = artifact.get("model")
+    if not isinstance(model, Mapping):
+        raise ProtocolIntegrityError("EXP024_MODEL_HOOK_QUALIFICATION_MODEL_METADATA_MISSING")
+    if model.get("model_name") != FORMAL_MODEL_NAME:
         raise ProtocolIntegrityError("EXP024_MODEL_HOOK_QUALIFICATION_MODEL_MISMATCH")
-    if artifact.get("model_snapshot") != FORMAL_MODEL_SNAPSHOT:
+    if model.get("model_snapshot") != FORMAL_MODEL_SNAPSHOT:
         raise ProtocolIntegrityError("EXP024_MODEL_HOOK_QUALIFICATION_SNAPSHOT_MISMATCH")
     return {
         "path": MODEL_HOOK_QUALIFICATION_PATH.relative_to(ROOT).as_posix(),

@@ -360,13 +360,34 @@ def test_stale_qualification_rejection(monkeypatch):
     assert "QUALIFICATION_SHA" in str(exc.value)
 
 
-def _write_qualification_artifact(root: Path, status: str) -> Path:
-    artifact = {
+_DEFAULT_QUALIFICATION_MODEL = {
+    "model_name": runner.FORMAL_MODEL_NAME,
+    "model_snapshot": runner.FORMAL_MODEL_SNAPSHOT,
+}
+_UNSET_MODEL = object()
+
+
+def _qualification_artifact(
+    status: str = "QUALIFICATION_PASSED",
+    model: object = _UNSET_MODEL,
+    top_level_model: bool = False,
+) -> dict[str, object]:
+    artifact: dict[str, object] = {
         "experiment": runner.EXPERIMENT,
         "status": status,
-        "model_name": runner.FORMAL_MODEL_NAME,
-        "model_snapshot": runner.FORMAL_MODEL_SNAPSHOT,
     }
+    if model is _UNSET_MODEL:
+        artifact["model"] = _DEFAULT_QUALIFICATION_MODEL
+    elif model is not None:
+        artifact["model"] = model
+    if top_level_model:
+        artifact["model_name"] = runner.FORMAL_MODEL_NAME
+        artifact["model_snapshot"] = runner.FORMAL_MODEL_SNAPSHOT
+    return artifact
+
+
+def _write_qualification_artifact(root: Path, status: str = "QUALIFICATION_PASSED", **kwargs: object) -> Path:
+    artifact = _qualification_artifact(status=status, **kwargs)
     path = root / runner.MODEL_HOOK_QUALIFICATION_PATH.relative_to(runner.ROOT)
     runner.write_json(path, artifact)
     return path
@@ -378,6 +399,8 @@ def test_qualification_status_contract_accepts_canonical(tmp_path):
     assert verified["path"] == "experiments/exp024/engineering/model_hook_qualification.json"
     assert verified["sha256"] == runner.sha256_file(path)
     assert verified["artifact"]["status"] == "QUALIFICATION_PASSED"
+    assert verified["artifact"]["model"]["model_name"] == runner.FORMAL_MODEL_NAME
+    assert verified["artifact"]["model"]["model_snapshot"] == runner.FORMAL_MODEL_SNAPSHOT
 
 
 @pytest.mark.parametrize(
@@ -389,6 +412,38 @@ def test_qualification_status_contract_rejects_noncanonical(tmp_path, status):
     with pytest.raises(runner.ProtocolIntegrityError) as exc:
         runner._verify_model_hook_qualification_artifact(tmp_path)
     assert "NOT_PASSED" in str(exc.value)
+
+
+@pytest.mark.parametrize(
+    "model",
+    [
+        {"model_name": "wrong/model", "model_snapshot": runner.FORMAL_MODEL_SNAPSHOT},
+        {"model_name": runner.FORMAL_MODEL_NAME, "model_snapshot": "wrong-snapshot"},
+        {"model_name": runner.FORMAL_MODEL_NAME},
+        {"model_snapshot": runner.FORMAL_MODEL_SNAPSHOT},
+        "not-an-object",
+    ],
+)
+def test_qualification_model_identity_contract_rejects_bad_nested(tmp_path, model):
+    _write_qualification_artifact(tmp_path, model=model)
+    with pytest.raises(runner.ProtocolIntegrityError) as exc:
+        runner._verify_model_hook_qualification_artifact(tmp_path)
+    message = str(exc.value)
+    assert any(
+        token in message
+        for token in (
+            "MODEL_MISMATCH",
+            "SNAPSHOT_MISMATCH",
+            "MODEL_METADATA_MISSING",
+        )
+    )
+
+
+def test_qualification_model_identity_rejects_top_level_fallback(tmp_path):
+    _write_qualification_artifact(tmp_path, model=None, top_level_model=True)
+    with pytest.raises(runner.ProtocolIntegrityError) as exc:
+        runner._verify_model_hook_qualification_artifact(tmp_path)
+    assert "MODEL_METADATA_MISSING" in str(exc.value)
 
 
 @pytest.mark.parametrize(
@@ -439,6 +494,31 @@ def test_synthetic_authorization_uses_only_permitted_fields(monkeypatch):
         lambda artifact: None,
     )
     assert runner._validate_formal_authorization(auth, runner.ROOT) == auth
+
+
+def test_formal_authorization_path_uses_canonical_nested_model(monkeypatch, tmp_path):
+    artifact = {
+        "experiment": runner.EXPERIMENT,
+        "status": "QUALIFICATION_PASSED",
+        "model": {
+            "model_name": runner.FORMAL_MODEL_NAME,
+            "model_snapshot": runner.FORMAL_MODEL_SNAPSHOT,
+        },
+        "runner_sha256": runner._runner_sha256(),
+        "frozen_manifest_sha256": runner.FROZEN_MANIFEST_SHA256,
+        "frozen_dataset_sha256": runner.FROZEN_DATASET_SHA256,
+        "preregistration_sha256": runner.FINAL_PREREGISTRATION_SHA256,
+    }
+    path = tmp_path / runner.MODEL_HOOK_QUALIFICATION_PATH.relative_to(runner.ROOT)
+    runner.write_json(path, artifact)
+    qualification_sha = runner.sha256_file(path)
+    auth = _authorization(qualification_sha=qualification_sha)
+    monkeypatch.setattr(
+        runner,
+        "_repository_commit",
+        lambda root=None: auth["authorized_repository_commit"],
+    )
+    assert runner._validate_formal_authorization(auth, tmp_path) == auth
 
 
 @pytest.mark.parametrize("field", sorted(runner.FORMAL_AUTHORIZATION_REQUIRED_FIELDS))
