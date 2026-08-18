@@ -43,7 +43,7 @@
   "primary_statistic": "Spearman_rho",
   "runner": {
     "path": "experiments/exp024/run_exp024.py",
-    "sha256": "07fd3dd2b9980a69f2e35a07245240b8ca7b61a50ca944392922499500239379"
+    "sha256": "4690115d2a322e8d89bfb3a21fa32e2c5ca758a26fa5e07c40df88af8648885e"
   },
   "scientific_outcome_access": false,
   "status": "PASS",

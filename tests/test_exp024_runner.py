@@ -360,6 +360,114 @@ def test_stale_qualification_rejection(monkeypatch):
     assert "QUALIFICATION_SHA" in str(exc.value)
 
 
+def _write_qualification_artifact(root: Path, status: str) -> Path:
+    artifact = {
+        "experiment": runner.EXPERIMENT,
+        "status": status,
+        "model_name": runner.FORMAL_MODEL_NAME,
+        "model_snapshot": runner.FORMAL_MODEL_SNAPSHOT,
+    }
+    path = root / runner.MODEL_HOOK_QUALIFICATION_PATH.relative_to(runner.ROOT)
+    runner.write_json(path, artifact)
+    return path
+
+
+def test_qualification_status_contract_accepts_canonical(tmp_path):
+    path = _write_qualification_artifact(tmp_path, "QUALIFICATION_PASSED")
+    verified = runner._verify_model_hook_qualification_artifact(tmp_path)
+    assert verified["path"] == "experiments/exp024/engineering/model_hook_qualification.json"
+    assert verified["sha256"] == runner.sha256_file(path)
+    assert verified["artifact"]["status"] == "QUALIFICATION_PASSED"
+
+
+@pytest.mark.parametrize(
+    "status",
+    ["QUALIFICATION_FAILED", "OPERATIONAL_FAILURE", "QUALIFIED", "ARBITRARY_STATUS"],
+)
+def test_qualification_status_contract_rejects_noncanonical(tmp_path, status):
+    _write_qualification_artifact(tmp_path, status)
+    with pytest.raises(runner.ProtocolIntegrityError) as exc:
+        runner._verify_model_hook_qualification_artifact(tmp_path)
+    assert "NOT_PASSED" in str(exc.value)
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("frozen_manifest_sha256", "c" * 64),
+        ("frozen_dataset_sha256", "d" * 64),
+        ("preregistration_sha256", "e" * 64),
+        ("model_name", "other/model"),
+        ("model_snapshot_identity", "other-revision"),
+    ],
+)
+def test_authorization_identity_binding_drift_rejected(monkeypatch, field, value):
+    auth = _authorization()
+    auth[field] = value
+    monkeypatch.setattr(
+        runner,
+        "_verify_model_hook_qualification_artifact",
+        lambda root=None: {"sha256": "b" * 64, "artifact": {}},
+    )
+    monkeypatch.setattr(
+        runner,
+        "_verify_model_hook_qualification_current",
+        lambda artifact: None,
+    )
+    with pytest.raises(runner.ProtocolIntegrityError) as exc:
+        runner._validate_formal_authorization(auth, runner.ROOT)
+    assert "BINDING_MISMATCH" in str(exc.value)
+
+
+def test_authorization_schema_minimal_and_fail_closed():
+    schema = runner.read_json(runner.AUTHORIZATION_SCHEMA_PATH)
+    assert schema["additionalProperties"] is False
+    assert set(schema["required"]) == runner.FORMAL_AUTHORIZATION_REQUIRED_FIELDS
+    assert set(schema["properties"]) == runner.FORMAL_AUTHORIZATION_REQUIRED_FIELDS
+
+
+def test_synthetic_authorization_uses_only_permitted_fields(monkeypatch):
+    auth = _authorization()
+    monkeypatch.setattr(
+        runner,
+        "_verify_model_hook_qualification_artifact",
+        lambda root=None: {"sha256": "b" * 64, "artifact": {}},
+    )
+    monkeypatch.setattr(
+        runner,
+        "_verify_model_hook_qualification_current",
+        lambda artifact: None,
+    )
+    assert runner._validate_formal_authorization(auth, runner.ROOT) == auth
+
+
+@pytest.mark.parametrize("field", sorted(runner.FORMAL_AUTHORIZATION_REQUIRED_FIELDS))
+def test_authorization_required_field_missing_rejected(field):
+    auth = _authorization()
+    del auth[field]
+    with pytest.raises(runner.ProtocolIntegrityError) as exc:
+        runner._validate_formal_authorization(auth, runner.ROOT)
+    assert "FIELDS_INVALID" in str(exc.value)
+
+
+def test_authorization_extra_field_rejected():
+    auth = _authorization()
+    auth["mode"] = "formal-run"
+    with pytest.raises(runner.ProtocolIntegrityError) as exc:
+        runner._validate_formal_authorization(auth, runner.ROOT)
+    assert "extra" in str(exc.value)
+
+
+@pytest.mark.parametrize(
+    "field",
+    ["mode", "qualification_storage_commit", "model_revision", "allowed_result_path"],
+)
+def test_task_illustrated_fields_not_required_by_production(field):
+    schema = runner.read_json(runner.AUTHORIZATION_SCHEMA_PATH)
+    assert field not in runner.FORMAL_AUTHORIZATION_REQUIRED_FIELDS
+    assert field not in schema["properties"]
+
+
 def test_authorization_consumption_is_single_use(tmp_path, monkeypatch):
     auth = _authorization()
     auth_path = tmp_path / "authorization.json"

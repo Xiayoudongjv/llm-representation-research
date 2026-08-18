@@ -273,3 +273,73 @@ SHA-256:
 
 Its status is `QUALIFICATION_FAILED` and it is not authorization-eligible
 evidence for the current or future runner.
+
+## 098C-PATCH Qualification Status Contract Alignment
+
+Task-098C exposed a producer/consumer qualification-status mismatch in the
+formal-run gate. The successful qualification producer and validator emit
+`QUALIFICATION_PASSED`, but the authorization consumer previously required
+`QUALIFIED`.
+
+- Canonical success status: `QUALIFICATION_PASSED`
+- Old consumer expectation: `QUALIFIED`
+- Corrected consumer expectation: `QUALIFICATION_PASSED`
+
+The production qualification artifact is not relabeled. Legacy
+`QUALIFIED` is not accepted as an ambiguous second success spelling.
+
+### Authorization Schema Contract Audit
+
+The committed authorization schema was compared with the production loader,
+schema validator, binding validator, consumption path, and formal-run
+entrypoint. `additionalProperties` remains `false`, and no schema change was
+required.
+
+Required production authorization bindings:
+
+| Authorization field | Production consumer | Purpose |
+| --- | --- | --- |
+| `schema_version` | `_validate_formal_authorization` | Exact contract version |
+| `experiment` | `_validate_formal_authorization` | Experiment isolation |
+| `authorization_id` | `_validate_formal_authorization`, consumption record | Stable authorization identity |
+| `single_use` | `_validate_formal_authorization` | Enforce one-time semantics |
+| `authorized_repository_commit` | `_validate_formal_authorization` | Runner provenance |
+| `authorized_runner_sha256` | `_validate_formal_authorization` | Fail-closed runner binding |
+| `frozen_manifest_sha256` | `_validate_formal_authorization` | Frozen authority binding |
+| `frozen_dataset_sha256` | `_validate_formal_authorization` | Frozen dataset binding |
+| `preregistration_sha256` | `_validate_formal_authorization` | Frozen preregistration binding |
+| `model_name` | `_validate_formal_authorization` | Model identity binding |
+| `model_snapshot_identity` | `_validate_formal_authorization` | Exact model revision binding |
+| `model_hook_qualification_sha256` | `_validate_formal_authorization` | Exact qualification evidence binding |
+| `canonical_result_path` | `_validate_formal_authorization` | Expected result destination binding |
+| `authorization_created_at_utc` | `_validate_formal_authorization` | Authorization provenance |
+
+The illustrated task-prompt fields are not required directly:
+
+- `mode`: `NOT_REQUIRED`. The runner CLI mode is not part of the authorization
+  payload.
+- `qualification_storage_commit`: `NOT_REQUIRED` directly. Qualification
+  content SHA is the primary authorization binding; storage commit remains
+  provenance metadata outside the authorization.
+- `model_revision`: `NOT_REQUIRED` directly. The chain
+  authorization -> qualification SHA -> qualification artifact -> exact
+  `model_snapshot` is enforced fail-closed.
+- `allowed_result_path`: `NOT_REQUIRED` directly. Production has a single
+  hard-coded `CANONICAL_RESULT_PATH`, and authorization binds the same path;
+  no authorization content can redirect result publication.
+
+### Post-Patch Qualification Evidence
+
+The pre-patch successful qualification artifact
+`experiments/exp024/engineering/model_hook_qualification.json` remains
+historical evidence for the old runner SHA. After this runner-source patch it
+is not authorization-eligible for the new runner and must be replaced by a
+fresh real qualification.
+
+```text
+OLD_SUCCESSFUL_QUALIFICATION_AUTHORIZATION_ELIGIBLE_FOR_NEW_RUNNER = false
+```
+
+No model/tokenizer load, formal-data inference, scientific calculation,
+authorization creation, authorization consumption, or formal result was
+performed by this patch.

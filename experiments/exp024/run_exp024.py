@@ -1426,8 +1426,8 @@ def _verify_model_hook_qualification_artifact(root: Path = ROOT) -> dict[str, An
     artifact = read_json(path)
     if artifact.get("experiment") != EXPERIMENT:
         raise ProtocolIntegrityError("EXP024_MODEL_HOOK_QUALIFICATION_EXPERIMENT_MISMATCH")
-    if artifact.get("status") != "QUALIFIED":
-        raise ProtocolIntegrityError("EXP024_MODEL_HOOK_QUALIFICATION_NOT_QUALIFIED")
+    if artifact.get("status") != "QUALIFICATION_PASSED":
+        raise ProtocolIntegrityError("EXP024_MODEL_HOOK_QUALIFICATION_NOT_PASSED")
     if artifact.get("model_name") != FORMAL_MODEL_NAME:
         raise ProtocolIntegrityError("EXP024_MODEL_HOOK_QUALIFICATION_MODEL_MISMATCH")
     if artifact.get("model_snapshot") != FORMAL_MODEL_SNAPSHOT:
