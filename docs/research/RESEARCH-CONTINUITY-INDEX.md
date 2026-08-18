@@ -459,3 +459,24 @@ authorized.
 - `PAPER_A_SUBMISSION_READINESS = ONE_TARGETED_FOLLOWUP_RECOMMENDED`
 - `ONE_TARGETED_FOLLOWUP_RECOMMENDED = true`
 - New prospective hypothesis: `HYP_CALIBRATION_CONDITIONAL_002`
+
+## Paper-A manuscript-planning assets
+
+Status: `NON-AUTHORITATIVE_DERIVED_FROM_CANONICAL_EVIDENCE`
+
+Paper planning files are derived from canonical experiment results and research
+ledgers. They must never outrank experiment results, claim statuses, or
+hypothesis state.
+
+- First-draft scaffold: `docs/paper/PAPER-A-FIRST-DRAFT-SCAFFOLD.md`
+- Claim-evidence matrix: `docs/paper/PAPER-A-CLAIM-EVIDENCE-MATRIX.md`
+- Figure plan: `docs/paper/PAPER-A-FIGURE-PLAN.md`
+- Paper status: `docs/paper/PAPER-A-STATUS.md`
+
+Paper-A architecture state:
+
+- `PAPER_A_CORE_CLAIM_STATUS = SUPPORTED_WITH_SCOPE_LIMITATIONS`
+- `PAPER_A_DRAFT_READINESS = START_FIRST_DRAFT_NOW`
+- `PAPER_A_SUBMISSION_READINESS = ONE_TARGETED_FOLLOWUP_RECOMMENDED`
+- `ONE_TARGETED_FOLLOWUP_SLOT_RESERVED = true`
+- `PRIOR_ART_SEARCH_REQUIRED = true`
