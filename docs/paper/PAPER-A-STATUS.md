@@ -71,3 +71,31 @@ Choose between:
   `HYP_CALIBRATION_CONDITIONAL_002`.
 
 Do not create EXP-024 or run new models in Task 097A.
+
+## Follow-Up Design
+
+- `FOLLOWUP_DESIGN_STATUS = SELECTED_NOT_FROZEN`
+- `SELECTED_FOLLOWUP_DESIGN = B`
+- Design draft: `docs/experiments/EXP-024-DESIGN-DRAFT.md`
+- Prior-art gap note: `docs/paper/PAPER-A-PRIOR-ART-GAP-NOTE.md`
+
+Selected evidence gap:
+
+> Can a condition-level fixed-readout degradation diagnostic estimated on
+> independent DIAGNOSTIC source families predict FIT-only featurewise
+> recalibration benefit on source-family-independent EVAL families?
+
+Design-level decisions:
+
+- `PRIMARY_SCIENTIFIC_UNIT = condition/panel`
+- `SECOND_MODEL_REQUIRED = false`
+- `DIAGNOSTIC_EVAL_INDEPENDENCE = PASS`
+- `ALGEBRAIC_SHARED_A0_PRIMARY_ANALYSIS = false`
+- Primary diagnostic: `D_diag_cond = BA_A0_diag(block27-pre) - BA_A0_diag(block16-pre)`
+- Primary confirmatory endpoint:
+  `G_eval_cond = BA_A_mu_sigma_EVAL(block27-pre) - BA_A0_EVAL(block27-pre)`
+- `EXP024_DESIGN_DRAFT_CREATED = true`
+- `EXP024_PREREGISTRATION_FROZEN = false`
+
+`PAPER_A_DRAFT_READINESS` remains `START_FIRST_DRAFT_NOW`. Prose drafting may
+continue in parallel with Task-097C dataset/protocol design.

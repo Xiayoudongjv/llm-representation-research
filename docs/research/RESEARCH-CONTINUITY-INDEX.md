@@ -460,6 +460,23 @@ authorized.
 - `ONE_TARGETED_FOLLOWUP_RECOMMENDED = true`
 - New prospective hypothesis: `HYP_CALIBRATION_CONDITIONAL_002`
 
+## Task-097B Paper-A prior-art positioning and follow-up selection
+
+- Status = `PAPER_A_097B_PRIOR_ART_AND_FOLLOWUP_DESIGN_COMPLETE`
+- `PRIOR_ART_TARGETED_REVIEW_COMPLETE = true`
+- `TUNED_LENS_POSITIONING_COMPLETE = true`
+- `MODEL_STITCHING_POSITIONING_COMPLETE = true`
+- `AFFINE_ALIGNMENT_NOVELTY_CLAIM = NOT_CLAIMED`
+- `SELECTED_FOLLOWUP_DESIGN = B`
+- `PRIMARY_SCIENTIFIC_UNIT = condition/panel`
+- `SECOND_MODEL_REQUIRED = false`
+- `DIAGNOSTIC_EVAL_INDEPENDENCE = PASS`
+- `ALGEBRAIC_SHARED_A0_PRIMARY_ANALYSIS = false`
+- `EXP024_DESIGN_DRAFT_CREATED = true`
+- `EXP024_PREREGISTRATION_FROZEN = false`
+- `NEW_DATASET_CREATED = false`
+- `MODEL_RUN_PERFORMED = false`
+
 ## Paper-A manuscript-planning assets
 
 Status: `NON-AUTHORITATIVE_DERIVED_FROM_CANONICAL_EVIDENCE`
@@ -472,6 +489,11 @@ hypothesis state.
 - Claim-evidence matrix: `docs/paper/PAPER-A-CLAIM-EVIDENCE-MATRIX.md`
 - Figure plan: `docs/paper/PAPER-A-FIGURE-PLAN.md`
 - Paper status: `docs/paper/PAPER-A-STATUS.md`
+- Prior-art gap note: `docs/paper/PAPER-A-PRIOR-ART-GAP-NOTE.md`
+
+Non-authoritative derived experimental-design assets:
+
+- EXP-024 design draft: `docs/experiments/EXP-024-DESIGN-DRAFT.md`
 
 Paper-A architecture state:
 
