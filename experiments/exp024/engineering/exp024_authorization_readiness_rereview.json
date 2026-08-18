@@ -1,0 +1,72 @@
+{
+  "schema_version": "1.0.0",
+  "experiment": "EXP-024",
+  "review_type": "AUTHORIZATION_READINESS_NARROW_REREVIEW",
+  "review_timestamp_utc": "2026-08-18T15:37:04+00:00",
+  "entry_head": "f531fabfb9201800e1cd4fcbf1775cca096cf8a7",
+  "entry_origin_main": "f531fabfb9201800e1cd4fcbf1775cca096cf8a7",
+  "formal_runtime_commit": "fbd2448dfb3505763f0dfbbe2186502b60489a41",
+  "qualification_storage_commit": "f531fabfb9201800e1cd4fcbf1775cca096cf8a7",
+  "final_verdict": "READY_FOR_SINGLE_USE_FORMAL_AUTHORIZATION",
+  "frozen_authorities": {
+    "preregistration_sha256": "55f9604d904fd389da28c6214082028faca081f7e3a0c87c8ba8d961f792d810",
+    "dataset_sha256": "46c832b68b6ac95704bf5143badc1431627d7f935648842a78971491b13ee404",
+    "condition_panel_sha256": "a3b8d565a94ef6041fbe6a29d73102ab4156cc19cfc07ccaeb06206d589f7954",
+    "data_schema_sha256": "e27c33c864c6305522aec0c92839634fb5885aeb50099372b9bf46da7f2fe3ec",
+    "manifest_sha256": "1409a33e300463067ffc060afa58ceb238fda8d6dc2479563c886a8474748f59",
+    "model_name": "Qwen/Qwen3-1.7B",
+    "model_snapshot": "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e"
+  },
+  "frozen_authority_modified_flags": {
+    "preregistration_modified": false,
+    "dataset_modified": false,
+    "condition_panel_modified": false,
+    "data_schema_modified": false
+  },
+  "original_formal_placeholder_closed": true,
+  "production_formal_call_graph": "PASS",
+  "authorization_consumption_order": "PASS",
+  "post_consumption_runtime_structurally_executable": true,
+  "repeat_use_protection": "PASS",
+  "formal_hook_path_covered_by_qualification": true,
+  "qualification": {
+    "artifact_path": "experiments/exp024/engineering/model_hook_qualification.json",
+    "sha256": "72e7f48d68a022819cfed5045061af5b0d6d84de659a49e056487b9d20da8d8f",
+    "status": "QUALIFICATION_PASSED",
+    "qualified_runner_commit": "fbd2448dfb3505763f0dfbbe2186502b60489a41",
+    "standalone_validator": "PASS",
+    "production_qualification_verifier": "PASS",
+    "authorization_path_dry_verify": "PASS",
+    "current_qualification_unambiguous": true
+  },
+  "runner": {
+    "path": "experiments/exp024/run_exp024.py",
+    "sha256": "6416e278bb6836b8751967e619bf7e8b3d2b3a3180dce814ec068b50c386615f",
+    "bytes_unchanged_after_qualification_storage": true
+  },
+  "commit_binding_semantics": "authorized_repository_commit must equal current repository HEAD; authorized_runner_sha256 must equal current runner SHA-256; qualification storage commit is not directly required, while model_hook_qualification_sha256 binds the canonical qualification content.",
+  "primary_analysis_binding": "PASS",
+  "posthoc_primary_escape_hatch": "NONE",
+  "fit_diag_eval_dataflow": "PASS",
+  "focused_tests": "98 passed, 4 warnings",
+  "result_publication_gate": "PASS",
+  "preexisting_state": {
+    "formal_authorization_exists": false,
+    "authorization_consumption_exists": false,
+    "canonical_formal_result_exists": false
+  },
+  "authorization_schema_ready": "PASS",
+  "task098d_authorization_binding_instruction": "Set authorized_repository_commit to the exact HEAD produced by this R2 review commit; keep authorized_runner_sha256 6416e278bb6836b8751967e619bf7e8b3d2b3a3180dce814ec068b50c386615f and model_hook_qualification_sha256 72e7f48d68a022819cfed5045061af5b0d6d84de659a49e056487b9d20da8d8f.",
+  "scientific_non_execution": {
+    "model_load_performed": false,
+    "tokenizer_load_performed": false,
+    "formal_dataset_text_used": false,
+    "scientific_endpoint_computed": false,
+    "formal_authorization_created": false,
+    "formal_authorization_consumed": false,
+    "formal_run_performed": false,
+    "formal_result_created": false,
+    "scientific_outcome_observed": false
+  },
+  "blockers": []
+}
