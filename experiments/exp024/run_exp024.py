@@ -397,6 +397,12 @@ def extract_block_hidden_state(output: Any) -> Any:
 class ForwardHookCapture:
     _captured: Any = None
     _capture_count: int = 0
+    owned_handle_ids: list[int] = None
+    target_module: Any = None
+    foreign_hooks_before: int = 0
+    foreign_hooks_after: int = 0
+    exp024_hooks_remaining: int = 0
+    cleanup_verified: bool | None = None
 
     def record(self, output: Any) -> None:
         if self._capture_count:
@@ -419,6 +425,12 @@ class ForwardHookCapture:
     def clear(self) -> None:
         self._captured = None
         self._capture_count = 0
+        self.owned_handle_ids = []
+        self.target_module = None
+        self.foreign_hooks_before = 0
+        self.foreign_hooks_after = 0
+        self.exp024_hooks_remaining = 0
+        self.cleanup_verified = None
 
 
 def make_block_output_hook(capture: ForwardHookCapture):
@@ -426,6 +438,7 @@ def make_block_output_hook(capture: ForwardHookCapture):
         capture.record(output)
         return None
 
+    setattr(hook, "_exp024_owned_hook", True)
     return hook
 
 
@@ -437,12 +450,20 @@ def block27_pre_final_rmsnorm_hook(capture: ForwardHookCapture):
 def block_output_hook_capture(module: Any, capture: ForwardHookCapture | None = None):
     capture = capture if capture is not None else ForwardHookCapture()
     capture.clear()
+    capture.target_module = module
+    capture.foreign_hooks_before = _module_hook_count(module)
     hook = make_block_output_hook(capture)
     handle = module.register_forward_hook(hook)
+    capture.owned_handle_ids = [handle.id]
     try:
         yield capture
     finally:
         handle.remove()
+        capture.foreign_hooks_after = _module_hook_count(module)
+        capture.exp024_hooks_remaining = _exp024_owned_hooks_remaining(
+            module, capture.owned_handle_ids
+        )
+        capture.cleanup_verified = capture.exp024_hooks_remaining == 0
 
 
 def extract_checkpoint_tensors(
@@ -641,6 +662,9 @@ def _run_qualification_forward(
         "attention_mask": attention_mask,
         "representations": representations,
         "hook_firing_count": capture.count,
+        "hook_cleanup_verified": capture.cleanup_verified,
+        "exp024_hooks_remaining": capture.exp024_hooks_remaining,
+        "foreign_hooks_remaining": capture.foreign_hooks_after,
     }
 
 
@@ -667,6 +691,11 @@ def _representations_match(
 
 def _module_hook_count(module: Any) -> int:
     return len(getattr(module, "_forward_hooks", {}) or {})
+
+
+def _exp024_owned_hooks_remaining(module: Any, handle_ids: Sequence[int]) -> int:
+    forward_hooks = getattr(module, "_forward_hooks", {}) or {}
+    return sum(1 for hook_id in handle_ids if hook_id in forward_hooks)
 
 
 def _all_checks_passed(checks: Mapping[str, Any]) -> bool:
@@ -744,6 +773,9 @@ def build_model_hook_qualification_result(
     token_entries: list[dict[str, Any]] = []
     representation_entries: list[dict[str, Any]] = []
     hook_firing_counts: list[int] = []
+    hook_cleanup_verified: list[bool] = []
+    exp024_hooks_remaining: list[int] = []
+    foreign_hooks_remaining: list[int] = []
     first_representations: dict[str, np.ndarray] | None = None
 
     for index, text in enumerate(NEUTRAL_QUALIFICATION_INPUTS):
@@ -768,6 +800,9 @@ def build_model_hook_qualification_result(
             }
         )
         hook_firing_counts.append(forward["hook_firing_count"])
+        hook_cleanup_verified.append(bool(forward["hook_cleanup_verified"]))
+        exp024_hooks_remaining.append(int(forward["exp024_hooks_remaining"]))
+        foreign_hooks_remaining.append(int(forward["foreign_hooks_remaining"]))
         if index == 0:
             first_representations = forward["representations"]
 
@@ -779,9 +814,13 @@ def build_model_hook_qualification_result(
         first_representations,
         repeat_forward["representations"],
     )
+    hook_cleanup_verified.append(bool(repeat_forward["hook_cleanup_verified"]))
+    exp024_hooks_remaining.append(int(repeat_forward["exp024_hooks_remaining"]))
+    foreign_hooks_remaining.append(int(repeat_forward["foreign_hooks_remaining"]))
 
-    block27 = model.model.layers[27]
-    hook_cleanup = _module_hook_count(block27) == 0
+    hook_cleanup = all(hook_cleanup_verified) and all(
+        remaining == 0 for remaining in exp024_hooks_remaining
+    )
     all_checkpoints = [
         checkpoint
         for entry in representation_entries
@@ -829,6 +868,10 @@ def build_model_hook_qualification_result(
             "tokenization": token_entries,
             "checkpoints": representation_entries,
             "hook_firing_counts": hook_firing_counts,
+            "hook_cleanup_diagnostics": {
+                "exp024_hooks_remaining": exp024_hooks_remaining,
+                "foreign_hooks_remaining": foreign_hooks_remaining,
+            },
             "repeatability": repeatability_details,
             "checks": checks,
         }

@@ -134,6 +134,9 @@ def _fake_forward(tokenizer, model, device, text):
             for index, name in enumerate(runner.QUALIFICATION_CHECKPOINT_NAMES)
         },
         "hook_firing_count": 1,
+        "hook_cleanup_verified": True,
+        "exp024_hooks_remaining": 0,
+        "foreign_hooks_remaining": 0,
     }
     monkeypatch.setattr(
         runner,
@@ -555,6 +558,12 @@ class SyntheticBlock(torch.nn.Module):
         return value * 2
 
 
+class ForeignCreatingBlock(torch.nn.Module):
+    def forward(self, value):
+        self.foreign_handle = self.register_forward_hook(lambda module, args, output: None)
+        return value * 2
+
+
 def test_block_hook_capture_and_cleanup():
     module = SyntheticBlock()
     capture = runner.ForwardHookCapture()
@@ -572,6 +581,63 @@ def test_block_hook_cleanup_on_failure():
         with runner.block_output_hook_capture(module, capture):
             raise RuntimeError("boom")
     assert runner._module_hook_count(module) == 0
+
+
+def test_foreign_preexisting_hook_is_preserved():
+    module = SyntheticBlock()
+    foreign_handle = module.register_forward_hook(lambda module, args, output: None)
+    capture = runner.ForwardHookCapture()
+    with runner.block_output_hook_capture(module, capture):
+        module(torch.ones(2, 3))
+    assert foreign_handle.id in module._forward_hooks
+    assert capture.cleanup_verified is True
+    assert capture.exp024_hooks_remaining == 0
+    assert capture.foreign_hooks_after == 1
+    foreign_handle.remove()
+
+
+def test_foreign_runtime_hook_does_not_fail_cleanup():
+    module = ForeignCreatingBlock()
+    capture = runner.ForwardHookCapture()
+    with runner.block_output_hook_capture(module, capture):
+        module(torch.ones(2, 3))
+    assert module.foreign_handle.id in module._forward_hooks
+    assert runner._module_hook_count(module) == 1
+    assert capture.cleanup_verified is True
+    assert capture.exp024_hooks_remaining == 0
+    module.foreign_handle.remove()
+
+
+def test_owned_hook_leak_is_detected():
+    module = SyntheticBlock()
+    capture = runner.ForwardHookCapture()
+    handle = module.register_forward_hook(runner.make_block_output_hook(capture))
+    remaining = runner._exp024_owned_hooks_remaining(module, [handle.id])
+    assert remaining == 1
+    assert (remaining == 0) is False
+    handle.remove()
+
+
+def test_block_hook_cleanup_on_validation_failure():
+    module = SyntheticBlock()
+    capture = runner.ForwardHookCapture()
+    with pytest.raises(ValueError):
+        with runner.block_output_hook_capture(module, capture):
+            module(torch.ones(2, 3))
+            raise ValueError("activation validation failure")
+    assert runner._module_hook_count(module) == 0
+    assert capture.cleanup_verified is True
+    assert capture.exp024_hooks_remaining == 0
+
+
+def test_repeated_extraction_does_not_accumulate_owned_hooks():
+    module = SyntheticBlock()
+    for _ in range(2):
+        capture = runner.ForwardHookCapture()
+        with runner.block_output_hook_capture(module, capture):
+            module(torch.ones(2, 3))
+        assert capture.cleanup_verified is True
+        assert runner._module_hook_count(module) == 0
 
 
 def test_extraction_materializes_float32_finite():

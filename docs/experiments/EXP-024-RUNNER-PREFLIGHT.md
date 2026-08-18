@@ -244,3 +244,32 @@ the no-clobber atomic write.
 
 No real model, tokenizer, hidden state, or formal dataset inference was
 executed by this patch task.
+
+## Hook-Ownership Cleanup Correction
+
+The first real Task-098B qualification exposed a false-positive cleanup
+criterion. All runtime checks passed except `hook_cleanup`.
+
+Old criterion:
+
+`target module total forward hooks after qualification == 0`
+
+Correct criterion:
+
+`all EXP-024-owned hook handles removed`
+
+Transformers may legitimately install and retain its own internal
+`output_capturing_hook` on `model.model.layers[27]` after a forward pass with
+`output_hidden_states=True`. Such foreign hooks are not EXP-024 state and must
+not be removed by EXP-024 qualification.
+
+The historical failed qualification artifact remains:
+
+`experiments/exp024/engineering/model_hook_qualification.json`
+
+SHA-256:
+
+`b46e9b78a7ae8f8725d86f52f0dc4fae61be6fce8025de1d661954e6d469f0c8`
+
+Its status is `QUALIFICATION_FAILED` and it is not authorization-eligible
+evidence for the current or future runner.
