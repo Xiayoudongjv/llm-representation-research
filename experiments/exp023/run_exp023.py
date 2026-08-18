@@ -55,7 +55,7 @@ HISTORICAL_EXCLUSION_SHA256 = (
 CANONICAL_RESULT_PATH = EXP_DIR / "results" / "exp023_results.json"
 PREFLIGHT_PATH = EXP_DIR / "engineering" / "runner_preflight.json"
 MODEL_HOOK_QUALIFICATION_PATH = (
-    EXP_DIR / "engineering" / "model_hook_qualification.json"
+    EXP_DIR / "engineering" / "model_hook_qualification_post_patch.json"
 )
 FORMAL_MODEL_NAME = "Qwen/Qwen3-1.7B"
 FORMAL_MODEL_SNAPSHOT = "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e"
@@ -1531,6 +1531,7 @@ def _validate_formal_authorization(
     qualification = _verify_model_hook_qualification_artifact(root)
     if authorization["model_hook_qualification_sha256"] != qualification["sha256"]:
         raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_QUALIFICATION_SHA_BINDING_MISMATCH")
+    _verify_model_hook_qualification_current(qualification["artifact"])
     return authorization
 
 
@@ -1547,7 +1548,20 @@ def _verify_model_hook_qualification_artifact(root: Path = ROOT) -> dict[str, An
         raise ProtocolIntegrityError("EXP023_MODEL_HOOK_QUALIFICATION_MODEL_MISMATCH")
     if artifact.get("model_snapshot") != FORMAL_MODEL_SNAPSHOT:
         raise ProtocolIntegrityError("EXP023_MODEL_HOOK_QUALIFICATION_SNAPSHOT_MISMATCH")
-    return {"path": str(MODEL_HOOK_QUALIFICATION_PATH.relative_to(ROOT)), "sha256": _sha256(path)}
+    return {
+        "path": MODEL_HOOK_QUALIFICATION_PATH.relative_to(ROOT).as_posix(),
+        "sha256": _sha256(path),
+        "artifact": artifact,
+    }
+
+
+def _verify_model_hook_qualification_current(artifact: Mapping[str, Any]) -> None:
+    if artifact.get("runner_sha256") != _runner_sha256():
+        raise ProtocolIntegrityError("EXP023_MODEL_HOOK_QUALIFICATION_RUNNER_STALE")
+    if artifact.get("frozen_preregistration_sha256") != FROZEN_PREREGISTRATION_SHA256:
+        raise ProtocolIntegrityError("EXP023_MODEL_HOOK_QUALIFICATION_PREREGISTRATION_STALE")
+    if artifact.get("frozen_dataset_sha256") != DATASET_SHA256:
+        raise ProtocolIntegrityError("EXP023_MODEL_HOOK_QUALIFICATION_DATASET_STALE")
 
 
 def _pre_consumption_static_checks(

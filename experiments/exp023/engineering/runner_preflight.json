@@ -7,7 +7,7 @@
   "static_preflight": {
     "canonical_result_present": false,
     "classification": "ENGINEERING_STATIC_PREFLIGHT_ONLY",
-    "created_at": "2026-08-17T17:09:13.141727+00:00",
+    "created_at": "2026-08-18T00:20:22.937728+00:00",
     "dataset_structural_validation": "PASS",
     "formal_prompt_text_accessed": false,
     "formal_run_authorized": false,
@@ -125,7 +125,7 @@
       "technical_failure_evidence": true
     },
     "runner_path": "experiments\\exp023\\run_exp023.py",
-    "runner_sha256": "c774837702944b6dea47f1f97a5c8cc4a934d7b58b28c8127ab92b1768ae3f52",
+    "runner_sha256": "9c8d5e10ac1ad6f349c9daf26571ec1a49d0241487122bc934a7e47903f82e0b",
     "scientific_result_created": false,
     "staging_result_present": false,
     "status": "EXP023_STATIC_PREFLIGHT_PASS",
@@ -138,7 +138,7 @@
   },
   "synthetic_preflight": {
     "classification": "ENGINEERING_SYNTHETIC_PREFLIGHT_ONLY",
-    "created_at": "2026-08-17T17:09:13.464562+00:00",
+    "created_at": "2026-08-18T00:20:23.269361+00:00",
     "cross_split_synthesis": {
       "G_cal": "NO_REPLICATION"
     },

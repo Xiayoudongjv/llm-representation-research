@@ -181,6 +181,34 @@ model-hook runtime correctness.
   created.
 - Next step: `TASK 096C-R` short final production-readiness confirmation.
 
+## Formal Qualification Authority Binding Patch
+
+- 096C-R blocker: formal path still selected the historical
+  `model_hook_qualification.json` instead of the post-patch qualification
+  authority.
+- Historical path defect: `MODEL_HOOK_QUALIFICATION_PATH` resolved to
+  `experiments/exp023/engineering/model_hook_qualification.json`.
+- Canonical formal qualification path now resolves to:
+  `experiments/exp023/engineering/model_hook_qualification_post_patch.json`.
+- Historical qualification is no longer formally selectable and has no
+  automatic fallback.
+- Existing post-patch qualification SHA
+  `0fcca22202624d8f0bdc697f13f3c3322af137b0d22417f6d95eea28929aa0a8`
+  is now `STALE_AFTER_QUALIFICATION_BINDING_RUNNER_PATCH` solely because this
+  patch changed the runner.
+- Qualification-binding-patched runner SHA-256:
+  `9c8d5e10ac1ad6f349c9daf26571ec1a49d0241487122bc934a7e47903f82e0b`.
+- Static preflight: `PASS`.
+- Synthetic preflight: `PASS`.
+- Focused EXP-023 tests: `59 passed`.
+- Full regression: `693 passed, 2 skipped, 2 failed`, known legacy
+  EXP-022A result-collision failures only.
+- No model/tokenizer load, no formal data inference, and no scientific
+  execution in this patch task.
+- Current formally usable qualification: `NONE_PENDING_REQUALIFICATION`.
+- Next required step: `TASK 096B-R2` minimal real model/hook requalification
+  for the qualification-binding-patched runner.
+
 ## Boundary
 
 - `MODEL_LOAD_PERFORMED = true`
@@ -190,14 +218,15 @@ model-hook runtime correctness.
 - `FORMAL_BOOTSTRAP_PERFORMED = false`
 - `EXP023_MODEL_HOOK_ENGINEERING_QUALIFIED = true`
 - `EXP023_MODEL_HOOK_ENGINEERING_REQUALIFIED = true`
+- `EXP023_CURRENT_FORMALLY_USABLE_QUALIFICATION = NONE_PENDING_REQUALIFICATION`
 - `EXP023_SCIENTIFIC_RESULT_CREATED = false`
 - `EXP023_OUTCOME_OBSERVED = false`
 - `EXP023_FORMAL_RUN_AUTHORIZED = false`
 
 ## Next required step
 
-`TASK 096C-R`: run one short production-readiness confirmation limited to
-the patched blocker, new qualification binding, unchanged prior PASS
-findings, and absence of formal data/science. If that passes, issue one new
-single-use EXP-023 formal authorization and launch exactly once. Do not
-issue a formal authorization or launch EXP-023 from this requalification.
+`TASK 096B-R2`: run a minimal real model/hook requalification for the
+qualification-binding-patched runner. After that, run the ultra-short
+`TASK 096C-R2` verification. Only if that passes may EXP-023 receive one
+single-use formal authorization and one launch. Do not authorize or launch
+from this binding patch.
