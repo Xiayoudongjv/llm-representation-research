@@ -1,6 +1,8 @@
 # Paper-A Status
 
-Status: `PAPER_A_097A_EVIDENCE_ARCHITECTURE_AND_DRAFT_SCAFFOLD_COMPLETE`
+Status: `PAPER_A_099A_FIRST_FULL_DRAFT_CREATED`
+
+Previous planning status: `PAPER_A_097A_EVIDENCE_ARCHITECTURE_AND_DRAFT_SCAFFOLD_COMPLETE`
 
 This file records manuscript-planning state only. It is not scientific
 authority and must never outrank canonical experiment results or the claim
@@ -8,10 +10,22 @@ ledger.
 
 ## Draft Readiness
 
-- `PAPER_A_DRAFT_READINESS = START_FIRST_DRAFT_NOW`
+- `PAPER_A_DRAFT_READINESS = FIRST_FULL_DRAFT_CREATED`
 
 Rationale: the evidence chain supports a coherent bounded manuscript with
 visible negative and heterogeneous results.
+
+## Task 099A Status
+
+- `FIRST_FULL_DRAFT_CREATED = true`
+- `SCIENTIFIC_STORY_STABLE = mostly_true`
+- `CORE_CLAIM_SCOPE_LOCKED = true`
+- `PRIOR_ART_POSITIONING_COMPLETE = false`
+- `FIGURES_READY = false`
+- `TABLES_READY = false`
+- `REFERENCES_VERIFIED = false`
+- `SUBMISSION_READY = false`
+- `NEXT_HIGHEST_PRIORITY_GAP = adversarial scientific manuscript review before revision`
 
 ## Submission Readiness
 
@@ -62,14 +76,15 @@ No acceptance probabilities are assigned.
 ## Current Files
 
 - Scaffold: `docs/paper/PAPER-A-FIRST-DRAFT-SCAFFOLD.md`
+- Full draft: `docs/paper/PAPER-A-FIRST-FULL-DRAFT.md`
 - Claim matrix: `docs/paper/PAPER-A-CLAIM-EVIDENCE-MATRIX.md`
 - Figure plan: `docs/paper/PAPER-A-FIGURE-PLAN.md`
 - Status: `docs/paper/PAPER-A-STATUS.md`
 
 ## Next Step
 
-Proceed to `Task 097A-W`: begin the actual Paper-A prose draft with the
-bounded story and the EXP-024 negative primary explicitly visible.
+Proceed to `Task 099B`: adversarial scientific manuscript review of
+`docs/paper/PAPER-A-FIRST-FULL-DRAFT.md`.
 
 Do not automatically create EXP-025, create a replacement authorization, or
 launch a second-model replication rescue.

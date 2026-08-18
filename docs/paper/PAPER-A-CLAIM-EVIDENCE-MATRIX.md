@@ -128,7 +128,7 @@ This matrix is a manuscript guardrail. Canonical experiment results and
 
 - Statement: Within the frozen EXP-024 10-condition panel, FIT-only featurewise
   recalibration produced positive `G_eval` in all 10 registered conditions.
-- Status: `OBSERVED_DESCRIPTIVE`
+- Status: `SUPPORTED_DESCRIPTIVELY`
 - Supporting evidence: EXP-024 canonical result `G_eval > 0` in 10/10
   conditions.
 - Limiting evidence: descriptive panel observation only; no preregistered
@@ -163,9 +163,9 @@ This matrix is a manuscript guardrail. Canonical experiment results and
 | C4 | fixed readout stability varies | `SUPPORTED_WITH_SCOPE_LIMITATIONS` | EXP-021 | qualification scope | 4.3 |
 | C5 | featurewise recalibration can rescue some readouts | `CONDITIONAL_SIGNAL` | EXP-022A/EXP-023 Split A | EXP-023 Split B null | 4.4/4.5 |
 | C6 | general calibration replication not supported | `SUPPORTED_NEGATIVE` | EXP-023 | one confirmatory experiment | 4.5 |
-| C7 | calibration susceptibility may be conditional | `HYPOTHESIS_GENERATING` | EXP-022A/023 heterogeneity | no predictor | 5.3/5.7 |
+| C7 | calibration susceptibility may be conditional | `HYPOTHESIS_GENERATING / SIMPLE_PREDICTOR_NOT_SUPPORTED` | EXP-022A/023 heterogeneity; EXP-024 panel | simple predictor not supported | 5.3/5.7 |
 | C8 | mean-only signal is secondary | `SECONDARY_DESCRIPTIVE` | EXP-023 Split A | Split B null | 4.5 |
 | C9 | general coordinate transport not tested | `NOT_TESTED` | none | no transport result | 5.4 |
 | C10 | functional binding not tested | `NOT_TESTED` | none | no binding result | 5.4 |
-| C11 | panel-bounded calibration benefit observed descriptively | `OBSERVED_DESCRIPTIVE` | EXP-024 10/10 G_eval positive | descriptive only | 4.6 |
+| C11 | panel-bounded calibration benefit observed descriptively | `SUPPORTED_DESCRIPTIVELY` | EXP-024 10/10 G_eval positive | descriptive only | 4.6 |
 | C12 | simple degradation-magnitude susceptibility prediction | `NOT_SUPPORTED` | EXP-024 rho=0.284, p=0.2115 | one panel, low resolution | 4.6/5.3/5.7 |
