@@ -18,6 +18,7 @@ import re
 import subprocess
 import sys
 import uuid
+from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -84,6 +85,41 @@ PRIMARY_CHECKPOINT_SPECS = {
     "block27_pre_final_rmsnorm": {"hidden_states_index": None, "role": "primary_final"},
 }
 SECONDARY_CHECKPOINT_NAMES = ("block27_post_final_rmsnorm",)
+
+QUALIFICATION_SCHEMA_VERSION = "1.0.0"
+QUALIFICATION_TYPE = "NON_FORMAL_MODEL_TOKENIZER_HOOK"
+QUALIFICATION_STATUSES = (
+    "QUALIFICATION_PASSED",
+    "QUALIFICATION_FAILED",
+    "OPERATIONAL_FAILURE",
+)
+QUALIFICATION_CHECKPOINT_SPECS = (
+    {
+        "name": "block16_pre_final_rmsnorm",
+        "hidden_states_index": 17,
+        "source": "hidden_states",
+    },
+    {
+        "name": "block27_pre_final_rmsnorm",
+        "hidden_states_index": None,
+        "source": "block27_pre_final_hook",
+    },
+    {
+        "name": "block27_post_final_rmsnorm",
+        "hidden_states_index": 28,
+        "source": "hidden_states",
+    },
+)
+QUALIFICATION_CHECKPOINT_NAMES = tuple(
+    spec["name"] for spec in QUALIFICATION_CHECKPOINT_SPECS
+)
+QUALIFICATION_REPEATABILITY_TOLERANCE = 1e-6
+NEUTRAL_QUALIFICATION_INPUTS = (
+    "The local snapshot is loaded in offline mode.",
+    "A neutral engineering forward pass checks tokenizer and checkpoint-hook metadata without scientific inference.",
+    "The attention mask determines the last valid non-padding token for representation extraction.",
+    "Runtime qualification records tensor shapes, dtypes, finite values, and hook cleanup deterministically.",
+)
 
 SCALER_KWARGS = {"with_mean": True, "with_std": True}
 CLASSIFIER_KWARGS = {
@@ -205,6 +241,662 @@ def _is_sha256(value: Any) -> bool:
 
 def _is_git_commit(value: Any) -> bool:
     return isinstance(value, str) and re.fullmatch(r"[0-9a-f]{40}", value) is not None
+
+
+def _import_torch() -> Any:
+    import torch
+
+    return torch
+
+
+def sha256_bytes(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def sha256_string(text: str) -> str:
+    return sha256_bytes(text.encode("utf-8"))
+
+
+def last_valid_token_indices(attention_mask: Any) -> Any:
+    torch = _import_torch()
+    if torch.is_tensor(attention_mask):
+        mask = attention_mask
+        if mask.ndim not in (1, 2):
+            raise ValueError("Attention mask must be one- or two-dimensional.")
+        if mask.numel() == 0:
+            raise ValueError("Attention mask must contain at least one token.")
+        if mask.dtype.is_complex:
+            raise TypeError("Complex attention masks are not supported.")
+        if torch.is_floating_point(mask) and not bool(torch.isfinite(mask).all()):
+            raise ValueError("Attention mask contains non-finite values.")
+        if bool(torch.any(mask < 0)):
+            raise ValueError("Attention mask contains negative values.")
+        indices = mask.sum(dim=-1, dtype=torch.long) - 1
+        indices = indices.reshape(-1)
+        if bool(torch.any(indices < 0)):
+            raise ValueError("Attention mask contains no valid token.")
+        return indices
+
+    mask = np.asarray(attention_mask)
+    if mask.ndim not in (1, 2):
+        raise ValueError("Attention mask must be one- or two-dimensional.")
+    if mask.size == 0:
+        raise ValueError("Attention mask must contain at least one token.")
+    if np.iscomplexobj(mask):
+        raise TypeError("Complex attention masks are not supported.")
+    if not np.isfinite(mask).all():
+        raise ValueError("Attention mask contains non-finite values.")
+    if np.any(mask < 0):
+        raise ValueError("Attention mask contains negative values.")
+    if mask.ndim == 1:
+        index = int(mask.sum()) - 1
+        if index < 0:
+            raise ValueError("Attention mask contains no valid token.")
+        return [index]
+    indices = [int(row.sum()) - 1 for row in mask]
+    if any(index < 0 for index in indices):
+        raise ValueError("Attention mask contains no valid token.")
+    return indices
+
+
+def _indices_to_python_list(indices: Any) -> list[int]:
+    torch = _import_torch()
+    if torch.is_tensor(indices):
+        return [int(value) for value in indices.detach().cpu().tolist()]
+    return [int(value) for value in indices]
+
+
+def _select_last_valid_token_torch(hidden_states: Any, indices: Any) -> Any:
+    torch = _import_torch()
+    if hidden_states.ndim not in (2, 3):
+        raise ValueError("Hidden states must be two- or three-dimensional.")
+    if torch.is_tensor(indices):
+        index_tensor = indices.to(device=hidden_states.device, dtype=torch.long).reshape(-1)
+    else:
+        index_tensor = torch.as_tensor(
+            indices, dtype=torch.long, device=hidden_states.device
+        ).reshape(-1)
+    if hidden_states.ndim == 2:
+        if index_tensor.numel() != 1:
+            raise ValueError("Two-dimensional hidden states require exactly one valid-token index.")
+        if hidden_states.shape[0] == 0:
+            raise ValueError("Hidden-state sequence dimension must be nonempty.")
+        token_index = index_tensor[0]
+        if bool(token_index < 0) or bool(token_index >= hidden_states.shape[0]):
+            raise ValueError("Valid-token index is outside hidden-state sequence bounds.")
+        return hidden_states[token_index]
+    if hidden_states.shape[0] == 0:
+        raise ValueError("Hidden-state batch dimension must be nonempty.")
+    if index_tensor.numel() != hidden_states.shape[0]:
+        raise ValueError("Valid-token index count must match hidden-state batch dimension.")
+    return hidden_states[torch.arange(hidden_states.shape[0], device=hidden_states.device), index_tensor]
+
+
+def _select_last_valid_token_numpy(hidden_states: Any, indices: Any) -> np.ndarray:
+    array = np.asarray(hidden_states)
+    if array.ndim not in (2, 3):
+        raise ValueError("Hidden states must be two- or three-dimensional.")
+    if array.ndim == 2:
+        if len(indices) != 1:
+            raise ValueError("Two-dimensional hidden states require exactly one valid-token index.")
+        if array.shape[0] == 0:
+            raise ValueError("Hidden-state sequence dimension must be nonempty.")
+        token_index = int(indices[0])
+        if token_index < 0 or token_index >= array.shape[0]:
+            raise ValueError("Valid-token index is outside hidden-state sequence bounds.")
+        return array[token_index]
+    if array.shape[0] == 0:
+        raise ValueError("Hidden-state batch dimension must be nonempty.")
+    if len(indices) != array.shape[0]:
+        raise ValueError("Valid-token index count must match hidden-state batch dimension.")
+    return array[np.arange(array.shape[0]), indices]
+
+
+def select_last_valid_token_at_indices(hidden_states: Any, indices: Any) -> Any:
+    torch = _import_torch()
+    if torch.is_tensor(hidden_states):
+        return _select_last_valid_token_torch(hidden_states, indices)
+    return _select_last_valid_token_numpy(hidden_states, indices)
+
+
+def select_last_valid_token(hidden_states: Any, attention_mask: Any) -> Any:
+    return select_last_valid_token_at_indices(
+        hidden_states, last_valid_token_indices(attention_mask)
+    )
+
+
+def to_float32_analysis_array(value: Any, expected_ndim: int | None = None) -> np.ndarray:
+    torch = _import_torch()
+    if torch.is_tensor(value):
+        array = value.detach().cpu().numpy()
+    else:
+        array = np.asarray(value)
+    array = np.asarray(array, dtype=np.float32)
+    if expected_ndim is not None and array.ndim != expected_ndim:
+        if array.ndim == expected_ndim + 1 and array.shape[0] == 1:
+            array = array[0]
+        else:
+            raise ValueError("Unexpected analysis array dimensionality.")
+    if not np.isfinite(array).all():
+        raise TechnicalInvalidError("NONFINITE_ANALYSIS_ARRAY")
+    return array
+
+
+def extract_block_hidden_state(output: Any) -> Any:
+    torch = _import_torch()
+    if torch.is_tensor(output):
+        return output
+    if isinstance(output, (tuple, list)):
+        if len(output) == 0:
+            raise TypeError("UNSUPPORTED_BLOCK_OUTPUT_STRUCTURE_EMPTY")
+        return extract_block_hidden_state(output[0])
+    raise TypeError("UNSUPPORTED_BLOCK_OUTPUT_STRUCTURE")
+
+
+@dataclass
+class ForwardHookCapture:
+    _captured: Any = None
+    _capture_count: int = 0
+
+    def record(self, output: Any) -> None:
+        if self._capture_count:
+            raise RuntimeError("UNEXPECTED_MULTIPLE_HOOK_CAPTURE")
+        self._captured = extract_block_hidden_state(output)
+        self._capture_count = 1
+
+    @property
+    def value(self) -> Any:
+        if self._capture_count == 0:
+            raise RuntimeError("HOOK_CAPTURE_MISSING")
+        if self._capture_count != 1:
+            raise RuntimeError("UNEXPECTED_MULTIPLE_HOOK_CAPTURE")
+        return self._captured
+
+    @property
+    def count(self) -> int:
+        return self._capture_count
+
+    def clear(self) -> None:
+        self._captured = None
+        self._capture_count = 0
+
+
+def make_block_output_hook(capture: ForwardHookCapture):
+    def hook(module: Any, args: Any, output: Any) -> None:
+        capture.record(output)
+        return None
+
+    return hook
+
+
+def block27_pre_final_rmsnorm_hook(capture: ForwardHookCapture):
+    return make_block_output_hook(capture)
+
+
+@contextmanager
+def block_output_hook_capture(module: Any, capture: ForwardHookCapture | None = None):
+    capture = capture if capture is not None else ForwardHookCapture()
+    capture.clear()
+    hook = make_block_output_hook(capture)
+    handle = module.register_forward_hook(hook)
+    try:
+        yield capture
+    finally:
+        handle.remove()
+
+
+def extract_checkpoint_tensors(
+    hidden_states: Sequence[Any],
+    block27_pre_final_output: Any,
+) -> dict[str, Any]:
+    torch = _import_torch()
+    if not isinstance(hidden_states, (tuple, list)):
+        raise TypeError("HIDDEN_STATES_SEQUENCE_REQUIRED")
+    checkpoint_tensors: dict[str, Any] = {}
+    for spec in QUALIFICATION_CHECKPOINT_SPECS:
+        hidden_states_index = spec["hidden_states_index"]
+        if hidden_states_index is None:
+            tensor = extract_block_hidden_state(block27_pre_final_output)
+        else:
+            index = int(hidden_states_index)
+            if index >= len(hidden_states):
+                raise ProtocolIntegrityError(f"MISSING_HIDDEN_STATE_{spec['name']}_{index}")
+            tensor = hidden_states[index]
+            if not torch.is_tensor(tensor):
+                raise TypeError(f"CHECKPOINT_{spec['name']}_NOT_TORCH_TENSOR")
+        checkpoint_tensors[spec["name"]] = tensor
+    if set(checkpoint_tensors) != set(QUALIFICATION_CHECKPOINT_NAMES):
+        raise ProtocolIntegrityError("CHECKPOINT_EXTRACTION_MAPPING_MISMATCH")
+    return checkpoint_tensors
+
+
+def extract_last_token_representations(
+    checkpoint_tensors: Mapping[str, Any],
+    attention_mask: Any,
+) -> dict[str, Any]:
+    if set(checkpoint_tensors) != set(QUALIFICATION_CHECKPOINT_NAMES):
+        raise ProtocolIntegrityError("CHECKPOINT_TENSOR_SET_MISMATCH")
+    indices = last_valid_token_indices(attention_mask)
+    return {
+        name: select_last_valid_token_at_indices(tensor, indices)
+        for name, tensor in checkpoint_tensors.items()
+    }
+
+
+def _set_offline_model_env() -> None:
+    os.environ["HF_HUB_OFFLINE"] = "1"
+    os.environ["TRANSFORMERS_OFFLINE"] = "1"
+
+
+def _load_qualification_tokenizer(root: Path = ROOT) -> Any:
+    del root
+    _set_offline_model_env()
+    from transformers import AutoTokenizer
+
+    return AutoTokenizer.from_pretrained(
+        str(FORMAL_MODEL_SNAPSHOT_PATH), local_files_only=True
+    )
+
+
+def _validate_qualification_model_architecture(model: Any) -> None:
+    if type(model).__name__ != "Qwen3ForCausalLM":
+        raise ProtocolIntegrityError("QUALIFICATION_MODEL_CLASS_MISMATCH")
+    config = getattr(model, "config", None)
+    if config is None:
+        raise ProtocolIntegrityError("QUALIFICATION_MODEL_CONFIG_MISSING")
+    if getattr(config, "model_type", None) != "qwen3":
+        raise ProtocolIntegrityError("QUALIFICATION_MODEL_TYPE_MISMATCH")
+    if int(getattr(config, "hidden_size", -1)) != 2048:
+        raise ProtocolIntegrityError("QUALIFICATION_MODEL_HIDDEN_SIZE_MISMATCH")
+    if int(getattr(config, "num_hidden_layers", -1)) != 28:
+        raise ProtocolIntegrityError("QUALIFICATION_MODEL_LAYER_COUNT_MISMATCH")
+    if not hasattr(model, "model") or len(model.model.layers) != 28:
+        raise ProtocolIntegrityError("QUALIFICATION_MODEL_TRANSFORMER_BLOCKS_MISMATCH")
+
+
+def _load_qualification_model(root: Path = ROOT) -> tuple[Any, Any]:
+    del root
+    _set_offline_model_env()
+    torch = _import_torch()
+    from transformers import AutoModelForCausalLM
+
+    model = AutoModelForCausalLM.from_pretrained(
+        str(FORMAL_MODEL_SNAPSHOT_PATH),
+        dtype=torch.float16,
+        local_files_only=True,
+    )
+    _validate_qualification_model_architecture(model)
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    model.to(device)
+    model.eval()
+    torch.set_grad_enabled(False)
+    return model, device
+
+
+def _load_qualification_runtime(root: Path = ROOT) -> tuple[Any, Any, Any]:
+    tokenizer = _load_qualification_tokenizer(root)
+    model, device = _load_qualification_model(root)
+    return tokenizer, model, device
+
+
+def _model_runtime_identity(model: Any, device: Any) -> dict[str, Any]:
+    config = getattr(model, "config", None)
+    dtype = next(model.parameters()).dtype
+    return {
+        "model_name": FORMAL_MODEL_NAME,
+        "model_snapshot": FORMAL_MODEL_SNAPSHOT,
+        "local_model_path": str(FORMAL_MODEL_SNAPSHOT_PATH),
+        "model_class": type(model).__name__,
+        "model_type": getattr(config, "model_type", None),
+        "block_count": int(getattr(config, "num_hidden_layers", -1)),
+        "hidden_size": int(getattr(config, "hidden_size", -1)),
+        "device": str(device),
+        "runtime_dtype": str(dtype).replace("torch.", ""),
+        "evaluation_mode": not model.training,
+    }
+
+
+def _tokenizer_runtime_identity(tokenizer: Any) -> dict[str, Any]:
+    return {
+        "tokenizer_class": type(tokenizer).__name__,
+        "tokenizer_family": "Qwen3",
+    }
+
+
+def _tokenize_qualification_input(
+    tokenizer: Any, text: str, device: Any
+) -> tuple[Any, Any]:
+    encoded = tokenizer(
+        text,
+        return_tensors="pt",
+        padding=False,
+        truncation=False,
+        add_special_tokens=True,
+    )
+    return encoded["input_ids"].to(device), encoded["attention_mask"].to(device)
+
+
+def _tokenization_metadata(
+    tokenizer: Any, input_ids: Any, attention_mask: Any
+) -> dict[str, Any]:
+    torch = _import_torch()
+    special_ids = set(getattr(tokenizer, "all_special_ids", []) or [])
+    last_token_id = int(input_ids[0, -1])
+    return {
+        "token_count": int(input_ids.numel()),
+        "attention_mask_shape": [int(value) for value in attention_mask.shape],
+        "last_token_id": last_token_id,
+        "last_token_is_special": last_token_id in special_ids,
+        "input_ids_dtype": str(input_ids.dtype).replace("torch.", ""),
+        "input_ids_device": str(input_ids.device),
+        "attention_mask_dtype": str(attention_mask.dtype).replace("torch.", ""),
+        "attention_mask_device": str(attention_mask.device),
+        "last_valid_token_index": int(
+            torch.as_tensor(last_valid_token_indices(attention_mask)).cpu().item()
+        ),
+    }
+
+
+def _neutral_input_identity(text: str) -> dict[str, Any]:
+    return {
+        "sha256": sha256_string(text),
+        "character_length": len(text),
+        "token_count": None,
+    }
+
+
+def _checkpoint_representation_metadata(array: np.ndarray) -> dict[str, Any]:
+    return {
+        "shape": [int(value) for value in array.shape],
+        "dtype": str(array.dtype),
+        "finite": bool(np.isfinite(array).all()),
+        "l2_norm": float(np.linalg.norm(array)),
+        "sha256": sha256_bytes(array.tobytes()),
+    }
+
+
+def _run_qualification_forward(
+    tokenizer: Any, model: Any, device: Any, text: str
+) -> dict[str, Any]:
+    torch = _import_torch()
+    input_ids, attention_mask = _tokenize_qualification_input(tokenizer, text, device)
+    block27 = model.model.layers[27]
+    capture = ForwardHookCapture()
+    with torch.inference_mode():
+        with block_output_hook_capture(block27, capture):
+            outputs = model(
+                input_ids=input_ids,
+                attention_mask=attention_mask,
+                use_cache=False,
+                output_hidden_states=True,
+            )
+    checkpoint_tensors = extract_checkpoint_tensors(outputs.hidden_states, capture.value)
+    selected = extract_last_token_representations(checkpoint_tensors, attention_mask)
+    representations = {
+        name: to_float32_analysis_array(selected[name][0], expected_ndim=1)
+        for name in QUALIFICATION_CHECKPOINT_NAMES
+    }
+    return {
+        "input_ids": input_ids,
+        "attention_mask": attention_mask,
+        "representations": representations,
+        "hook_firing_count": capture.count,
+    }
+
+
+def _representations_match(
+    first: Mapping[str, np.ndarray],
+    second: Mapping[str, np.ndarray],
+    tolerance: float = QUALIFICATION_REPEATABILITY_TOLERANCE,
+) -> tuple[bool, dict[str, Any]]:
+    details: dict[str, Any] = {}
+    all_match = True
+    for name in QUALIFICATION_CHECKPOINT_NAMES:
+        left = first[name]
+        right = second[name]
+        if left.shape != right.shape:
+            all_match = False
+            details[name] = {"match": False, "reason": "shape_mismatch"}
+            continue
+        max_abs = float(np.max(np.abs(left.astype(np.float64) - right.astype(np.float64))))
+        matched = bool(np.isfinite(max_abs) and max_abs <= tolerance)
+        all_match = all_match and matched
+        details[name] = {"match": matched, "max_abs_difference": max_abs, "tolerance": tolerance}
+    return all_match, details
+
+
+def _module_hook_count(module: Any) -> int:
+    return len(getattr(module, "_forward_hooks", {}) or {})
+
+
+def _all_checks_passed(checks: Mapping[str, Any]) -> bool:
+    return all(value in (True, "PASS") for value in checks.values())
+
+
+def _qualification_status_from_checks(checks: Mapping[str, Any]) -> str:
+    return "QUALIFICATION_PASSED" if _all_checks_passed(checks) else "QUALIFICATION_FAILED"
+
+
+def _qualification_artifact_base(root: Path, authorities: Mapping[str, Any]) -> dict[str, Any]:
+    return {
+        "schema_version": QUALIFICATION_SCHEMA_VERSION,
+        "qualification_type": QUALIFICATION_TYPE,
+        "experiment": EXPERIMENT,
+        "runner_sha256": _runner_sha256(),
+        "qualified_runner_commit": _repository_commit(root),
+        "frozen_manifest_sha256": FROZEN_MANIFEST_SHA256,
+        "frozen_dataset_sha256": FROZEN_DATASET_SHA256,
+        "preregistration_sha256": FINAL_PREREGISTRATION_SHA256,
+        "authorities": authorities,
+        "formal_data_content_used": False,
+        "formal_classifier_fit_performed": False,
+        "formal_recalibration_performed": False,
+        "s_diag_computed": False,
+        "g_eval_computed": False,
+        "primary_spearman_computed": False,
+        "primary_permutation_test_performed": False,
+        "formal_authorization_created": False,
+        "formal_authorization_consumed": False,
+        "formal_result_created": False,
+        "created_at_utc": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+def _qualification_failure_result(
+    root: Path, authorities: Mapping[str, Any], exc: Exception, operational: bool
+) -> dict[str, Any]:
+    status = "OPERATIONAL_FAILURE" if operational else "QUALIFICATION_FAILED"
+    result = _qualification_artifact_base(root, authorities)
+    result.update(
+        {
+            "status": status,
+            "error_type": type(exc).__name__,
+            "error_message": str(exc),
+            "model": {
+                "model_name": FORMAL_MODEL_NAME,
+                "model_snapshot": FORMAL_MODEL_SNAPSHOT,
+            },
+            "tokenizer": {},
+            "neutral_inputs": [],
+            "checks": {},
+        }
+    )
+    return result
+
+
+def _operational_exception(exc: Exception) -> bool:
+    if isinstance(exc, (OSError, ImportError, FileNotFoundError)):
+        return True
+    try:
+        torch = _import_torch()
+    except Exception:
+        return False
+    return isinstance(exc, torch.cuda.OutOfMemoryError)
+
+
+def build_model_hook_qualification_result(
+    root: Path,
+    authorities: Mapping[str, Any],
+    tokenizer: Any,
+    model: Any,
+    device: Any,
+) -> dict[str, Any]:
+    token_entries: list[dict[str, Any]] = []
+    representation_entries: list[dict[str, Any]] = []
+    hook_firing_counts: list[int] = []
+    first_representations: dict[str, np.ndarray] | None = None
+
+    for index, text in enumerate(NEUTRAL_QUALIFICATION_INPUTS):
+        forward = _run_qualification_forward(tokenizer, model, device, text)
+        token_metadata = _tokenization_metadata(
+            tokenizer, forward["input_ids"], forward["attention_mask"]
+        )
+        token_entries.append(
+            {
+                "input_sha256": sha256_string(text),
+                "character_length": len(text),
+                **token_metadata,
+            }
+        )
+        representation_entries.append(
+            {
+                "input_sha256": sha256_string(text),
+                "checkpoints": {
+                    name: _checkpoint_representation_metadata(array)
+                    for name, array in forward["representations"].items()
+                },
+            }
+        )
+        hook_firing_counts.append(forward["hook_firing_count"])
+        if index == 0:
+            first_representations = forward["representations"]
+
+    repeat_forward = _run_qualification_forward(
+        tokenizer, model, device, NEUTRAL_QUALIFICATION_INPUTS[0]
+    )
+    assert first_representations is not None
+    repeatability_match, repeatability_details = _representations_match(
+        first_representations,
+        repeat_forward["representations"],
+    )
+
+    block27 = model.model.layers[27]
+    hook_cleanup = _module_hook_count(block27) == 0
+    all_checkpoints = [
+        checkpoint
+        for entry in representation_entries
+        for checkpoint in entry["checkpoints"].values()
+    ]
+    reference_qualified = all(
+        "block16_pre_final_rmsnorm" in entry["checkpoints"]
+        and entry["checkpoints"]["block16_pre_final_rmsnorm"]["finite"]
+        for entry in representation_entries
+    )
+    final_qualified = all(
+        "block27_pre_final_rmsnorm" in entry["checkpoints"]
+        and entry["checkpoints"]["block27_pre_final_rmsnorm"]["finite"]
+        for entry in representation_entries
+    )
+    finite_qualified = all(checkpoint["finite"] for checkpoint in all_checkpoints)
+    dtype_qualified = all(checkpoint["dtype"] == "float32" for checkpoint in all_checkpoints)
+
+    checks = {
+        "reference_checkpoint_qualified": "PASS" if reference_qualified else "FAIL",
+        "final_checkpoint_qualified": "PASS" if final_qualified else "FAIL",
+        "hook_firing_cardinality": (
+            "PASS" if all(count == 1 for count in hook_firing_counts) else "FAIL"
+        ),
+        "hook_cleanup": "PASS" if hook_cleanup else "FAIL",
+        "repeatability": "PASS" if repeatability_match else "FAIL",
+        "representation_finite": "PASS" if finite_qualified else "FAIL",
+        "output_dtype": "PASS" if dtype_qualified else "FAIL",
+        "formal_data_firewall": "PASS",
+    }
+    result = _qualification_artifact_base(root, authorities)
+    result.update(
+        {
+            "status": _qualification_status_from_checks(checks),
+            "model": _model_runtime_identity(model, device),
+            "tokenizer": _tokenizer_runtime_identity(tokenizer),
+            "neutral_inputs": [
+                {
+                    "sha256": entry["input_sha256"],
+                    "character_length": entry["character_length"],
+                    "token_count": entry["token_count"],
+                }
+                for entry in token_entries
+            ],
+            "tokenization": token_entries,
+            "checkpoints": representation_entries,
+            "hook_firing_counts": hook_firing_counts,
+            "repeatability": repeatability_details,
+            "checks": checks,
+        }
+    )
+    return result
+
+
+def run_model_hook_qualification(root: Path = ROOT, *, publish: bool = True) -> dict[str, Any]:
+    authorities = verify_frozen_authority(root)
+    try:
+        tokenizer, model, device = _load_qualification_runtime(root)
+        result = build_model_hook_qualification_result(root, authorities, tokenizer, model, device)
+    except Exception as exc:
+        result = _qualification_failure_result(root, authorities, exc, _operational_exception(exc))
+    if publish:
+        return publish_model_hook_qualification(result, root)
+    return result
+
+
+def validate_model_hook_qualification(result: Mapping[str, Any], root: Path = ROOT) -> None:
+    if not isinstance(result, Mapping):
+        raise ProtocolIntegrityError("QUALIFICATION_NOT_OBJECT")
+    if result.get("schema_version") != QUALIFICATION_SCHEMA_VERSION:
+        raise ProtocolIntegrityError("QUALIFICATION_SCHEMA_VERSION_MISMATCH")
+    if result.get("qualification_type") != QUALIFICATION_TYPE:
+        raise ProtocolIntegrityError("QUALIFICATION_TYPE_MISMATCH")
+    if result.get("experiment") != EXPERIMENT:
+        raise ProtocolIntegrityError("QUALIFICATION_EXPERIMENT_MISMATCH")
+    if result.get("status") not in QUALIFICATION_STATUSES:
+        raise ProtocolIntegrityError("QUALIFICATION_STATUS_INVALID")
+    if result.get("runner_sha256") != _runner_sha256():
+        raise ProtocolIntegrityError("QUALIFICATION_RUNNER_SHA_MISMATCH")
+    if not _is_git_commit(result.get("qualified_runner_commit")):
+        raise ProtocolIntegrityError("QUALIFICATION_RUNNER_COMMIT_INVALID")
+    if result.get("frozen_manifest_sha256") != FROZEN_MANIFEST_SHA256:
+        raise ProtocolIntegrityError("QUALIFICATION_MANIFEST_SHA_MISMATCH")
+    if result.get("frozen_dataset_sha256") != FROZEN_DATASET_SHA256:
+        raise ProtocolIntegrityError("QUALIFICATION_DATASET_SHA_MISMATCH")
+    if result.get("preregistration_sha256") != FINAL_PREREGISTRATION_SHA256:
+        raise ProtocolIntegrityError("QUALIFICATION_PREREGISTRATION_SHA_MISMATCH")
+    if result.get("formal_data_content_used") is not False:
+        raise ProtocolIntegrityError("QUALIFICATION_FORMAL_DATA_FIREWALL_VIOLATION")
+    if result.get("formal_classifier_fit_performed") is not False:
+        raise ProtocolIntegrityError("QUALIFICATION_CLASSIFIER_FIT_VIOLATION")
+    if result.get("formal_recalibration_performed") is not False:
+        raise ProtocolIntegrityError("QUALIFICATION_RECALIBRATION_VIOLATION")
+    if result.get("s_diag_computed") is not False or result.get("g_eval_computed") is not False:
+        raise ProtocolIntegrityError("QUALIFICATION_SCIENCE_COMPUTATION_VIOLATION")
+    if result.get("formal_result_created") is not False:
+        raise ProtocolIntegrityError("QUALIFICATION_FORMAL_RESULT_VIOLATION")
+    if result["status"] == "QUALIFICATION_PASSED":
+        if not isinstance(result.get("model"), Mapping) or not result["model"].get("model_name"):
+            raise ProtocolIntegrityError("QUALIFICATION_MODEL_METADATA_MISSING")
+        if not isinstance(result.get("tokenizer"), Mapping) or not result["tokenizer"].get("tokenizer_class"):
+            raise ProtocolIntegrityError("QUALIFICATION_TOKENIZER_METADATA_MISSING")
+        if len(result.get("neutral_inputs", [])) != len(NEUTRAL_QUALIFICATION_INPUTS):
+            raise ProtocolIntegrityError("QUALIFICATION_NEUTRAL_INPUT_COUNT_MISMATCH")
+        checks = result.get("checks", {})
+        if not checks or not _all_checks_passed(checks):
+            raise ProtocolIntegrityError("QUALIFICATION_CHECKS_NOT_PASSED")
+
+
+def publish_model_hook_qualification(
+    result: Mapping[str, Any], root: Path = ROOT
+) -> dict[str, str]:
+    validate_model_hook_qualification(result, root)
+    path = root / MODEL_HOOK_QUALIFICATION_PATH.relative_to(ROOT)
+    return atomic_write_json(path, result)
 
 
 def load_freeze_manifest(root: Path = ROOT) -> dict[str, Any]:
@@ -810,7 +1502,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         if args.static_preflight:
             print(json.dumps(static_preflight(root), ensure_ascii=False, indent=2, sort_keys=True))
         elif args.model_hook_qualification:
-            raise PermissionError("EXP024_MODEL_HOOK_QUALIFICATION_NOT_AUTHORIZED_IN_098A")
+            result = run_model_hook_qualification(root)
+            print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
         elif args.formal_run:
             authorization_path = (
                 Path(args.authorization_file).resolve()

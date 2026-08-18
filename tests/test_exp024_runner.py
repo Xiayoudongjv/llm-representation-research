@@ -10,6 +10,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+import torch
 
 
 MODULE_PATH = (
@@ -86,6 +87,54 @@ def _mock_qualification(monkeypatch: pytest.MonkeyPatch, sha: str = "b" * 64) ->
         "_verify_model_hook_qualification_artifact",
         lambda root=None: {"sha256": sha, "artifact": {}},
     )
+
+
+class FakeConfig:
+    model_type = "qwen3"
+    hidden_size = 4
+    num_hidden_layers = 28
+
+
+class FakeLayer:
+    pass
+
+
+class FakeTransformer:
+    def __init__(self):
+        self.layers = [FakeLayer() for _ in range(28)]
+
+
+class FakeModel:
+    training = False
+
+    def __init__(self):
+        self.config = FakeConfig()
+        self.model = FakeTransformer()
+
+    def parameters(self):
+        return iter([torch.tensor([0.0], dtype=torch.float32)])
+
+
+class FakeTokenizer:
+    all_special_ids = {1}
+
+    def __call__(self, text, return_tensors=None, padding=False, truncation=False, add_special_tokens=True):
+        return {
+            "input_ids": torch.tensor([[0, 2, 1]], dtype=torch.long),
+            "attention_mask": torch.ones((1, 3), dtype=torch.long),
+        }
+
+
+def _fake_forward(tokenizer, model, device, text):
+    return {
+        "input_ids": torch.tensor([[0, 2, 1]], dtype=torch.long, device=device),
+        "attention_mask": torch.ones((1, 3), dtype=torch.long, device=device),
+        "representations": {
+            name: np.full((4,), index + 1, dtype=np.float32)
+            for index, name in enumerate(runner.QUALIFICATION_CHECKPOINT_NAMES)
+        },
+        "hook_firing_count": 1,
+    }
     monkeypatch.setattr(
         runner,
         "_verify_model_hook_qualification_current",
@@ -376,12 +425,222 @@ def test_static_preflight_performs_no_model_access(monkeypatch):
     assert result["formal_result_present"] is False
 
 
-def test_qualification_mode_cannot_load_formal_records(monkeypatch):
+def test_qualification_cli_reaches_real_runtime(monkeypatch, capsys):
+    monkeypatch.setattr(
+        runner,
+        "run_model_hook_qualification",
+        lambda root=None: {"status": "QUALIFICATION_PASSED"},
+    )
+    assert runner.main(["--model-hook-qualification"]) == 0
+    assert "QUALIFICATION_PASSED" in capsys.readouterr().out
+
+
+def test_qualification_production_call_graph(monkeypatch, tmp_path):
+    calls: list[str] = []
+
+    monkeypatch.setattr(
+        runner,
+        "verify_frozen_authority",
+        lambda root=None: calls.append("verify_authority") or {},
+    )
+    monkeypatch.setattr(
+        runner,
+        "_load_qualification_runtime",
+        lambda root=None: calls.append("load_runtime") or (None, None, None),
+    )
+    monkeypatch.setattr(
+        runner,
+        "build_model_hook_qualification_result",
+        lambda root, authorities, tokenizer, model, device: calls.append("build_result")
+        or {"status": "QUALIFICATION_PASSED"},
+    )
+    monkeypatch.setattr(
+        runner,
+        "publish_model_hook_qualification",
+        lambda result, root=None: calls.append("publish") or result,
+    )
+
+    result = runner.run_model_hook_qualification(tmp_path)
+    assert result["status"] == "QUALIFICATION_PASSED"
+    assert calls == ["verify_authority", "load_runtime", "build_result", "publish"]
+
+
+def test_qualification_does_not_load_formal_dataset(monkeypatch, tmp_path):
     def forbidden(*args, **kwargs):
-        raise AssertionError("formal dataset loader must not be called in 098A qualification mode")
+        raise AssertionError("formal dataset loader must not be called")
 
     monkeypatch.setattr(runner, "load_frozen_dataset", forbidden)
-    assert runner.main(["--model-hook-qualification"]) == 2
+    monkeypatch.setattr(
+        runner,
+        "verify_frozen_authority",
+        lambda root=None: {"frozen": "authority"},
+    )
+    monkeypatch.setattr(
+        runner,
+        "_load_qualification_runtime",
+        lambda root=None: (FakeTokenizer(), FakeModel(), torch.device("cpu")),
+    )
+    monkeypatch.setattr(runner, "_run_qualification_forward", _fake_forward)
+    monkeypatch.setattr(runner, "_repository_commit", lambda root=None: "a" * 40)
+    monkeypatch.setattr(
+        runner,
+        "publish_model_hook_qualification",
+        lambda result, root=None: result,
+    )
+
+    result = runner.run_model_hook_qualification(tmp_path)
+    assert result["status"] == "QUALIFICATION_PASSED"
+
+
+def test_qualification_formal_science_firewall(monkeypatch, tmp_path):
+    def forbidden(name):
+        def _forbidden(*args, **kwargs):
+            raise AssertionError(f"{name} must not be reached by qualification")
+
+        return _forbidden
+
+    for name in (
+        "fit_classifier",
+        "fit_scaler",
+        "compute_s_diag",
+        "compute_g_eval",
+        "balanced_accuracy",
+        "spearman_rho",
+        "exact_one_sided_permutation_p",
+        "finalize_formal_result",
+    ):
+        monkeypatch.setattr(runner, name, forbidden(name))
+
+    monkeypatch.setattr(
+        runner,
+        "verify_frozen_authority",
+        lambda root=None: {"frozen": "authority"},
+    )
+    monkeypatch.setattr(
+        runner,
+        "_load_qualification_runtime",
+        lambda root=None: (FakeTokenizer(), FakeModel(), torch.device("cpu")),
+    )
+    monkeypatch.setattr(runner, "_run_qualification_forward", _fake_forward)
+    monkeypatch.setattr(runner, "_repository_commit", lambda root=None: "a" * 40)
+    monkeypatch.setattr(
+        runner,
+        "publish_model_hook_qualification",
+        lambda result, root=None: result,
+    )
+
+    result = runner.run_model_hook_qualification(tmp_path)
+    assert result["status"] == "QUALIFICATION_PASSED"
+
+
+def test_tokenizer_metadata_contract():
+    tokenizer = FakeTokenizer()
+    input_ids = torch.tensor([[0, 2, 1]], dtype=torch.long)
+    attention_mask = torch.ones((1, 3), dtype=torch.long)
+    metadata = runner._tokenization_metadata(tokenizer, input_ids, attention_mask)
+    assert metadata["token_count"] == 3
+    assert metadata["attention_mask_shape"] == [1, 3]
+    assert metadata["last_token_id"] == 1
+    assert metadata["last_token_is_special"] is True
+    assert metadata["last_valid_token_index"] == 2
+
+
+def test_invalid_extraction_position_rejected():
+    with pytest.raises(ValueError):
+        runner.last_valid_token_indices(torch.zeros((1, 3), dtype=torch.long))
+
+
+class SyntheticBlock(torch.nn.Module):
+    def forward(self, value):
+        return value * 2
+
+
+def test_block_hook_capture_and_cleanup():
+    module = SyntheticBlock()
+    capture = runner.ForwardHookCapture()
+    with runner.block_output_hook_capture(module, capture):
+        output = module(torch.ones(2, 3))
+    assert capture.count == 1
+    assert torch.equal(capture.value, output)
+    assert runner._module_hook_count(module) == 0
+
+
+def test_block_hook_cleanup_on_failure():
+    module = SyntheticBlock()
+    capture = runner.ForwardHookCapture()
+    with pytest.raises(RuntimeError):
+        with runner.block_output_hook_capture(module, capture):
+            raise RuntimeError("boom")
+    assert runner._module_hook_count(module) == 0
+
+
+def test_extraction_materializes_float32_finite():
+    hidden_states = tuple(
+        torch.ones((1, 5, 4), dtype=torch.float16) * (index + 1)
+        for index in range(29)
+    )
+    block27_pre = torch.ones((1, 5, 4), dtype=torch.float16) * 30
+    attention_mask = torch.ones((1, 5), dtype=torch.long)
+    checkpoint_tensors = runner.extract_checkpoint_tensors(hidden_states, block27_pre)
+    selected = runner.extract_last_token_representations(checkpoint_tensors, attention_mask)
+    for name in runner.QUALIFICATION_CHECKPOINT_NAMES:
+        array = runner.to_float32_analysis_array(selected[name][0], expected_ndim=1)
+        assert array.dtype == np.float32
+        assert array.shape == (4,)
+        assert np.isfinite(array).all()
+
+
+def test_materialization_rejects_nonfinite():
+    with pytest.raises(runner.TechnicalInvalidError):
+        runner.to_float32_analysis_array(
+            torch.tensor([1.0, float("nan")], dtype=torch.float32), expected_ndim=1
+        )
+
+
+def test_repeatability_checker_pass_and_fail():
+    left = {
+        name: np.full((4,), index + 1, dtype=np.float32)
+        for index, name in enumerate(runner.QUALIFICATION_CHECKPOINT_NAMES)
+    }
+    right = {name: value.copy() for name, value in left.items()}
+    matched, details = runner._representations_match(left, right)
+    assert matched is True
+    assert all(details[name]["match"] for name in runner.QUALIFICATION_CHECKPOINT_NAMES)
+
+    right["block16_pre_final_rmsnorm"] = np.full((4,), 99.0, dtype=np.float32)
+    matched, details = runner._representations_match(left, right)
+    assert matched is False
+    assert details["block16_pre_final_rmsnorm"]["match"] is False
+
+
+def test_qualification_validator_called_before_publication(tmp_path, monkeypatch):
+    calls: list[str] = []
+
+    def validator(result, root=None):
+        calls.append("validator")
+        return None
+
+    def atomic(path, result):
+        calls.append("atomic")
+        return {"path": str(path)}
+
+    monkeypatch.setattr(runner, "validate_model_hook_qualification", validator)
+    monkeypatch.setattr(runner, "atomic_write_json", atomic)
+    runner.publish_model_hook_qualification({}, tmp_path)
+    assert calls == ["validator", "atomic"]
+
+
+def test_qualification_validator_failure_prevents_publication(tmp_path, monkeypatch):
+    def validator(result, root=None):
+        raise runner.ProtocolIntegrityError("QUALIFICATION_INVALID")
+
+    def atomic(path, result):
+        raise AssertionError("publication must not happen")
+
+    monkeypatch.setattr(runner, "validate_model_hook_qualification", validator)
+    monkeypatch.setattr(runner, "atomic_write_json", atomic)
+    with pytest.raises(runner.ProtocolIntegrityError):
+        runner.publish_model_hook_qualification({}, tmp_path)
 
 
 def test_no_mode_fails_closed():

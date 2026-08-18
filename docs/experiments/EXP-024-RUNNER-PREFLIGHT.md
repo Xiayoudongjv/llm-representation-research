@@ -149,3 +149,98 @@ NO MODEL / SCIENTIFIC RUN PERFORMED
 - `FORMAL_AUTHORIZATION_CONSUMED = false`
 - `SCIENTIFIC_OUTCOME_OBSERVED = false`
 - `FORMAL_RESULT_CREATED = false`
+
+## 098B Qualification Implementation Patch
+
+Previous state:
+`QUALIFICATION_ENTRYPOINT_PRESENT_RUNTIME_MISSING`
+
+New state:
+`QUALIFICATION_RUNTIME_IMPLEMENTED_NOT_YET_RUN`
+
+The `--model-hook-qualification` mode now routes to the real non-formal
+qualification runtime. This patch does not execute that runtime against the
+real model.
+
+### Qualification Call Graph
+
+The production qualification path is ordered:
+
+1. Validate frozen authority file hashes only.
+2. Obtain the fixed qualification-only neutral inputs.
+3. Load the registered local tokenizer.
+4. Load the registered local model and validate architecture.
+5. Run neutral forward passes with the shared checkpoint-extraction path.
+6. Validate the qualification result.
+7. Publish the technical qualification artifact with no-clobber.
+
+The path does not call `load_frozen_dataset`, `partition_records`,
+`fit_reference_classifier`, `fit_scaler`, `compute_S_diag`, `compute_G_eval`,
+or formal-result publication.
+
+### Neutral-Input Firewall
+
+Qualification uses exactly four deterministic neutral engineering strings
+bound by the runner source SHA. They are not EXP-024 records, paraphrases,
+condition templates, or scientific labels. The runner does not deserialize
+formal record text during qualification.
+
+### Shared Production Extraction Path
+
+The same checkpoint extraction helpers are used by qualification and are
+available for the future formal runtime:
+
+- `last_valid_token_indices`
+- `select_last_valid_token_at_indices`
+- `extract_block_hidden_state`
+- `ForwardHookCapture`
+- `block_output_hook_capture`
+- `extract_checkpoint_tensors`
+- `extract_last_token_representations`
+- `to_float32_analysis_array`
+
+Reference checkpoint:
+`block16_pre_final_rmsnorm` / `hidden_states[17]`
+
+Final checkpoint:
+`block27_pre_final_rmsnorm` via a forward hook on
+`model.model.layers[27]`
+
+Secondary checkpoint:
+`block27_post_final_rmsnorm` / `hidden_states[28]`
+
+### Model / Tokenizer Loading
+
+Qualification loads the exact local snapshot:
+
+`D:\AI_Cache\huggingface\hub\models--Qwen--Qwen3-1.7B\snapshots\70d244cc86ccca08cf5af4e1e306ecf908b1ad5e`
+
+with `local_files_only=True`, `HF_HUB_OFFLINE=1`, and
+`TRANSFORMERS_OFFLINE=1`. No network fallback or alternate model is used.
+Architecture validation requires `Qwen3ForCausalLM`, `model_type=qwen3`,
+28 blocks, hidden size 2048, and 28 transformer layers.
+
+### Hook and Materialization Checks
+
+- Forward hooks are observational and removed in `finally`.
+- Hook firing cardinality must be exactly one for each qualification pass.
+- Repeatability uses two identical neutral forward passes.
+- Selected checkpoint vectors are detached, moved to CPU, converted to
+  `float32`, and checked for finite values.
+- Qualification artifacts store only shape, dtype, finite status, norm, and
+  SHA-256 digest; raw hidden-state vectors are not persisted.
+
+### Qualification Validator
+
+`validate_model_hook_qualification` checks runner SHA, runner source commit,
+frozen authority hashes, model/tokenizer metadata, neutral-input count,
+checkpoint checks, hook checks, repeatability, materialization, and formal-data
+firewall flags. `publish_model_hook_qualification` calls the validator before
+the no-clobber atomic write.
+
+### Patch-Task Statement
+
+`EXP024_MODEL_HOOK_QUALIFICATION_PERFORMED = false`
+
+No real model, tokenizer, hidden state, or formal dataset inference was
+executed by this patch task.
