@@ -871,13 +871,13 @@ KAN / constrained operator family -> operator-complexity ladder -> future minimu
 - Potential Scientific Value: A concrete future operator-complexity ladder for mechanism diagnosis.
 - Potential Engineering Value: A KAN-like coordinatewise nonlinear operator can serve as the `T_diag-nonlinear` comparison arm rather than a Transformer replacement.
 - Potential Formalization: See subsections below; `k* = min { k : Delta_EVAL(T_k) >= tau }`, with `tau` unregistered.
-- Potential Testable Consequence: Future minimum-sufficient-operator diagnosis after cross-model replication.
-- Dependencies: `HYP_CALIBRATION_CONDITIONAL_002`, `HYP-TRANSPORT-001`, `HYP-OPERATOR-001`; deferred behind cross-model replication.
+- Potential Testable Consequence: Future minimum-sufficient-operator diagnosis after the model/depth compatibility profile clarifies the cross-model pattern.
+- Dependencies: `HYP_CALIBRATION_CONDITIONAL_002`, `HYP-TRANSPORT-001`, `HYP-OPERATOR-001`; deferred behind model/depth compatibility profiling after EXP-025 `D-`.
 - Current Evidence: Architecture prior art only.
 - Counterevidence / Limitations: KAN does not validate the project's operator theory, cognitive folding, coordinate transport, invariant reasoning, or functional binding. Standard KAN is not immune to catastrophic forgetting and does not eliminate the curse of dimensionality.
 - Overclaim Boundary: `NOT_CURRENT_PAPER_A_CLAIM`, `NOT_EMPIRICALLY_VALIDATED_BY_PROJECT`; not a new backbone or Paper-A method.
 - Priority: `TIER 2` future mechanism; current status `ACTIVE_INSPIRATION_ASSET`.
-- Activation Trigger: Only after cross-model replication evidence indicates fixed-readout degradation/calibration phenomenon merits mechanism study.
+- Activation Trigger: Only after the model/depth compatibility profile indicates that operator-capacity diagnosis is the next informative mechanism test; EXP-025 does not trigger immediate escalation.
 - Related Constructs: Operator-valued edge, geometric operator vocabulary, featurewise recalibration, diagonal affine transport.
 - Related Hypotheses: `HYP-OPERATOR-001`, `HYP-TRANSPORT-001`.
 - Related Claims: None.

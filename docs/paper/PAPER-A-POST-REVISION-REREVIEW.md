@@ -171,11 +171,11 @@ No `CLAIM_MATRIX_MANUSCRIPT_DRIFT` was found.
 
 ## 10. Remaining Risks
 
-- `TOP_REMAINING_ACCEPTANCE_RISK = incremental one-model contribution with an unsupported simple susceptibility predictor; the manuscript must rely on transparent bounded framing rather than mechanism or generality`
+- `TOP_REMAINING_ACCEPTANCE_RISK_AT_REVIEW_TIME = incremental one-model contribution with an unsupported simple susceptibility predictor; the manuscript must rely on transparent bounded framing rather than mechanism or generality`
 - Other nonblocking risks:
   - actual figure production has not occurred yet
   - bibliography metadata is not final-verified
-  - cross-model generality remains untested and is correctly limited
+  - cross-model generality was untested at review time; EXP-025 later showed limited recovery support and no degradation breadth
 
 No remaining risk is a `NEW_EXPERIMENT_REQUIRED` scientific blocker.
 
@@ -237,3 +237,12 @@ finalization.
 
 Task 099D stops here. Do not automatically modify the manuscript, produce
 figures, or design an experiment.
+
+## Post-Hoc EXP-025 Update
+
+After this rereview, EXP-025 completed as a valid `POST_HOC_PROTOCOL_RECOVERY`
+result. It reports `D-` for OLMo fixed-readout degradation breadth and `G+`
+for limited second-family featurewise-recalibration recovery. The manuscript
+scope has been updated accordingly: the core degradation existence claim
+remains supported by the Qwen chain, while cross-model degradation breadth is
+`NOT_ESTABLISHED` and cross-model recovery support is `LIMITED`.

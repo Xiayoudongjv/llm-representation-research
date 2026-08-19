@@ -153,6 +153,31 @@ This matrix is a manuscript guardrail. Canonical experiment results and
   universal mechanism denial.
 - Paper section: Results 4.6 and Discussion 5.3/5.7.
 
+## EXP-025 Claim Updates
+
+EXP-025 extends the panel to `allenai/OLMo-2-0425-1B-Instruct` and requires
+the following narrow claim-level updates:
+
+- **CLAIM A1 — core existence:** fixed readout compatibility loss can occur
+  across depth. Status: `SUPPORTED`. Evidence remains the Qwen chain.
+- **CLAIM A2 — cross-model degradation breadth:** fixed-readout degradation is
+  broadly/stably reproduced across model families. Status: `NOT_ESTABLISHED`.
+  Evidence: EXP-025 `D-`.
+- **CLAIM B — FIT-only low-capacity featurewise recalibration recovery:**
+  Status: `STRENGTHENED_WITH_LIMITED_CROSS_MODEL_SUPPORT`. Evidence: EXP-025
+  `G+`.
+- **CLAIM C — cross-model generality:** Status:
+  `LIMITED_CROSS_MODEL_SUPPORT`. Evidence: recovery support is second-family
+  but not architecture-independent; degradation breadth is not replicated.
+- **CLAIM D — simple degradation magnitude predicts recalibration
+  susceptibility:** Status: `NOT_SUPPORTED`. Evidence: EXP-024 and EXP-025 both
+  failed the registered support rule.
+- **CLAIM E — transport / invariant preservation / functional binding /
+  behavioral effect:** Status: `NOT_TESTED`.
+
+Existing C4/C5/C7/C12 remain correct for their original scope; their limiting
+evidence now also includes the EXP-025 cross-model result where applicable.
+
 ## Matrix Summary
 
 | ID | Statement | Status | Supporting | Limiting | Paper section |

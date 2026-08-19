@@ -23,6 +23,10 @@
 | fixed variant-direction explanation | NOT_SUPPORTED | EXP-022A/EXP-023 complementary split degradation/rescue pattern |
 | panel-bounded featurewise calibration benefit | OBSERVED_DESCRIPTIVE | EXP-024 canonical result: `G_eval > 0` in 10/10 registered conditions; descriptive panel observation |
 | simple condition-level degradation-magnitude susceptibility prediction | NOT_SUPPORTED | EXP-024 canonical result: rho `0.28401877872187725`, exact one-sided p `0.2115079365079365`, support false |
+| cross-model fixed-readout degradation breadth | NOT_ESTABLISHED | EXP-025 canonical result: `D-`; 7 positive, 2 negative, 1 zero; exact one-sided p `0.08984375` |
+| cross-model FIT-only featurewise recalibration recovery | LIMITED_SUPPORT | EXP-025 canonical result: `G+`; 7 positive, 1 negative, 2 zero; exact one-sided p `0.03515625` |
+| simple degradation-magnitude susceptibility prediction across both registered panels | NOT_SUPPORTED | EXP-024 and EXP-025 both failed the registered support rule; EXP-025 rho `0.3765432098765432`, exact permutation p `0.14020502645502644` |
+| core fixed-readout degradation existence | SUPPORTED | Qwen evidence chain remains; EXP-025 `D-` narrows breadth but does not refute the existence claim |
 | same-family layerwise readout refit rescue | NOT_SUPPORTED_IN_EXP022A | EXP-022A G_refit unsupported both splits |
 | coordinate transport | NOT_TESTED | no canonical result |
 | functional binding / behavioral control | NOT_SUPPORTED / NOT_TESTED_BY_EXP022A | EXP-017; EXP-022A did not directly test this claim |
@@ -31,6 +35,8 @@
 
 - `SUPPORTED`: canonical result supports the claim.
 - `NOT_SUPPORTED`: canonical result does not support the claim.
+- `NOT_ESTABLISHED`: no canonical support for breadth/generality exists; not an assertion of global absence.
+- `LIMITED_SUPPORT`: a registered result supports a bounded/second-family interpretation, but not a broad generality claim.
 - `FAILED`: canonical result failed an explicit test.
 - `NOT_TESTED`: no canonical result exists.
 - `SPECULATIVE`: hypothesis only.

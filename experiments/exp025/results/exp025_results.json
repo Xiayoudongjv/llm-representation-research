@@ -1,0 +1,348 @@
+{
+  "attempt_status": "FORMAL_RUN_ATTEMPT_COMPLETED",
+  "classes": [
+    "logic",
+    "causality",
+    "analogy",
+    "definition"
+  ],
+  "condition_level": {
+    "condition_order": [
+      "c01_lexical_relex",
+      "c02_syntactic_restructure",
+      "c03_controlled_compression",
+      "c04_controlled_elaboration",
+      "c05_relation_explicit",
+      "c06_relation_implicit",
+      "c07_register_formal",
+      "c08_register_informal",
+      "c09_neutral_distractor_prefix",
+      "c10_anaphoric_reference"
+    ],
+    "descriptive_summaries": {
+      "mean_g_eval": 0.109375,
+      "mean_s_diag": 0.065625,
+      "median_g_eval": 0.125,
+      "median_s_diag": 0.09375
+    },
+    "diagnostic_balanced_accuracy": {
+      "c01_lexical_relex": {
+        "A0_block15": 0.8125,
+        "A0_block9": 1.0
+      },
+      "c02_syntactic_restructure": {
+        "A0_block15": 0.375,
+        "A0_block9": 0.53125
+      },
+      "c03_controlled_compression": {
+        "A0_block15": 0.71875,
+        "A0_block9": 0.75
+      },
+      "c04_controlled_elaboration": {
+        "A0_block15": 0.6875,
+        "A0_block9": 0.53125
+      },
+      "c05_relation_explicit": {
+        "A0_block15": 0.34375,
+        "A0_block9": 0.4375
+      },
+      "c06_relation_implicit": {
+        "A0_block15": 0.3125,
+        "A0_block9": 0.3125
+      },
+      "c07_register_formal": {
+        "A0_block15": 0.78125,
+        "A0_block9": 1.0
+      },
+      "c08_register_informal": {
+        "A0_block15": 0.625,
+        "A0_block9": 0.8125
+      },
+      "c09_neutral_distractor_prefix": {
+        "A0_block15": 0.90625,
+        "A0_block9": 0.75
+      },
+      "c10_anaphoric_reference": {
+        "A0_block15": 0.65625,
+        "A0_block9": 0.75
+      }
+    },
+    "eval_balanced_accuracy": {
+      "c01_lexical_relex": {
+        "A0": 0.84375,
+        "A_mu": 1.0,
+        "A_mu_sigma": 1.0,
+        "A_sigma": 0.59375
+      },
+      "c02_syntactic_restructure": {
+        "A0": 0.34375,
+        "A_mu": 0.46875,
+        "A_mu_sigma": 0.46875,
+        "A_sigma": 0.25
+      },
+      "c03_controlled_compression": {
+        "A0": 0.75,
+        "A_mu": 0.75,
+        "A_mu_sigma": 0.75,
+        "A_sigma": 0.5625
+      },
+      "c04_controlled_elaboration": {
+        "A0": 0.71875,
+        "A_mu": 0.875,
+        "A_mu_sigma": 0.90625,
+        "A_sigma": 0.625
+      },
+      "c05_relation_explicit": {
+        "A0": 0.34375,
+        "A_mu": 0.3125,
+        "A_mu_sigma": 0.3125,
+        "A_sigma": 0.28125
+      },
+      "c06_relation_implicit": {
+        "A0": 0.3125,
+        "A_mu": 0.3125,
+        "A_mu_sigma": 0.3125,
+        "A_sigma": 0.25
+      },
+      "c07_register_formal": {
+        "A0": 0.75,
+        "A_mu": 1.0,
+        "A_mu_sigma": 0.96875,
+        "A_sigma": 0.59375
+      },
+      "c08_register_informal": {
+        "A0": 0.78125,
+        "A_mu": 0.84375,
+        "A_mu_sigma": 0.90625,
+        "A_sigma": 0.78125
+      },
+      "c09_neutral_distractor_prefix": {
+        "A0": 0.78125,
+        "A_mu": 0.875,
+        "A_mu_sigma": 0.875,
+        "A_sigma": 0.625
+      },
+      "c10_anaphoric_reference": {
+        "A0": 0.59375,
+        "A_mu": 0.78125,
+        "A_mu_sigma": 0.8125,
+        "A_sigma": 0.71875
+      }
+    },
+    "g_eval": {
+      "c01_lexical_relex": 0.15625,
+      "c02_syntactic_restructure": 0.125,
+      "c03_controlled_compression": 0.0,
+      "c04_controlled_elaboration": 0.1875,
+      "c05_relation_explicit": -0.03125,
+      "c06_relation_implicit": 0.0,
+      "c07_register_formal": 0.21875,
+      "c08_register_informal": 0.125,
+      "c09_neutral_distractor_prefix": 0.09375,
+      "c10_anaphoric_reference": 0.21875
+    },
+    "g_joint_over_mu": {
+      "c01_lexical_relex": 0.0,
+      "c02_syntactic_restructure": 0.0,
+      "c03_controlled_compression": 0.0,
+      "c04_controlled_elaboration": 0.03125,
+      "c05_relation_explicit": 0.0,
+      "c06_relation_implicit": 0.0,
+      "c07_register_formal": -0.03125,
+      "c08_register_informal": 0.0625,
+      "c09_neutral_distractor_prefix": 0.0,
+      "c10_anaphoric_reference": 0.03125
+    },
+    "g_joint_over_sigma": {
+      "c01_lexical_relex": 0.40625,
+      "c02_syntactic_restructure": 0.21875,
+      "c03_controlled_compression": 0.1875,
+      "c04_controlled_elaboration": 0.28125,
+      "c05_relation_explicit": 0.03125,
+      "c06_relation_implicit": 0.0625,
+      "c07_register_formal": 0.375,
+      "c08_register_informal": 0.125,
+      "c09_neutral_distractor_prefix": 0.25,
+      "c10_anaphoric_reference": 0.09375
+    },
+    "g_mu": {
+      "c01_lexical_relex": 0.15625,
+      "c02_syntactic_restructure": 0.125,
+      "c03_controlled_compression": 0.0,
+      "c04_controlled_elaboration": 0.15625,
+      "c05_relation_explicit": -0.03125,
+      "c06_relation_implicit": 0.0,
+      "c07_register_formal": 0.25,
+      "c08_register_informal": 0.0625,
+      "c09_neutral_distractor_prefix": 0.09375,
+      "c10_anaphoric_reference": 0.1875
+    },
+    "g_sigma": {
+      "c01_lexical_relex": -0.25,
+      "c02_syntactic_restructure": -0.09375,
+      "c03_controlled_compression": -0.1875,
+      "c04_controlled_elaboration": -0.09375,
+      "c05_relation_explicit": -0.0625,
+      "c06_relation_implicit": -0.0625,
+      "c07_register_formal": -0.15625,
+      "c08_register_informal": 0.0,
+      "c09_neutral_distractor_prefix": -0.15625,
+      "c10_anaphoric_reference": 0.125
+    },
+    "s_diag": {
+      "c01_lexical_relex": 0.1875,
+      "c02_syntactic_restructure": 0.15625,
+      "c03_controlled_compression": 0.03125,
+      "c04_controlled_elaboration": -0.15625,
+      "c05_relation_explicit": 0.09375,
+      "c06_relation_implicit": 0.0,
+      "c07_register_formal": 0.21875,
+      "c08_register_informal": 0.1875,
+      "c09_neutral_distractor_prefix": -0.15625,
+      "c10_anaphoric_reference": 0.09375
+    }
+  },
+  "condition_panel": {
+    "path": "experiments\\exp024\\condition_panel_spec.json",
+    "sha256": "a3b8d565a94ef6041fbe6a29d73102ab4156cc19cfc07ccaeb06206d589f7954"
+  },
+  "d_g_inference": {
+    "D": {
+      "classification": "NEGATIVE",
+      "direction": "D-",
+      "effective_n": 9,
+      "effective_successes": 7,
+      "exact_one_sided_p": 0.08984375,
+      "negative_count": 2,
+      "positive_count": 7,
+      "status": "EVALUABLE",
+      "support": "NOT_SUPPORTED",
+      "zero_count": 1
+    },
+    "G": {
+      "classification": "POSITIVE",
+      "direction": "G+",
+      "effective_n": 8,
+      "effective_successes": 7,
+      "exact_one_sided_p": 0.03515625,
+      "negative_count": 1,
+      "positive_count": 7,
+      "status": "EVALUABLE",
+      "support": "SUPPORTED",
+      "zero_count": 2
+    },
+    "condition_order": [
+      "c01_lexical_relex",
+      "c02_syntactic_restructure",
+      "c03_controlled_compression",
+      "c04_controlled_elaboration",
+      "c05_relation_explicit",
+      "c06_relation_implicit",
+      "c07_register_formal",
+      "c08_register_informal",
+      "c09_neutral_distractor_prefix",
+      "c10_anaphoric_reference"
+    ]
+  },
+  "dataset": {
+    "condition_count": 10,
+    "partition_family_counts": {
+      "DIAGNOSTIC": 320,
+      "EVAL": 320,
+      "FIT": 240
+    },
+    "path": "experiments\\exp024\\data\\exp024_condition_panel_frozen.json",
+    "record_count": 1760,
+    "semantic_class_count": 4,
+    "sha256": "46c832b68b6ac95704bf5143badc1431627d7f935648842a78971491b13ee404",
+    "source_family_count": 880
+  },
+  "experiment": "EXP-025",
+  "hidden_states_included": false,
+  "model": {
+    "block_count": 16,
+    "device": "cuda:0",
+    "hidden_size": 2048,
+    "model_class": "Olmo2ForCausalLM",
+    "model_id": "allenai/OLMo-2-0425-1B-Instruct",
+    "model_type": "olmo2",
+    "revision": "48d788eca847d4d7548f375ad03d3c9312f6139e",
+    "runtime_dtype": "torch.bfloat16"
+  },
+  "primary": {
+    "alpha": 0.05,
+    "alternative": "greater",
+    "count_ge": 508776,
+    "diagnostic": "S_diag(c)",
+    "exact_one_sided_p": 0.14020502645502644,
+    "outcome": "G_eval(c)",
+    "permutation_count": 3628800,
+    "permutation_status": "EVALUABLE",
+    "rho": 0.3765432098765432,
+    "scientific_unit": "condition",
+    "statistic": "Spearman_rho",
+    "support_rule": "rho>0_and_p<=0.05",
+    "supported": false
+  },
+  "prompt_text_included": false,
+  "provenance": {
+    "authorization_id": "7b3dbdaf-1fb4-4272-a80b-58b99adac59d",
+    "authorization_sha256": "be2c8aaa70cc5b24ed5bf9a9edae288c75803b9c5974e2872544a77c2fe8814d",
+    "authorized_repository_commit": "753aeb83fbcaead1527a46795ecda54faadf79a7",
+    "authorized_runner_sha256": "c28c424a502fb755a44458f34be2811a8ab121b39b6a3062096e8d350da0c201",
+    "clarification_authority_hashes": {
+      "clarification_json": "4f65a60dcf40e24e57cbddda1be8d6573b353ab9cf17c901b3aa5fb2d5b47e16",
+      "clarification_md": "1b91d6b2efd4c4459779e6645f893aea91804c32d7834b22044a85f7e721b0ed",
+      "clarification_validator": "d3abf68502861f752655b46ef72405b1193783d80b3332f912ccf734abafb555"
+    },
+    "consumption_record_path": "D:\\Research\\llm-representation-research\\experiments\\exp025\\results\\authorization_consumption\\7b3dbdaf-1fb4-4272-a80b-58b99adac59d.json",
+    "consumption_record_sha256": "2d88598be6deaf8e078c0e7ae8d9c1ed49f2946d6f2356d89dec3451025602c6",
+    "execution_finished_at_utc": "2026-08-19T10:54:06.131115+00:00",
+    "execution_started_at_utc": "2026-08-19T10:53:12.279517+00:00",
+    "formal_data_model_inference_count": 1120,
+    "historical_formal_attempts": {
+      "authorization_consumption_count": 1,
+      "consumed_formal_attempt_count": 1,
+      "preconsumption_abort_count": 2,
+      "prior_scientific_outcome_exposure": false,
+      "prior_valid_scientific_result_count": 0,
+      "total_formal_command_launch_count": 3
+    },
+    "original_frozen_authority_hashes": {
+      "checkpoint_mapping": "5f8c5df4aa849ceb7ee2ca8b1765aeeff46b96182426c97b81d320b3dda6a087",
+      "design_validator": "e87042535622e545c682a6f1019bf3703b4d0029d895e80c74269f7f1f26376d",
+      "exp025_preregistration": "b83fd58ba36e55ab5c48577169e07a168d2a55df759d3131677cd86f2363e08e",
+      "frozen_config": "2c9b1b8735378108c921a8ca99a1aab115b2a6669bf82e5ae0a9314dd4b62275",
+      "model_selection": "be28f7a2b1f460879e65f0ac911b01756d76b45069f8f438021412b76e954f80"
+    },
+    "run_attempt_id": "188b06acbaac436591bb690afdfe8bb4"
+  },
+  "recovery_governance": {
+    "amendment_id": "EXP025_PROTOCOL_RECOVERY_AMENDMENT_001",
+    "amendment_path": "experiments\\exp025\\engineering\\EXP-025-PROTOCOL-RECOVERY-AMENDMENT-001.md",
+    "amendment_sha256": "8438b34d08cf12fa451fb8f5b5040c00fa72b7bb9d336118ead28b739d43cfcd",
+    "execution_classification": "POST_HOC_PROTOCOL_RECOVERY",
+    "prior_scientific_outcome_exposure": false
+  },
+  "result_status": "FORMAL_RESULT",
+  "routing": {
+    "generic_calibration_breadth": null,
+    "next_mechanism_question": "MODEL_DEPTH_COMPATIBILITY_HIGHER_PRIORITY",
+    "operator_mechanism_priority": "DEFER_OR_REASSESS",
+    "paper_a_breadth": "NOT_CROSS_MODEL_REPLICATED",
+    "routing": "D-_G+",
+    "technical_validity": "VALID"
+  },
+  "runner": {
+    "path": "experiments\\exp025\\run_exp025.py",
+    "repository_commit": "753aeb83fbcaead1527a46795ecda54faadf79a7",
+    "sha256": "c28c424a502fb755a44458f34be2811a8ab121b39b6a3062096e8d350da0c201"
+  },
+  "schema_version": "1.0.0",
+  "scientific_status": "FORMAL_ANALYSIS_COMPLETED",
+  "technical_validity": {
+    "fit_reference_balanced_accuracy": 1.0,
+    "passes_measurement_usability_criterion": true,
+    "status": "VALID"
+  }
+}

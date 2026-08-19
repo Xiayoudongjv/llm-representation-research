@@ -48,14 +48,15 @@ Registered result: primary support `false`.
 The remaining scientific gap is not the absence of a susceptibility test. It is
 that a simple independent degradation-magnitude measure is insufficient to
 explain condition-level calibration benefit, while the actual mechanism remains
-unresolved. Cross-model generality also remains untested.
+unresolved. EXP-025 now tests OLMo-2: degradation breadth is not replicated and
+recovery support is limited.
 
 ## Venue Readiness
 
 | Venue | Current fit | Main strength | Main weakness | Minimum additional evidence needed |
 | --- | --- | --- | --- | --- |
 | TMLR | conditional | transparent negative result and reproducibility controls | simple susceptibility predictor not supported; mechanism unresolved | clearly bounded claim; optional cross-model breadth |
-| Neural Networks | conditional | layerwise readout + calibration analysis | one model family, controlled data | cross-model generality or mechanistic condition-level diagnostic |
+| Neural Networks | conditional | layerwise readout + calibration analysis | limited two-family breadth; degradation not replicated | mechanistic condition-level diagnostic or model/depth compatibility profile |
 | ICLR | cautious | clean controlled chain and negative evidence | small evidence breadth | stronger mechanistic or generalization evidence |
 | NeurIPS | cautious | interesting negative/heterogeneous result | no causal/functional mechanism | independent predictor and broader validation |
 | ICML | cautious | controlled methodology | limited theoretical/functional contribution | clear mechanism-level advance |
@@ -88,6 +89,27 @@ Proceed to `Task 099B`: adversarial scientific manuscript review of
 
 Do not automatically create EXP-025, create a replacement authorization, or
 launch a second-model replication rescue.
+
+## Task 100E Scientific Review
+
+- `EXP025_100E_COMPLETE = true`
+- `EXP025_CANONICAL_RESULT_SHA256 = bbac2f03b24bdf2ec93485c201d3c0cf50588ed51659e607bb97b231181765a9`
+- `EXP025_REGISTERED_ROUTING_CLASSIFICATION = D-_G+`
+- `EXP025_RQ1_STATUS = NOT_SUPPORTED`
+- `EXP025_RQ2_STATUS = SUPPORTED`
+- `EXP025_RQ3_STATUS = NOT_SUPPORTED`
+- Primary next direction: `MODEL_DEPTH_COMPATIBILITY_PROFILE`
+- Backup next direction: `OPERATOR_CAPACITY_MINIMUM_SUFFICIENT_ALIGNMENT`
+
+## Task 100F Archive and Paper A Accuracy Correction
+
+- `EXP025_CANONICAL_RESULT_ARCHIVED = true`
+- `EXP025_RECOVERY_PROVENANCE_ARCHIVED = true`
+- `PAPER_A_UPDATED_FOR_EXP025 = true`
+- `PAPER_A_CROSS_MODEL_SCOPE_CORRECTED = true`
+- `PAPER_A_RECOVERY_PROVENANCE_DISCLOSED = true`
+- `PAPER_A_NEW_EXPERIMENT_REQUIRED = NO`
+- Next task: `101A_MODEL_DEPTH_COMPATIBILITY_PROFILE_DESIGN_AUDIT`
 
 ## Follow-Up Design
 

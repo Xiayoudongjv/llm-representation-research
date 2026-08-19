@@ -14,7 +14,7 @@ Canonical experimental artifacts outrank it.
 - EXP-022A -> diagnosed fixed-frame degradation with the A0/A1/A2 ladder.
 - EXP-023 -> independent preregistered `NO_REPLICATION`; one strong featurewise-calibration rescue split and one null split.
 - EXP-024 -> valid condition-panel susceptibility test; simple independent degradation-magnitude predictor `NOT_SUPPORTED`; broad descriptive calibration benefit observed in 10/10 conditions.
-- EXP-025 -> cross-model replication design frozen with `allenai/OLMo-2-0425-1B-Instruct`; formal run not yet authorized or performed.
+- EXP-025 -> cross-model panel replication on `allenai/OLMo-2-0425-1B-Instruct`; registered `D-_G+`.
 
 ## EXP-022A Result Summary
 
@@ -45,6 +45,22 @@ Canonical experimental artifacts outrank it.
 - Claim boundary: broad panel-level calibration benefit is descriptive; a simple
   independent degradation-magnitude susceptibility predictor is not supported.
 
+## EXP-025 Result Summary
+
+- Canonical result SHA-256:
+  `bbac2f03b24bdf2ec93485c201d3c0cf50588ed51659e607bb97b231181765a9`
+- Execution classification: `POST_HOC_PROTOCOL_RECOVERY`
+- `D`: `NOT_SUPPORTED`, direction `D-`; 7 positive, 2 negative, 1 zero; exact
+  one-sided `p = 0.08984375`.
+- `G`: `SUPPORTED`, direction `G+`; 7 positive, 1 negative, 2 zero; exact
+  one-sided `p = 0.03515625`.
+- RQ3 susceptibility predictor: rho `0.3765432098765432`, exact permutation
+  `p = 0.14020502645502644`, support false.
+- Registered routing: `D-_G+`.
+- Claim boundary: core degradation existence remains supported by the Qwen
+  chain; cross-model degradation breadth is not established; recovery has
+  limited second-family support.
+
 ## Result-Conditioned Decision Tree
 
 - A0 degradation: present directionally in both splits; primary-supported only in Split B.
@@ -61,8 +77,20 @@ Post-EXP-024 branch:
 - Paper-A full prose drafting may proceed with the bounded story.
 - Second-model breadth is optional/venue-uplift, not a validity requirement for
   the current bounded manuscript.
-- Explicit Task 100A has now frozen a bounded EXP-025 cross-model replication
-  design, but formal execution remains disabled pending engineering
-  qualification and a single-use authorization.
+- Explicit Task 100A froze a bounded EXP-025 cross-model replication design;
+  execution was later completed under a post-hoc protocol-recovery
+  authorization after pre-inference engineering failure.
+
+Post-EXP-025 branch:
+
+- EXP-025 completed as a valid `POST_HOC_PROTOCOL_RECOVERY` result.
+- `D-` means cross-model degradation breadth is not established; the next
+  highest-information question is model/depth compatibility, not immediate
+  operator-capacity escalation.
+- `G+` gives limited cross-model recovery support.
+- Primary next direction: `MODEL_DEPTH_COMPATIBILITY_PROFILE`.
+- Backup next direction:
+  `OPERATOR_CAPACITY_MINIMUM_SUFFICIENT_ALIGNMENT`.
+- Do not create EXP-026 yet.
 
 This is an experimental-priority decision, not a scientific claim.

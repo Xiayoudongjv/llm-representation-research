@@ -23,11 +23,11 @@ not be cited as findings or moved into `CLAIM-LEDGER.md` as fact.
 - Title: Featurewise recalibration benefit may be conditional on independently measurable readout mismatch
 - Origin: EXP-023 `NO_REPLICATION` with strong Split-A rescue and Split-B null; EXP-022A complementary split pattern.
 - Hypothesis: Featurewise recalibration benefit may occur primarily when a representation/readout interface exhibits independently measurable layerwise mismatch, rather than being a uniform property of all held-out conditions.
-- Current evidence: EXP-024 valid formal test observed rho `0.28401877872187725`, exact one-sided p `0.2115079365079365`, primary support false; all 10 conditions had positive `S_diag` and `G_eval` descriptively.
-- Counterevidence: EXP-024 primary support rule was not met; simple independent degradation magnitude did not significantly rank calibration benefit; condition-level diagnostic had limited resolution and substantial ties.
-- Status: `NOT_SUPPORTED_BY_EXP024_PRIMARY_TEST`
-- Dependencies: EXP-024 canonical result `experiments/exp024/results/exp024_results.json`.
-- Next discriminating experiment: No immediate confirmatory follow-up; preserve the mechanism gap unless a materially different, theoretically justified, separately preregistered question is proposed.
+- Current evidence: EXP-024 valid formal test observed rho `0.28401877872187725`, exact one-sided p `0.2115079365079365`, primary support false; all 10 conditions had positive `S_diag` and `G_eval` descriptively. EXP-025 OLMo panel observed rho `0.3765432098765432`, exact permutation p `0.14020502645502644`, primary support false.
+- Counterevidence: EXP-024 and EXP-025 primary support rules were not met; simple independent degradation magnitude did not significantly rank calibration benefit; condition-level diagnostic had limited resolution and substantial ties.
+- Status: `NOT_SUPPORTED_BY_EXP024_AND_EXP025_PRIMARY_TESTS`
+- Dependencies: EXP-024 canonical result `experiments/exp024/results/exp024_results.json`; EXP-025 canonical result `experiments/exp025/results/exp025_results.json`.
+- Next discriminating experiment: No immediate confirmatory follow-up; preserve the mechanism gap unless a materially different, theoretically justified, separately preregistered question is proposed. Primary routing is now `MODEL_DEPTH_COMPATIBILITY_PROFILE`.
 - Claim boundary: Simple susceptibility predictor not supported; this does not negate the descriptive panel calibration benefit and does not establish general unrelatedness.
 
 ## HYP_MEAN_CALIBRATION_001
@@ -82,7 +82,8 @@ not be cited as findings or moved into `CLAIM-LEDGER.md` as fact.
 - Next discriminating experiment: Deferred.
 - Claim boundary: Do not assert non-Abelian structure.
 - KAN / operator-family note: Standard KAN provides a concrete example of function-valued edges and a prospective `T0`-`T5` complexity ladder, but it does not provide evidence for this hypothesis and must not be cited as validation of the project's operator theory.
-- Deferred sub-question: Does held-out fixed-readout recovery require operator complexity beyond diagonal affine recalibration? Candidate label `HYP_OPERATOR_CAPACITY_001` is not registered as a separate active hypothesis; status `DEFERRED_BEHIND_CROSS_MODEL_REPLICATION`, evidence `NOT_TESTED`.
+- Deferred sub-question: Does held-out fixed-readout recovery require operator complexity beyond diagonal affine recalibration? Candidate label `HYP_OPERATOR_CAPACITY_001` is not registered as a separate active hypothesis; status `DEFERRED_OR_REASSESS`, evidence `NOT_TESTED`.
+- EXP-025 routing note: `D-` assigns higher priority to model/depth compatibility profiling than to immediate operator-capacity escalation; operator-capacity work remains a deferred backup direction, not abandoned.
 
 ## HYP-OPERATOR-NET-001
 

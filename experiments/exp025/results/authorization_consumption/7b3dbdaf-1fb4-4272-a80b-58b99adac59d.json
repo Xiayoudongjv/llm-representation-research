@@ -1,0 +1,12 @@
+{
+  "authorization_id": "7b3dbdaf-1fb4-4272-a80b-58b99adac59d",
+  "authorization_path": "D:\\Research\\llm-representation-research\\experiments\\exp025\\exp025_protocol_recovery_authorization_001.json",
+  "authorization_sha256": "be2c8aaa70cc5b24ed5bf9a9edae288c75803b9c5974e2872544a77c2fe8814d",
+  "classification": "AUTHORIZATION_CONSUMPTION",
+  "consumed_at_utc": "2026-08-19T10:53:12.203418+00:00",
+  "consumption_record_path": "D:\\Research\\llm-representation-research\\experiments\\exp025\\results\\authorization_consumption\\7b3dbdaf-1fb4-4272-a80b-58b99adac59d.json",
+  "repository_commit": "753aeb83fbcaead1527a46795ecda54faadf79a7",
+  "run_attempt_id": "188b06acbaac436591bb690afdfe8bb4",
+  "runner_sha256": "c28c424a502fb755a44458f34be2811a8ab121b39b6a3062096e8d350da0c201",
+  "schema_version": "1.0.0"
+}

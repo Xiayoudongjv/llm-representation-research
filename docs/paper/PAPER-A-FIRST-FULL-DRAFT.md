@@ -26,10 +26,14 @@ conditions show positive diagnostic degradation and positive calibration benefit
 descriptively, but the preregistered primary test of simple independent
 degradation-magnitude prediction is `NOT_SUPPORTED`
 (`rho = 0.28401877872187725`, exact one-sided permutation `p = 0.2115079365079365`).
+A separate OLMo-2 cross-model panel is less uniform: fixed-readout degradation
+is not broadly replicated (`D-`, exact one-sided `p = 0.08984375`), while
+FIT-only featurewise recalibration shows limited second-family recovery support
+(`G+`, exact one-sided `p = 0.03515625`).
 The bounded conclusion is that fixed-readout incompatibility, calibration
 utility, and susceptibility predictability are distinct empirical questions;
-simple degradation magnitude is not sufficient to explain calibration
-susceptibility.
+the effects are condition- and model-dependent, and simple degradation
+magnitude is not sufficient to explain calibration susceptibility.
 
 ## 1. Introduction
 
@@ -87,9 +91,12 @@ The strongest bounded claim is:
 > Fixed semantic readouts can lose compatibility across Transformer depth under
 > held-out evaluation. Low-capacity FIT-only featurewise recalibration can
 > restore substantial readout performance in multiple tested conditions,
-> although the effect is heterogeneous across datasets and splits. Moreover, a
+> although the effect is heterogeneous across datasets, splits, and models.
+> OLMo-2 provides limited cross-model recovery support without uniformly
+> replicating the Qwen fixed-readout degradation pattern. Moreover, a
 > preregistered independent measure of fixed-readout degradation did not
-> reliably predict the magnitude of calibration benefit.
+> reliably predict the magnitude of calibration benefit in either registered
+> panel.
 
 This claim does not assert representation invariance, coordinate transport,
 semantic preservation, universal calibration, causal reasoning control, true
@@ -161,6 +168,15 @@ replication EXP-020A uses `Qwen/Qwen3-4B`. EXP-018 includes secondary
 Gemma-3-1B configurations, but the behavioral and later calibration studies
 focus on Qwen3 models. Model and tokenizer loading used local-only offline
 semantics; no alternate snapshot or network fallback was permitted.
+
+EXP-025 repeats the frozen 10-condition panel with
+`allenai/OLMo-2-0425-1B-Instruct`, local snapshot
+`48d788eca847d4d7548f375ad03d3c9312f6139e`, using the same FIT/DIAGNOSTIC/EVAL
+partition structure and the same fixed-readout/recalibration endpoints. Its
+formal result is governed as a post-hoc protocol-recovery execution: a prior
+authorization was consumed by a deterministic pre-inference implementation
+failure, and no DIAGNOSTIC or EVAL data, scientific inference, registered
+statistic, or scientific outcome was observed before the recovery execution.
 
 For the frozen Qwen3-1.7B implementation, hidden-state tuple semantics are:
 
@@ -301,6 +317,7 @@ results. It is summarized below:
 | EXP-022A | Does fixed-readout degradation occur in a discovery frame? | Fixed readout at reference vs block27-pre | `PARTIAL_CONCORDANCE`; Split B `D_fixed = -0.50`, `p = 0.015625` | Fixed-readout degradation observed | Discovery stage |
 | EXP-023 | Does featurewise calibration rescue replicate across complementary splits? | Independent preregistered replication | `NO_REPLICATION` | Split A rescue, Split B null rescue | No general cross-split calibration claim |
 | EXP-024 | Does independent `S_diag` predict independent `G_eval` across the panel? | 10-condition independent DIAGNOSTIC/EVAL design | Primary `NOT_SUPPORTED`; `rho = 0.284`, exact `p = 0.2115` | Simple degradation predictor unsupported | 10/10 positivity is descriptive only |
+| EXP-025 | Does the fixed-readout/recalibration panel pattern replicate across model families? | Same 10-condition panel on `allenai/OLMo-2-0425-1B-Instruct` | `D-`; `G+` | Degradation breadth not replicated; recovery limited | `D-` not established; `G+` limited cross-model recovery |
 
 ## 4. Results
 
@@ -460,7 +477,30 @@ The correct dual-proposition reading is: broad panel-bounded positive
 calibration benefit does not imply successful prospective susceptibility
 prediction.
 
-### 4.6 Integrated claim-boundary synthesis
+### 4.6 EXP-025 cross-model panel evidence
+
+EXP-025 applied the frozen 10-condition panel to
+`allenai/OLMo-2-0425-1B-Instruct`. It reports:
+
+- `S_diag`: 7 positive, 2 negative, 1 zero conditions;
+  `mean(S_diag) = 0.065625`; exact one-sided `p = 0.08984375`.
+- `G_eval`: 7 positive, 1 negative, 2 zero conditions;
+  `mean(G_eval) = 0.109375`; exact one-sided `p = 0.03515625`.
+- Susceptibility predictor:
+  `rho = 0.3765432098765432`, exact permutation `p = 0.14020502645502644`,
+  support `false`.
+
+The registered routing is `D-_G+`: fixed-readout degradation breadth is not
+replicated across this model comparison, while FIT-only featurewise
+recalibration has limited second-family recovery support. The simple
+independent susceptibility predictor remains `NOT_SUPPORTED` in the second
+registered panel test.
+
+These are pattern-level cross-model observations. The absolute effect sizes are
+not interpreted as directly comparable beyond what the shared condition-panel
+design supports.
+
+### 4.7 Integrated claim-boundary synthesis
 
 The combined chain supports a bounded positive/negative story:
 
@@ -470,11 +510,14 @@ The combined chain supports a bounded positive/negative story:
 - FIT-only featurewise recalibration can rescue some degraded readouts.
 - General cross-split calibration replication is not supported.
 - Panel-bounded descriptive calibration benefit is observed in EXP-024.
+- EXP-025 shows mixed OLMo degradation, limited recovery support, and a second
+  non-support for the simple susceptibility predictor.
 - Simple independent degradation magnitude does not reliably rank calibration
   susceptibility.
 
 General coordinate transport, functional binding, universal calibration, and
-cross-model generality remain outside the supported claims.
+cross-model degradation breadth remain outside the supported claims. OLMo
+recovery support is limited, not a claim of architecture independence.
 
 ## 5. Discussion
 
@@ -483,6 +526,8 @@ cross-model generality remain outside the supported claims.
 Fixed readout degradation was repeatedly observed across deeper checkpoints.
 Featurewise recalibration improved readout accuracy in several degraded
 conditions, and EXP-024 observed positive `G_eval` in all ten panel conditions.
+EXP-025 did not uniformly replicate the fixed-readout degradation pattern in
+OLMo, but still showed a registered `G+` recovery signal.
 These observations make it difficult to interpret every fixed-readout failure
 as evidence that task-associated information has disappeared.
 
@@ -503,6 +548,12 @@ larger independent diagnostic degradation should rank larger calibration
 benefit. The primary test did not support this predictor. The result is a
 negative mechanism result, not evidence that calibration benefit and
 degradation are unrelated in general.
+
+EXP-025 repeated the condition-level predictor on OLMo. Its exact permutation
+`p = 0.14020502645502644` also failed the same support rule. The combined
+evidence is consistent with non-support of the simple predictor across both
+panels, but still does not establish general unrelatedness or a causal
+mechanism.
 
 ### 5.4 Open mechanism
 
@@ -534,7 +585,8 @@ This is a measurement-resolution limitation. It does not turn the registered
 
 The main limitations are:
 
-1. The primary evidence remains largely one model family.
+1. The primary evidence is now two model families, but EXP-025 shows that
+   fixed-readout degradation breadth is not established across them.
 2. The semantic construct has four operational classes.
 3. The condition panel is frozen and not a random sample from all possible
    surface transformations.
@@ -543,7 +595,8 @@ The main limitations are:
 5. EXP-024 condition-level diagnostic resolution is limited and tied.
 6. Calibration is deliberately low-capacity featurewise adaptation, not
    arbitrary alignment.
-7. Cross-model generality is untested.
+7. Cross-model recovery support is limited to the registered OLMo `G+` result;
+   fixed-readout degradation breadth is not replicated.
 8. Behavioral control is not established.
 9. Functional binding is not tested.
 10. General coordinate transport is not tested.
@@ -559,9 +612,11 @@ Three bounded conclusions follow from the evidence chain:
    under the tested settings.
 2. FIT-only featurewise recalibration can recover substantial readout
    performance in multiple tested conditions, but replication is heterogeneous
-   across datasets and splits.
+   across datasets, splits, and models; OLMo provides limited cross-model
+   recovery support.
 3. A simple independent degradation-magnitude diagnostic did not reliably
-   predict calibration benefit under the registered EXP-024 primary test.
+   predict calibration benefit under the registered EXP-024 or EXP-025 primary
+   tests.
 
 The mechanism governing calibration susceptibility remains unresolved. Future
 work should study which structural properties of representation/readout
@@ -642,7 +697,7 @@ canonical evidence. Vector SVG and preview PNG versions are stored in
 
 - **Table 1** (`docs/paper/tables/paper_a_evidence_summary.md`): scientific
   progression evidence summary across EXP-018, EXP-017, EXP-019, EXP-020A,
-  EXP-021, EXP-022A, EXP-023, and EXP-024.
+  EXP-021, EXP-022A, EXP-023, EXP-024, and EXP-025.
 - **Table 2** (`docs/paper/tables/exp024_condition_outcomes.md`): all ten
   EXP-024 condition outcomes with canonical `S_diag(c)`, `G_eval(c)`, and
   diagnostic balanced-accuracy fields, plus the registered primary summary.

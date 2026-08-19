@@ -22,6 +22,7 @@ recalibrated or transported across layers and interventions?
 - EXP-022A does not support same-family layerwise readout refit rescue.
 - EXP-023 independently returns `NO_REPLICATION`: strong Split-A rescue, null Split B.
 - EXP-024 returns a valid condition-panel primary `NOT_SUPPORTED` for the simple degradation-magnitude predictor, while 10/10 conditions show positive `S_diag` and `G_eval` descriptively.
+- EXP-025 returns a valid OLMo cross-model panel result: `D-` / `G+`; degradation breadth is not established, recovery support is limited.
 
 ## 4. Current claim boundaries
 
@@ -31,6 +32,7 @@ recalibrated or transported across layers and interventions?
 - Featurewise recalibration is currently descriptive, not a confirmed mechanism.
 - EXP-023 shows calibration rescue is conditional, not general cross-split replication.
 - EXP-024 shows broad panel-level calibration benefit descriptively, but the simple independent degradation-magnitude predictor is not supported.
+- EXP-025 shows mixed OLMo fixed-readout degradation and limited second-family recovery support; the simple predictor remains unsupported.
 - Coordinate transport is not tested.
 
 ## 5. EXP-022A exact scientific synthesis
@@ -64,10 +66,27 @@ recalibrated or transported across layers and interventions?
 - Design improvement: DIAGNOSTIC predictor and EVAL outcome use independent
   source families; `EXP024_SHARED_EVAL_A0_ALGEBRAIC_DEPENDENCY = false`.
 
+## 5c. EXP-025 exact scientific synthesis
+
+- Canonical result SHA-256:
+  `bbac2f03b24bdf2ec93485c201d3c0cf50588ed51659e607bb97b231181765a9`
+- Execution classification: `POST_HOC_PROTOCOL_RECOVERY`
+- `D`: `NOT_SUPPORTED` (`D-`); exact one-sided p `0.08984375`.
+- `G`: `SUPPORTED` (`G+`); exact one-sided p `0.03515625`.
+- RQ3 susceptibility predictor: rho `0.3765432098765432`, exact permutation p
+  `0.14020502645502644`, support false.
+- Registered routing: `D-_G+`.
+- `mean(S_diag) = 0.065625`; `mean(G_eval) = 0.109375`.
+- `S_diag`: 7 positive, 2 negative, 1 zero.
+- `G_eval`: 7 positive, 1 negative, 2 zero.
+- Cross-model degradation breadth: `NOT_ESTABLISHED`.
+- Cross-model recovery: `LIMITED_SUPPORT`.
+- Transport / functional binding: `NOT_TESTED`.
+
 ## 6. Active hypotheses
 
 - `HYP-CALIBRATION-001`: `NOT_SUPPORTED_AS_GENERAL_CROSS_SPLIT_REPLICATION`
-- `HYP_CALIBRATION_CONDITIONAL_002`: `NOT_SUPPORTED_BY_EXP024_PRIMARY_TEST`
+- `HYP_CALIBRATION_CONDITIONAL_002`: `NOT_SUPPORTED_BY_EXP024_AND_EXP025_PRIMARY_TESTS`
 - `HYP_MEAN_CALIBRATION_001`: `HYPOTHESIS_GENERATING_ONLY`
 - `HYP-TRANSPORT-001`: `ACTIVE_BUT_DEFERRED_BEHIND_CALIBRATION`
 - `HYP-COVER-001`: `INCUBATING_CONCEPTUAL`
@@ -88,9 +107,14 @@ current positive/negative evidence chain. Do not automatically launch EXP-025,
 a replacement authorization, or a second-model replication rescue; second-model
 breadth is optional/venue-uplift only.
 
-Explicit Task 100A has since frozen a bounded EXP-025 cross-model replication
-design using `allenai/OLMo-2-0425-1B-Instruct`. Formal execution remains
-disabled; the next gate is `100B_EXP025_ENGINEERING_QUALIFICATION`.
+Explicit Task 100A froze a bounded EXP-025 cross-model replication design using
+`allenai/OLMo-2-0425-1B-Instruct`; execution was later completed under a
+post-hoc protocol-recovery authorization after pre-inference engineering
+failure.
+
+Task 100F has now archived the valid EXP-025 recovery result. The next research
+direction is `MODEL_DEPTH_COMPATIBILITY_PROFILE`; backup is
+`OPERATOR_CAPACITY_MINIMUM_SUFFICIENT_ALIGNMENT`. Do not create EXP-026 yet.
 
 ## 9. Frozen authority links/hashes
 
@@ -118,6 +142,15 @@ disabled; the next gate is `100B_EXP025_ENGINEERING_QUALIFICATION`.
 - EXP-024 canonical result: `experiments/exp024/results/exp024_results.json`
   - SHA-256: `50a6ea72dbb9c33ae8ec15d0e2ad31b32ebe0cf299679875fe7b34fb6cabcb69`
 
+- EXP-025 canonical result: `experiments/exp025/results/exp025_results.json`
+  - SHA-256: `bbac2f03b24bdf2ec93485c201d3c0cf50588ed51659e607bb97b231181765a9`
+- EXP-025 recovery authorization:
+  `experiments/exp025/exp025_protocol_recovery_authorization_001.json`
+  - SHA-256: `be2c8aaa70cc5b24ed5bf9a9edae288c75803b9c5974e2872544a77c2fe8814d`
+- EXP-025 recovery consumption:
+  `experiments/exp025/results/authorization_consumption/7b3dbdaf-1fb4-4272-a80b-58b99adac59d.json`
+  - SHA-256: `2d88598be6deaf8e078c0e7ae8d9c1ed49f2946d6f2356d89dec3451025602c6`
+
 ## 10. Instructions to future AI
 
 - Canonical artifacts outrank chat summaries.
@@ -127,6 +160,7 @@ disabled; the next gate is `100B_EXP025_ENGINEERING_QUALIFICATION`.
 - Do not modify frozen protocol after outcome.
 - Do not modify frozen EXP-023 protocol after outcome.
 - Do not modify frozen EXP-024 protocol after outcome.
+- Do not modify the archived EXP-025 result or recovery provenance.
 
 ## 11. Long-Horizon Research Asset Map
 
