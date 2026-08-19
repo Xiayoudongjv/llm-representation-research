@@ -1,19 +1,22 @@
 {
   "atomic_consumption_test": "PASS",
   "atomic_publication_test": "PASS",
-  "canonical_result_sha256": "b4f7b55e629d36fbb27f48486572a6650b114b6a92db8b02f9f09833d7a9d16d",
+  "canonical_result_sha256": "16b2744428f19ccbe955c5a5e12b54d13f1cef9f4b094c53e9aa1b2fb4fc1d8e",
   "clarification_authority_hashes": {
     "clarification_json": "4f65a60dcf40e24e57cbddda1be8d6573b353ab9cf17c901b3aa5fb2d5b47e16",
     "clarification_md": "1b91d6b2efd4c4459779e6645f893aea91804c32d7834b22044a85f7e721b0ed",
     "clarification_validator": "d3abf68502861f752655b46ef72405b1193783d80b3332f912ccf734abafb555"
   },
   "classification": "FORMAL_PIPELINE_QUALIFICATION_ONLY",
-  "created_at_utc": "2026-08-19T09:15:41.258534+00:00",
+  "complete_provenance_binding": "PASS",
+  "created_at_utc": "2026-08-19T10:10:36.488889+00:00",
+  "degenerate_statistic_behavior": "PASS",
   "experiment": "EXP-025",
-  "finished_at_utc": "2026-08-19T09:15:41.430536+00:00",
+  "finished_at_utc": "2026-08-19T10:10:36.599291+00:00",
   "fit_diag_eval_firewall_test": "PASS",
   "formal_pipeline_qualification": "PASS",
   "formal_run_readiness": "READY",
+  "nested_schema_validation": "PASS",
   "original_frozen_authority_hashes": {
     "checkpoint_mapping": "5f8c5df4aa849ceb7ee2ca8b1765aeeff46b96182426c97b81d320b3dda6a087",
     "design_validator": "e87042535622e545c682a6f1019bf3703b4d0029d895e80c74269f7f1f26376d",
@@ -30,9 +33,11 @@
   "real_formal_run_executed": false,
   "real_production_executor_completed_on_synthetic_fixture": true,
   "real_production_executor_reached": true,
+  "recovery_governance_disclosure": "PASS",
+  "registered_descriptive_summaries": "PASS",
   "registered_statistics_expected_value_test": "PASS",
   "repository_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-  "runner_sha256": "ec3ec1378d52ffe03c6aea5a8c16da4a6c28cd26aee8235e0a1842b36d983d3f",
+  "runner_sha256": "c28c424a502fb755a44458f34be2811a8ab121b39b6a3062096e8d350da0c201",
   "schema_validation": "PASS",
   "schema_version": "1.0.0",
   "status": "PASS",
@@ -58,5 +63,6 @@
     "hidden_size": 4,
     "record_count": 1760
   },
+  "technical_usability_gate_test": "PASS",
   "valid_scientific_result_count": 0
 }

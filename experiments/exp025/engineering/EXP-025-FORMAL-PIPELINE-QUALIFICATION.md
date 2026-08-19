@@ -61,6 +61,6 @@ The real `_execute_formal_analysis` function was not mocked.
 
 ## Next Step
 
-If and only if independent rereview confirms this qualification and the formal
-executor, the next task is exactly one adversarial formal-executor rereview:
-`100D_F_ADVERSARIAL_FORMAL_EXECUTOR_REREVIEW`.
+If and only if the post-repair targeted rereview confirms this qualification
+and the formal executor, the next task is exactly one targeted post-repair
+rereview: `100D_H_TARGETED_POST_REPAIR_REREVIEW`.

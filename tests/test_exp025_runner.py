@@ -1,6 +1,8 @@
+import copy
 import hashlib
 import json
 import math
+import os
 import sys
 import uuid
 from pathlib import Path
@@ -476,10 +478,15 @@ def test_formal_runtime_synthetic_production_execution(tmp_path, monkeypatch):
     )
     result = runner._execute_formal_analysis(
         tmp_path,
-        {"authorization_id": "synthetic-auth"},
+            {
+                "authorization_id": "synthetic-auth",
+                "authorized_repository_commit": "a" * 40,
+                "runner_sha256": sha256_file(Path(runner.__file__)),
+            },
         {
             "authorization_sha256": "a" * 64,
             "consumption_record_sha256": "b" * 64,
+            "consumption_record_path": str(tmp_path / "consumption" / "synthetic-auth.json"),
         },
         "synthetic-attempt",
         condition_order=runner.CONDITION_ORDER,
@@ -516,10 +523,15 @@ def test_formal_atomic_publication_uses_temporary_root(tmp_path, monkeypatch):
     )
     result = runner._execute_formal_analysis(
         tmp_path,
-        {"authorization_id": "synthetic-auth"},
+            {
+                "authorization_id": "synthetic-auth",
+                "authorized_repository_commit": "a" * 40,
+                "runner_sha256": sha256_file(Path(runner.__file__)),
+            },
         {
             "authorization_sha256": "a" * 64,
             "consumption_record_sha256": "b" * 64,
+            "consumption_record_path": str(tmp_path / "consumption" / "synthetic-auth.json"),
         },
         "synthetic-attempt",
         condition_order=runner.CONDITION_ORDER,
@@ -562,3 +574,159 @@ def test_authorization_failure_matrix_blocks_before_consumption(tmp_path, monkey
     with pytest.raises(runner.ProtocolIntegrityError, match=expected):
         runner.run_formal(ROOT, authorization_path)
     assert not list(consumption_dir.glob("*.json"))
+
+
+def _build_valid_formal_result(tmp_path, monkeypatch):
+    records = _synthetic_formal_records()
+    monkeypatch.setattr(runner, "verify_frozen_design", lambda root=None: {})
+    monkeypatch.setattr(runner, "verify_inherited_authorities", lambda root=None: {})
+    monkeypatch.setattr(runner, "verify_clarification_authorities", lambda root=None: {})
+    monkeypatch.setattr(runner, "verify_no_result_collision", lambda root=None: None)
+    monkeypatch.setattr(runner, "_repository_commit", lambda root=None: "a" * 40)
+    monkeypatch.setattr(
+        runner,
+        "exact_one_sided_permutation_p",
+        lambda x, y, alternative="greater": {
+            "rho": 0.5,
+            "p": 0.04,
+            "count_ge": 1,
+            "total": math.factorial(10),
+            "status": "EVALUABLE",
+        },
+    )
+    return runner._execute_formal_analysis(
+        tmp_path,
+        {
+            "authorization_id": "synthetic-auth",
+            "authorized_repository_commit": "a" * 40,
+            "runner_sha256": sha256_file(Path(runner.__file__)),
+        },
+        {
+            "authorization_sha256": "a" * 64,
+            "consumption_record_sha256": "b" * 64,
+            "consumption_record_path": str(tmp_path / "consumption" / "synthetic-auth.json"),
+        },
+        "synthetic-attempt",
+        condition_order=runner.CONDITION_ORDER,
+        records_loader=lambda root=None: (records, []),
+        runtime_loader=lambda root=None: _synthetic_runtime(),
+        record_extractor=_synthetic_formal_forward,
+    )
+
+
+def test_validate_result_schema_rejects_missing_nested_fields(tmp_path, monkeypatch):
+    result = _build_valid_formal_result(tmp_path, monkeypatch)
+    missing_paths = [
+        ("runner", "sha256"),
+        ("model", "model_id"),
+        ("dataset", "path"),
+        ("condition_panel", "sha256"),
+        ("condition_level", "descriptive_summaries"),
+        ("recovery_governance", "execution_classification"),
+        ("provenance", "consumption_record_path"),
+        ("technical_validity", "status"),
+    ]
+    for path in missing_paths:
+        mutated = copy.deepcopy(result)
+        cursor = mutated
+        for part in path[:-1]:
+            cursor = cursor[part]
+        del cursor[path[-1]]
+        with pytest.raises(runner.ProtocolIntegrityError):
+            runner.validate_result_schema(mutated, formal=True)
+
+
+def test_low_usability_formal_run_blocks_canonical_result(tmp_path, monkeypatch):
+    torch = pytest.importorskip("torch")
+    records = _synthetic_formal_records()
+    consumption_dir = tmp_path / "consumption"
+    result_path = tmp_path / "exp025_results.json"
+    auth_path = tmp_path / "authorization.json"
+
+    def random_forward(tokenizer, model, device, text):
+        seed = int.from_bytes(hashlib.sha256(text.encode("utf-8")).digest()[:8], "big")
+        rng = np.random.default_rng(seed)
+        vectors = {
+            checkpoint: rng.normal(size=(4,)).astype(np.float32)
+            for checkpoint in runner.CHECKPOINT_NAMES
+        }
+        return {
+            "input_ids": torch.tensor([[0, 1, 2]], dtype=torch.long, device=device),
+            "attention_mask": torch.ones((1, 3), dtype=torch.long, device=device),
+            "representations": vectors,
+            "hook_firing_count": 2,
+            "hook_cleanup_verified": True,
+            "exp025_hooks_remaining": 0,
+            "foreign_hooks_remaining": 0,
+        }
+
+    monkeypatch.setattr(runner, "AUTHORIZATION_CONSUMPTION_DIR", consumption_dir)
+    monkeypatch.setattr(runner, "FORMAL_RESULT_PATH", result_path)
+    monkeypatch.setattr(runner, "FORMAL_RESULT_CANDIDATES", (result_path,))
+    monkeypatch.setattr(runner, "verify_frozen_design", lambda root=None: {})
+    monkeypatch.setattr(runner, "verify_inherited_authorities", lambda root=None: {})
+    monkeypatch.setattr(runner, "verify_clarification_authorities", lambda root=None: {})
+    monkeypatch.setattr(runner, "verify_no_result_collision", lambda root=None: None)
+    monkeypatch.setattr(runner, "_repository_commit", lambda root=None: "a" * 40)
+    monkeypatch.setattr(runner, "load_frozen_dataset", lambda root=None: (records, []))
+    monkeypatch.setattr(runner, "_load_runtime", lambda root=None: _synthetic_runtime())
+    monkeypatch.setattr(runner, "_formal_record_extractor", random_forward)
+    monkeypatch.setattr(
+        runner,
+        "_validate_authorization",
+        lambda root, path: (
+            {
+                "authorization_id": "low-usability-auth",
+                "authorized_repository_commit": "a" * 40,
+                "runner_sha256": sha256_file(Path(runner.__file__)),
+            },
+            "a" * 64,
+        ),
+    )
+
+    with pytest.raises(runner.TechnicalInvalidError, match="USABILITY"):
+        runner.run_formal(ROOT, auth_path)
+
+    assert (consumption_dir / "low-usability-auth.json").is_file()
+    assert not result_path.exists()
+
+
+def test_publication_race_fails_closed_without_overwrite(tmp_path, monkeypatch):
+    result = _build_valid_formal_result(tmp_path, monkeypatch)
+    monkeypatch.setattr(runner, "FORMAL_RESULT_PATH", runner.EXP_DIR / "results" / "exp025_results.json")
+    monkeypatch.setattr(runner, "verify_no_result_collision", lambda root=None: None)
+    canonical = tmp_path / (runner.EXP_DIR / "results" / "exp025_results.json").relative_to(runner.ROOT)
+    temp_path = canonical.with_name(canonical.name + ".tmp")
+
+    real_link = os.link
+
+    def racing_link(src, dst):
+        Path(dst).write_bytes(b"PREEXISTING")
+        return real_link(src, dst)
+
+    monkeypatch.setattr(runner.os, "link", racing_link)
+    with pytest.raises(runner.ProtocolIntegrityError, match="FORMAL_RESULT_PATH_UNEXPECTED"):
+        runner.atomic_publish_validated_result(result, tmp_path)
+    assert canonical.read_bytes() == b"PREEXISTING"
+    assert not temp_path.exists()
+
+
+def test_constant_and_nonfinite_spearman_are_not_evaluable():
+    constant_result = runner.exact_one_sided_permutation_p([1.0, 1.0, 1.0], [1.0, 1.0, 1.0])
+    assert constant_result["status"] == "NOT_EVALUABLE"
+    assert constant_result["rho"] != constant_result["rho"]
+    assert constant_result["p"] is None
+    assert constant_result["count_ge"] is None
+
+    nonfinite_result = runner.exact_one_sided_permutation_p([1.0, 2.0], [float("nan"), 1.0])
+    assert nonfinite_result["status"] == "NOT_EVALUABLE"
+
+
+def test_formal_pipeline_qualification_reports_expected_statistics(tmp_path, monkeypatch):
+    result = runner.run_formal_pipeline_qualification(ROOT, publish=False)
+    assert result["formal_pipeline_qualification"] == "PASS"
+    assert result["formal_run_readiness"] == "READY"
+    assert result["registered_statistics_expected_value_test"] == "PASS"
+    assert result["provenance_validation"] == "PASS"
+    assert result["recovery_governance_disclosure"] == "PASS"
+    assert result["registered_descriptive_summaries"] == "PASS"

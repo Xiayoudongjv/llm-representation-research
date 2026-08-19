@@ -87,6 +87,9 @@ FORMAL_RESULT_CANDIDATES = (
 )
 AUTHORIZATION_CONSUMPTION_DIR = EXP_DIR / "results" / "authorization_consumption"
 AUTHORIZATION_RETIREMENT_DIR = EXP_DIR / "engineering" / "authorization_retirement"
+RECOVERY_AMENDMENT_PATH = EXP_DIR / "engineering" / "EXP-025-PROTOCOL-RECOVERY-AMENDMENT-001.md"
+RECOVERY_EXECUTION_CLASSIFICATION = "POST_HOC_PROTOCOL_RECOVERY"
+RECOVERY_AMENDMENT_ID = "EXP025_PROTOCOL_RECOVERY_AMENDMENT_001"
 
 CLASS_ORDER = ("logic", "causality", "analogy", "definition")
 CLASS_UNIVERSE = frozenset(CLASS_ORDER)
@@ -308,13 +311,17 @@ def spearman_rho(x: Sequence[float], y: Sequence[float]) -> float:
         raise ValueError("Spearman inputs must be nonempty.")
     if len(x) == 1:
         return 0.0
+    x_values = np.asarray(x, dtype=float)
+    y_values = np.asarray(y, dtype=float)
+    if not np.isfinite(x_values).all() or not np.isfinite(y_values).all():
+        return float("nan")
     x_rank = np.asarray(average_rank(x), dtype=float)
     y_rank = np.asarray(average_rank(y), dtype=float)
     x_rank -= x_rank.mean()
     y_rank -= y_rank.mean()
     denominator = float(np.sqrt((x_rank @ x_rank) * (y_rank @ y_rank)))
     if denominator == 0.0:
-        return 0.0
+        return float("nan")
     rho = float((x_rank @ y_rank) / denominator)
     if not math.isfinite(rho):
         return float("nan")
@@ -347,16 +354,6 @@ def exact_one_sided_permutation_p(
     x_rank -= x_rank.mean()
     y_rank -= y_rank.mean()
     denominator = float(np.sqrt((x_rank @ x_rank) * (y_rank @ y_rank)))
-    if denominator == 0.0:
-        rho_is_zero = float(x_rank @ y_rank) == 0.0
-        if observed == 0.0 and rho_is_zero:
-            return {
-                "rho": 0.0,
-                "p": 1.0,
-                "count_ge": math.factorial(n),
-                "total": math.factorial(n),
-                "status": "EVALUABLE",
-            }
     count = 0
     for perm in itertools.permutations(range(n)):
         permuted = y_rank[list(perm)]
@@ -795,6 +792,7 @@ def _consume_authorization(
     if not authorization_id:
         raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_ID_MISSING")
     run_attempt_id = run_attempt_id or uuid.uuid4().hex
+    consumption_path = _authorization_consumption_path(root, authorization_id)
     record: dict[str, Any] = {
         "schema_version": "1.0.0",
         "classification": "AUTHORIZATION_CONSUMPTION",
@@ -805,8 +803,8 @@ def _consume_authorization(
         "repository_commit": _repository_commit(root),
         "runner_sha256": sha256_file(Path(__file__)),
         "authorization_path": str(Path(authorization_path)),
+        "consumption_record_path": str(consumption_path),
     }
-    consumption_path = _authorization_consumption_path(root, authorization_id)
     consumption_sha = _atomic_write_json_exclusive(consumption_path, record)
     record["consumption_record_sha256"] = consumption_sha
     return record, consumption_sha
@@ -1488,17 +1486,47 @@ def run_engineering_qualification(root: Path = ROOT, *, publish: bool = True) ->
 def validate_result_schema(result: Mapping[str, Any], *, formal: bool = False) -> None:
     if not isinstance(result, Mapping):
         raise ProtocolIntegrityError("RESULT_NOT_OBJECT")
+
+    def fail(message: str) -> None:
+        raise ProtocolIntegrityError(message)
+
+    def require(condition: bool, message: str) -> None:
+        if not condition:
+            fail(message)
+
+    def require_mapping(value: Any, label: str) -> None:
+        require(isinstance(value, Mapping) and bool(value), f"RESULT_FIELD_NOT_OBJECT:{label}")
+
+    def require_string(value: Any, label: str) -> None:
+        require(isinstance(value, str) and bool(value), f"RESULT_FIELD_NOT_STRING:{label}")
+
+    def require_float(value: Any, label: str, *, allow_none: bool = False) -> None:
+        if allow_none and value is None:
+            return
+        require(
+            isinstance(value, (int, float)) and not isinstance(value, bool),
+            f"RESULT_FIELD_NOT_NUMBER:{label}",
+        )
+
+    def require_int(value: Any, label: str) -> None:
+        require(isinstance(value, int) and not isinstance(value, bool), f"RESULT_FIELD_NOT_INT:{label}")
+
+    def require_bool(value: Any, label: str) -> None:
+        require(isinstance(value, bool), f"RESULT_FIELD_NOT_BOOL:{label}")
+
     required = {
         "schema_version",
         "experiment",
         "runner",
         "model",
         "dataset",
+        "condition_panel",
         "classes",
         "primary",
         "condition_level",
         "d_g_inference",
         "routing",
+        "recovery_governance",
         "technical_validity",
         "attempt_status",
         "result_status",
@@ -1506,21 +1534,190 @@ def validate_result_schema(result: Mapping[str, Any], *, formal: bool = False) -
         "provenance",
     }
     missing = required - set(result)
-    if missing:
-        raise ProtocolIntegrityError(f"RESULT_MISSING_FIELDS:{sorted(missing)}")
-    if result["schema_version"] != RESULT_SCHEMA_VERSION:
-        raise ProtocolIntegrityError("RESULT_SCHEMA_VERSION_MISMATCH")
-    if result["experiment"] != EXPERIMENT:
-        raise ProtocolIntegrityError("RESULT_EXPERIMENT_MISMATCH")
-    if result.get("hidden_states_included", True) is True:
-        raise ProtocolIntegrityError("RESULT_MUST_NOT_INCLUDE_RAW_HIDDEN_STATES")
-    if result.get("prompt_text_included", True) is True:
-        raise ProtocolIntegrityError("RESULT_MUST_NOT_INCLUDE_PROMPT_TEXT")
+    require(not missing, f"RESULT_MISSING_FIELDS:{sorted(missing)}")
+    require(result["schema_version"] == RESULT_SCHEMA_VERSION, "RESULT_SCHEMA_VERSION_MISMATCH")
+    require(result["experiment"] == EXPERIMENT, "RESULT_EXPERIMENT_MISMATCH")
+    require(result.get("hidden_states_included", True) is False, "RESULT_MUST_NOT_INCLUDE_RAW_HIDDEN_STATES")
+    require(result.get("prompt_text_included", True) is False, "RESULT_MUST_NOT_INCLUDE_PROMPT_TEXT")
+
+    runner = result["runner"]
+    require_mapping(runner, "runner")
+    require_string(runner.get("path"), "runner.path")
+    require_string(runner.get("sha256"), "runner.sha256")
+    require_string(runner.get("repository_commit"), "runner.repository_commit")
+
+    model = result["model"]
+    require_mapping(model, "model")
+    require_string(model.get("model_id"), "model.model_id")
+    require_string(model.get("revision"), "model.revision")
+    require_string(model.get("model_class"), "model.model_class")
+    require_string(model.get("model_type"), "model.model_type")
+    require_int(model.get("block_count"), "model.block_count")
+    require_int(model.get("hidden_size"), "model.hidden_size")
+    require_string(model.get("device"), "model.device")
+    require_string(model.get("runtime_dtype"), "model.runtime_dtype")
+
+    dataset = result["dataset"]
+    require_mapping(dataset, "dataset")
+    require_string(dataset.get("path"), "dataset.path")
+    require_string(dataset.get("sha256"), "dataset.sha256")
+    require_int(dataset.get("record_count"), "dataset.record_count")
+    require_int(dataset.get("source_family_count"), "dataset.source_family_count")
+    require_int(dataset.get("condition_count"), "dataset.condition_count")
+    require_int(dataset.get("semantic_class_count"), "dataset.semantic_class_count")
+    require_mapping(dataset.get("partition_family_counts"), "dataset.partition_family_counts")
+
+    condition_panel = result["condition_panel"]
+    require_mapping(condition_panel, "condition_panel")
+    require_string(condition_panel.get("path"), "condition_panel.path")
+    require_string(condition_panel.get("sha256"), "condition_panel.sha256")
+
+    require(result["classes"] == list(CLASS_ORDER), "RESULT_CLASSES_MISMATCH")
+
+    primary = result["primary"]
+    require_mapping(primary, "primary")
+    require_string(primary.get("scientific_unit"), "primary.scientific_unit")
+    require_string(primary.get("diagnostic"), "primary.diagnostic")
+    require_string(primary.get("outcome"), "primary.outcome")
+    require_string(primary.get("statistic"), "primary.statistic")
+    require_string(primary.get("alternative"), "primary.alternative")
+    require_string(primary.get("permutation_status"), "primary.permutation_status")
+    require_string(primary.get("support_rule"), "primary.support_rule")
+    require_bool(primary.get("supported"), "primary.supported")
+    require_float(primary.get("alpha"), "primary.alpha")
+    if primary.get("permutation_status") == "NOT_EVALUABLE":
+        require(primary.get("rho") is None, "RESULT_RHO_MUST_BE_NULL_WHEN_NOT_EVALUABLE")
+        require(primary.get("exact_one_sided_p") is None, "RESULT_P_MUST_BE_NULL_WHEN_NOT_EVALUABLE")
+        require(primary.get("count_ge") is None, "RESULT_COUNT_GE_MUST_BE_NULL_WHEN_NOT_EVALUABLE")
+    else:
+        require_float(primary.get("rho"), "primary.rho")
+        require_float(primary.get("exact_one_sided_p"), "primary.exact_one_sided_p")
+        require_int(primary.get("count_ge"), "primary.count_ge")
+    require_int(primary.get("permutation_count"), "primary.permutation_count")
+
+    condition_level = result["condition_level"]
+    require_mapping(condition_level, "condition_level")
+    require(condition_level.get("condition_order") == list(CONDITION_ORDER), "RESULT_CONDITION_ORDER_MISMATCH")
+    for key in (
+        "s_diag",
+        "g_eval",
+        "g_mu",
+        "g_sigma",
+        "g_joint_over_mu",
+        "g_joint_over_sigma",
+    ):
+        metric = condition_level.get(key)
+        require_mapping(metric, f"condition_level.{key}")
+        require(set(metric) == CONDITION_UNIVERSE, f"RESULT_CONDITION_METRIC_KEYS_MISMATCH:{key}")
+        for condition in CONDITION_ORDER:
+            require_float(metric.get(condition), f"condition_level.{key}.{condition}")
+
+    diag_ba = condition_level.get("diagnostic_balanced_accuracy")
+    require_mapping(diag_ba, "condition_level.diagnostic_balanced_accuracy")
+    require(set(diag_ba) == CONDITION_UNIVERSE, "RESULT_DIAG_BA_CONDITION_KEYS_MISMATCH")
+    for condition in CONDITION_ORDER:
+        variant_map = diag_ba.get(condition)
+        require_mapping(variant_map, f"condition_level.diagnostic_balanced_accuracy.{condition}")
+        require(set(variant_map) == {"A0_block9", "A0_block15"}, f"RESULT_DIAG_BA_VARIANT_KEYS_MISMATCH:{condition}")
+        for variant in ("A0_block9", "A0_block15"):
+            require_float(variant_map.get(variant), f"condition_level.diagnostic_balanced_accuracy.{condition}.{variant}")
+
+    eval_ba = condition_level.get("eval_balanced_accuracy")
+    require_mapping(eval_ba, "condition_level.eval_balanced_accuracy")
+    require(set(eval_ba) == CONDITION_UNIVERSE, "RESULT_EVAL_BA_CONDITION_KEYS_MISMATCH")
+    for condition in CONDITION_ORDER:
+        variant_map = eval_ba.get(condition)
+        require_mapping(variant_map, f"condition_level.eval_balanced_accuracy.{condition}")
+        require(set(variant_map) == {"A0", "A_mu", "A_sigma", "A_mu_sigma"}, f"RESULT_EVAL_BA_VARIANT_KEYS_MISMATCH:{condition}")
+        for variant in ("A0", "A_mu", "A_sigma", "A_mu_sigma"):
+            require_float(variant_map.get(variant), f"condition_level.eval_balanced_accuracy.{condition}.{variant}")
+
+    summaries = condition_level.get("descriptive_summaries")
+    require_mapping(summaries, "condition_level.descriptive_summaries")
+    for key in ("mean_s_diag", "median_s_diag", "mean_g_eval", "median_g_eval"):
+        require_float(summaries.get(key), f"condition_level.descriptive_summaries.{key}")
+
+    d_g_inference = result["d_g_inference"]
+    require_mapping(d_g_inference, "d_g_inference")
+    require_mapping(d_g_inference.get("D"), "d_g_inference.D")
+    require_mapping(d_g_inference.get("G"), "d_g_inference.G")
+    require(d_g_inference.get("condition_order") == list(CONDITION_ORDER), "RESULT_D_G_CONDITION_ORDER_MISMATCH")
+
+    routing = result["routing"]
+    require_mapping(routing, "routing")
+    require_string(routing.get("routing"), "routing.routing")
+    require_string(routing.get("technical_validity"), "routing.technical_validity")
+
+    recovery = result["recovery_governance"]
+    require_mapping(recovery, "recovery_governance")
+    require(recovery.get("execution_classification") == RECOVERY_EXECUTION_CLASSIFICATION, "RESULT_RECOVERY_CLASSIFICATION_MISMATCH")
+    require(recovery.get("amendment_id") == RECOVERY_AMENDMENT_ID, "RESULT_RECOVERY_AMENDMENT_ID_MISMATCH")
+    require_string(recovery.get("amendment_path"), "recovery_governance.amendment_path")
+    require_string(recovery.get("amendment_sha256"), "recovery_governance.amendment_sha256")
+    require(recovery.get("prior_scientific_outcome_exposure") is False, "RESULT_RECOVERY_OUTCOME_EXPOSURE_MUST_BE_FALSE")
+
+    technical = result["technical_validity"]
+    require_mapping(technical, "technical_validity")
+    require(technical.get("status") == "VALID", "RESULT_TECHNICAL_STATUS_NOT_VALID")
+    require_float(technical.get("fit_reference_balanced_accuracy"), "technical_validity.fit_reference_balanced_accuracy")
+    require_bool(technical.get("passes_measurement_usability_criterion"), "technical_validity.passes_measurement_usability_criterion")
+    require(technical.get("passes_measurement_usability_criterion") is True, "RESULT_MEASUREMENT_USABILITY_CRITERION_NOT_PASSED")
+
+    require_string(result.get("attempt_status"), "attempt_status")
+    require_string(result.get("result_status"), "result_status")
+    require_string(result.get("scientific_status"), "scientific_status")
+
+    provenance = result["provenance"]
+    require_mapping(provenance, "provenance")
+    require_string(provenance.get("run_attempt_id"), "provenance.run_attempt_id")
+    require_string(provenance.get("authorization_id"), "provenance.authorization_id")
+    require_string(provenance.get("authorization_sha256"), "provenance.authorization_sha256")
+    require_string(provenance.get("consumption_record_path"), "provenance.consumption_record_path")
+    require_string(provenance.get("consumption_record_sha256"), "provenance.consumption_record_sha256")
+    require_string(provenance.get("authorized_repository_commit"), "provenance.authorized_repository_commit")
+    require_string(provenance.get("authorized_runner_sha256"), "provenance.authorized_runner_sha256")
+    require_mapping(provenance.get("original_frozen_authority_hashes"), "provenance.original_frozen_authority_hashes")
+    require_mapping(provenance.get("clarification_authority_hashes"), "provenance.clarification_authority_hashes")
+    require_mapping(provenance.get("historical_formal_attempts"), "provenance.historical_formal_attempts")
+    require_int(provenance.get("formal_data_model_inference_count"), "provenance.formal_data_model_inference_count")
+    require_string(provenance.get("execution_started_at_utc"), "provenance.execution_started_at_utc")
+    require_string(provenance.get("execution_finished_at_utc"), "provenance.execution_finished_at_utc")
+
+    frozen_hashes = provenance["original_frozen_authority_hashes"]
+    expected_frozen = {
+        "exp025_preregistration": DESIGN_PREREGISTRATION_SHA256,
+        "model_selection": DESIGN_MODEL_SELECTION_SHA256,
+        "checkpoint_mapping": DESIGN_CHECKPOINT_MAPPING_SHA256,
+        "frozen_config": DESIGN_CONFIG_SHA256,
+        "design_validator": DESIGN_VALIDATOR_SHA256,
+    }
+    for key, expected_hash in expected_frozen.items():
+        require(frozen_hashes.get(key) == expected_hash, f"RESULT_FROZEN_HASH_MISMATCH:{key}")
+
+    clarification_hashes = provenance["clarification_authority_hashes"]
+    expected_clarification = {
+        "clarification_md": CLARIFICATION_MD_SHA256,
+        "clarification_json": CLARIFICATION_JSON_SHA256,
+        "clarification_validator": CLARIFICATION_VALIDATOR_SHA256,
+    }
+    for key, expected_hash in expected_clarification.items():
+        require(clarification_hashes.get(key) == expected_hash, f"RESULT_CLARIFICATION_HASH_MISMATCH:{key}")
+
+    historical = provenance["historical_formal_attempts"]
+    expected_historical = {
+        "total_formal_command_launch_count": 3,
+        "preconsumption_abort_count": 2,
+        "authorization_consumption_count": 1,
+        "consumed_formal_attempt_count": 1,
+        "prior_valid_scientific_result_count": 0,
+        "prior_scientific_outcome_exposure": False,
+    }
+    for key, expected_value in expected_historical.items():
+        require(historical.get(key) == expected_value, f"RESULT_HISTORICAL_ATTEMPT_MISMATCH:{key}")
+
     if formal:
-        if result.get("result_status") != "FORMAL_RESULT":
-            raise ProtocolIntegrityError("FORMAL_RESULT_STATUS_INVALID")
-        if result.get("scientific_status") != "FORMAL_ANALYSIS_COMPLETED":
-            raise ProtocolIntegrityError("FORMAL_SCIENTIFIC_STATUS_INVALID")
+        require(result.get("result_status") == "FORMAL_RESULT", "FORMAL_RESULT_STATUS_INVALID")
+        require(result.get("scientific_status") == "FORMAL_ANALYSIS_COMPLETED", "FORMAL_SCIENTIFIC_STATUS_INVALID")
 
 
 def atomic_publish_validated_result(result: Mapping[str, Any], root: Path = ROOT) -> dict[str, str]:
@@ -1530,17 +1727,19 @@ def atomic_publish_validated_result(result: Mapping[str, Any], root: Path = ROOT
     temp_path = canonical.with_name(canonical.name + ".tmp")
     if temp_path.exists():
         raise ProtocolIntegrityError("FORMAL_RESULT_TEMP_ARTIFACT_UNEXPECTED")
-    sha = _atomic_write_json_exclusive(temp_path, result)
+    _atomic_write_json_exclusive(temp_path, result)
     try:
-        if canonical.exists():
-            raise ProtocolIntegrityError("FORMAL_RESULT_PATH_UNEXPECTED")
-        os.replace(temp_path, canonical)
-    except Exception:
         try:
-            temp_path.unlink()
-        except FileNotFoundError:
-            pass
+            os.link(temp_path, canonical)
+        except FileExistsError:
+            raise ProtocolIntegrityError("FORMAL_RESULT_PATH_UNEXPECTED") from None
+    except Exception:
+        temp_path.unlink(missing_ok=True)
         raise
+    try:
+        temp_path.unlink()
+    except FileNotFoundError:
+        pass
     final_sha = sha256_file(canonical)
     return {
         "canonical_result_path": str(canonical),
@@ -1619,6 +1818,8 @@ def _execute_formal_analysis(
         classifier, transform_with_stats(X_fit_reference, reference_mean, reference_scale)
     )
     fit_reference_ba = balanced_accuracy(fit_reference_labels, fit_reference_predictions)
+    if fit_reference_ba < QUALIFICATION_MIN_REFERENCE_BALANCED_ACCURACY:
+        raise TechnicalInvalidError("EXP025_MEASUREMENT_USABILITY_FLOOR_NOT_MET")
 
     fit_realization_by_condition = _group_records_by_condition(
         fit_realization_records, condition_order
@@ -1702,9 +1903,15 @@ def _execute_formal_analysis(
 
     s_values = [float(s_diag[condition]) for condition in condition_order]
     g_values = [float(g_eval[condition]) for condition in condition_order]
+    descriptive_summaries = {
+        "mean_s_diag": float(np.mean(s_values)),
+        "median_s_diag": float(np.median(s_values)),
+        "mean_g_eval": float(np.mean(g_values)),
+        "median_g_eval": float(np.median(g_values)),
+    }
     permutation = exact_one_sided_permutation_p(s_values, g_values)
     if permutation.get("status") == "NOT_EVALUABLE":
-        rho = float("nan")
+        rho = None
         exact_p = None
         secondary_supported = False
     else:
@@ -1715,6 +1922,13 @@ def _execute_formal_analysis(
     d_classification = classify_direction(s_values, "D")
     g_classification = classify_direction(g_values, "G")
     routing = route_replication(d_classification, g_classification)
+    recovery_governance = {
+        "execution_classification": RECOVERY_EXECUTION_CLASSIFICATION,
+        "amendment_id": RECOVERY_AMENDMENT_ID,
+        "amendment_path": str(RECOVERY_AMENDMENT_PATH.relative_to(ROOT)),
+        "amendment_sha256": sha256_file(RECOVERY_AMENDMENT_PATH),
+        "prior_scientific_outcome_exposure": False,
+    }
 
     formal_data_model_inference_count = (
         len(fit_reference_records)
@@ -1750,6 +1964,10 @@ def _execute_formal_analysis(
             "semantic_class_count": partition_integrity["semantic_class_count"],
             "partition_family_counts": partition_integrity["partition_family_counts"],
         },
+        "condition_panel": {
+            "path": str(INHERITED_CONDITION_PANEL_PATH.relative_to(ROOT)),
+            "sha256": INHERITED_CONDITION_PANEL_SHA256,
+        },
         "classes": list(CLASS_ORDER),
         "primary": {
             "scientific_unit": "condition",
@@ -1776,6 +1994,7 @@ def _execute_formal_analysis(
             "g_joint_over_sigma": g_joint_over_sigma,
             "diagnostic_balanced_accuracy": diag_ba,
             "eval_balanced_accuracy": eval_ba,
+            "descriptive_summaries": descriptive_summaries,
         },
         "d_g_inference": {
             "D": d_classification,
@@ -1783,6 +2002,7 @@ def _execute_formal_analysis(
             "condition_order": list(condition_order),
         },
         "routing": routing,
+        "recovery_governance": recovery_governance,
         "technical_validity": {
             "status": "VALID",
             "fit_reference_balanced_accuracy": fit_reference_ba,
@@ -1797,6 +2017,7 @@ def _execute_formal_analysis(
             "run_attempt_id": run_attempt_id,
             "authorization_id": authorization.get("authorization_id"),
             "authorization_sha256": consumption.get("authorization_sha256"),
+            "consumption_record_path": consumption.get("consumption_record_path"),
             "consumption_record_sha256": consumption.get("consumption_record_sha256"),
             "authorized_repository_commit": authorization.get("authorized_repository_commit"),
             "authorized_runner_sha256": authorization.get("runner_sha256"),
@@ -1818,6 +2039,7 @@ def _execute_formal_analysis(
                 "authorization_consumption_count": 1,
                 "consumed_formal_attempt_count": 1,
                 "prior_valid_scientific_result_count": 0,
+                "prior_scientific_outcome_exposure": False,
             },
             "formal_data_model_inference_count": formal_data_model_inference_count,
             "execution_started_at_utc": started_at.isoformat(),
@@ -1910,13 +2132,10 @@ def run_formal_pipeline_qualification(root: Path = ROOT, *, publish: bool = True
         class_index = next(
             index for index, semantic_class in enumerate(CLASS_ORDER) if semantic_class in text
         )
-        digest = hashlib.sha256(text.encode("utf-8")).digest()
         vectors = {}
-        for checkpoint_index, checkpoint in enumerate(CHECKPOINT_NAMES):
-            rng = np.random.default_rng(int.from_bytes(digest[:8], "big") + checkpoint_index)
+        for checkpoint in CHECKPOINT_NAMES:
             vector = np.zeros((4,), dtype=np.float32)
             vector[class_index] = 1.0
-            vector += rng.normal(0.0, 0.02, size=(4,)).astype(np.float32)
             vectors[checkpoint] = vector
         return {
             "input_ids": torch.tensor([[0, 1, 2]], dtype=torch.long, device=device),
@@ -1993,7 +2212,91 @@ def run_formal_pipeline_qualification(root: Path = ROOT, *, publish: bool = True
         consumption_exists = consumption_path.is_file()
         canonical_exists = result_path.is_file()
         canonical_sha = sha256_file(result_path) if canonical_exists else None
-        status = "PASS" if consumption_exists and canonical_exists and formal_result.get("result_status") == "FORMAL_RESULT" else "FAIL"
+        canonical_result = read_json(result_path) if canonical_exists else None
+
+        expected_checks: list[tuple[str, str]] = []
+
+        def check(name: str, condition: bool) -> None:
+            expected_checks.append((name, "PASS" if condition else "FAIL"))
+
+        def close(actual: Any, expected: float, tol: float = 1e-6) -> bool:
+            if not isinstance(actual, (int, float)) or isinstance(actual, bool):
+                return False
+            return math.isfinite(float(actual)) and math.isclose(
+                float(actual), expected, rel_tol=0.0, abs_tol=tol
+            )
+
+        if not isinstance(canonical_result, dict):
+            canonical_result = {}
+
+        try:
+            validate_result_schema(canonical_result, formal=True)
+            schema_validation = "PASS"
+        except ProtocolIntegrityError as exc:
+            schema_validation = f"FAIL:{exc}"
+
+        check("technical_usability_gate", bool(
+            canonical_result.get("technical_validity", {}).get("fit_reference_balanced_accuracy", -1.0) >= QUALIFICATION_MIN_REFERENCE_BALANCED_ACCURACY
+        ))
+        check("nested_schema_validation", schema_validation == "PASS")
+        check("complete_provenance_binding", bool(
+            isinstance(canonical_result.get("provenance", {}), Mapping)
+            and bool(canonical_result.get("provenance", {}).get("consumption_record_path"))
+            and bool(canonical_result.get("provenance", {}).get("consumption_record_sha256"))
+        ))
+        check("recovery_governance_disclosure", bool(
+            canonical_result.get("recovery_governance", {}).get("execution_classification") == RECOVERY_EXECUTION_CLASSIFICATION
+        ))
+
+        condition_level = canonical_result.get("condition_level", {})
+        for condition in CONDITION_ORDER:
+            check(f"s_diag_zero_{condition}", close(condition_level.get("s_diag", {}).get(condition), 0.0))
+            check(f"g_eval_zero_{condition}", close(condition_level.get("g_eval", {}).get(condition), 0.0))
+            check(
+                f"diag_ba_one_{condition}",
+                all(
+                    close(condition_level.get("diagnostic_balanced_accuracy", {}).get(condition, {}).get(variant), 1.0)
+                    for variant in ("A0_block9", "A0_block15")
+                ),
+            )
+            check(
+                f"eval_ba_one_{condition}",
+                all(
+                    close(condition_level.get("eval_balanced_accuracy", {}).get(condition, {}).get(variant), 1.0)
+                    for variant in ("A0", "A_mu", "A_sigma", "A_mu_sigma")
+                ),
+            )
+
+        summaries = condition_level.get("descriptive_summaries", {})
+        for key in ("mean_s_diag", "median_s_diag", "mean_g_eval", "median_g_eval"):
+            check(f"summary_zero_{key}", close(summaries.get(key), 0.0))
+
+        primary = canonical_result.get("primary", {})
+        check("rho_null", primary.get("rho") is None)
+        check("exact_p_null", primary.get("exact_one_sided_p") is None)
+        check("permutation_not_evaluable", primary.get("permutation_status") == "NOT_EVALUABLE")
+        check("permutation_count_exact", primary.get("permutation_count") == math.factorial(10))
+        check("secondary_not_supported", primary.get("supported") is False)
+
+        d_g = canonical_result.get("d_g_inference", {})
+        check("d_not_evaluable", d_g.get("D", {}).get("status") == "NOT_EVALUABLE")
+        check("g_not_evaluable", d_g.get("G", {}).get("status") == "NOT_EVALUABLE")
+        check("routing_no_scientific", canonical_result.get("routing", {}).get("routing") == "NO SCIENTIFIC ROUTING")
+        check("routing_indeterminate", canonical_result.get("routing", {}).get("technical_validity") == "INVALID_OR_INDETERMINATE")
+        check("technical_valid", canonical_result.get("technical_validity", {}).get("status") == "VALID")
+        check("fit_reference_ba_one", close(canonical_result.get("technical_validity", {}).get("fit_reference_balanced_accuracy"), 1.0))
+        check("condition_panel_bound", bool(canonical_result.get("condition_panel", {}).get("sha256")))
+        check("recovery_amendment_bound", bool(canonical_result.get("recovery_governance", {}).get("amendment_sha256")))
+
+        expected_stats_pass = all(status == "PASS" for _, status in expected_checks)
+        checks_pass = (
+            consumption_exists
+            and canonical_exists
+            and formal_result.get("result_status") == "FORMAL_RESULT"
+            and schema_validation == "PASS"
+            and expected_stats_pass
+        )
+        status = "PASS" if checks_pass else "FAIL"
         qualification_status = status
         readiness = "READY" if status == "PASS" else "BLOCKED"
         result = {
@@ -2027,10 +2330,36 @@ def run_formal_pipeline_qualification(root: Path = ROOT, *, publish: bool = True
             ),
             "atomic_consumption_test": "PASS" if consumption_exists else "FAIL",
             "fit_diag_eval_firewall_test": "PASS",
-            "registered_statistics_expected_value_test": "PASS",
+            "registered_statistics_expected_value_test": "PASS" if expected_stats_pass else "FAIL",
             "atomic_publication_test": "PASS" if canonical_exists else "FAIL",
-            "schema_validation": "PASS",
-            "provenance_validation": "PASS",
+            "schema_validation": schema_validation,
+            "provenance_validation": "PASS" if all(
+                canonical_result.get("provenance", {}).get(field)
+                for field in (
+                    "authorization_id",
+                    "authorization_sha256",
+                    "consumption_record_path",
+                    "consumption_record_sha256",
+                    "authorized_repository_commit",
+                    "authorized_runner_sha256",
+                )
+            ) else "FAIL",
+            "technical_usability_gate_test": dict(expected_checks).get("technical_usability_gate", "FAIL"),
+            "nested_schema_validation": dict(expected_checks).get("nested_schema_validation", "FAIL"),
+            "complete_provenance_binding": dict(expected_checks).get("complete_provenance_binding", "FAIL"),
+            "recovery_governance_disclosure": dict(expected_checks).get("recovery_governance_disclosure", "FAIL"),
+            "registered_descriptive_summaries": "PASS" if all(
+                status == "PASS" for name, status in expected_checks if name.startswith("summary_zero_")
+            ) else "FAIL",
+            "degenerate_statistic_behavior": "PASS" if all(
+                status == "PASS" for name, status in expected_checks if name in {
+                    "rho_null",
+                    "exact_p_null",
+                    "permutation_not_evaluable",
+                    "d_not_evaluable",
+                    "g_not_evaluable",
+                }
+            ) else "FAIL",
             "formal_pipeline_qualification": qualification_status,
             "formal_run_readiness": readiness,
             "real_diag_data_accessed": False,
