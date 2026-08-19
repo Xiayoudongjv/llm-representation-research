@@ -1,6 +1,7 @@
 import hashlib
 import json
 import sys
+import uuid
 from pathlib import Path
 
 import numpy as np
@@ -137,3 +138,162 @@ def test_result_schema_validation_reachable_from_production_path():
     # The production run_formal entry point is wired to the same frozen design verifier.
     identities = runner.verify_frozen_design(ROOT)
     assert identities["design_config_sha256"] == runner.DESIGN_CONFIG_SHA256
+
+
+
+def _write_valid_authorization(path: Path, authorization_id: str, **overrides):
+    repo_commit = overrides.pop("repo_commit", runner._repository_commit(ROOT))
+    runner_sha = overrides.pop("runner_sha", sha256_file(Path(runner.__file__)))
+    qualification_sha = overrides.pop("qualification_sha", sha256_file(runner.ENGINEERING_QUALIFICATION_PATH))
+    model_id = overrides.pop("model_id", runner.MODEL_ID)
+    model_revision = overrides.pop("model_revision", runner.MODEL_REVISION)
+    if overrides:
+        raise ValueError(f"unexpected overrides: {sorted(overrides)}")
+    authorization = {
+        "schema_version": "1.0.0",
+        "authorization_id": authorization_id,
+        "experiment": "EXP-025",
+        "purpose": "SINGLE_USE_FORMAL_RUN",
+        "single_use": True,
+        "issued_at_utc": "2026-08-19T00:00:00+00:00",
+        "authorization_created_at_utc": "2026-08-19T00:00:00+00:00",
+        "repository_commit": repo_commit,
+        "authorized_repository_commit": repo_commit,
+        "runner_sha256": runner_sha,
+        "qualification_artifact_sha256": qualification_sha,
+        "qualification_status": "PASS",
+        "formal_run_readiness": "READY",
+        "frozen_authority_hashes": {
+            "exp025_preregistration": runner.DESIGN_PREREGISTRATION_SHA256,
+            "model_selection": runner.DESIGN_MODEL_SELECTION_SHA256,
+            "checkpoint_mapping": runner.DESIGN_CHECKPOINT_MAPPING_SHA256,
+            "frozen_config": runner.DESIGN_CONFIG_SHA256,
+            "design_validator": runner.DESIGN_VALIDATOR_SHA256,
+        },
+        "dataset_identity": {
+            "path": "experiments/exp024/data/exp024_condition_panel_frozen.json",
+            "sha256": runner.INHERITED_DATASET_SHA256,
+        },
+        "condition_panel_identity": {
+            "path": "experiments/exp024/condition_panel_spec.json",
+            "sha256": sha256_file(ROOT / "experiments" / "exp024" / "condition_panel_spec.json"),
+        },
+        "model_id": model_id,
+        "model_revision": model_revision,
+        "model_family": "OLMo2",
+        "formal_mode": "--formal-run",
+        "authorized_execution_count": 1,
+        "canonical_result_path": "experiments/exp025/results/exp025_results.json",
+        "consumption_directory": "experiments/exp025/results/authorization_consumption",
+        "formal_run_performed": False,
+        "scientific_result_created": False,
+    }
+    path.write_text(json.dumps(authorization, indent=2, sort_keys=True), encoding="utf-8")
+    return authorization
+
+
+def _fresh_authorization_setup(tmp_path, monkeypatch, authorization_id=None):
+    authorization_id = authorization_id or uuid.uuid4().hex
+    consumption_dir = tmp_path / "authorization_consumption"
+    monkeypatch.setattr(runner, "AUTHORIZATION_CONSUMPTION_DIR", consumption_dir)
+    authorization_path = tmp_path / "authorization.json"
+    _write_valid_authorization(authorization_path, authorization_id)
+    return authorization_path, authorization_id, consumption_dir
+
+
+def test_fresh_authorization_is_consumed_and_reaches_executor(tmp_path, monkeypatch):
+    authorization_path, authorization_id, consumption_dir = _fresh_authorization_setup(tmp_path, monkeypatch)
+    calls = []
+
+    def fake_execute(root, authorization, consumption, run_attempt_id):
+        calls.append((root, authorization, consumption, run_attempt_id))
+        return {"executor": "reached"}
+
+    monkeypatch.setattr(runner, "_execute_formal_analysis", fake_execute)
+    result = runner.run_formal(ROOT, authorization_path)
+    assert result == {"executor": "reached"}
+    assert len(calls) == 1
+
+    consumption_path = consumption_dir / f"{authorization_id}.json"
+    assert consumption_path.exists()
+    record = json.loads(consumption_path.read_text(encoding="utf-8"))
+    assert record["authorization_id"] == authorization_id
+    assert record["authorization_sha256"] == sha256_file(authorization_path)
+    assert record["run_attempt_id"] == calls[0][3]
+
+
+def test_double_consumption_is_rejected(tmp_path, monkeypatch):
+    authorization_path, authorization_id, consumption_dir = _fresh_authorization_setup(tmp_path, monkeypatch)
+    calls = []
+
+    def fake_execute(root, authorization, consumption, run_attempt_id):
+        calls.append(run_attempt_id)
+        return None
+
+    monkeypatch.setattr(runner, "_execute_formal_analysis", fake_execute)
+    runner.run_formal(ROOT, authorization_path)
+    with pytest.raises(runner.ProtocolIntegrityError, match="AUTHORIZATION_ALREADY_CONSUMED"):
+        runner.run_formal(ROOT, authorization_path)
+    assert len(calls) == 1
+    assert len(list(consumption_dir.glob("*.json"))) == 1
+
+
+def test_existing_result_blocks_consumption(tmp_path, monkeypatch):
+    authorization_path, authorization_id, consumption_dir = _fresh_authorization_setup(tmp_path, monkeypatch)
+    result_path = tmp_path / "exp025_results.json"
+    result_path.write_text("{}", encoding="utf-8")
+    monkeypatch.setattr(runner, "FORMAL_RESULT_CANDIDATES", (result_path,))
+    with pytest.raises(runner.ProtocolIntegrityError, match="FORMAL_RESULT_PATH_UNEXPECTED"):
+        runner.run_formal(ROOT, authorization_path)
+    assert not list(consumption_dir.glob("*.json"))
+
+
+def test_wrong_repository_commit_blocks_consumption(tmp_path, monkeypatch):
+    authorization_path, authorization_id, consumption_dir = _fresh_authorization_setup(tmp_path, monkeypatch)
+    _write_valid_authorization(authorization_path, authorization_id, repo_commit="0" * 40)
+    with pytest.raises(runner.ProtocolIntegrityError, match="REPOSITORY_COMMIT_MISMATCH"):
+        runner.run_formal(ROOT, authorization_path)
+    assert not list(consumption_dir.glob("*.json"))
+
+
+@pytest.mark.parametrize(
+    "override,expected",
+    [
+        ({"model_id": "wrong/model"}, "MODEL_ID_MISMATCH"),
+        ({"model_revision": "deadbeef"}, "MODEL_REVISION_MISMATCH"),
+    ],
+)
+def test_wrong_model_identity_blocks_consumption(tmp_path, monkeypatch, override, expected):
+    authorization_path, authorization_id, consumption_dir = _fresh_authorization_setup(tmp_path, monkeypatch)
+    _write_valid_authorization(authorization_path, authorization_id, **override)
+    with pytest.raises(runner.ProtocolIntegrityError, match=expected):
+        runner.run_formal(ROOT, authorization_path)
+    assert not list(consumption_dir.glob("*.json"))
+
+
+def test_science_paths_are_not_reached_before_consumption(tmp_path, monkeypatch):
+    authorization_path, authorization_id, consumption_dir = _fresh_authorization_setup(tmp_path, monkeypatch)
+    science_called = {"executor": False, "runtime": False, "dataset": False}
+
+    def fake_execute(root, authorization, consumption, run_attempt_id):
+        science_called["executor"] = True
+        return None
+
+    def forbid_runtime(*args, **kwargs):
+        science_called["runtime"] = True
+        raise AssertionError("runtime reached before consumption")
+
+    def forbid_dataset(*args, **kwargs):
+        science_called["dataset"] = True
+        raise AssertionError("dataset loader reached before consumption")
+
+    monkeypatch.setattr(runner, "_execute_formal_analysis", fake_execute)
+    monkeypatch.setattr(runner, "_load_runtime", forbid_runtime)
+    monkeypatch.setattr(runner, "load_frozen_dataset", forbid_dataset)
+    runner.run_formal(ROOT, authorization_path)
+    assert science_called == {"executor": True, "runtime": False, "dataset": False}
+
+
+def test_stale_100b_sentinel_is_removed():
+    source = Path(runner.__file__).read_text(encoding="utf-8")
+    assert "FORMAL_AUTHORIZATION_NOT_CONSUMED_IN_100B" not in source

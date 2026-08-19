@@ -1,0 +1,13 @@
+{
+    "schema_version":  "1.0.0",
+    "classification":  "AUTHORIZATION_RETIREMENT_AUDIT",
+    "authorization_id":  "798f71e8-ff9f-4dd6-94b0-f1f0fcc02589",
+    "authorization_sha256":  "f9488e2e46b4ff0ab2f3d268027306fa2ff23de2ab6f8fbab532062a24c99e16",
+    "bound_runtime_commit":  "799ecf2536ff1a4a177bf714f8ec5d34841a50be",
+    "status":  "RETIRED_UNCONSUMED_AFTER_PRECONSUMPTION_RUNTIME_DEFECT",
+    "failure_class":  "PRECONSUMPTION_ENGINEERING_FAILURE",
+    "scientific_execution_performed":  false,
+    "outcome_exposure":  false,
+    "reason":  "Stale formal-entry guard raised FORMAL_AUTHORIZATION_NOT_CONSUMED_IN_100B before authorization validation/consumption.",
+    "retired_at_utc":  "2026-08-19T06:02:06.8332141Z"
+}

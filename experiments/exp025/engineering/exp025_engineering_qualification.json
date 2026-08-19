@@ -227,8 +227,8 @@
     "revision": "48d788eca847d4d7548f375ad03d3c9312f6139e",
     "snapshot_path": "D:\\AI_Cache\\huggingface\\hub\\models--allenai--OLMo-2-0425-1B-Instruct\\snapshots\\48d788eca847d4d7548f375ad03d3c9312f6139e"
   },
-  "qualification_finished_at_utc": "2026-08-19T05:29:36.234796+00:00",
-  "qualification_started_at_utc": "2026-08-19T05:29:13.227420+00:00",
+  "qualification_finished_at_utc": "2026-08-19T06:01:00.590573+00:00",
+  "qualification_started_at_utc": "2026-08-19T06:00:40.751099+00:00",
   "schema_version": "1.0.0",
   "scientific_result_created": false
 }

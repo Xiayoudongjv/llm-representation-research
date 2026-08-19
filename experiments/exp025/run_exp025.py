@@ -15,6 +15,7 @@ import os
 import re
 import subprocess
 import sys
+import uuid
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -61,11 +62,13 @@ INHERITED_DATASET_SHA256 = "46c832b68b6ac95704bf5143badc1431627d7f935648842a7897
 
 ENGINEERING_QUALIFICATION_PATH = EXP_DIR / "engineering" / "exp025_engineering_qualification.json"
 QUALIFICATION_DOC_PATH = EXP_DIR / "EXP-025-ENGINEERING-QUALIFICATION.md"
+FORMAL_RESULT_PATH = EXP_DIR / "results" / "exp025_results.json"
 FORMAL_RESULT_CANDIDATES = (
-    EXP_DIR / "results" / "exp025_results.json",
+    FORMAL_RESULT_PATH,
     EXP_DIR / "exp025_formal_result.json",
-    EXP_DIR / "exp025_formal_run_authorization.json",
 )
+AUTHORIZATION_CONSUMPTION_DIR = EXP_DIR / "results" / "authorization_consumption"
+AUTHORIZATION_RETIREMENT_DIR = EXP_DIR / "engineering" / "authorization_retirement"
 
 CLASS_ORDER = ("logic", "causality", "analogy", "definition")
 CLASS_UNIVERSE = frozenset(CLASS_ORDER)
@@ -390,6 +393,152 @@ def verify_no_result_collision(root: Path = ROOT) -> None:
     for path in FORMAL_RESULT_CANDIDATES:
         if path.exists():
             raise ProtocolIntegrityError(f"FORMAL_RESULT_PATH_UNEXPECTED_{path.name}")
+
+
+def _resolve_repo_path(root: Path, value: Any) -> Path | None:
+    if not isinstance(value, str) or not value:
+        return None
+    path = Path(value)
+    if not path.is_absolute():
+        path = root / path
+    return path
+
+
+def _authorization_consumption_path(root: Path, authorization_id: str) -> Path:
+    return AUTHORIZATION_CONSUMPTION_DIR / f"{authorization_id}.json"
+
+
+def _atomic_write_json_exclusive(path: Path, data: Any) -> str:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = json.dumps(data, ensure_ascii=False, indent=2, sort_keys=True, allow_nan=False) + "\n"
+    flags = os.O_CREAT | os.O_EXCL | os.O_WRONLY
+    try:
+        fd = os.open(str(path), flags, 0o644)
+    except FileExistsError as exc:
+        raise ProtocolIntegrityError("AUTHORIZATION_ALREADY_CONSUMED") from exc
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            handle.write(payload)
+            handle.flush()
+            os.fsync(handle.fileno())
+    except Exception:
+        try:
+            path.unlink()
+        except FileNotFoundError:
+            pass
+        raise
+    return sha256_file(path)
+
+
+def _validate_authorization(root: Path, authorization_path: Path) -> tuple[dict[str, Any], str]:
+    path = Path(authorization_path)
+    if not path.is_file():
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_FILE_MISSING")
+    authorization = read_json(path)
+    if not isinstance(authorization, dict):
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_SCHEMA_INVALID")
+
+    if authorization.get("schema_version") != "1.0.0":
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_SCHEMA_VERSION_INVALID")
+    if authorization.get("experiment") != EXPERIMENT:
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_EXPERIMENT_MISMATCH")
+    if authorization.get("purpose") != "SINGLE_USE_FORMAL_RUN":
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_PURPOSE_INVALID")
+    if authorization.get("single_use") is not True:
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_NOT_SINGLE_USE")
+    if authorization.get("authorized_execution_count") != 1:
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_EXECUTION_COUNT_INVALID")
+    if authorization.get("formal_mode") != "--formal-run":
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_MODE_INVALID")
+    if authorization.get("model_id") != MODEL_ID:
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_MODEL_ID_MISMATCH")
+    if authorization.get("model_revision") != MODEL_REVISION:
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_MODEL_REVISION_MISMATCH")
+
+    repository_commit = _repository_commit(root)
+    if authorization.get("repository_commit") != repository_commit:
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_REPOSITORY_COMMIT_MISMATCH")
+    if authorization.get("authorized_repository_commit") != repository_commit:
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_REPOSITORY_COMMIT_MISMATCH")
+
+    runner_sha = sha256_file(Path(__file__))
+    if authorization.get("runner_sha256") != runner_sha:
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_RUNNER_SHA_MISMATCH")
+
+    if not ENGINEERING_QUALIFICATION_PATH.is_file():
+        raise ProtocolIntegrityError("FORMAL_QUALIFICATION_ARTIFACT_MISSING")
+    qualification_sha = sha256_file(ENGINEERING_QUALIFICATION_PATH)
+    if authorization.get("qualification_artifact_sha256") != qualification_sha:
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_QUALIFICATION_SHA_MISMATCH")
+
+    expected_frozen = {
+        "exp025_preregistration": DESIGN_PREREGISTRATION_SHA256,
+        "model_selection": DESIGN_MODEL_SELECTION_SHA256,
+        "checkpoint_mapping": DESIGN_CHECKPOINT_MAPPING_SHA256,
+        "frozen_config": DESIGN_CONFIG_SHA256,
+        "design_validator": DESIGN_VALIDATOR_SHA256,
+    }
+    frozen_hashes = authorization.get("frozen_authority_hashes")
+    if not isinstance(frozen_hashes, dict):
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_FROZEN_HASHES_INVALID")
+    for key, expected_hash in expected_frozen.items():
+        if frozen_hashes.get(key) != expected_hash:
+            raise ProtocolIntegrityError(f"FORMAL_AUTHORIZATION_FROZEN_HASH_MISMATCH_{key}")
+
+    dataset_identity = authorization.get("dataset_identity")
+    if not isinstance(dataset_identity, dict):
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_DATASET_IDENTITY_INVALID")
+    dataset_path = _resolve_repo_path(root, dataset_identity.get("path"))
+    if dataset_path is None or not dataset_path.is_file():
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_DATASET_PATH_MISSING")
+    if dataset_identity.get("sha256") != sha256_file(dataset_path):
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_DATASET_SHA_MISMATCH")
+
+    condition_panel_identity = authorization.get("condition_panel_identity")
+    if not isinstance(condition_panel_identity, dict):
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_CONDITION_PANEL_IDENTITY_INVALID")
+    condition_panel_path = _resolve_repo_path(root, condition_panel_identity.get("path"))
+    if condition_panel_path is None or not condition_panel_path.is_file():
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_CONDITION_PANEL_PATH_MISSING")
+    if condition_panel_identity.get("sha256") != sha256_file(condition_panel_path):
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_CONDITION_PANEL_SHA_MISMATCH")
+
+    verify_no_result_collision(root)
+
+    authorization_id = str(authorization.get("authorization_id", ""))
+    if not authorization_id:
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_ID_MISSING")
+    if _authorization_consumption_path(root, authorization_id).exists():
+        raise ProtocolIntegrityError("AUTHORIZATION_ALREADY_CONSUMED")
+
+    return authorization, sha256_file(path)
+
+
+def _consume_authorization(
+    root: Path,
+    authorization_path: Path,
+    authorization: Mapping[str, Any],
+    authorization_sha: str,
+    run_attempt_id: str | None = None,
+) -> tuple[dict[str, Any], str]:
+    authorization_id = str(authorization.get("authorization_id", ""))
+    if not authorization_id:
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_ID_MISSING")
+    run_attempt_id = run_attempt_id or uuid.uuid4().hex
+    record: dict[str, Any] = {
+        "schema_version": "1.0.0",
+        "classification": "AUTHORIZATION_CONSUMPTION",
+        "authorization_id": authorization_id,
+        "authorization_sha256": authorization_sha,
+        "consumed_at_utc": datetime.now(timezone.utc).isoformat(),
+        "run_attempt_id": run_attempt_id,
+        "repository_commit": _repository_commit(root),
+        "runner_sha256": sha256_file(Path(__file__)),
+        "authorization_path": str(Path(authorization_path)),
+    }
+    consumption_path = _authorization_consumption_path(root, authorization_id)
+    consumption_sha = _atomic_write_json_exclusive(consumption_path, record)
+    return record, consumption_sha
 
 
 def _set_offline_model_env() -> None:
@@ -754,19 +903,18 @@ def run_engineering_qualification(root: Path = ROOT, *, publish: bool = True) ->
 
 
 def _execute_formal_analysis(root: Path, authorization: Mapping[str, Any], consumption: Mapping[str, Any], run_attempt_id: str) -> dict[str, Any]:
-    _load_runtime(root)
-    load_frozen_dataset(root)
-    raise ProtocolIntegrityError("FORMAL_ANALYSIS_NOT_AUTHORIZED_IN_100B")
+    raise ProtocolIntegrityError("FORMAL_SCIENCE_NOT_AUTHORIZED_IN_100D_A")
 
 
-def run_formal(root: Path = ROOT, authorization_path: Path | None = None) -> None:
-    verify_frozen_design(root)
-    verify_inherited_dataset(root)
+def run_formal(root: Path = ROOT, authorization_path: Path | None = None) -> Any:
     if authorization_path is None:
         authorization_path = FORMAL_AUTHORIZATION_PATH
-    if not Path(authorization_path).is_file():
-        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_FILE_MISSING")
-    raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_NOT_CONSUMED_IN_100B")
+    authorization, authorization_sha = _validate_authorization(root, Path(authorization_path))
+    run_attempt_id = uuid.uuid4().hex
+    consumption, _consumption_sha = _consume_authorization(
+        root, Path(authorization_path), authorization, authorization_sha, run_attempt_id
+    )
+    return _execute_formal_analysis(root, authorization, consumption, run_attempt_id)
 
 
 def static_preflight(root: Path = ROOT) -> dict[str, Any]:
