@@ -9,6 +9,14 @@ any formal-executor implementation. It does not modify `run_exp025.py`, does not
 create a recovery authorization, and does not access DIAGNOSTIC or EVAL
 outcomes.
 
+## Supersession Note
+
+This file is the Task 100D-E0 classification snapshot. Task 100D-E1 later
+resolved all five scientifically consequential gaps with
+`EXP-025-PREOUTCOME-SPECIFICATION-CLARIFICATION-001`; the current remaining
+specification-gap count is `0`. See that clarification authority and the
+updated executor specification for the current state.
+
 ## Entry Gate
 
 ```text
@@ -83,6 +91,17 @@ implementation.
 EXP025_IMPLEMENTATION_BLOCKED_BY_PREOUTCOME_SPECIFICATION_GAP = true
 EXP025_READY_FOR_FORMAL_EXECUTOR_IMPLEMENTATION = false
 EXP025_NEXT_TASK = 100D_E1_PROSPECTIVE_SPECIFICATION_CLARIFICATION_REVIEW
+```
+
+## Current Status After Task 100D-E1
+
+Task 100D-E1 resolved all five consequential gaps through
+`EXP-025-PREOUTCOME-SPECIFICATION-CLARIFICATION-001`.
+
+```text
+EXP025_REMAINING_SPECIFICATION_GAPS = 0
+EXP025_READY_FOR_FORMAL_EXECUTOR_IMPLEMENTATION = true
+EXP025_NEXT_TASK = 100D_E_IMPLEMENT_FROZEN_FORMAL_EXECUTOR
 ```
 
 ## Required Flags

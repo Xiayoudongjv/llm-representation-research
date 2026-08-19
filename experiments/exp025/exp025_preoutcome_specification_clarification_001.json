@@ -1,0 +1,62 @@
+{
+  "schema_version": "1.0.0",
+  "experiment": "EXP-025",
+  "clarification_id": "EXP025_PREOUTCOME_SPECIFICATION_CLARIFICATION_001",
+  "classification": "PROSPECTIVE_PREOUTCOME_SPECIFICATION_CLARIFICATION",
+  "created_at_utc": "2026-08-19T08:31:37.896777Z",
+  "repository_commit": "3ec13ab796ebf878e5d1873b316e6abd905af19f",
+  "prior_scientific_outcome_exposure": false,
+  "prior_diag_access": false,
+  "prior_eval_access": false,
+  "original_preregistration_changed": false,
+  "preoutcome_protocol_clarification_added": true,
+  "gap_resolutions": {
+    "GAP-001": {
+      "status": "PROSPECTIVE_PREOUTCOME_CLARIFICATION",
+      "authority": "experiments/exp025/EXP-025-PREOUTCOME-SPECIFICATION-CLARIFICATION-001.md",
+      "exact_rule": "Assign average ranks to tied values within S and G separately, then compute Pearson correlation between the two rank vectors. Equivalent to standard Spearman rho with average-rank ties. Do not break ties by condition order, randomize, jitter, or use ordinal/min/max ranks.",
+      "scientific_quantities_affected": [
+        "rho_secondary"
+      ]
+    },
+    "GAP-002": {
+      "status": "PROSPECTIVE_PREOUTCOME_CLARIFICATION",
+      "authority": "experiments/exp025/EXP-025-PREOUTCOME-SPECIFICATION-CLARIFICATION-001.md",
+      "exact_rule": "Enumerate all 10! permutations of G across the fixed condition order, including the observed labeling. Direction is one-sided positive association. A permutation is at least as extreme iff rho_perm >= rho_obs. For complete enumeration p = count(rho_perm >= rho_obs) / N_permutations. No Monte-Carlo +1 correction. Non-finite rho_obs or any non-finite rho_perm makes the secondary RQ3 analysis NOT_EVALUABLE.",
+      "scientific_quantities_affected": [
+        "exact_permutation_p_value",
+        "rq3_support_flag"
+      ]
+    },
+    "GAP-004": {
+      "status": "PROSPECTIVE_PREOUTCOME_CLARIFICATION",
+      "authority": "experiments/exp025/EXP-025-PREOUTCOME-SPECIFICATION-CLARIFICATION-001.md",
+      "exact_rule": "For each featurewise standardized term z_j=(x_j-mu_source,j)/sigma_source,j, use the registered equation when sigma_source,j > 0 and set z_j=0 when sigma_source,j == 0. This applies featurewise to A0, A_mu, A_sigma, and A_mu_sigma. No epsilon, learned fallback, dimension dropping, or DIAG/EVAL decision logic.",
+      "scientific_quantities_affected": [
+        "A_sigma",
+        "A_mu_sigma",
+        "G_eval",
+        "routing"
+      ]
+    },
+    "GAP-005": {
+      "status": "PROSPECTIVE_PREOUTCOME_CLARIFICATION",
+      "authority": "experiments/exp025/EXP-025-PREOUTCOME-SPECIFICATION-CLARIFICATION-001.md",
+      "exact_rule": "If effective_n == 0, set BINOMIAL_RULE_STATUS=NOT_EVALUABLE, effective_successes=0, exact_one_sided_p=UNDEFINED, and support=NOT_EVALUABLE. Preserve effective_n=0, effective_successes=0, and status=NOT_EVALUABLE in the result. Propagate indeterminate state; D or G NOT_EVALUABLE maps to NO SCIENTIFIC ROUTING.",
+      "scientific_quantities_affected": [
+        "D_G_support_classification",
+        "routing"
+      ]
+    },
+    "GAP-006": {
+      "status": "PROSPECTIVE_PREOUTCOME_CLARIFICATION",
+      "authority": "experiments/exp025/EXP-025-PREOUTCOME-SPECIFICATION-CLARIFICATION-001.md",
+      "exact_rule": "For the four registered semantic classes logic/causality/analogy/definition, BA=(1/4)*sum(TP_c/N_c). This is unadjusted macro-average recall with equal class weights. No frequency weighting, no adjusted balanced accuracy, fixed four-class registry, and deterministic class ordering only for serialization. If a registered class has zero examples in an evaluation subset, STOP_AND_REPORT_PROTOCOL_INTEGRITY_ERROR.",
+      "scientific_quantities_affected": [
+        "S_diag",
+        "G_eval",
+        "routing"
+      ]
+    }
+  }
+}

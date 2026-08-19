@@ -389,22 +389,27 @@ authority. Task 100D-D records them as `SPECIFICATION_GAP`. They must be
 resolved by an explicit frozen authority or binding governance decision before
 implementation if they could affect the scientific result.
 
+Task 100D-E1 resolved the five consequential gaps with
+`EXP-025-PREOUTCOME-SPECIFICATION-CLARIFICATION-001`. GAP-003 is resolved by
+pre-existing serialization/provenance conventions.
+
 ### GAP-001: Spearman tie-handling
 
-Status: `UNRESOLVED_D`
+Status: `RESOLVED_BY_PREOUTCOME_CLARIFICATION`
 
 `EXP-025-PREREGISTRATION.md` defines the secondary statistic as
 `Spearman(S_diag(c), G_eval(c))` but does not restate the tie-handling rule.
-EXP-024 states standard average ranks for the EXP-024 primary test, but the
-frozen EXP-025 text does not explicitly bind its secondary RQ3 to that rule.
+The additive clarification binds standard Spearman with average-rank ties.
 
 ### GAP-002: Exact permutation tie/zero semantics
 
-Status: `UNRESOLVED_D`
+Status: `RESOLVED_BY_PREOUTCOME_CLARIFICATION`
 
 The exact one-sided permutation p-value is not specified at the implementation
 level for ties in permuted `rho` values, exact zero permutation correlations,
-or whether the count includes `rho_perm >= rho_observed`.
+or whether the count includes `rho_perm >= rho_observed`. The additive
+clarification binds complete enumeration with `>=`, no Monte-Carlo correction,
+and non-finite-`rho` `NOT_EVALUABLE` semantics.
 
 ### GAP-003: Canonical JSON schema and serialization precision
 
@@ -417,48 +422,50 @@ conventions, without changing any scientific quantity.
 
 ### GAP-004: Zero-variance/scaling edge behavior
 
-Status: `UNRESOLVED_D`
+Status: `RESOLVED_BY_PREOUTCOME_CLARIFICATION`
 
 The formal behavior of `A_sigma` and `A_mu_sigma` when a fitted scale is zero
-or near zero is not explicitly frozen for EXP-025.
+or near zero is not explicitly frozen for EXP-025. The additive clarification
+uses an epsilon-free `z_j = 0` rule when the source scale is exactly zero.
 
 ### GAP-005: Effective sample size zero for D/G
 
-Status: `UNRESOLVED_D`
+Status: `RESOLVED_BY_PREOUTCOME_CLARIFICATION`
 
 The D/G inference rule drops exact zero values, but the authority does not
 define behavior when the effective nonzero sample size is `0`. The binomial
-formula is undefined for that case.
+formula is undefined for that case. The additive clarification sets
+`BINOMIAL_RULE_STATUS = NOT_EVALUABLE` and propagates the indeterminate state.
 
 ### GAP-006: Balanced-accuracy definition
 
-Status: `UNRESOLVED_D`
+Status: `RESOLVED_BY_PREOUTCOME_CLARIFICATION`
 
 The authority uses `BA` in the primary estimands and a balanced-accuracy
 technical floor, but does not explicitly freeze the exact multi-class
 balanced-accuracy formula or its equivalence to
-`sklearn.metrics.balanced_accuracy_score`.
+`sklearn.metrics.balanced_accuracy_score`. The additive clarification binds
+unadjusted macro-average recall over the four registered classes.
 
 ## Implementation Gate
 
 The executor may not be implemented or authorized for formal science until the
 specification gaps are resolved and the end-to-end qualification standard is
-met. Task 100D-E0 classifies five of the six gaps as scientifically
-consequential and unresolved. The current gate result is:
+met. Task 100D-E1 resolved all remaining scientifically consequential gaps.
+The current gate result is:
 
 ```text
 EXP025_FORMAL_EXECUTOR_SPEC_COMPLETE = true
-EXP025_SPECIFICATION_GAPS = 5
+EXP025_SPECIFICATION_GAPS = 0
 EXP025_IMPLEMENTATION_COVERAGE_BASELINE = 0/12
 EXP025_FIT_DIAG_EVAL_FIREWALL_SPECIFIED = true
 EXP025_PUBLICATION_CONTRACT_SPECIFIED = true
-EXP025_READY_FOR_FORMAL_EXECUTOR_IMPLEMENTATION = false
-EXP025_NEXT_TASK = 100D_E1_PROSPECTIVE_SPECIFICATION_CLARIFICATION_REVIEW
+EXP025_READY_FOR_FORMAL_EXECUTOR_IMPLEMENTATION = true
+EXP025_NEXT_TASK = 100D_E_IMPLEMENT_FROZEN_FORMAL_EXECUTOR
 ```
 
-`EXP025_READY_FOR_FORMAL_EXECUTOR_IMPLEMENTATION = false` means implementation
-must remain blocked until the five unresolved scientific gaps are explicitly
-resolved through a separately governed prospective clarification.
+`EXP025_READY_FOR_FORMAL_EXECUTOR_IMPLEMENTATION = true` means implementation
+may proceed under the next task; it does not mean formal-run readiness.
 
 ## Publication Contract
 
@@ -485,13 +492,13 @@ Publication failure must fail closed and must not fabricate a valid result.
 
 ```text
 EXP025_FORMAL_EXECUTOR_SPEC_COMPLETE = true
-EXP025_SPECIFICATION_GAPS = 5
+EXP025_SPECIFICATION_GAPS = 0
 EXP025_IMPLEMENTATION_COVERAGE_BASELINE = 0/12
 EXP025_FIT_DIAG_EVAL_FIREWALL_SPECIFIED = true
 EXP025_PUBLICATION_CONTRACT_SPECIFIED = true
 EXP025_SCIENTIFIC_DESIGN_CHANGED = false
 EXP025_FORMAL_RUN_EXECUTED = false
 EXP025_RECOVERY_AUTHORIZATION_CREATED = false
-EXP025_READY_FOR_FORMAL_EXECUTOR_IMPLEMENTATION = false
-EXP025_NEXT_TASK = 100D_E1_PROSPECTIVE_SPECIFICATION_CLARIFICATION_REVIEW
+EXP025_READY_FOR_FORMAL_EXECUTOR_IMPLEMENTATION = true
+EXP025_NEXT_TASK = 100D_E_IMPLEMENT_FROZEN_FORMAL_EXECUTOR
 ```
