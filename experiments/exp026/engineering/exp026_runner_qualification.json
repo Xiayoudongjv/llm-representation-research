@@ -1,0 +1,61 @@
+{
+  "classification": "ENGINEERING_MODEL_HOOK_QUALIFICATION_ONLY",
+  "experiment": "EXP-026",
+  "finished_at_utc": "2026-08-19T15:07:44.691275+00:00",
+  "formal_data_accessed": false,
+  "models": {
+    "O": {
+      "all_layer_extraction": "PASS",
+      "determinism_max_abs_diff": 0.0,
+      "device": "cuda:0",
+      "hidden_size": 2048,
+      "identity": {
+        "device": "cuda:0",
+        "hidden_size": 2048,
+        "model_class": "Olmo2ForCausalLM",
+        "model_key": "O",
+        "model_type": "olmo2",
+        "num_hidden_layers": 16,
+        "runtime_dtype": "torch.bfloat16"
+      },
+      "load_success": true,
+      "logical_layer_count": 16,
+      "model_id": "allenai/OLMo-2-0425-1B-Instruct",
+      "model_revision": "48d788eca847d4d7548f375ad03d3c9312f6139e",
+      "neutral_input_count": 4,
+      "runtime_dtype": "torch.bfloat16"
+    },
+    "Q": {
+      "all_layer_extraction": "PASS",
+      "determinism_max_abs_diff": 0.0,
+      "device": "cuda:0",
+      "hidden_size": 2048,
+      "identity": {
+        "device": "cuda:0",
+        "hidden_size": 2048,
+        "model_class": "Qwen3ForCausalLM",
+        "model_key": "Q",
+        "model_type": "qwen3",
+        "num_hidden_layers": 28,
+        "runtime_dtype": "torch.bfloat16"
+      },
+      "load_success": true,
+      "logical_layer_count": 28,
+      "model_id": "Qwen/Qwen3-1.7B",
+      "model_revision": "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e",
+      "neutral_input_count": 4,
+      "runtime_dtype": "torch.bfloat16"
+    }
+  },
+  "repository_commit": "045873d31d65eeaed426177299bb4a9cf83b2747",
+  "resource": {
+    "cuda_available": true,
+    "gpu_name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+    "torch_version": "2.12.1+cu130"
+  },
+  "runner_sha256": "c9b4bf3c9244468f1cc572c54990d092c155cf430c78d3ace63b153e857b7188",
+  "schema_version": "1.0.0",
+  "scientific_result_created": false,
+  "started_at_utc": "2026-08-19T15:07:25.806438+00:00",
+  "status": "PASS"
+}

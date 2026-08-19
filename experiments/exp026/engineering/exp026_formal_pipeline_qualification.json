@@ -1,0 +1,40 @@
+{
+  "classification": "FORMAL_PIPELINE_SYNTHETIC_QUALIFICATION",
+  "experiment": "EXP-026",
+  "finished_at_utc": "2026-08-19T15:11:22.310023+00:00",
+  "formal_data_accessed": false,
+  "provenance_validation": "PASS",
+  "real_executor_connected": true,
+  "repository_commit": "045873d31d65eeaed426177299bb4a9cf83b2747",
+  "routing": {
+    "p1": false,
+    "p2": false,
+    "p3": false,
+    "p4": false,
+    "p5": true,
+    "per_model": {
+      "O": {
+        "p1": false,
+        "p2": false,
+        "p4": false
+      },
+      "Q": {
+        "p1": false,
+        "p2": false,
+        "p4": false
+      }
+    },
+    "route": "P5"
+  },
+  "runner_sha256": "c9b4bf3c9244468f1cc572c54990d092c155cf430c78d3ace63b153e857b7188",
+  "schema_validation": "PASS",
+  "schema_version": "1.0.0",
+  "scientific_result_created": false,
+  "started_at_utc": "2026-08-19T15:11:21.254240+00:00",
+  "status": "PASS",
+  "synthetic_model_layers": {
+    "A": 4,
+    "B": 3
+  },
+  "synthetic_result_sha256": "ab8fdcecd71cc10756104482873b427f3aa83bd843cd8a7cf4f0c49fca7e5576"
+}
