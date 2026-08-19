@@ -24,3 +24,19 @@ scientific execution.
 - Not a scientific negative.
 - Not a measurement failure.
 - Not a formal scientific result.
+
+## Reconciliation
+
+- `EXP025_FROZEN_DESIGN_CONTRADICTION = false`
+- `EXP025_RUNTIME_IMPLEMENTATION_CONTRADICTION = true`
+- `EXP025_LEGACY_DESIGN_VALIDATOR_STATUS = POST_AUTHORIZATION_SCOPE_LIMITATION`
+
+The frozen scientific design did not require formal authorization consumption
+during Task 100B. The failure was caused by a stale runtime sentinel in
+`run_exp025.py`.
+
+The standalone Task 100A design validator treats
+`exp025_formal_run_authorization.json` as a formal-result path, which is a
+post-authorization scope limitation rather than evidence that the frozen
+scientific design itself forbids authorization. The frozen authority hashes
+remain unchanged.
