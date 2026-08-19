@@ -391,12 +391,16 @@ implementation if they could affect the scientific result.
 
 ### GAP-001: Spearman tie-handling
 
+Status: `UNRESOLVED_D`
+
 `EXP-025-PREREGISTRATION.md` defines the secondary statistic as
 `Spearman(S_diag(c), G_eval(c))` but does not restate the tie-handling rule.
-Inherited EXP-024 states standard average ranks for the EXP-024 primary test,
-but EXP-025 does not explicitly bind its secondary RQ3 to that rule.
+EXP-024 states standard average ranks for the EXP-024 primary test, but the
+frozen EXP-025 text does not explicitly bind its secondary RQ3 to that rule.
 
 ### GAP-002: Exact permutation tie/zero semantics
+
+Status: `UNRESOLVED_D`
 
 The exact one-sided permutation p-value is not specified at the implementation
 level for ties in permuted `rho` values, exact zero permutation correlations,
@@ -404,21 +408,31 @@ or whether the count includes `rho_perm >= rho_observed`.
 
 ### GAP-003: Canonical JSON schema and serialization precision
 
-The canonical result object schema, float serialization precision, key
-ordering, newline behavior, and pre-publication hashing rules are not frozen.
+Status: `RESOLVED_C`
+
+The result object schema, serialization precision, key ordering, newline, and
+pre-publication hashing behavior are pure publication/provenance details. They
+are resolved from the pre-existing repository JSON/atomic-publication
+conventions, without changing any scientific quantity.
 
 ### GAP-004: Zero-variance/scaling edge behavior
+
+Status: `UNRESOLVED_D`
 
 The formal behavior of `A_sigma` and `A_mu_sigma` when a fitted scale is zero
 or near zero is not explicitly frozen for EXP-025.
 
 ### GAP-005: Effective sample size zero for D/G
 
+Status: `UNRESOLVED_D`
+
 The D/G inference rule drops exact zero values, but the authority does not
 define behavior when the effective nonzero sample size is `0`. The binomial
 formula is undefined for that case.
 
 ### GAP-006: Balanced-accuracy definition
+
+Status: `UNRESOLVED_D`
 
 The authority uses `BA` in the primary estimands and a balanced-accuracy
 technical floor, but does not explicitly freeze the exact multi-class
@@ -429,20 +443,22 @@ balanced-accuracy formula or its equivalence to
 
 The executor may not be implemented or authorized for formal science until the
 specification gaps are resolved and the end-to-end qualification standard is
-met. The current baseline remains:
+met. Task 100D-E0 classifies five of the six gaps as scientifically
+consequential and unresolved. The current gate result is:
 
 ```text
 EXP025_FORMAL_EXECUTOR_SPEC_COMPLETE = true
-EXP025_SPECIFICATION_GAPS = 6
+EXP025_SPECIFICATION_GAPS = 5
 EXP025_IMPLEMENTATION_COVERAGE_BASELINE = 0/12
 EXP025_FIT_DIAG_EVAL_FIREWALL_SPECIFIED = true
 EXP025_PUBLICATION_CONTRACT_SPECIFIED = true
-EXP025_READY_FOR_FORMAL_EXECUTOR_IMPLEMENTATION = true
+EXP025_READY_FOR_FORMAL_EXECUTOR_IMPLEMENTATION = false
+EXP025_NEXT_TASK = 100D_E1_PROSPECTIVE_SPECIFICATION_CLARIFICATION_REVIEW
 ```
 
-`EXP025_READY_FOR_FORMAL_EXECUTOR_IMPLEMENTATION = true` means readiness to
-implement the executor under the next task. It does not mean formal-run
-readiness.
+`EXP025_READY_FOR_FORMAL_EXECUTOR_IMPLEMENTATION = false` means implementation
+must remain blocked until the five unresolved scientific gaps are explicitly
+resolved through a separately governed prospective clarification.
 
 ## Publication Contract
 
@@ -469,11 +485,13 @@ Publication failure must fail closed and must not fabricate a valid result.
 
 ```text
 EXP025_FORMAL_EXECUTOR_SPEC_COMPLETE = true
-EXP025_SPECIFICATION_GAPS = 6
+EXP025_SPECIFICATION_GAPS = 5
 EXP025_IMPLEMENTATION_COVERAGE_BASELINE = 0/12
 EXP025_FIT_DIAG_EVAL_FIREWALL_SPECIFIED = true
 EXP025_PUBLICATION_CONTRACT_SPECIFIED = true
 EXP025_SCIENTIFIC_DESIGN_CHANGED = false
 EXP025_FORMAL_RUN_EXECUTED = false
 EXP025_RECOVERY_AUTHORIZATION_CREATED = false
+EXP025_READY_FOR_FORMAL_EXECUTOR_IMPLEMENTATION = false
+EXP025_NEXT_TASK = 100D_E1_PROSPECTIVE_SPECIFICATION_CLARIFICATION_REVIEW
 ```
