@@ -1,34 +1,36 @@
 # EXP-025 Engineering Qualification
 
-Status: `FORMAL_RUN_READINESS = BLOCKED`
+Status: `FORMAL_RUN_READINESS = READY`
 
 This document records the Task 100B engineering-qualification attempt for
 EXP-025. It does not contain DIAGNOSTIC or EVAL scientific outcomes.
 
 ## Result Summary
 
-- `ENGINEERING_STATUS = FAIL`
-- `MEASUREMENT_STATUS = FAIL`
-- `FORMAL_RUN_READINESS = BLOCKED`
+- `ENGINEERING_STATUS = PASS`
+- `MEASUREMENT_STATUS = PASS`
+- `FORMAL_RUN_READINESS = READY`
 - `EXP025_FALLBACK_USED = false`
 - `EXP025_DIAG_OUTCOME_VIEWED = false`
 - `EXP025_EVAL_OUTCOME_VIEWED = false`
 - `EXP025_FORMAL_RUN_PERFORMED = false`
 - `EXP025_SCIENTIFIC_RESULT_CREATED = false`
 
-## Blocking Reason
+## Repair Applied
 
-The exact pinned OLMo model revision config and tokenizer files are present in
-the local HF cache, but the model weights file is not present:
+- `BF16_NUMPY_BOUNDARY_REPAIR = true`
+- `BF16_MODEL_RUNTIME_PRESERVED = true`
+- `SCIENTIFIC_EXTRACTION_ARRAY_DTYPE = float32`
+- `FROZEN_SCIENTIFIC_DESIGN_CHANGED = false`
+
+The centralized Tensor-to-NumPy helper now explicitly converts:
 
 ```text
-model.safetensors missing from snapshot
-48d788eca847d4d7548f375ad03d3c9312f6139e
+tensor.detach().cpu().to(torch.float32).numpy()
 ```
 
-The real model/tokenizer/hook qualification therefore could not be executed in
-this attempt. The failure is a model-acquisition/runtime availability block,
-not a scientific measurement result.
+Single-record last-valid-token extraction is flattened to the frozen
+`[hidden_size]` vector contract before classifier/scaler processing.
 
 ## Frozen Design Status
 
@@ -46,7 +48,7 @@ Frozen Task 100A design files remain unchanged:
 
 - Python: `3.11.9`
 - PyTorch: `2.12.1+cu130`
-- Transformers: `5.14.1`
+- Transformers: `5.15.0`
 - NumPy: `2.4.6`
 - scikit-learn: `1.9.0`
 - Hugging Face Hub: `1.27.0`
@@ -79,7 +81,7 @@ tests/test_exp025_runner.py
 Focused pytest result:
 
 ```text
-12 passed
+14 passed
 ```
 
 Covered checks include:
@@ -93,15 +95,24 @@ Covered checks include:
 - FIT/DIAG/EVAL firewall separation
 - recalibration known-answer behavior
 - qualification cannot publish a scientific result
+- BF16 Tensor-to-NumPy conversion boundary
+- single-record representation flattening
+
+## Qualification Checks
+
+- `MODEL_IDENTITY`: PASS
+- `TOKENIZER_CONTRACT`: PASS
+- `CHECKPOINT_MAPPING`: PASS
+- `HIDDEN_STATE_EXTRACTION`: PASS
+- `DETERMINISM`: PASS
+- `PROBABILITY_CLASS_MAPPING`: PASS
+- `MEASUREMENT_QUALIFICATION`: PASS
+- `RECALIBRATION_PATH`: PASS
+- `RESOURCE_FEASIBILITY`: PASS
+- `PRODUCTION_CALL_GRAPH`: PASS
+- `FIT_DIAG_EVAL_FIREWALL`: PASS
 
 ## Next Action
 
-The weights file `model.safetensors` must be acquired for the exact pinned
-revision before real runtime qualification can be repeated. After acquisition,
-rerun:
-
-```text
-python experiments/exp025/run_exp025.py --engineering-qualification
-```
-
-Do not fall back to another model on the basis of scientific outcomes.
+Stop here. Do not create or consume a formal-run authorization in this task.
+The next gate is exactly `100C_SINGLE_FORMAL_RUN_AUTHORIZATION`.

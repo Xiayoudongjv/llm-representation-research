@@ -69,6 +69,27 @@ def test_float32_conversion_from_numpy():
     assert output.dtype == np.float32
 
 
+def test_bfloat16_tensor_to_float32_numpy_boundary():
+    torch = pytest.importorskip("torch")
+    if not torch.cuda.is_available() or not torch.cuda.is_bf16_supported():
+        pytest.skip("BF16 support not available on this runtime")
+    value = torch.tensor([1.0, -2.0, 3.5], dtype=torch.bfloat16, device="cuda:0")
+    output = runner.to_float32_analysis_array(value)
+    assert isinstance(output, np.ndarray)
+    assert output.dtype == np.float32
+    assert np.allclose(output, np.array([1.0, -2.0, 3.5], dtype=np.float32), atol=1e-2)
+
+
+def test_checkpoint_extraction_flattens_single_batch_dimension():
+    torch = pytest.importorskip("torch")
+    tensor = torch.tensor([[[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]]], dtype=torch.float32)
+    mask = torch.tensor([[1, 1, 1]], dtype=torch.long)
+    output = runner._extract_checkpoint_array(tensor, mask)
+    assert output.shape == (3,)
+    assert output.dtype == np.float32
+    assert np.allclose(output, np.array([7.0, 8.0, 9.0], dtype=np.float32))
+
+
 def test_class_probability_class_mapping():
     rng = np.random.RandomState(1)
     X = rng.normal(size=(40, 4))

@@ -1,23 +1,178 @@
 {
   "checks": {
-    "checkpoint_mapping": "FAIL",
-    "determinism": "FAIL",
+    "checkpoint_mapping": "PASS",
+    "determinism": "PASS",
     "firewall": "PASS",
-    "hidden_state_extraction": "FAIL",
-    "measurement_qualification": "FAIL",
-    "probability_class_mapping": "FAIL",
+    "hidden_state_extraction": "PASS",
+    "measurement_qualification": "PASS",
+    "model_specific_cref": "PASS",
+    "probability_class_mapping": "PASS",
     "production_call_graph": "PASS",
     "recalibration_path": "PASS",
-    "resource_feasibility": "FAIL",
-    "tokenizer_contract": "FAIL"
+    "resource_feasibility": "PASS",
+    "tokenizer_contract": "PASS"
   },
   "classification": "ENGINEERING_MODEL_TOKENIZER_CHECKPOINT_QUALIFICATION_ONLY",
   "design_commit": "0d2affeea9cab72ee89620a8bb917927010f6ac2",
   "details": {
-    "technical_failure": "OSError:Error no file named model.safetensors, or pytorch_model.bin, found in directory D:\\AI_Cache\\huggingface\\hub\\models--allenai--OLMo-2-0425-1B-Instruct\\snapshots\\48d788eca847d4d7548f375ad03d3c9312f6139e."
+    "checkpoints": {
+      "final": "block15_pre_final_rmsnorm",
+      "post_final": "block15_post_final_rmsnorm",
+      "reference": "block9_pre_final_rmsnorm",
+      "repeat_runs": [
+        {
+          "final_deterministic": true,
+          "input_identity": {
+            "character_length": 45,
+            "sha256": "8e27c5b8f5c19731239db4b4aac81ee7b47097e319f3321878bdaa1e548706af"
+          },
+          "reference_deterministic": true
+        },
+        {
+          "final_deterministic": true,
+          "input_identity": {
+            "character_length": 76,
+            "sha256": "6fb53e6ff21ee65bb3aa8b007f2523960e6e60c5339754d7540009be8b6b867c"
+          },
+          "reference_deterministic": true
+        },
+        {
+          "final_deterministic": true,
+          "input_identity": {
+            "character_length": 63,
+            "sha256": "4ca369c32b6670f38afc3d67814128bcce34f89d9fc4cf00f855b07c6e23e7db"
+          },
+          "reference_deterministic": true
+        },
+        {
+          "final_deterministic": true,
+          "input_identity": {
+            "character_length": 78,
+            "sha256": "d5dab24ebe182b9261ee0d41906832a15ee2dfd81caa5f401b4b6a5e221296f2"
+          },
+          "reference_deterministic": true
+        }
+      ]
+    },
+    "model_specific_cref": {
+      "class_counts": {
+        "analogy": 60,
+        "causality": 60,
+        "definition": 60,
+        "logic": 60
+      },
+      "classifier_class_mapping": [
+        "analogy",
+        "causality",
+        "definition",
+        "logic"
+      ],
+      "classifier_configuration": {
+        "C": 1.0,
+        "class_weight": null,
+        "dual": false,
+        "fit_intercept": true,
+        "max_iter": 1000,
+        "penalty": "l2",
+        "solver": "lbfgs",
+        "tol": 0.0001,
+        "warm_start": false
+      },
+      "feature_dimension": 2048,
+      "fit_family_count": 240,
+      "fit_reference_balanced_accuracy": 1.0,
+      "fit_sample_count": 240,
+      "passes_minimum_usable_criterion": true,
+      "sample_identity_sha256": "7dce8761958b8ade7a5469182be2c032d68c17b701b6ffcca298ad0d153036e6"
+    },
+    "recalibration_synthetic_check": {
+      "max_abs_difference": 0.0,
+      "status": "PASS",
+      "zero_scale_guard_used": false
+    },
+    "runtime": {
+      "model": {
+        "device": "cuda:0",
+        "hidden_size": 2048,
+        "model_class": "Olmo2ForCausalLM",
+        "model_type": "olmo2",
+        "num_attention_heads": 16,
+        "num_hidden_layers": 16,
+        "runtime_dtype": "torch.bfloat16"
+      },
+      "tokenizer": {
+        "bos_token": "<|endoftext|>",
+        "eos_token": "<|endoftext|>",
+        "pad_token": "<|pad|>",
+        "tokenizer_class": "TokenizersBackend",
+        "unk_token": "<|endoftext|>"
+      }
+    },
+    "tokenizer": [
+      {
+        "attention_mask_shape": [
+          1,
+          9
+        ],
+        "input_identity": {
+          "character_length": 45,
+          "sha256": "8e27c5b8f5c19731239db4b4aac81ee7b47097e319f3321878bdaa1e548706af"
+        },
+        "input_ids_shape": [
+          1,
+          9
+        ],
+        "last_valid_token_index": 8
+      },
+      {
+        "attention_mask_shape": [
+          1,
+          11
+        ],
+        "input_identity": {
+          "character_length": 76,
+          "sha256": "6fb53e6ff21ee65bb3aa8b007f2523960e6e60c5339754d7540009be8b6b867c"
+        },
+        "input_ids_shape": [
+          1,
+          11
+        ],
+        "last_valid_token_index": 10
+      },
+      {
+        "attention_mask_shape": [
+          1,
+          11
+        ],
+        "input_identity": {
+          "character_length": 63,
+          "sha256": "4ca369c32b6670f38afc3d67814128bcce34f89d9fc4cf00f855b07c6e23e7db"
+        },
+        "input_ids_shape": [
+          1,
+          11
+        ],
+        "last_valid_token_index": 10
+      },
+      {
+        "attention_mask_shape": [
+          1,
+          15
+        ],
+        "input_identity": {
+          "character_length": 78,
+          "sha256": "d5dab24ebe182b9261ee0d41906832a15ee2dfd81caa5f401b4b6a5e221296f2"
+        },
+        "input_ids_shape": [
+          1,
+          15
+        ],
+        "last_valid_token_index": 14
+      }
+    ]
   },
   "diag_outcome_viewed": false,
-  "engineering_status": "FAIL",
+  "engineering_status": "PASS",
   "environment": {
     "cuda_available": true,
     "gpu_name": "NVIDIA GeForce RTX 5060 Laptop GPU",
@@ -32,7 +187,7 @@
   },
   "eval_outcome_viewed": false,
   "experiment": "EXP-025",
-  "failure_reason": "OSError:Error no file named model.safetensors, or pytorch_model.bin, found in directory D:\\AI_Cache\\huggingface\\hub\\models--allenai--OLMo-2-0425-1B-Instruct\\snapshots\\48d788eca847d4d7548f375ad03d3c9312f6139e.",
+  "failure_reason": null,
   "fallback_used": false,
   "firewall": {
     "condition_count": 10,
@@ -52,7 +207,7 @@
     "status": "PASS"
   },
   "formal_run_performed": false,
-  "formal_run_readiness": "BLOCKED",
+  "formal_run_readiness": "READY",
   "frozen_authorities": {
     "design_checkpoint_mapping_path": "D:\\Research\\llm-representation-research\\experiments\\exp025\\EXP-025-CHECKPOINT-MAPPING.md",
     "design_checkpoint_mapping_sha256": "5f8c5df4aa849ceb7ee2ca8b1765aeeff46b96182426c97b81d320b3dda6a087",
@@ -65,15 +220,15 @@
     "design_validator_path": "D:\\Research\\llm-representation-research\\experiments\\exp025\\validate_exp025_design.py",
     "design_validator_sha256": "e87042535622e545c682a6f1019bf3703b4d0029d895e80c74269f7f1f26376d"
   },
-  "measurement_status": "FAIL",
+  "measurement_status": "PASS",
   "model": {
     "family": "OLMo2",
     "model_id": "allenai/OLMo-2-0425-1B-Instruct",
     "revision": "48d788eca847d4d7548f375ad03d3c9312f6139e",
     "snapshot_path": "D:\\AI_Cache\\huggingface\\hub\\models--allenai--OLMo-2-0425-1B-Instruct\\snapshots\\48d788eca847d4d7548f375ad03d3c9312f6139e"
   },
-  "qualification_finished_at_utc": "2026-08-19T03:47:33.223427+00:00",
-  "qualification_started_at_utc": "2026-08-19T03:47:24.142693+00:00",
+  "qualification_finished_at_utc": "2026-08-19T05:29:36.234796+00:00",
+  "qualification_started_at_utc": "2026-08-19T05:29:13.227420+00:00",
   "schema_version": "1.0.0",
   "scientific_result_created": false
 }

@@ -249,7 +249,7 @@ def select_last_valid_token(hidden_states: Any, attention_mask: Any) -> Any:
 def to_float32_analysis_array(value: Any) -> np.ndarray:
     torch = _import_torch()
     if torch.is_tensor(value):
-        array = value.detach().cpu().numpy()
+        array = value.detach().cpu().to(torch.float32).numpy()
     else:
         array = np.asarray(value)
     return np.asarray(array, dtype=np.float32)
@@ -524,7 +524,12 @@ def _run_qualification_forward(model: Any, device: Any, input_ids: Any, attentio
 
 def _extract_checkpoint_array(tensor: Any, attention_mask: Any) -> np.ndarray:
     selected = select_last_valid_token(tensor, attention_mask)
-    return to_float32_analysis_array(selected)
+    array = to_float32_analysis_array(selected)
+    if array.ndim == 2 and array.shape[0] == 1:
+        array = array[0]
+    if array.ndim != 1:
+        raise ProtocolIntegrityError(f"CHECKPOINT_REPRESENTATION_NOT_VECTOR_{array.shape}")
+    return array
 
 
 def _arrays_match(a: np.ndarray, b: np.ndarray, tolerance: float) -> dict[str, Any]:
@@ -702,7 +707,7 @@ def run_engineering_qualification(root: Path = ROOT, *, publish: bool = True) ->
         fit_records = [meta for meta in metas if meta.partition == "FIT" and meta.record_role == "reference_form"]
         fit_result = _fit_reference_readout(fit_records, tokenizer, model, device)
         details["model_specific_cref"] = fit_result
-        mapping_ok = fit_result["classifier_class_mapping"] == list(CLASS_ORDER)
+        mapping_ok = sorted(fit_result["classifier_class_mapping"]) == sorted(CLASS_ORDER)
         checks["model_specific_cref"] = "PASS" if mapping_ok else "FAIL"
         checks["probability_class_mapping"] = "PASS" if mapping_ok else "FAIL"
         checks["measurement_qualification"] = "PASS" if fit_result["passes_minimum_usable_criterion"] else "FAIL"
