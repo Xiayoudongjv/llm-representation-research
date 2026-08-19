@@ -1,0 +1,79 @@
+{
+  "checks": {
+    "checkpoint_mapping": "FAIL",
+    "determinism": "FAIL",
+    "firewall": "PASS",
+    "hidden_state_extraction": "FAIL",
+    "measurement_qualification": "FAIL",
+    "probability_class_mapping": "FAIL",
+    "production_call_graph": "PASS",
+    "recalibration_path": "PASS",
+    "resource_feasibility": "FAIL",
+    "tokenizer_contract": "FAIL"
+  },
+  "classification": "ENGINEERING_MODEL_TOKENIZER_CHECKPOINT_QUALIFICATION_ONLY",
+  "design_commit": "0d2affeea9cab72ee89620a8bb917927010f6ac2",
+  "details": {
+    "technical_failure": "OSError:Error no file named model.safetensors, or pytorch_model.bin, found in directory D:\\AI_Cache\\huggingface\\hub\\models--allenai--OLMo-2-0425-1B-Instruct\\snapshots\\48d788eca847d4d7548f375ad03d3c9312f6139e."
+  },
+  "diag_outcome_viewed": false,
+  "engineering_status": "FAIL",
+  "environment": {
+    "cuda_available": true,
+    "gpu_name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+    "gpu_vram_gb": 7.96,
+    "huggingface_hub": "1.27.0",
+    "numpy": "2.4.6",
+    "os": "Windows-10-10.0.26200-SP0",
+    "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+    "sklearn": "1.9.0",
+    "torch": "2.12.1+cu130",
+    "transformers": "5.14.1"
+  },
+  "eval_outcome_viewed": false,
+  "experiment": "EXP-025",
+  "failure_reason": "OSError:Error no file named model.safetensors, or pytorch_model.bin, found in directory D:\\AI_Cache\\huggingface\\hub\\models--allenai--OLMo-2-0425-1B-Instruct\\snapshots\\48d788eca847d4d7548f375ad03d3c9312f6139e.",
+  "fallback_used": false,
+  "firewall": {
+    "condition_count": 10,
+    "overlaps": {
+      "diag_eval": 0,
+      "fit_diag": 0,
+      "fit_eval": 0
+    },
+    "partition_family_counts": {
+      "DIAGNOSTIC": 320,
+      "EVAL": 320,
+      "FIT": 240
+    },
+    "record_count": 1760,
+    "semantic_class_count": 4,
+    "source_family_count": 880,
+    "status": "PASS"
+  },
+  "formal_run_performed": false,
+  "formal_run_readiness": "BLOCKED",
+  "frozen_authorities": {
+    "design_checkpoint_mapping_path": "D:\\Research\\llm-representation-research\\experiments\\exp025\\EXP-025-CHECKPOINT-MAPPING.md",
+    "design_checkpoint_mapping_sha256": "5f8c5df4aa849ceb7ee2ca8b1765aeeff46b96182426c97b81d320b3dda6a087",
+    "design_config_path": "D:\\Research\\llm-representation-research\\experiments\\exp025\\exp025_frozen_config.json",
+    "design_config_sha256": "2c9b1b8735378108c921a8ca99a1aab115b2a6669bf82e5ae0a9314dd4b62275",
+    "design_model_selection_path": "D:\\Research\\llm-representation-research\\experiments\\exp025\\EXP-025-MODEL-SELECTION.md",
+    "design_model_selection_sha256": "be28f7a2b1f460879e65f0ac911b01756d76b45069f8f438021412b76e954f80",
+    "design_preregistration_path": "D:\\Research\\llm-representation-research\\experiments\\exp025\\EXP-025-PREREGISTRATION.md",
+    "design_preregistration_sha256": "b83fd58ba36e55ab5c48577169e07a168d2a55df759d3131677cd86f2363e08e",
+    "design_validator_path": "D:\\Research\\llm-representation-research\\experiments\\exp025\\validate_exp025_design.py",
+    "design_validator_sha256": "e87042535622e545c682a6f1019bf3703b4d0029d895e80c74269f7f1f26376d"
+  },
+  "measurement_status": "FAIL",
+  "model": {
+    "family": "OLMo2",
+    "model_id": "allenai/OLMo-2-0425-1B-Instruct",
+    "revision": "48d788eca847d4d7548f375ad03d3c9312f6139e",
+    "snapshot_path": "D:\\AI_Cache\\huggingface\\hub\\models--allenai--OLMo-2-0425-1B-Instruct\\snapshots\\48d788eca847d4d7548f375ad03d3c9312f6139e"
+  },
+  "qualification_finished_at_utc": "2026-08-19T03:47:33.223427+00:00",
+  "qualification_started_at_utc": "2026-08-19T03:47:24.142693+00:00",
+  "schema_version": "1.0.0",
+  "scientific_result_created": false
+}
