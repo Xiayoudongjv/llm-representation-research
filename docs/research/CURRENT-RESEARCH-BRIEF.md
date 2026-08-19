@@ -88,6 +88,10 @@ current positive/negative evidence chain. Do not automatically launch EXP-025,
 a replacement authorization, or a second-model replication rescue; second-model
 breadth is optional/venue-uplift only.
 
+Explicit Task 100A has since frozen a bounded EXP-025 cross-model replication
+design using `allenai/OLMo-2-0425-1B-Instruct`. Formal execution remains
+disabled; the next gate is `100B_EXP025_ENGINEERING_QUALIFICATION`.
+
 ## 9. Frozen authority links/hashes
 
 - Preregistration: `docs/experiments/EXP-022A-PREREGISTRATION.md`

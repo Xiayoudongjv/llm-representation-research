@@ -14,6 +14,7 @@ Canonical experimental artifacts outrank it.
 - EXP-022A -> diagnosed fixed-frame degradation with the A0/A1/A2 ladder.
 - EXP-023 -> independent preregistered `NO_REPLICATION`; one strong featurewise-calibration rescue split and one null split.
 - EXP-024 -> valid condition-panel susceptibility test; simple independent degradation-magnitude predictor `NOT_SUPPORTED`; broad descriptive calibration benefit observed in 10/10 conditions.
+- EXP-025 -> cross-model replication design frozen with `allenai/OLMo-2-0425-1B-Instruct`; formal run not yet authorized or performed.
 
 ## EXP-022A Result Summary
 
@@ -60,5 +61,8 @@ Post-EXP-024 branch:
 - Paper-A full prose drafting may proceed with the bounded story.
 - Second-model breadth is optional/venue-uplift, not a validity requirement for
   the current bounded manuscript.
+- Explicit Task 100A has now frozen a bounded EXP-025 cross-model replication
+  design, but formal execution remains disabled pending engineering
+  qualification and a single-use authorization.
 
 This is an experimental-priority decision, not a scientific claim.
