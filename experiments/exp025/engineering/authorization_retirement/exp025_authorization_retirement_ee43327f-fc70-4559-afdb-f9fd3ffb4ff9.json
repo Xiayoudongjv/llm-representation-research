@@ -1,0 +1,13 @@
+{
+    "schema_version":  "1.0.0",
+    "classification":  "AUTHORIZATION_RETIREMENT_AUDIT",
+    "authorization_id":  "ee43327f-fc70-4559-afdb-f9fd3ffb4ff9",
+    "authorization_sha256":  "f71ff6f67fb57411500c811f4f03c36d81372d847c114b2b907eebb5e12c3c1e",
+    "bound_runtime_commit":  "9fee7cb8f293f25a032c62d270c96ba0818a22a3",
+    "status":  "RETIRED_UNCONSUMED_DUE_TO_PURPOSE_SCHEMA_MISMATCH",
+    "failure_class":  "PRECONSUMPTION_AUTHORIZATION_METADATA_FAILURE",
+    "scientific_execution_performed":  false,
+    "outcome_exposure":  false,
+    "reason":  "Authorization purpose used an unsupported enum value; production validator requires SINGLE_USE_FORMAL_RUN.",
+    "retired_at_utc":  "2026-08-19T06:25:05.1244138Z"
+}
