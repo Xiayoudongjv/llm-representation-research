@@ -15,6 +15,7 @@ Canonical experimental artifacts outrank it.
 - EXP-023 -> independent preregistered `NO_REPLICATION`; one strong featurewise-calibration rescue split and one null split.
 - EXP-024 -> valid condition-panel susceptibility test; simple independent degradation-magnitude predictor `NOT_SUPPORTED`; broad descriptive calibration benefit observed in 10/10 conditions.
 - EXP-025 -> cross-model panel replication on `allenai/OLMo-2-0425-1B-Instruct`; registered `D-_G+`.
+- EXP-026 -> model-depth source/target fixed-readout compatibility matrix design frozen; not run.
 
 ## EXP-022A Result Summary
 
@@ -91,6 +92,14 @@ Post-EXP-025 branch:
 - Primary next direction: `MODEL_DEPTH_COMPATIBILITY_PROFILE`.
 - Backup next direction:
   `OPERATOR_CAPACITY_MINIMUM_SUFFICIENT_ALIGNMENT`.
-- Do not create EXP-026 yet.
+
+Post-Task-101B branch:
+
+- Task 101B froze the EXP-026 full source/target compatibility matrix design.
+- EXP-026 remains `FROZEN_DESIGN_NOT_RUN`.
+- Next task, if design validation remains `PASS` and specification gaps remain
+  `0`, is `101C_EXP026_RUNNER_IMPLEMENTATION_AND_SYNTHETIC_QUALIFICATION`.
+- EXP-026 is design-only; no runner, GPU run, formal authorization, or
+  scientific result was created.
 
 This is an experimental-priority decision, not a scientific claim.

@@ -1,0 +1,210 @@
+{
+  "claim_ceiling": "The two tested models exhibit reproducible differences in depth-structured source/target fixed-readout compatibility under the frozen condition panel, and FIT-only featurewise recalibratability is not fully reducible to raw fixed-readout compatibility loss.",
+  "created_at_utc": "2026-08-19T00:00:00Z",
+  "dataset_reused": true,
+  "design_files": {
+    "layer_carrier_mapping_path": "experiments/exp026/EXP-026-LAYER-CARRIER-MAPPING.md",
+    "layer_carrier_mapping_sha256": "04c6565ff366fc04960966fcff148228c5338870756c75375baf976177d6dfb1",
+    "matrix_metric_specification_path": "experiments/exp026/EXP-026-MATRIX-METRIC-SPECIFICATION.md",
+    "matrix_metric_specification_sha256": "5f58445e26eee7effddd7cd5b4ae255b7153d61fa7a76b5c0684fa1dbb08d8db",
+    "model_selection_path": "experiments/exp026/EXP-026-MODEL-SELECTION.md",
+    "model_selection_sha256": "2221bb5defd21e61f316e175a6c8afd8cb3df7f34f4a2ed7b325c82416d0b5ac",
+    "preregistration_path": "experiments/exp026/EXP-026-PREREGISTRATION.md",
+    "preregistration_sha256": "730175071e315b484e360b6359945f567bfe8edf4f52e6a0893c3f2a7dadf8e1",
+    "routing_rules_path": "experiments/exp026/EXP-026-ROUTING-RULES.md",
+    "routing_rules_sha256": "4ff6be135066e1cd0bbcad54ee6c7472d693d35063df8202326b5bd0b4308856"
+  },
+  "design_selected": "FULL_SOURCE_TARGET_COMPATIBILITY_MATRIX",
+  "design_status": "FROZEN_DESIGN_NOT_RUN",
+  "experiment": "EXP-026",
+  "fallback_model": "NONE",
+  "family_causal_claim_prohibited": true,
+  "firewall": {
+    "diagnostic_roles": [
+      "source_layer_technical_eligibility",
+      "preregistered_diagnostic_quantities",
+      "frozen_diagnostic_mask"
+    ],
+    "eval_forbidden_selection": [
+      "source_layers",
+      "target_layers",
+      "matrix_regions",
+      "transition_locations",
+      "calibration_variants",
+      "statistics",
+      "thresholds"
+    ],
+    "eval_roles": [
+      "confirmatory_compatibility_and_recovery_summaries"
+    ],
+    "fit_roles": [
+      "source_layer_classifier_parameters",
+      "pairwise_fit_only_recalibration_parameters"
+    ]
+  },
+  "flags": {
+    "formal_authorization_created": false,
+    "gpu_run_executed": false,
+    "runner_created": false,
+    "scientific_result_created": false
+  },
+  "freeze_commit": "6dfccb10f5b907667f621ae307df9f3b0893e46e",
+  "inherited_authorities": {
+    "condition_panel_path": "experiments/exp024/condition_panel_spec.json",
+    "condition_panel_sha256": "a3b8d565a94ef6041fbe6a29d73102ab4156cc19cfc07ccaeb06206d589f7954",
+    "data_schema_path": "experiments/exp024/data_schema.json",
+    "data_schema_sha256": "e27c33c864c6305522aec0c92839634fb5885aeb50099372b9bf46da7f2fe3ec",
+    "dataset_path": "experiments/exp024/data/exp024_condition_panel_frozen.json",
+    "dataset_sha256": "46c832b68b6ac95704bf5143badc1431627d7f935648842a78971491b13ee404",
+    "exp024_preregistration_path": "docs/experiments/EXP-024-PREREGISTRATION.md",
+    "exp024_preregistration_sha256": "55f9604d904fd389da28c6214082028faca081f7e3a0c87c8ba8d961f792d810",
+    "frozen_manifest_path": "experiments/exp024/exp024_frozen_manifest.json",
+    "frozen_manifest_sha256": "1409a33e300463067ffc060afa58ceb238fda8d6dc2479563c886a8474748f59"
+  },
+  "layer_carrier": {
+    "eligible_depth_set": "all_transformer_decoder_blocks",
+    "excluded_states": [
+      "embedding_state",
+      "lm_head_logits",
+      "post_lm_head_state",
+      "inconsistent_final_normalized_only_carrier"
+    ],
+    "full_layer_extraction_feasible": true,
+    "normalized_depth_formula": "layer_index/(num_layers-1)",
+    "semantics": "post_decoder_block_residual_before_next_block_and_before_model_final_norm"
+  },
+  "llama_future_gate_defined": true,
+  "llama_included": false,
+  "metrics": {
+    "balanced_accuracy_definition": "macro_average_per_class_recall_over_logic_causality_analogy_definition",
+    "c0_definition": "eval_balanced_accuracy_of_source_classifier_h_m_i_applied_directly_to_target_layer_j_eval_representations_under_condition_c_no_recalibration",
+    "c_cal_definition": "eval_balanced_accuracy_after_primary_A_mu_sigma_pairwise_fit_only_recalibration",
+    "classifier_contract": {
+      "C": 1.0,
+      "class_weight": null,
+      "dual": false,
+      "fit_intercept": true,
+      "max_iter": 1000,
+      "penalty": "L2",
+      "solver": "lbfgs",
+      "tol": 0.0001,
+      "warm_start": false
+    },
+    "condition_pooling": "arithmetic_mean_over_all_10_conditions_equal_weight",
+    "cself_definition": "C0_m_i_i_c",
+    "d_definition": "Cself-C0",
+    "primary_recalibration": "A_mu_sigma",
+    "r_definition": "Ccal-C0",
+    "scaler_contract": {
+      "with_mean": true,
+      "with_std": true
+    },
+    "source_coverage_min_fraction": 0.5,
+    "source_coverage_min_normalized_depth_span": 0.5,
+    "source_technical_floor": 0.75,
+    "source_technical_floor_evaluated_on": "DIAGNOSTIC",
+    "source_technical_floor_pooling": "arithmetic_mean_over_10_conditions"
+  },
+  "model_dependent_language_enforced": true,
+  "model_scope": "TWO_MODEL_COMPARATIVE_PROFILE",
+  "models": {
+    "O": {
+      "eligible_blocks": {
+        "count": 16,
+        "first_index": 0,
+        "last_index": 15
+      },
+      "hidden_size": 2048,
+      "local_snapshot": "D:/AI_Cache/huggingface/hub/models--allenai--OLMo-2-0425-1B-Instruct/snapshots/48d788eca847d4d7548f375ad03d3c9312f6139e",
+      "model_class": "Olmo2ForCausalLM",
+      "model_family": "OLMo2",
+      "model_id": "allenai/OLMo-2-0425-1B-Instruct",
+      "model_revision": "48d788eca847d4d7548f375ad03d3c9312f6139e",
+      "model_type": "olmo2",
+      "num_hidden_layers": 16
+    },
+    "Q": {
+      "eligible_blocks": {
+        "count": 28,
+        "first_index": 0,
+        "last_index": 27
+      },
+      "hidden_size": 2048,
+      "local_snapshot": "D:/AI_Cache/huggingface/hub/models--Qwen--Qwen3-1.7B/snapshots/70d244cc86ccca08cf5af4e1e306ecf908b1ad5e",
+      "model_class": "Qwen3ForCausalLM",
+      "model_family": "Qwen3",
+      "model_id": "Qwen/Qwen3-1.7B",
+      "model_revision": "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e",
+      "model_type": "qwen3",
+      "num_hidden_layers": 28
+    }
+  },
+  "next_task": "101C_EXP026_RUNNER_IMPLEMENTATION_AND_SYNTHETIC_QUALIFICATION",
+  "panel": {
+    "allocation": {
+      "DIAGNOSTIC": 8,
+      "EVAL": 8,
+      "FIT": 6
+    },
+    "condition_order": [
+      "c01_lexical_relex",
+      "c02_syntactic_restructure",
+      "c03_controlled_compression",
+      "c04_controlled_elaboration",
+      "c05_relation_explicit",
+      "c06_relation_implicit",
+      "c07_register_formal",
+      "c08_register_informal",
+      "c09_neutral_distractor_prefix",
+      "c10_anaphoric_reference"
+    ],
+    "n_conditions": 10,
+    "record_count": 1760,
+    "semantic_classes": [
+      "logic",
+      "causality",
+      "analogy",
+      "definition"
+    ],
+    "source_family_count": 880
+  },
+  "routing": {
+    "conflict_resolution": "P3 > P1 > P2 > P4 > P5",
+    "frozen": true,
+    "p1": "localized_transition_plus_concentrated_recovery_to_operator_capacity",
+    "p2": "source_reference_dominance_to_reference_anchor_resolution",
+    "p3": "materially_different_model_signatures_to_third_model_validation",
+    "p4": "broad_low_d_recovery_to_minimum_sufficient_alignment_operator",
+    "p5": "flat_stable_matrices_and_weak_recovery_to_reconsider_panel_reference_specificity"
+  },
+  "schema_version": "1.0.0",
+  "specification_gaps": 0,
+  "statistics": {
+    "bootstrap_design": "condition_stratified_source_family_cluster_bootstrap",
+    "bootstrap_replicates": 5000,
+    "ci_level": 0.95,
+    "interpolation_method": "linear_on_common_normalized_depth_grid",
+    "localization_zero_denominator": "LOCALIZATION_0_STATUS_NO_TARGET_BOUNDARY_VARIATION",
+    "low_d_recovery_effective_n_zero": "NOT_EVALUABLE",
+    "permutation_test_used": false,
+    "quantile_method": "numpy.percentile_method_linear",
+    "resampling_unit": "source_family",
+    "rng_algorithm": "numpy.random.PCG64",
+    "sdi_variance_convention": "population_variance_ddof_0",
+    "seed": 20260819,
+    "spearman_tie_handling": "average_ranks",
+    "statistical_unit": "source_family_cluster"
+  },
+  "summaries": {
+    "cross_model_matrix_similarity_status": "DESCRIPTIVE",
+    "localization_status": "DESCRIPTIVE",
+    "primary_1": "DISTANCE_ASSOCIATION",
+    "primary_2": "SOURCE_DOMINANCE_INDEX",
+    "secondary_confirmatory": "LOW_D_RECOVERY",
+    "secondary_descriptive": [
+      "LOCALIZATION",
+      "CROSS_MODEL_NORMALIZED_MATRIX_SIMILARITY",
+      "FULL_C0_D_R_MATRICES"
+    ]
+  }
+}

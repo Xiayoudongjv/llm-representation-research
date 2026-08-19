@@ -23,6 +23,7 @@ recalibrated or transported across layers and interventions?
 - EXP-023 independently returns `NO_REPLICATION`: strong Split-A rescue, null Split B.
 - EXP-024 returns a valid condition-panel primary `NOT_SUPPORTED` for the simple degradation-magnitude predictor, while 10/10 conditions show positive `S_diag` and `G_eval` descriptively.
 - EXP-025 returns a valid OLMo cross-model panel result: `D-` / `G+`; degradation breadth is not established, recovery support is limited.
+- EXP-026 has a frozen `FROZEN_DESIGN_NOT_RUN` full source/target model-depth compatibility matrix design; it has not been executed.
 
 ## 4. Current claim boundaries
 
@@ -114,7 +115,12 @@ failure.
 
 Task 100F has now archived the valid EXP-025 recovery result. The next research
 direction is `MODEL_DEPTH_COMPATIBILITY_PROFILE`; backup is
-`OPERATOR_CAPACITY_MINIMUM_SUFFICIENT_ALIGNMENT`. Do not create EXP-026 yet.
+`OPERATOR_CAPACITY_MINIMUM_SUFFICIENT_ALIGNMENT`.
+
+Task 101B has now frozen the EXP-026 full source/target compatibility matrix
+design. EXP-026 remains `FROZEN_DESIGN_NOT_RUN`; no runner, GPU run, formal
+authorization, or scientific result was created. The next task is
+`101C_EXP026_RUNNER_IMPLEMENTATION_AND_SYNTHETIC_QUALIFICATION`.
 
 ## 9. Frozen authority links/hashes
 
@@ -150,6 +156,11 @@ direction is `MODEL_DEPTH_COMPATIBILITY_PROFILE`; backup is
 - EXP-025 recovery consumption:
   `experiments/exp025/results/authorization_consumption/7b3dbdaf-1fb4-4272-a80b-58b99adac59d.json`
   - SHA-256: `2d88598be6deaf8e078c0e7ae8d9c1ed49f2946d6f2356d89dec3451025602c6`
+
+- EXP-026 frozen design config: `experiments/exp026/exp026_frozen_config.json`
+  - SHA-256: `ccf60c8a9dc6f3b9d3cce533910334e1f8ec33665a1cf692b98a8aaf683afb57`
+- EXP-026 preregistration: `experiments/exp026/EXP-026-PREREGISTRATION.md`
+  - SHA-256: `730175071e315b484e360b6359945f567bfe8edf4f52e6a0893c3f2a7dadf8e1`
 
 ## 10. Instructions to future AI
 
