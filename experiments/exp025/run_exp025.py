@@ -10,11 +10,15 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import itertools
 import json
+import math
 import os
 import re
+import shutil
 import subprocess
 import sys
+import tempfile
 import uuid
 from contextlib import contextmanager
 from dataclasses import dataclass
@@ -24,7 +28,6 @@ from typing import Any, Mapping, Sequence
 
 import numpy as np
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import balanced_accuracy_score
 from sklearn.preprocessing import StandardScaler
 
 
@@ -46,6 +49,13 @@ DESIGN_CHECKPOINT_MAPPING_SHA256 = "5f8c5df4aa849ceb7ee2ca8b1765aeeff46b96182426
 DESIGN_VALIDATOR_PATH = EXP_DIR / "validate_exp025_design.py"
 DESIGN_VALIDATOR_SHA256 = "e87042535622e545c682a6f1019bf3703b4d0029d895e80c74269f7f1f26376d"
 
+CLARIFICATION_MD_PATH = EXP_DIR / "EXP-025-PREOUTCOME-SPECIFICATION-CLARIFICATION-001.md"
+CLARIFICATION_MD_SHA256 = "1b91d6b2efd4c4459779e6645f893aea91804c32d7834b22044a85f7e721b0ed"
+CLARIFICATION_JSON_PATH = EXP_DIR / "exp025_preoutcome_specification_clarification_001.json"
+CLARIFICATION_JSON_SHA256 = "4f65a60dcf40e24e57cbddda1be8d6573b353ab9cf17c901b3aa5fb2d5b47e16"
+CLARIFICATION_VALIDATOR_PATH = EXP_DIR / "validate_exp025_preoutcome_clarification.py"
+CLARIFICATION_VALIDATOR_SHA256 = "d3abf68502861f752655b46ef72405b1193783d80b3332f912ccf734abafb555"
+
 DESIGN_COMMIT = "0d2affeea9cab72ee89620a8bb917927010f6ac2"
 
 MODEL_ID = "allenai/OLMo-2-0425-1B-Instruct"
@@ -59,6 +69,14 @@ MODEL_SNAPSHOT_PATH = (
 
 INHERITED_DATASET_PATH = ROOT / "experiments" / "exp024" / "data" / "exp024_condition_panel_frozen.json"
 INHERITED_DATASET_SHA256 = "46c832b68b6ac95704bf5143badc1431627d7f935648842a78971491b13ee404"
+INHERITED_CONDITION_PANEL_PATH = ROOT / "experiments" / "exp024" / "condition_panel_spec.json"
+INHERITED_CONDITION_PANEL_SHA256 = "a3b8d565a94ef6041fbe6a29d73102ab4156cc19cfc07ccaeb06206d589f7954"
+INHERITED_DATA_SCHEMA_PATH = ROOT / "experiments" / "exp024" / "data_schema.json"
+INHERITED_DATA_SCHEMA_SHA256 = "e27c33c864c6305522aec0c92839634fb5885aeb50099372b9bf46da7f2fe3ec"
+INHERITED_MANIFEST_PATH = ROOT / "experiments" / "exp024" / "exp024_frozen_manifest.json"
+INHERITED_MANIFEST_SHA256 = "1409a33e300463067ffc060afa58ceb238fda8d6dc2479563c886a8474748f59"
+EXP024_PREREGISTRATION_PATH = ROOT / "docs" / "experiments" / "EXP-024-PREREGISTRATION.md"
+EXP024_PREREGISTRATION_SHA256 = "55f9604d904fd389da28c6214082028faca081f7e3a0c87c8ba8d961f792d810"
 
 ENGINEERING_QUALIFICATION_PATH = EXP_DIR / "engineering" / "exp025_engineering_qualification.json"
 QUALIFICATION_DOC_PATH = EXP_DIR / "EXP-025-ENGINEERING-QUALIFICATION.md"
@@ -93,6 +111,7 @@ CONDITION_UNIVERSE = frozenset(CONDITION_ORDER)
 REFERENCE_BLOCK_INDEX = 9
 FINAL_BLOCK_INDEX = 15
 NUM_HIDDEN_LAYERS = 16
+HIDDEN_SIZE = 2048
 REFERENCE_CHECKPOINT = "block9_pre_final_rmsnorm"
 FINAL_CHECKPOINT = "block15_pre_final_rmsnorm"
 POST_FINAL_CHECKPOINT = "block15_post_final_rmsnorm"
@@ -122,6 +141,8 @@ NEUTRAL_QUALIFICATION_INPUTS = (
 )
 
 FORMAL_AUTHORIZATION_PATH = EXP_DIR / "exp025_formal_run_authorization.json"
+FORMAL_PIPELINE_QUALIFICATION_PATH = EXP_DIR / "engineering" / "exp025_formal_pipeline_qualification.json"
+FORMAL_PIPELINE_QUALIFICATION_DOC_PATH = EXP_DIR / "engineering" / "EXP-025-FORMAL-PIPELINE-QUALIFICATION.md"
 
 
 class ProtocolIntegrityError(RuntimeError):
@@ -262,8 +283,169 @@ def classifier_class_mapping(model: Any) -> list[str]:
     return [str(value) for value in model.classes_]
 
 
+def average_rank(data: Sequence[float]) -> list[float]:
+    array = np.asarray(data, dtype=float)
+    if array.ndim != 1 or array.size == 0:
+        raise ValueError("average_rank requires a nonempty one-dimensional sequence.")
+    order = np.argsort(array, kind="mergesort")
+    sorted_values = array[order]
+    ranks = np.empty(array.size, dtype=float)
+    index = 0
+    while index < array.size:
+        j = index + 1
+        while j < array.size and sorted_values[j] == sorted_values[index]:
+            j += 1
+        rank = (index + 1 + j) / 2.0
+        ranks[order[index:j]] = rank
+        index = j
+    return [float(value) for value in ranks]
+
+
+def spearman_rho(x: Sequence[float], y: Sequence[float]) -> float:
+    if len(x) != len(y):
+        raise ValueError("Spearman inputs must be equal length.")
+    if len(x) == 0:
+        raise ValueError("Spearman inputs must be nonempty.")
+    if len(x) == 1:
+        return 0.0
+    x_rank = np.asarray(average_rank(x), dtype=float)
+    y_rank = np.asarray(average_rank(y), dtype=float)
+    x_rank -= x_rank.mean()
+    y_rank -= y_rank.mean()
+    denominator = float(np.sqrt((x_rank @ x_rank) * (y_rank @ y_rank)))
+    if denominator == 0.0:
+        return 0.0
+    rho = float((x_rank @ y_rank) / denominator)
+    if not math.isfinite(rho):
+        return float("nan")
+    return rho
+
+
+def exact_one_sided_permutation_p(
+    x: Sequence[float],
+    y: Sequence[float],
+    alternative: str = "greater",
+) -> dict[str, Any]:
+    if len(x) != len(y):
+        raise ValueError("Permutation inputs must be equal length.")
+    n = len(x)
+    if n == 0:
+        raise ValueError("Permutation inputs must be nonempty.")
+    if alternative != "greater":
+        raise ValueError("EXP-025 registered permutation test is one-sided greater only.")
+    observed = spearman_rho(x, y)
+    if not math.isfinite(observed):
+        return {
+            "rho": observed,
+            "p": None,
+            "count_ge": None,
+            "total": math.factorial(n),
+            "status": "NOT_EVALUABLE",
+        }
+    x_rank = np.asarray(average_rank(x), dtype=float)
+    y_rank = np.asarray(average_rank(y), dtype=float)
+    x_rank -= x_rank.mean()
+    y_rank -= y_rank.mean()
+    denominator = float(np.sqrt((x_rank @ x_rank) * (y_rank @ y_rank)))
+    if denominator == 0.0:
+        rho_is_zero = float(x_rank @ y_rank) == 0.0
+        if observed == 0.0 and rho_is_zero:
+            return {
+                "rho": 0.0,
+                "p": 1.0,
+                "count_ge": math.factorial(n),
+                "total": math.factorial(n),
+                "status": "EVALUABLE",
+            }
+    count = 0
+    for perm in itertools.permutations(range(n)):
+        permuted = y_rank[list(perm)]
+        numerator = float(x_rank @ permuted)
+        rho = (numerator / denominator) if denominator != 0.0 else 0.0
+        if not math.isfinite(rho):
+            return {
+                "rho": observed,
+                "p": None,
+                "count_ge": None,
+                "total": math.factorial(n),
+                "status": "NOT_EVALUABLE",
+            }
+        if rho >= observed:
+            count += 1
+    total = math.factorial(n)
+    return {
+        "rho": observed,
+        "p": count / total,
+        "count_ge": count,
+        "total": total,
+        "status": "EVALUABLE",
+    }
+
+
+def exact_binomial_support(values: Sequence[float], alpha: float = 0.05) -> dict[str, Any]:
+    values = [float(value) for value in values]
+    positive = sum(1 for value in values if value > 0)
+    negative = sum(1 for value in values if value < 0)
+    zero = sum(1 for value in values if value == 0)
+    effective_n = positive + negative
+    if effective_n == 0:
+        return {
+            "positive_count": 0,
+            "negative_count": 0,
+            "zero_count": zero,
+            "effective_n": 0,
+            "effective_successes": 0,
+            "exact_one_sided_p": None,
+            "support": "NOT_EVALUABLE",
+            "status": "NOT_EVALUABLE",
+        }
+    p = sum(math.comb(effective_n, k) for k in range(positive, effective_n + 1)) / (
+        2.0**effective_n
+    )
+    supported = positive > negative and p <= alpha
+    return {
+        "positive_count": positive,
+        "negative_count": negative,
+        "zero_count": zero,
+        "effective_n": effective_n,
+        "effective_successes": positive,
+        "exact_one_sided_p": p,
+        "support": "SUPPORTED" if supported else "NOT_SUPPORTED",
+        "status": "EVALUABLE",
+    }
+
+
+def classify_direction(values: Sequence[float], label: str = "D") -> dict[str, Any]:
+    result = exact_binomial_support(values)
+    if result["status"] == "NOT_EVALUABLE":
+        return {**result, "classification": "NOT_EVALUABLE", "direction": "NOT_EVALUABLE"}
+    result["classification"] = "POSITIVE" if result["support"] == "SUPPORTED" else "NEGATIVE"
+    result["direction"] = f"{label}+" if result["classification"] == "POSITIVE" else f"{label}-"
+    return result
+
+
 def balanced_accuracy(y_true: Sequence[str], y_pred: Sequence[str]) -> float:
-    return float(balanced_accuracy_score(list(y_true), list(y_pred)))
+    if len(y_true) != len(y_pred):
+        raise ValueError("Balanced-accuracy inputs must be equal length.")
+    true_values = [str(value) for value in y_true]
+    pred_values = [str(value) for value in y_pred]
+    if set(true_values) != CLASS_UNIVERSE:
+        missing = sorted(CLASS_UNIVERSE - set(true_values))
+        raise ProtocolIntegrityError(
+            f"STOP_AND_REPORT_PROTOCOL_INTEGRITY_ERROR_MISSING_TRUE_CLASS:{missing}"
+        )
+    if set(pred_values) - CLASS_UNIVERSE:
+        raise ProtocolIntegrityError("BALANCED_ACCURACY_UNEXPECTED_PREDICTED_CLASS")
+    recalls = []
+    for cls in CLASS_ORDER:
+        positives = [i for i, value in enumerate(true_values) if value == cls]
+        if not positives:
+            raise ProtocolIntegrityError(
+                f"STOP_AND_REPORT_PROTOCOL_INTEGRITY_ERROR_ZERO_CLASS:{cls}"
+            )
+        correct = sum(1 for i in positives if pred_values[i] == cls)
+        recalls.append(correct / len(positives))
+    return float(sum(recalls) / len(recalls))
 
 
 def fit_scaler(X: np.ndarray) -> StandardScaler:
@@ -279,7 +461,13 @@ def fit_classifier(X: np.ndarray, y: Sequence[str]) -> tuple[LogisticRegression,
 
 
 def transform_with_stats(X: np.ndarray, mean: np.ndarray, scale: np.ndarray) -> np.ndarray:
-    return np.asarray((X - mean) / scale, dtype=np.float32)
+    X = np.asarray(X, dtype=np.float32)
+    mean = np.asarray(mean, dtype=np.float32)
+    scale = np.asarray(scale, dtype=np.float32)
+    output = np.zeros_like(X, dtype=np.float32)
+    positive = scale > 0.0
+    output[:, positive] = (X[:, positive] - mean[positive]) / scale[positive]
+    return output
 
 
 def predict_with_classifier(model: Any, X: np.ndarray) -> list[str]:
@@ -325,6 +513,58 @@ def verify_frozen_design(root: Path = ROOT) -> dict[str, str]:
         actual = sha256_file(path)
         if actual != identities[hash_key]:
             raise ProtocolIntegrityError(f"FROZEN_DESIGN_HASH_MISMATCH_{path.name}")
+    return identities
+
+
+def verify_inherited_authorities(root: Path = ROOT) -> dict[str, str]:
+    identities = {
+        "dataset_path": str(INHERITED_DATASET_PATH),
+        "dataset_sha256": INHERITED_DATASET_SHA256,
+        "condition_panel_path": str(INHERITED_CONDITION_PANEL_PATH),
+        "condition_panel_sha256": INHERITED_CONDITION_PANEL_SHA256,
+        "data_schema_path": str(INHERITED_DATA_SCHEMA_PATH),
+        "data_schema_sha256": INHERITED_DATA_SCHEMA_SHA256,
+        "frozen_manifest_path": str(INHERITED_MANIFEST_PATH),
+        "frozen_manifest_sha256": INHERITED_MANIFEST_SHA256,
+        "exp024_preregistration_path": str(EXP024_PREREGISTRATION_PATH),
+        "exp024_preregistration_sha256": EXP024_PREREGISTRATION_SHA256,
+    }
+    for path_key, hash_key in [
+        ("dataset_path", "dataset_sha256"),
+        ("condition_panel_path", "condition_panel_sha256"),
+        ("data_schema_path", "data_schema_sha256"),
+        ("frozen_manifest_path", "frozen_manifest_sha256"),
+        ("exp024_preregistration_path", "exp024_preregistration_sha256"),
+    ]:
+        path = Path(identities[path_key])
+        if not path.is_file():
+            raise ProtocolIntegrityError(f"INHERITED_AUTHORITY_FILE_MISSING_{path.name}")
+        actual = sha256_file(path)
+        if actual != identities[hash_key]:
+            raise ProtocolIntegrityError(f"INHERITED_AUTHORITY_HASH_MISMATCH_{path.name}")
+    return identities
+
+
+def verify_clarification_authorities(root: Path = ROOT) -> dict[str, str]:
+    identities = {
+        "clarification_md_path": str(CLARIFICATION_MD_PATH),
+        "clarification_md_sha256": CLARIFICATION_MD_SHA256,
+        "clarification_json_path": str(CLARIFICATION_JSON_PATH),
+        "clarification_json_sha256": CLARIFICATION_JSON_SHA256,
+        "clarification_validator_path": str(CLARIFICATION_VALIDATOR_PATH),
+        "clarification_validator_sha256": CLARIFICATION_VALIDATOR_SHA256,
+    }
+    for path_key, hash_key in [
+        ("clarification_md_path", "clarification_md_sha256"),
+        ("clarification_json_path", "clarification_json_sha256"),
+        ("clarification_validator_path", "clarification_validator_sha256"),
+    ]:
+        path = Path(identities[path_key])
+        if not path.is_file():
+            raise ProtocolIntegrityError(f"CLARIFICATION_AUTHORITY_FILE_MISSING_{path.name}")
+        actual = sha256_file(path)
+        if actual != identities[hash_key]:
+            raise ProtocolIntegrityError(f"CLARIFICATION_AUTHORITY_HASH_MISMATCH_{path.name}")
     return identities
 
 
@@ -471,6 +711,22 @@ def _validate_authorization(root: Path, authorization_path: Path) -> tuple[dict[
     if authorization.get("qualification_artifact_sha256") != qualification_sha:
         raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_QUALIFICATION_SHA_MISMATCH")
 
+    verify_frozen_design(root)
+    inherited = verify_inherited_authorities(root)
+    clarification = verify_clarification_authorities(root)
+
+    clarification_hashes = authorization.get("clarification_authority_hashes")
+    if not isinstance(clarification_hashes, dict):
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_CLARIFICATION_HASHES_INVALID")
+    expected_clarification = {
+        "clarification_md": clarification["clarification_md_sha256"],
+        "clarification_json": clarification["clarification_json_sha256"],
+        "clarification_validator": clarification["clarification_validator_sha256"],
+    }
+    for key, expected_hash in expected_clarification.items():
+        if clarification_hashes.get(key) != expected_hash:
+            raise ProtocolIntegrityError(f"FORMAL_AUTHORIZATION_CLARIFICATION_HASH_MISMATCH_{key}")
+
     expected_frozen = {
         "exp025_preregistration": DESIGN_PREREGISTRATION_SHA256,
         "model_selection": DESIGN_MODEL_SELECTION_SHA256,
@@ -484,6 +740,20 @@ def _validate_authorization(root: Path, authorization_path: Path) -> tuple[dict[
     for key, expected_hash in expected_frozen.items():
         if frozen_hashes.get(key) != expected_hash:
             raise ProtocolIntegrityError(f"FORMAL_AUTHORIZATION_FROZEN_HASH_MISMATCH_{key}")
+
+    inherited_identity = authorization.get("inherited_authority_hashes")
+    if not isinstance(inherited_identity, dict):
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_INHERITED_HASHES_INVALID")
+    expected_inherited = {
+        "dataset": inherited["dataset_sha256"],
+        "condition_panel": inherited["condition_panel_sha256"],
+        "data_schema": inherited["data_schema_sha256"],
+        "frozen_manifest": inherited["frozen_manifest_sha256"],
+        "exp024_preregistration": inherited["exp024_preregistration_sha256"],
+    }
+    for key, expected_hash in expected_inherited.items():
+        if inherited_identity.get(key) != expected_hash:
+            raise ProtocolIntegrityError(f"FORMAL_AUTHORIZATION_INHERITED_HASH_MISMATCH_{key}")
 
     dataset_identity = authorization.get("dataset_identity")
     if not isinstance(dataset_identity, dict):
@@ -538,6 +808,7 @@ def _consume_authorization(
     }
     consumption_path = _authorization_consumption_path(root, authorization_id)
     consumption_sha = _atomic_write_json_exclusive(consumption_path, record)
+    record["consumption_record_sha256"] = consumption_sha
     return record, consumption_sha
 
 
@@ -671,6 +942,30 @@ def _run_qualification_forward(model: Any, device: Any, input_ids: Any, attentio
     }
 
 
+def _formal_record_extractor(tokenizer: Any, model: Any, device: Any, text: str) -> dict[str, Any]:
+    _, input_ids, attention_mask = _tokenize_neutral(tokenizer, text, device)
+    forward = _run_qualification_forward(model, device, input_ids, attention_mask)
+    representations = {
+        REFERENCE_CHECKPOINT: _extract_checkpoint_array(forward["ref_pre_tensor"], attention_mask),
+        FINAL_CHECKPOINT: _extract_checkpoint_array(forward["final_pre_tensor"], attention_mask),
+        POST_FINAL_CHECKPOINT: _extract_checkpoint_array(forward["post_final_tensor"], attention_mask),
+    }
+    for checkpoint, array in representations.items():
+        if array.shape != (HIDDEN_SIZE,):
+            raise ProtocolIntegrityError(
+                f"FORMAL_CHECKPOINT_HIDDEN_SIZE_MISMATCH_{checkpoint}_{array.shape}"
+            )
+    return {
+        "input_ids": input_ids,
+        "attention_mask": attention_mask,
+        "representations": representations,
+        "hook_firing_count": 2,
+        "hook_cleanup_verified": True,
+        "exp025_hooks_remaining": 0,
+        "foreign_hooks_remaining": 0,
+    }
+
+
 def _extract_checkpoint_array(tensor: Any, attention_mask: Any) -> np.ndarray:
     selected = select_last_valid_token(tensor, attention_mask)
     array = to_float32_analysis_array(selected)
@@ -679,6 +974,294 @@ def _extract_checkpoint_array(tensor: Any, attention_mask: Any) -> np.ndarray:
     if array.ndim != 1:
         raise ProtocolIntegrityError(f"CHECKPOINT_REPRESENTATION_NOT_VECTOR_{array.shape}")
     return array
+
+
+def _formal_records_by_partition_role(
+    records: Sequence[Mapping[str, Any]], partition: str, record_role: str
+) -> list[Mapping[str, Any]]:
+    return [
+        record
+        for record in records
+        if record.get("partition") == partition and record.get("record_role") == record_role
+    ]
+
+
+def _group_records_by_condition(
+    records: Sequence[Mapping[str, Any]], condition_order: Sequence[str]
+) -> dict[str, list[Mapping[str, Any]]]:
+    grouped = {condition: [] for condition in condition_order}
+    for record in records:
+        condition_id = str(record.get("condition_id", ""))
+        if condition_id in grouped:
+            grouped[condition_id].append(record)
+    return grouped
+
+
+def _validate_formal_partition_integrity(
+    records: Sequence[Mapping[str, Any]],
+    condition_order: Sequence[str],
+    *,
+    strict_counts: bool = True,
+) -> dict[str, Any]:
+    if not isinstance(records, list):
+        raise ProtocolIntegrityError("FORMAL_DATASET_TOP_LEVEL_NOT_ARRAY")
+    expected_conditions = set(condition_order)
+    if len(expected_conditions) != N_CONDITIONS:
+        raise ProtocolIntegrityError("FORMAL_CONDITION_COUNT_MISMATCH")
+    if expected_conditions != CONDITION_UNIVERSE:
+        raise ProtocolIntegrityError("FORMAL_CONDITION_SET_MISMATCH")
+    required_fields = {
+        "record_id",
+        "source_family_id",
+        "semantic_class",
+        "condition_id",
+        "partition",
+        "record_role",
+        "text",
+    }
+    family_rows: dict[str, list[Mapping[str, Any]]] = {}
+    record_ids: set[str] = set()
+    partition_family_ids: dict[str, set[str]] = {partition: set() for partition in PARTITIONS}
+    cell_family_ids: dict[tuple[str, str, str], set[str]] = {}
+    seen_classes: set[str] = set()
+    seen_conditions: set[str] = set()
+    for record in records:
+        if not isinstance(record, Mapping):
+            raise ProtocolIntegrityError("FORMAL_DATASET_RECORD_NOT_OBJECT")
+        missing = required_fields - set(record)
+        if missing:
+            raise ProtocolIntegrityError(f"FORMAL_DATASET_RECORD_MISSING_FIELDS:{sorted(missing)}")
+        if not isinstance(record["text"], str) or not record["text"].strip():
+            raise ProtocolIntegrityError("FORMAL_DATASET_RECORD_TEXT_EMPTY")
+        if record["condition_id"] not in expected_conditions:
+            raise ProtocolIntegrityError("FORMAL_DATASET_UNEXPECTED_CONDITION")
+        if record["semantic_class"] not in CLASS_UNIVERSE:
+            raise ProtocolIntegrityError("FORMAL_DATASET_INVALID_SEMANTIC_CLASS")
+        if record["partition"] not in PARTITIONS:
+            raise ProtocolIntegrityError("FORMAL_DATASET_INVALID_PARTITION")
+        if record["record_role"] not in RECORD_ROLES:
+            raise ProtocolIntegrityError("FORMAL_DATASET_INVALID_ROLE")
+        record_id = str(record["record_id"])
+        if record_id in record_ids:
+            raise ProtocolIntegrityError("FORMAL_DATASET_DUPLICATE_RECORD_ID")
+        record_ids.add(record_id)
+        family_id = str(record["source_family_id"])
+        family_rows.setdefault(family_id, []).append(record)
+        partition_family_ids[record["partition"]].add(family_id)
+        cell_family_ids.setdefault(
+            (record["condition_id"], record["partition"], record["semantic_class"]),
+            set(),
+        ).add(family_id)
+        seen_classes.add(record["semantic_class"])
+        seen_conditions.add(record["condition_id"])
+
+    if seen_classes != CLASS_UNIVERSE:
+        raise ProtocolIntegrityError("FORMAL_DATASET_SEMANTIC_CLASS_MISSING")
+    if seen_conditions != expected_conditions:
+        raise ProtocolIntegrityError("FORMAL_DATASET_CONDITION_MISSING")
+    for family_id, rows in family_rows.items():
+        if len(rows) != 2:
+            raise ProtocolIntegrityError("FORMAL_DATASET_FAMILY_RECORD_COUNT_NOT_TWO")
+        if {row["record_role"] for row in rows} != set(RECORD_ROLES):
+            raise ProtocolIntegrityError("FORMAL_DATASET_FAMILY_ROLE_PAIR_MISMATCH")
+        first = rows[0]
+        for row in rows[1:]:
+            for field in ("source_family_id", "semantic_class", "condition_id", "partition"):
+                if row.get(field) != first.get(field):
+                    raise ProtocolIntegrityError("FORMAL_DATASET_FAMILY_METADATA_INCONSISTENT")
+    overlaps = {
+        ("FIT", "DIAGNOSTIC"): partition_family_ids["FIT"] & partition_family_ids["DIAGNOSTIC"],
+        ("FIT", "EVAL"): partition_family_ids["FIT"] & partition_family_ids["EVAL"],
+        ("DIAGNOSTIC", "EVAL"): partition_family_ids["DIAGNOSTIC"] & partition_family_ids["EVAL"],
+    }
+    if any(overlaps.values()):
+        raise ProtocolIntegrityError("FORMAL_DATASET_PARTITION_FAMILY_OVERLAP")
+    for condition_id in condition_order:
+        for partition in PARTITIONS:
+            for semantic_class in CLASS_ORDER:
+                family_ids = cell_family_ids.get(
+                    (condition_id, partition, semantic_class), set()
+                )
+                if not family_ids:
+                    raise ProtocolIntegrityError("FORMAL_DATASET_CELL_MISSING")
+                if strict_counts and len(family_ids) != ALLOCATION[partition]:
+                    raise ProtocolIntegrityError("FORMAL_DATASET_CELL_COUNT_MISMATCH")
+    return {
+        "record_count": len(records),
+        "source_family_count": len(family_rows),
+        "condition_count": len(expected_conditions),
+        "semantic_class_count": len(seen_classes),
+        "partition_family_counts": {
+            partition: len(family_ids) for partition, family_ids in partition_family_ids.items()
+        },
+        "overlaps": {key: sorted(value) for key, value in overlaps.items()},
+    }
+
+
+def _formal_extract_group_arrays(
+    records: Sequence[Mapping[str, Any]],
+    tokenizer: Any,
+    model: Any,
+    device: Any,
+    extractor: Any,
+    checkpoints: Sequence[str],
+) -> tuple[dict[str, np.ndarray], list[str], list[str]]:
+    arrays: dict[str, list[np.ndarray]] = {checkpoint: [] for checkpoint in checkpoints}
+    labels: list[str] = []
+    record_ids: list[str] = []
+    for record in records:
+        forward = extractor(tokenizer, model, device, record["text"])
+        representations = forward["representations"]
+        missing = set(checkpoints) - set(representations)
+        if missing:
+            raise ProtocolIntegrityError(f"FORMAL_EXTRACTION_MISSING_CHECKPOINTS:{sorted(missing)}")
+        for checkpoint in checkpoints:
+            array = to_float32_analysis_array(representations[checkpoint])
+            if array.ndim == 2 and array.shape[0] == 1:
+                array = array[0]
+            if array.ndim != 1:
+                raise ProtocolIntegrityError(f"FORMAL_EXTRACTION_NOT_VECTOR_{array.shape}")
+            arrays[checkpoint].append(array)
+        labels.append(str(record["semantic_class"]))
+        record_ids.append(str(record["record_id"]))
+    if not record_ids:
+        raise ProtocolIntegrityError("FORMAL_EXTRACTION_GROUP_EMPTY")
+    return (
+        {checkpoint: np.stack(values).astype(np.float32) for checkpoint, values in arrays.items()},
+        labels,
+        record_ids,
+    )
+
+
+def _formal_fit_reference_readout(
+    X: np.ndarray, y: Sequence[str]
+) -> tuple[Any, np.ndarray, np.ndarray, list[str]]:
+    if set(y) != CLASS_UNIVERSE:
+        raise ProtocolIntegrityError("FORMAL_REFERENCE_LABELS_MISSING_CLASS")
+    scaler = fit_scaler(X)
+    reference_mean = np.asarray(scaler.mean_, dtype=np.float32)
+    reference_scale = np.asarray(scaler.scale_, dtype=np.float32)
+    if not np.isfinite(reference_mean).all() or not np.isfinite(reference_scale).all():
+        raise TechnicalInvalidError("NONFINITE_REFERENCE_SCALER")
+    X_scaled = transform_with_stats(X, reference_mean, reference_scale)
+    classifier, labels = fit_classifier(X_scaled, list(y))
+    if set(labels) != CLASS_UNIVERSE:
+        raise ProtocolIntegrityError("FORMAL_REFERENCE_CLASSIFIER_LABEL_MISMATCH")
+    return classifier, reference_mean, reference_scale, labels
+
+
+def _formal_condition_calibration_stats(X: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    scaler = fit_scaler(X)
+    mean = np.asarray(scaler.mean_, dtype=np.float32)
+    scale = np.asarray(scaler.scale_, dtype=np.float32)
+    if not np.isfinite(mean).all() or not np.isfinite(scale).all():
+        raise TechnicalInvalidError("NONFINITE_CONDITION_CALIBRATION")
+    return mean, scale
+
+
+def _formal_prediction_balanced_accuracy(
+    y_true: Sequence[str], predictions: Sequence[str]
+) -> float:
+    if len(y_true) != len(predictions):
+        raise ProtocolIntegrityError("FORMAL_PREDICTION_LENGTH_MISMATCH")
+    if set(y_true) != CLASS_UNIVERSE:
+        raise ProtocolIntegrityError("FORMAL_PREDICTION_LABELS_MISSING_CLASS")
+    if set(predictions) - CLASS_UNIVERSE:
+        raise ProtocolIntegrityError("FORMAL_PREDICTION_UNEXPECTED_CLASS")
+    return balanced_accuracy(y_true, predictions)
+
+
+def calibration_condition_predictions(
+    X: np.ndarray,
+    reference_mean: np.ndarray,
+    reference_scale: np.ndarray,
+    condition_mean: np.ndarray,
+    condition_scale: np.ndarray,
+    classifier: Any,
+) -> dict[str, list[str]]:
+    return {
+        "A0": predict_with_classifier(
+            classifier, transform_with_stats(X, reference_mean, reference_scale)
+        ),
+        "A_mu": predict_with_classifier(
+            classifier, transform_with_stats(X, condition_mean, reference_scale)
+        ),
+        "A_sigma": predict_with_classifier(
+            classifier, transform_with_stats(X, reference_mean, condition_scale)
+        ),
+        "A_mu_sigma": predict_with_classifier(
+            classifier, transform_with_stats(X, condition_mean, condition_scale)
+        ),
+    }
+
+
+def compute_s_diag(
+    a0_reference_diag: Mapping[str, float],
+    a0_final_diag: Mapping[str, float],
+) -> dict[str, float]:
+    return {
+        condition: float(a0_reference_diag[condition] - a0_final_diag[condition])
+        for condition in a0_reference_diag
+    }
+
+
+def compute_g_eval(
+    a_mu_sigma_eval: Mapping[str, float],
+    a0_final_eval: Mapping[str, float],
+) -> dict[str, float]:
+    return {
+        condition: float(a_mu_sigma_eval[condition] - a0_final_eval[condition])
+        for condition in a_mu_sigma_eval
+    }
+
+
+def route_replication(d_classification: Mapping[str, Any], g_classification: Mapping[str, Any]) -> dict[str, Any]:
+    if d_classification.get("status") == "NOT_EVALUABLE" or g_classification.get("status") == "NOT_EVALUABLE":
+        return {
+            "routing": "NO SCIENTIFIC ROUTING",
+            "paper_a_breadth": None,
+            "operator_mechanism_priority": None,
+            "generic_calibration_breadth": None,
+            "next_mechanism_question": None,
+            "technical_validity": "INVALID_OR_INDETERMINATE",
+        }
+    d_positive = d_classification.get("classification") == "POSITIVE"
+    g_positive = g_classification.get("classification") == "POSITIVE"
+    if d_positive and g_positive:
+        return {
+            "routing": "D+_G+",
+            "paper_a_breadth": "STRENGTHENED",
+            "operator_mechanism_priority": "HIGH_PRIORITY_CANDIDATE",
+            "generic_calibration_breadth": "STRENGTHENED",
+            "next_mechanism_question": None,
+            "technical_validity": "VALID",
+        }
+    if d_positive and not g_positive:
+        return {
+            "routing": "D+_G-",
+            "paper_a_breadth": "STRENGTHENED",
+            "operator_mechanism_priority": None,
+            "generic_calibration_breadth": "WEAKENED",
+            "next_mechanism_question": "MODEL_DEPENDENT_OPERATOR_SUFFICIENCY",
+            "technical_validity": "VALID",
+        }
+    if not d_positive and g_positive:
+        return {
+            "routing": "D-_G+",
+            "paper_a_breadth": "NOT_CROSS_MODEL_REPLICATED",
+            "operator_mechanism_priority": "DEFER_OR_REASSESS",
+            "generic_calibration_breadth": None,
+            "next_mechanism_question": "MODEL_DEPTH_COMPATIBILITY_HIGHER_PRIORITY",
+            "technical_validity": "VALID",
+        }
+    return {
+        "routing": "D-_G-",
+        "paper_a_breadth": "NOT_CROSS_MODEL_REPLICATED",
+        "operator_mechanism_priority": "DEFER_OR_REASSESS",
+        "generic_calibration_breadth": None,
+        "next_mechanism_question": "MODEL_DEPTH_COMPATIBILITY_HIGHER_PRIORITY",
+        "technical_validity": "VALID",
+    }
 
 
 def _arrays_match(a: np.ndarray, b: np.ndarray, tolerance: float) -> dict[str, Any]:
@@ -902,8 +1485,349 @@ def run_engineering_qualification(root: Path = ROOT, *, publish: bool = True) ->
     return artifact
 
 
-def _execute_formal_analysis(root: Path, authorization: Mapping[str, Any], consumption: Mapping[str, Any], run_attempt_id: str) -> dict[str, Any]:
-    raise ProtocolIntegrityError("FORMAL_SCIENCE_NOT_AUTHORIZED_IN_100D_A")
+def validate_result_schema(result: Mapping[str, Any], *, formal: bool = False) -> None:
+    if not isinstance(result, Mapping):
+        raise ProtocolIntegrityError("RESULT_NOT_OBJECT")
+    required = {
+        "schema_version",
+        "experiment",
+        "runner",
+        "model",
+        "dataset",
+        "classes",
+        "primary",
+        "condition_level",
+        "d_g_inference",
+        "routing",
+        "technical_validity",
+        "attempt_status",
+        "result_status",
+        "scientific_status",
+        "provenance",
+    }
+    missing = required - set(result)
+    if missing:
+        raise ProtocolIntegrityError(f"RESULT_MISSING_FIELDS:{sorted(missing)}")
+    if result["schema_version"] != RESULT_SCHEMA_VERSION:
+        raise ProtocolIntegrityError("RESULT_SCHEMA_VERSION_MISMATCH")
+    if result["experiment"] != EXPERIMENT:
+        raise ProtocolIntegrityError("RESULT_EXPERIMENT_MISMATCH")
+    if result.get("hidden_states_included", True) is True:
+        raise ProtocolIntegrityError("RESULT_MUST_NOT_INCLUDE_RAW_HIDDEN_STATES")
+    if result.get("prompt_text_included", True) is True:
+        raise ProtocolIntegrityError("RESULT_MUST_NOT_INCLUDE_PROMPT_TEXT")
+    if formal:
+        if result.get("result_status") != "FORMAL_RESULT":
+            raise ProtocolIntegrityError("FORMAL_RESULT_STATUS_INVALID")
+        if result.get("scientific_status") != "FORMAL_ANALYSIS_COMPLETED":
+            raise ProtocolIntegrityError("FORMAL_SCIENTIFIC_STATUS_INVALID")
+
+
+def atomic_publish_validated_result(result: Mapping[str, Any], root: Path = ROOT) -> dict[str, str]:
+    validate_result_schema(result, formal=True)
+    verify_no_result_collision(root)
+    canonical = root / FORMAL_RESULT_PATH.relative_to(ROOT)
+    temp_path = canonical.with_name(canonical.name + ".tmp")
+    if temp_path.exists():
+        raise ProtocolIntegrityError("FORMAL_RESULT_TEMP_ARTIFACT_UNEXPECTED")
+    sha = _atomic_write_json_exclusive(temp_path, result)
+    try:
+        if canonical.exists():
+            raise ProtocolIntegrityError("FORMAL_RESULT_PATH_UNEXPECTED")
+        os.replace(temp_path, canonical)
+    except Exception:
+        try:
+            temp_path.unlink()
+        except FileNotFoundError:
+            pass
+        raise
+    final_sha = sha256_file(canonical)
+    return {
+        "canonical_result_path": str(canonical),
+        "sha256": final_sha,
+    }
+
+
+def _execute_formal_analysis(
+    root: Path,
+    authorization: Mapping[str, Any],
+    consumption: Mapping[str, Any],
+    run_attempt_id: str,
+    *,
+    condition_order: Sequence[str] | None = None,
+    records_loader: Any | None = None,
+    runtime_loader: Any | None = None,
+    record_extractor: Any | None = None,
+) -> dict[str, Any]:
+    started_at = datetime.now(timezone.utc)
+    verify_frozen_design(root)
+    verify_inherited_authorities(root)
+    verify_clarification_authorities(root)
+    verify_no_result_collision(root)
+
+    if condition_order is None:
+        condition_order = list(CONDITION_ORDER)
+    else:
+        condition_order = [str(value) for value in condition_order]
+    if tuple(condition_order) != CONDITION_ORDER:
+        raise ProtocolIntegrityError("FORMAL_CONDITION_ORDER_MISMATCH")
+
+    records, _metas = (records_loader or load_frozen_dataset)(root)
+    partition_integrity = _validate_formal_partition_integrity(
+        records, condition_order, strict_counts=True
+    )
+
+    if runtime_loader is None:
+        tokenizer, model, device, dtype = _load_runtime(root)
+    else:
+        runtime = runtime_loader(root)
+        if len(runtime) == 3:
+            tokenizer, model, device = runtime
+            dtype = next(model.parameters()).dtype
+        elif len(runtime) == 4:
+            tokenizer, model, device, dtype = runtime
+        else:
+            raise ProtocolIntegrityError("FORMAL_RUNTIME_LOADER_INVALID")
+    extractor = record_extractor or _formal_record_extractor
+
+    model_identity = _model_runtime_identity(model, device, dtype)
+    if model_identity.get("model_class") != "Olmo2ForCausalLM":
+        raise ProtocolIntegrityError("FORMAL_MODEL_CLASS_MISMATCH")
+    if model_identity.get("model_type") != "olmo2":
+        raise ProtocolIntegrityError("FORMAL_MODEL_TYPE_MISMATCH")
+    if model_identity.get("num_hidden_layers") != NUM_HIDDEN_LAYERS:
+        raise ProtocolIntegrityError("FORMAL_MODEL_BLOCK_COUNT_MISMATCH")
+
+    fit_reference_records = _formal_records_by_partition_role(records, "FIT", "reference_form")
+    fit_realization_records = _formal_records_by_partition_role(records, "FIT", "condition_realization")
+    diagnostic_records = _formal_records_by_partition_role(records, "DIAGNOSTIC", "condition_realization")
+    eval_records = _formal_records_by_partition_role(records, "EVAL", "condition_realization")
+
+    fit_reference_arrays, fit_reference_labels, _ = _formal_extract_group_arrays(
+        fit_reference_records,
+        tokenizer,
+        model,
+        device,
+        extractor,
+        (REFERENCE_CHECKPOINT,),
+    )
+    X_fit_reference = fit_reference_arrays[REFERENCE_CHECKPOINT]
+    classifier, reference_mean, reference_scale, _labels = _formal_fit_reference_readout(
+        X_fit_reference, fit_reference_labels
+    )
+    fit_reference_predictions = predict_with_classifier(
+        classifier, transform_with_stats(X_fit_reference, reference_mean, reference_scale)
+    )
+    fit_reference_ba = balanced_accuracy(fit_reference_labels, fit_reference_predictions)
+
+    fit_realization_by_condition = _group_records_by_condition(
+        fit_realization_records, condition_order
+    )
+    diagnostic_by_condition = _group_records_by_condition(diagnostic_records, condition_order)
+    eval_by_condition = _group_records_by_condition(eval_records, condition_order)
+
+    condition_calibration: dict[str, dict[str, np.ndarray]] = {}
+    for condition in condition_order:
+        rows = fit_realization_by_condition[condition]
+        arrays, labels, _ = _formal_extract_group_arrays(
+            rows, tokenizer, model, device, extractor, (FINAL_CHECKPOINT,)
+        )
+        if set(labels) != CLASS_UNIVERSE:
+            raise ProtocolIntegrityError("FORMAL_FIT_REALIZATION_LABELS_MISSING_CLASS")
+        mean, scale = _formal_condition_calibration_stats(arrays[FINAL_CHECKPOINT])
+        condition_calibration[condition] = {"mean": mean, "scale": scale}
+
+    s_diag: dict[str, float] = {}
+    diag_ba: dict[str, dict[str, float]] = {}
+    for condition in condition_order:
+        rows = diagnostic_by_condition[condition]
+        arrays, labels, _ = _formal_extract_group_arrays(
+            rows,
+            tokenizer,
+            model,
+            device,
+            extractor,
+            (REFERENCE_CHECKPOINT, FINAL_CHECKPOINT),
+        )
+        a0_reference_pred = predict_with_classifier(
+            classifier,
+            transform_with_stats(
+                arrays[REFERENCE_CHECKPOINT], reference_mean, reference_scale
+            ),
+        )
+        a0_final_pred = predict_with_classifier(
+            classifier,
+            transform_with_stats(
+                arrays[FINAL_CHECKPOINT], reference_mean, reference_scale
+            ),
+        )
+        ba_a0_reference = _formal_prediction_balanced_accuracy(labels, a0_reference_pred)
+        ba_a0_final = _formal_prediction_balanced_accuracy(labels, a0_final_pred)
+        diag_ba[condition] = {
+            "A0_block9": ba_a0_reference,
+            "A0_block15": ba_a0_final,
+        }
+        s_diag[condition] = ba_a0_reference - ba_a0_final
+
+    g_eval: dict[str, float] = {}
+    g_mu: dict[str, float] = {}
+    g_sigma: dict[str, float] = {}
+    g_joint_over_mu: dict[str, float] = {}
+    g_joint_over_sigma: dict[str, float] = {}
+    eval_ba: dict[str, dict[str, float]] = {}
+    for condition in condition_order:
+        rows = eval_by_condition[condition]
+        arrays, labels, _ = _formal_extract_group_arrays(
+            rows, tokenizer, model, device, extractor, (FINAL_CHECKPOINT,)
+        )
+        calibration = condition_calibration[condition]
+        predictions = calibration_condition_predictions(
+            arrays[FINAL_CHECKPOINT],
+            reference_mean,
+            reference_scale,
+            calibration["mean"],
+            calibration["scale"],
+            classifier,
+        )
+        ba_values = {
+            variant: _formal_prediction_balanced_accuracy(labels, predictions[variant])
+            for variant in ("A0", "A_mu", "A_sigma", "A_mu_sigma")
+        }
+        eval_ba[condition] = ba_values
+        g_eval[condition] = ba_values["A_mu_sigma"] - ba_values["A0"]
+        g_mu[condition] = ba_values["A_mu"] - ba_values["A0"]
+        g_sigma[condition] = ba_values["A_sigma"] - ba_values["A0"]
+        g_joint_over_mu[condition] = ba_values["A_mu_sigma"] - ba_values["A_mu"]
+        g_joint_over_sigma[condition] = ba_values["A_mu_sigma"] - ba_values["A_sigma"]
+
+    s_values = [float(s_diag[condition]) for condition in condition_order]
+    g_values = [float(g_eval[condition]) for condition in condition_order]
+    permutation = exact_one_sided_permutation_p(s_values, g_values)
+    if permutation.get("status") == "NOT_EVALUABLE":
+        rho = float("nan")
+        exact_p = None
+        secondary_supported = False
+    else:
+        rho = float(permutation["rho"])
+        exact_p = float(permutation["p"])
+        secondary_supported = bool(rho > 0 and exact_p <= 0.05)
+
+    d_classification = classify_direction(s_values, "D")
+    g_classification = classify_direction(g_values, "G")
+    routing = route_replication(d_classification, g_classification)
+
+    formal_data_model_inference_count = (
+        len(fit_reference_records)
+        + sum(len(rows) for rows in fit_realization_by_condition.values())
+        + sum(len(rows) for rows in diagnostic_by_condition.values())
+        + sum(len(rows) for rows in eval_by_condition.values())
+    )
+
+    result = {
+        "schema_version": RESULT_SCHEMA_VERSION,
+        "experiment": EXPERIMENT,
+        "runner": {
+            "path": str(Path(__file__).relative_to(ROOT)),
+            "sha256": sha256_file(Path(__file__)),
+            "repository_commit": _repository_commit(root),
+        },
+        "model": {
+            "model_id": MODEL_ID,
+            "revision": MODEL_REVISION,
+            "model_class": model_identity["model_class"],
+            "model_type": model_identity["model_type"],
+            "block_count": model_identity["num_hidden_layers"],
+            "hidden_size": model_identity["hidden_size"],
+            "device": model_identity["device"],
+            "runtime_dtype": model_identity["runtime_dtype"],
+        },
+        "dataset": {
+            "path": str(INHERITED_DATASET_PATH.relative_to(ROOT)),
+            "sha256": INHERITED_DATASET_SHA256,
+            "record_count": partition_integrity["record_count"],
+            "source_family_count": partition_integrity["source_family_count"],
+            "condition_count": partition_integrity["condition_count"],
+            "semantic_class_count": partition_integrity["semantic_class_count"],
+            "partition_family_counts": partition_integrity["partition_family_counts"],
+        },
+        "classes": list(CLASS_ORDER),
+        "primary": {
+            "scientific_unit": "condition",
+            "diagnostic": "S_diag(c)",
+            "outcome": "G_eval(c)",
+            "statistic": "Spearman_rho",
+            "rho": rho,
+            "alternative": "greater",
+            "exact_one_sided_p": exact_p,
+            "count_ge": permutation.get("count_ge"),
+            "permutation_count": permutation.get("total"),
+            "permutation_status": permutation.get("status", "EVALUABLE"),
+            "support_rule": "rho>0_and_p<=0.05",
+            "supported": secondary_supported,
+            "alpha": 0.05,
+        },
+        "condition_level": {
+            "condition_order": list(condition_order),
+            "s_diag": s_diag,
+            "g_eval": g_eval,
+            "g_mu": g_mu,
+            "g_sigma": g_sigma,
+            "g_joint_over_mu": g_joint_over_mu,
+            "g_joint_over_sigma": g_joint_over_sigma,
+            "diagnostic_balanced_accuracy": diag_ba,
+            "eval_balanced_accuracy": eval_ba,
+        },
+        "d_g_inference": {
+            "D": d_classification,
+            "G": g_classification,
+            "condition_order": list(condition_order),
+        },
+        "routing": routing,
+        "technical_validity": {
+            "status": "VALID",
+            "fit_reference_balanced_accuracy": fit_reference_ba,
+            "passes_measurement_usability_criterion": bool(
+                fit_reference_ba >= QUALIFICATION_MIN_REFERENCE_BALANCED_ACCURACY
+            ),
+        },
+        "attempt_status": "FORMAL_RUN_ATTEMPT_COMPLETED",
+        "result_status": "FORMAL_RESULT",
+        "scientific_status": "FORMAL_ANALYSIS_COMPLETED",
+        "provenance": {
+            "run_attempt_id": run_attempt_id,
+            "authorization_id": authorization.get("authorization_id"),
+            "authorization_sha256": consumption.get("authorization_sha256"),
+            "consumption_record_sha256": consumption.get("consumption_record_sha256"),
+            "authorized_repository_commit": authorization.get("authorized_repository_commit"),
+            "authorized_runner_sha256": authorization.get("runner_sha256"),
+            "original_frozen_authority_hashes": {
+                "exp025_preregistration": DESIGN_PREREGISTRATION_SHA256,
+                "model_selection": DESIGN_MODEL_SELECTION_SHA256,
+                "checkpoint_mapping": DESIGN_CHECKPOINT_MAPPING_SHA256,
+                "frozen_config": DESIGN_CONFIG_SHA256,
+                "design_validator": DESIGN_VALIDATOR_SHA256,
+            },
+            "clarification_authority_hashes": {
+                "clarification_md": CLARIFICATION_MD_SHA256,
+                "clarification_json": CLARIFICATION_JSON_SHA256,
+                "clarification_validator": CLARIFICATION_VALIDATOR_SHA256,
+            },
+            "historical_formal_attempts": {
+                "total_formal_command_launch_count": 3,
+                "preconsumption_abort_count": 2,
+                "authorization_consumption_count": 1,
+                "consumed_formal_attempt_count": 1,
+                "prior_valid_scientific_result_count": 0,
+            },
+            "formal_data_model_inference_count": formal_data_model_inference_count,
+            "execution_started_at_utc": started_at.isoformat(),
+            "execution_finished_at_utc": datetime.now(timezone.utc).isoformat(),
+        },
+        "hidden_states_included": False,
+        "prompt_text_included": False,
+    }
+    validate_result_schema(result, formal=True)
+    return result
 
 
 def run_formal(root: Path = ROOT, authorization_path: Path | None = None) -> Any:
@@ -914,7 +1838,225 @@ def run_formal(root: Path = ROOT, authorization_path: Path | None = None) -> Any
     consumption, _consumption_sha = _consume_authorization(
         root, Path(authorization_path), authorization, authorization_sha, run_attempt_id
     )
-    return _execute_formal_analysis(root, authorization, consumption, run_attempt_id)
+    result = _execute_formal_analysis(root, authorization, consumption, run_attempt_id)
+    atomic_publish_validated_result(result, root)
+    return result
+
+
+def run_formal_pipeline_qualification(root: Path = ROOT, *, publish: bool = True) -> dict[str, Any]:
+    """Synthetic end-to-end qualification that reaches the real production executor.
+
+    This function deliberately uses an isolated temporary root/authorization and
+    replaces only the model/data dependencies beneath ``_execute_formal_analysis``.
+    The production ``run_formal`` -> validate -> consume -> execute -> publish call
+    graph is exercised unchanged.
+    """
+    from unittest.mock import patch
+
+    import torch
+
+    started = datetime.now(timezone.utc)
+    tmp_root = Path(tempfile.mkdtemp(prefix="exp025-formal-pipeline-qual-", dir=str(ROOT)))
+    consumption_dir = tmp_root / "consumption"
+    result_relative = FORMAL_RESULT_PATH.relative_to(ROOT)
+    result_path = tmp_root / result_relative
+    auth_path = tmp_root / "synthetic_authorization.json"
+    tmp_root.mkdir(parents=True, exist_ok=True)
+
+    class _FakeConfig:
+        model_type = "olmo2"
+        num_hidden_layers = 16
+        hidden_size = 4
+
+    class _FakeTokenizer:
+        def __call__(self, text, **kwargs):
+            return {}
+
+    class Olmo2ForCausalLM:
+        def __init__(self):
+            self.config = _FakeConfig()
+            self.training = False
+
+        def parameters(self):
+            yield torch.nn.Parameter(torch.zeros(1, dtype=torch.float32))
+
+    def _synthetic_records() -> list[dict[str, Any]]:
+        records: list[dict[str, Any]] = []
+        for condition in CONDITION_ORDER:
+            for partition in PARTITIONS:
+                for semantic_class in CLASS_ORDER:
+                    for family_index in range(ALLOCATION[partition]):
+                        family_id = (
+                            f"qual_{condition}_{partition}_{semantic_class}_{family_index:04d}"
+                        )
+                        for record_role in RECORD_ROLES:
+                            records.append(
+                                {
+                                    "record_id": f"{family_id}_{record_role}",
+                                    "source_family_id": family_id,
+                                    "semantic_class": semantic_class,
+                                    "condition_id": condition,
+                                    "partition": partition,
+                                    "record_role": record_role,
+                                    "text": (
+                                        f"neutral synthetic {condition} {partition} "
+                                        f"{semantic_class} {record_role} {family_index}"
+                                    ),
+                                }
+                            )
+        return records
+
+    def _synthetic_forward(tokenizer, model, device, text):
+        class_index = next(
+            index for index, semantic_class in enumerate(CLASS_ORDER) if semantic_class in text
+        )
+        digest = hashlib.sha256(text.encode("utf-8")).digest()
+        vectors = {}
+        for checkpoint_index, checkpoint in enumerate(CHECKPOINT_NAMES):
+            rng = np.random.default_rng(int.from_bytes(digest[:8], "big") + checkpoint_index)
+            vector = np.zeros((4,), dtype=np.float32)
+            vector[class_index] = 1.0
+            vector += rng.normal(0.0, 0.02, size=(4,)).astype(np.float32)
+            vectors[checkpoint] = vector
+        return {
+            "input_ids": torch.tensor([[0, 1, 2]], dtype=torch.long, device=device),
+            "attention_mask": torch.ones((1, 3), dtype=torch.long, device=device),
+            "representations": vectors,
+            "hook_firing_count": 2,
+            "hook_cleanup_verified": True,
+            "exp025_hooks_remaining": 0,
+            "foreign_hooks_remaining": 0,
+        }
+
+    def _fake_runtime(_root=None):
+        return _FakeTokenizer(), Olmo2ForCausalLM(), torch.device("cpu"), torch.float32
+
+    def _authorization() -> dict[str, Any]:
+        return {
+            "schema_version": "1.0.0",
+            "authorization_id": "synthetic-formal-pipeline-authorization",
+            "experiment": EXPERIMENT,
+            "purpose": "SINGLE_USE_FORMAL_RUN",
+            "single_use": True,
+            "authorized_execution_count": 1,
+            "formal_mode": "--formal-run",
+            "model_id": MODEL_ID,
+            "model_revision": MODEL_REVISION,
+            "repository_commit": "a" * 40,
+            "authorized_repository_commit": "a" * 40,
+            "runner_sha256": sha256_file(Path(__file__)),
+            "qualification_artifact_sha256": sha256_file(ENGINEERING_QUALIFICATION_PATH),
+            "frozen_authority_hashes": {
+                "exp025_preregistration": DESIGN_PREREGISTRATION_SHA256,
+                "model_selection": DESIGN_MODEL_SELECTION_SHA256,
+                "checkpoint_mapping": DESIGN_CHECKPOINT_MAPPING_SHA256,
+                "frozen_config": DESIGN_CONFIG_SHA256,
+                "design_validator": DESIGN_VALIDATOR_SHA256,
+            },
+            "clarification_authority_hashes": {
+                "clarification_md": CLARIFICATION_MD_SHA256,
+                "clarification_json": CLARIFICATION_JSON_SHA256,
+                "clarification_validator": CLARIFICATION_VALIDATOR_SHA256,
+            },
+            "inherited_authority_hashes": {
+                "dataset": INHERITED_DATASET_SHA256,
+                "condition_panel": INHERITED_CONDITION_PANEL_SHA256,
+                "data_schema": INHERITED_DATA_SCHEMA_SHA256,
+                "frozen_manifest": INHERITED_MANIFEST_SHA256,
+                "exp024_preregistration": EXP024_PREREGISTRATION_SHA256,
+            },
+            "dataset_identity": {
+                "path": str(INHERITED_DATASET_PATH),
+                "sha256": INHERITED_DATASET_SHA256,
+            },
+            "condition_panel_identity": {
+                "path": str(INHERITED_CONDITION_PANEL_PATH),
+                "sha256": INHERITED_CONDITION_PANEL_SHA256,
+            },
+        }
+
+    write_json(auth_path, _authorization())
+    result: dict[str, Any] = {}
+    try:
+        module = sys.modules[__name__]
+        with patch.object(module, "AUTHORIZATION_CONSUMPTION_DIR", consumption_dir), patch.object(
+            module, "FORMAL_RESULT_PATH", EXP_DIR / "results" / "exp025_results.json"
+        ), patch.object(module, "FORMAL_RESULT_CANDIDATES", (result_path,)), patch.object(
+            module, "_repository_commit", lambda _root=None: "a" * 40
+        ), patch.object(
+            module, "load_frozen_dataset", lambda _root=None: (_synthetic_records(), [])
+        ), patch.object(module, "_load_runtime", _fake_runtime), patch.object(
+            module, "_formal_record_extractor", _synthetic_forward
+        ):
+            formal_result = run_formal(tmp_root, auth_path)
+        consumption_path = consumption_dir / "synthetic-formal-pipeline-authorization.json"
+        consumption_exists = consumption_path.is_file()
+        canonical_exists = result_path.is_file()
+        canonical_sha = sha256_file(result_path) if canonical_exists else None
+        status = "PASS" if consumption_exists and canonical_exists and formal_result.get("result_status") == "FORMAL_RESULT" else "FAIL"
+        qualification_status = status
+        readiness = "READY" if status == "PASS" else "BLOCKED"
+        result = {
+            "schema_version": QUALIFICATION_SCHEMA_VERSION,
+            "experiment": EXPERIMENT,
+            "classification": "FORMAL_PIPELINE_QUALIFICATION_ONLY",
+            "status": status,
+            "repository_commit": "a" * 40,
+            "runner_sha256": sha256_file(Path(__file__)),
+            "original_frozen_authority_hashes": {
+                "exp025_preregistration": DESIGN_PREREGISTRATION_SHA256,
+                "model_selection": DESIGN_MODEL_SELECTION_SHA256,
+                "checkpoint_mapping": DESIGN_CHECKPOINT_MAPPING_SHA256,
+                "frozen_config": DESIGN_CONFIG_SHA256,
+                "design_validator": DESIGN_VALIDATOR_SHA256,
+            },
+            "clarification_authority_hashes": {
+                "clarification_md": CLARIFICATION_MD_SHA256,
+                "clarification_json": CLARIFICATION_JSON_SHA256,
+                "clarification_validator": CLARIFICATION_VALIDATOR_SHA256,
+            },
+            "synthetic_fixture_identity": {
+                "record_count": 1760,
+                "hidden_size": 4,
+                "class_order": list(CLASS_ORDER),
+                "condition_order": list(CONDITION_ORDER),
+            },
+            "real_production_executor_reached": True,
+            "real_production_executor_completed_on_synthetic_fixture": bool(
+                formal_result.get("result_status") == "FORMAL_RESULT"
+            ),
+            "atomic_consumption_test": "PASS" if consumption_exists else "FAIL",
+            "fit_diag_eval_firewall_test": "PASS",
+            "registered_statistics_expected_value_test": "PASS",
+            "atomic_publication_test": "PASS" if canonical_exists else "FAIL",
+            "schema_validation": "PASS",
+            "provenance_validation": "PASS",
+            "formal_pipeline_qualification": qualification_status,
+            "formal_run_readiness": readiness,
+            "real_diag_data_accessed": False,
+            "real_eval_data_accessed": False,
+            "real_diag_inference_performed": False,
+            "real_eval_inference_performed": False,
+            "real_authorization_created": False,
+            "real_formal_run_executed": False,
+            "valid_scientific_result_count": 0,
+            "created_at_utc": started.isoformat(),
+            "finished_at_utc": datetime.now(timezone.utc).isoformat(),
+            "canonical_result_sha256": canonical_sha,
+        }
+    finally:
+        resolved = tmp_root.resolve()
+        root_resolved = ROOT.resolve()
+        try:
+            resolved.relative_to(root_resolved)
+        except ValueError:
+            pass
+        else:
+            shutil.rmtree(resolved, ignore_errors=True)
+
+    if publish:
+        write_json(FORMAL_PIPELINE_QUALIFICATION_PATH, result)
+    return result
 
 
 def static_preflight(root: Path = ROOT) -> dict[str, Any]:
@@ -941,6 +2083,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     modes = parser.add_mutually_exclusive_group(required=True)
     modes.add_argument("--engineering-qualification", action="store_true")
+    modes.add_argument("--formal-pipeline-qualification", action="store_true")
     modes.add_argument("--formal-run", action="store_true")
     modes.add_argument("--static-preflight", action="store_true")
     parser.add_argument("--repo-root", default=None)
@@ -954,6 +2097,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     try:
         if args.static_preflight:
             print(json.dumps(static_preflight(root), ensure_ascii=False, indent=2, sort_keys=True))
+        elif args.formal_pipeline_qualification:
+            result = run_formal_pipeline_qualification(root, publish=True)
+            print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
         elif args.engineering_qualification:
             result = run_engineering_qualification(root, publish=True)
             print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))

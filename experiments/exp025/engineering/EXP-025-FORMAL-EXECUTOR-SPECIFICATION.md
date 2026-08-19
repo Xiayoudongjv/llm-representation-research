@@ -3,9 +3,16 @@
 Classification: `GOVERNANCE_AND_IMPLEMENTATION_SPECIFICATION_ONLY`
 
 This document specifies the frozen scientific/publication contract that the
-future `_execute_formal_analysis` implementation must satisfy. It does not
-implement `run_exp025.py`, does not create a formal authorization, and does not
-execute formal science.
+EXP-025 formal executor must satisfy. Task 100D-E implemented and qualified the
+production path; this specification remains the frozen implementation contract
+and does not itself create a formal authorization or execute formal science.
+
+## Implementation Status Update
+
+Task 100D-E replaced the historical fail-closed stub with the real
+`_execute_formal_analysis` implementation and passed the focused test suite,
+engineering/measurement requalification, and synthetic formal-pipeline
+qualification. The implementation-coverage matrix is now `12/12`.
 
 ## Scope
 
@@ -20,13 +27,8 @@ run_formal
   -> atomic publication boundary
 ```
 
-Task 100D-D does not implement this path. The current implementation is the
-fail-closed stub:
-
-```text
-_execute_formal_analysis raises
-FORMAL_SCIENCE_NOT_AUTHORIZED_IN_100D_A
-```
+The production implementation now exercises this path. The historical
+fail-closed stub was removed in Task 100D-E.
 
 ## Frozen Authorities
 
@@ -457,11 +459,11 @@ The current gate result is:
 ```text
 EXP025_FORMAL_EXECUTOR_SPEC_COMPLETE = true
 EXP025_SPECIFICATION_GAPS = 0
-EXP025_IMPLEMENTATION_COVERAGE_BASELINE = 0/12
+EXP025_IMPLEMENTATION_COVERAGE = 12/12
 EXP025_FIT_DIAG_EVAL_FIREWALL_SPECIFIED = true
 EXP025_PUBLICATION_CONTRACT_SPECIFIED = true
 EXP025_READY_FOR_FORMAL_EXECUTOR_IMPLEMENTATION = true
-EXP025_NEXT_TASK = 100D_E_IMPLEMENT_FROZEN_FORMAL_EXECUTOR
+EXP025_NEXT_TASK = 100D_F_ADVERSARIAL_FORMAL_EXECUTOR_REREVIEW
 ```
 
 `EXP025_READY_FOR_FORMAL_EXECUTOR_IMPLEMENTATION = true` means implementation
@@ -493,12 +495,12 @@ Publication failure must fail closed and must not fabricate a valid result.
 ```text
 EXP025_FORMAL_EXECUTOR_SPEC_COMPLETE = true
 EXP025_SPECIFICATION_GAPS = 0
-EXP025_IMPLEMENTATION_COVERAGE_BASELINE = 0/12
+EXP025_IMPLEMENTATION_COVERAGE = 12/12
 EXP025_FIT_DIAG_EVAL_FIREWALL_SPECIFIED = true
 EXP025_PUBLICATION_CONTRACT_SPECIFIED = true
 EXP025_SCIENTIFIC_DESIGN_CHANGED = false
 EXP025_FORMAL_RUN_EXECUTED = false
 EXP025_RECOVERY_AUTHORIZATION_CREATED = false
 EXP025_READY_FOR_FORMAL_EXECUTOR_IMPLEMENTATION = true
-EXP025_NEXT_TASK = 100D_E_IMPLEMENT_FROZEN_FORMAL_EXECUTOR
+EXP025_NEXT_TASK = 100D_F_ADVERSARIAL_FORMAL_EXECUTOR_REREVIEW
 ```

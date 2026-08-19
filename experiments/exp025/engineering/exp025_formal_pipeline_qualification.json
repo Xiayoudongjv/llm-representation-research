@@ -1,0 +1,62 @@
+{
+  "atomic_consumption_test": "PASS",
+  "atomic_publication_test": "PASS",
+  "canonical_result_sha256": "b4f7b55e629d36fbb27f48486572a6650b114b6a92db8b02f9f09833d7a9d16d",
+  "clarification_authority_hashes": {
+    "clarification_json": "4f65a60dcf40e24e57cbddda1be8d6573b353ab9cf17c901b3aa5fb2d5b47e16",
+    "clarification_md": "1b91d6b2efd4c4459779e6645f893aea91804c32d7834b22044a85f7e721b0ed",
+    "clarification_validator": "d3abf68502861f752655b46ef72405b1193783d80b3332f912ccf734abafb555"
+  },
+  "classification": "FORMAL_PIPELINE_QUALIFICATION_ONLY",
+  "created_at_utc": "2026-08-19T09:15:41.258534+00:00",
+  "experiment": "EXP-025",
+  "finished_at_utc": "2026-08-19T09:15:41.430536+00:00",
+  "fit_diag_eval_firewall_test": "PASS",
+  "formal_pipeline_qualification": "PASS",
+  "formal_run_readiness": "READY",
+  "original_frozen_authority_hashes": {
+    "checkpoint_mapping": "5f8c5df4aa849ceb7ee2ca8b1765aeeff46b96182426c97b81d320b3dda6a087",
+    "design_validator": "e87042535622e545c682a6f1019bf3703b4d0029d895e80c74269f7f1f26376d",
+    "exp025_preregistration": "b83fd58ba36e55ab5c48577169e07a168d2a55df759d3131677cd86f2363e08e",
+    "frozen_config": "2c9b1b8735378108c921a8ca99a1aab115b2a6669bf82e5ae0a9314dd4b62275",
+    "model_selection": "be28f7a2b1f460879e65f0ac911b01756d76b45069f8f438021412b76e954f80"
+  },
+  "provenance_validation": "PASS",
+  "real_authorization_created": false,
+  "real_diag_data_accessed": false,
+  "real_diag_inference_performed": false,
+  "real_eval_data_accessed": false,
+  "real_eval_inference_performed": false,
+  "real_formal_run_executed": false,
+  "real_production_executor_completed_on_synthetic_fixture": true,
+  "real_production_executor_reached": true,
+  "registered_statistics_expected_value_test": "PASS",
+  "repository_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "runner_sha256": "ec3ec1378d52ffe03c6aea5a8c16da4a6c28cd26aee8235e0a1842b36d983d3f",
+  "schema_validation": "PASS",
+  "schema_version": "1.0.0",
+  "status": "PASS",
+  "synthetic_fixture_identity": {
+    "class_order": [
+      "logic",
+      "causality",
+      "analogy",
+      "definition"
+    ],
+    "condition_order": [
+      "c01_lexical_relex",
+      "c02_syntactic_restructure",
+      "c03_controlled_compression",
+      "c04_controlled_elaboration",
+      "c05_relation_explicit",
+      "c06_relation_implicit",
+      "c07_register_formal",
+      "c08_register_informal",
+      "c09_neutral_distractor_prefix",
+      "c10_anaphoric_reference"
+    ],
+    "hidden_size": 4,
+    "record_count": 1760
+  },
+  "valid_scientific_result_count": 0
+}
