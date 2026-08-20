@@ -250,7 +250,7 @@ def test_matrix_from_observations_and_condition_pool():
     X, y = runner._matrix_from_observations(obs, 0)
     assert X.shape == (len(obs), 2)
     assert set(y) == set(runner.CLASS_ORDER)
-    matrix = np.arange(8, dtype=np.float32).reshape(2, 2, 2)
+    matrix = np.arange(40, dtype=np.float32).reshape(2, 2, 10)
     assert np.allclose(runner._condition_pool(matrix), matrix.mean(axis=2))
 
 
@@ -282,14 +282,14 @@ def test_compute_matrix_profile_synthetic_shapes_and_diagonal():
     profile = runner.compute_matrix_profile(
         fixtures["A"],
         num_layers=4,
-        condition_order=runner.CONDITION_ORDER[:2],
+        condition_order=runner.CONDITION_ORDER,
         bootstrap_replicates=0,
     )
     assert profile["num_layers"] == 4
-    assert profile["c0_eval"].shape == (4, 4, 2)
-    assert profile["c0_diag"].shape == (4, 4, 2)
-    assert profile["c_cal_eval"].shape == (4, 4, 2)
-    assert profile["r_eval"].shape == (4, 4, 2)
+    assert profile["c0_eval"].shape == (4, 4, 10)
+    assert profile["c0_diag"].shape == (4, 4, 10)
+    assert profile["c_cal_eval"].shape == (4, 4, 10)
+    assert profile["r_eval"].shape == (4, 4, 10)
     assert np.allclose(np.diagonal(profile["d_eval"][:, :, 0]), 0.0)
     assert any(profile["source_qualification"]["eligible_source_mask"])
     assert "distance_association" in profile["point"]
@@ -299,8 +299,8 @@ def test_compute_matrix_profile_synthetic_shapes_and_diagonal():
 
 def test_synthetic_expected_values():
     fixtures = _observations()
-    a = runner.compute_matrix_profile(fixtures["A"], num_layers=4, condition_order=runner.CONDITION_ORDER[:2], bootstrap_replicates=0)
-    b = runner.compute_matrix_profile(fixtures["B"], num_layers=3, condition_order=runner.CONDITION_ORDER[:2], bootstrap_replicates=0)
+    a = runner.compute_matrix_profile(fixtures["A"], num_layers=4, condition_order=runner.CONDITION_ORDER, bootstrap_replicates=0)
+    b = runner.compute_matrix_profile(fixtures["B"], num_layers=3, condition_order=runner.CONDITION_ORDER, bootstrap_replicates=0)
     runner._verify_synthetic_expected_values(a, b)
 
 
@@ -337,37 +337,17 @@ def test_matrix_serialization_roundtrip():
     json.dumps(serialized, allow_nan=False)
 
 
-def test_result_schema_validation():
+def test_result_schema_rejects_shallow_or_malformed_nested_payload():
     payload = {
         "schema_version": runner.RESULT_SCHEMA_VERSION,
         "classification": "EXP026_SCIENTIFIC_RESULT",
         "experiment": runner.EXPERIMENT,
-        "authority_hashes": {"a": "b"},
-        "model_profiles": {
-            "Q": {"num_layers": 28, "matrices": {}},
-            "O": {"num_layers": 16, "matrices": {}},
-        },
+        "authority_hashes": {}, "model_profiles": {}, "models": {},
     }
-    assert runner.validate_result_schema(payload) == []
-    bad = json.loads(json.dumps(payload))
-    bad["model_profiles"]["Q"]["num_layers"] = 4
-    assert "model_profile_num_layers" in runner.validate_result_schema(bad)
-
-
-def test_synthetic_result_schema_validation():
-    payload = {
-        "schema_version": runner.RESULT_SCHEMA_VERSION,
-        "classification": "EXP026_SCIENTIFIC_RESULT",
-        "experiment": runner.EXPERIMENT,
-        "authority_hashes": {},
-        "model_profiles": {
-            "A": {"num_layers": 4, "matrices": {}},
-            "B": {"num_layers": 3, "matrices": {}},
-        },
-    }
-    assert runner.validate_synthetic_result_schema(payload) == []
-    payload["model_profiles"]["B"]["num_layers"] = 4
-    assert "synthetic_model_profile_num_layers" in runner.validate_synthetic_result_schema(payload)
+    errors = runner.validate_result_schema(payload)
+    assert "authority_hashes" in errors
+    assert "model_profiles" in errors
+    assert "runner_sha256" in errors
 
 
 def test_result_publication_race(tmp_path):
@@ -380,18 +360,19 @@ def test_result_publication_race(tmp_path):
 
 
 def test_authorization_consumption_exclusive(tmp_path, monkeypatch):
-    monkeypatch.setattr(runner, "AUTHORIZATION_CONSUMPTION_DIR", tmp_path / "consumption")
     auth = {"authorization_id": "AUTH_001"}
-    record, sha = runner.consume_authorization(ROOT, tmp_path / "auth.json", auth, "a" * 64, run_attempt_id="attempt-1")
+    consumption = tmp_path / "consumption"
+    record, sha = runner.consume_authorization(ROOT, tmp_path / "auth.json", auth, "a" * 64, run_attempt_id="attempt-1", consumption_dir=consumption)
     assert record["run_attempt_id"] == "attempt-1"
-    assert (tmp_path / "consumption" / "AUTH_001.json").exists()
+    assert (consumption / "AUTH_001.json").exists()
     assert len(sha) == 64
     with pytest.raises(runner.ProtocolIntegrityError):
-        runner.consume_authorization(ROOT, tmp_path / "auth.json", auth, "a" * 64, run_attempt_id="attempt-2")
+        runner.consume_authorization(ROOT, tmp_path / "auth.json", auth, "a" * 64, run_attempt_id="attempt-2", consumption_dir=consumption)
 
 
-def test_formal_authorization_validation(tmp_path):
-    runner_sha = runner.sha256_file(Path(runner.__file__))
+def test_formal_authorization_validation_full_binding(tmp_path, monkeypatch):
+    binding = runner.formal_execution_binding(ROOT)
+    monkeypatch.setattr(runner, "_qualification_binding", lambda root: {"engineering_qualification": "a" * 64, "formal_pipeline_qualification": "b" * 64})
     auth = {
         "schema_version": "1.0.0",
         "experiment": runner.EXPERIMENT,
@@ -399,23 +380,25 @@ def test_formal_authorization_validation(tmp_path):
         "single_use": True,
         "authorized_execution_count": 1,
         "formal_mode": "--formal-run",
-        "models": {
-            "Q": {
-                "model_id": runner.MODEL_REGISTRY["Q"]["model_id"],
-                "model_revision": runner.MODEL_REGISTRY["Q"]["model_revision"],
-            },
-            "O": {
-                "model_id": runner.MODEL_REGISTRY["O"]["model_id"],
-                "model_revision": runner.MODEL_REGISTRY["O"]["model_revision"],
-            },
-        },
-        "runner_sha256": runner_sha,
+        "execution_binding": binding,
+        "qualification_hashes": {"engineering_qualification": "a" * 64, "formal_pipeline_qualification": "b" * 64},
     }
     path = tmp_path / "auth.json"
     path.write_text(json.dumps(auth), encoding="utf-8")
     validated, auth_sha = runner.validate_formal_authorization(ROOT, path)
     assert validated == auth
     assert auth_sha == runner.sha256_file(path)
+
+
+def test_formal_authorization_rejects_any_frozen_binding_mismatch(tmp_path, monkeypatch):
+    binding = runner.formal_execution_binding(ROOT)
+    monkeypatch.setattr(runner, "_qualification_binding", lambda root: {"engineering_qualification": "a" * 64, "formal_pipeline_qualification": "b" * 64})
+    auth = {"schema_version": "1.0.0", "experiment": runner.EXPERIMENT, "purpose": "SINGLE_USE_FORMAL_RUN", "single_use": True, "authorized_execution_count": 1, "formal_mode": "--formal-run", "execution_binding": dict(binding), "qualification_hashes": {"engineering_qualification": "a" * 64, "formal_pipeline_qualification": "b" * 64}}
+    auth["execution_binding"]["panel_identity_sha256"] = "0" * 64
+    path = tmp_path / "auth.json"
+    path.write_text(json.dumps(auth), encoding="utf-8")
+    with pytest.raises(runner.ProtocolIntegrityError, match="BINDING_MISMATCH"):
+        runner.validate_formal_authorization(ROOT, path)
 
 
 def test_static_preflight():
@@ -454,3 +437,91 @@ def test_engineering_qualification_orchestration(tmp_path, monkeypatch):
     assert result["formal_data_accessed"] is False
     assert result["scientific_result_created"] is False
     assert (tmp_path / "qualification.json").exists()
+
+
+def test_condition_pool_requires_all_ten_frozen_conditions():
+    with pytest.raises(runner.ProtocolIntegrityError, match="ALL_FROZEN_CONDITIONS"):
+        runner._condition_pool(np.zeros((2, 2, 9), dtype=np.float32))
+
+
+def test_source_coverage_failure_is_not_evaluable_and_never_routes(monkeypatch):
+    fixtures = _observations()["A"]
+    monkeypatch.setattr(
+        runner,
+        "_source_qualification",
+        lambda *_args: {"ba_diag_self": [0.0] * 4, "eligible_source_mask": [False] * 4,
+                         "eligible_source_count": 0, "eligible_depth_span": 0.0,
+                         "source_coverage_evaluable": False},
+    )
+    profile = runner.compute_matrix_profile(fixtures, num_layers=4, bootstrap_replicates=10)
+    assert profile["confirmatory_status"] == "NOT_EVALUABLE_SOURCE_COVERAGE"
+    assert set(profile["support"].values()) == {"NOT_EVALUABLE"}
+    assert runner.classify_route(profile, profile)["route"] == "NOT_EVALUABLE"
+
+
+def test_bootstrap_resamples_complete_source_family_clusters(monkeypatch):
+    observations = []
+    for condition in runner.CONDITION_ORDER:
+        for class_index, semantic_class in enumerate(runner.CLASS_ORDER):
+            for family in range(2):
+                for member in range(2):
+                    observations.append(runner.ExtractedObservation(
+                        record_id=f"{condition}-{semantic_class}-{family}-{member}", partition="EVAL",
+                        condition_id=condition, semantic_class=semantic_class,
+                        source_family_id=f"{condition}-{semantic_class}-{family}",
+                        vectors=np.full((2, 2), class_index + member / 10, dtype=np.float32),
+                    ))
+    captured = []
+    def fake_c0(sample, *_args):
+        captured.append(list(sample))
+        return np.zeros((2, 2, 10), dtype=np.float32)
+    monkeypatch.setattr(runner, "_compute_c0_for_partition", fake_c0)
+    monkeypatch.setattr(runner, "_compute_c_cal_for_partition", lambda *_args: np.zeros((2, 2, 10), dtype=np.float32))
+    monkeypatch.setattr(runner, "_summarize_point_profile", lambda *_args: {"distance_association": 0.0, "sdi": {"sdi": 0.0}})
+    class IdentityClusterRng:
+        def integers(self, low, high, size):
+            return np.arange(size, dtype=np.int64)
+    runner._bootstrap_model_summaries(
+        observations, 2, runner.CONDITION_ORDER, [], {}, [True, True],
+        np.zeros((2, 2), dtype=np.float32), np.zeros((2, 2), dtype=bool), 1,
+        IdentityClusterRng(),
+    )
+    sampled = captured[0]
+    for family in {item.source_family_id for item in sampled}:
+        assert sum(item.source_family_id == family for item in sampled) % 2 == 0
+
+
+def test_independent_numeric_goldens_detect_sabotaged_condition_pool(monkeypatch):
+    monkeypatch.setattr(runner, "_condition_pool", lambda matrix: np.zeros((2, 2), dtype=np.float32))
+    with pytest.raises(runner.ProtocolIntegrityError, match="INDEPENDENT_GOLDEN_CONDITION_POOL_FAILED"):
+        runner.verify_independent_numeric_goldens()
+
+
+def test_synthetic_qualification_calls_shared_authorized_executor(monkeypatch):
+    original = runner._run_authorized_executor
+    calls = []
+    def observed_executor(**kwargs):
+        calls.append(set(kwargs))
+        return original(**kwargs)
+    monkeypatch.setattr(runner, "_run_authorized_executor", observed_executor)
+    result = runner.run_synthetic_formal_qualification(ROOT, publish=False)
+    assert result["shared_authorized_executor"] == "PASS"
+    assert calls and {"authorization_validator", "observations_provider", "result_path"} <= calls[0]
+
+
+def test_matrix_orientation_baseline_sign_and_class_mapping_contract():
+    # Hand-specified matrices: C0[source, target, condition], diagonal baseline,
+    # and D = Cself - C0.  This is not derived from production output.
+    c0 = np.zeros((2, 2, 10), dtype=np.float32)
+    c0[0, 0, :] = 0.9
+    c0[0, 1, :] = 0.4
+    c0[1, 0, :] = 0.3
+    c0[1, 1, :] = 0.8
+    d = np.zeros_like(c0)
+    for source in range(2):
+        for target in range(2):
+            d[source, target, :] = c0[source, source, :] - c0[source, target, :]
+    assert np.allclose(np.diagonal(d[:, :, 0]), 0.0)
+    assert np.all(d[0, 1, :] > 0.0)
+    assert np.all(d[1, 0, :] > 0.0)
+    assert runner.classifier_class_mapping(SimpleNamespace(classes_=np.asarray(sorted(runner.CLASS_ORDER)))) == sorted(runner.CLASS_ORDER)

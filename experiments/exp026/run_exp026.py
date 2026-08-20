@@ -28,7 +28,7 @@ import uuid
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any, Callable, Mapping, Sequence
 
 import numpy as np
 from sklearn.linear_model import LogisticRegression
@@ -121,8 +121,10 @@ FORMAL_RESULT_CANDIDATES = (
     EXP_DIR / "exp026_formal_result.json",
 )
 ENGINEERING_DIR = EXP_DIR / "engineering"
-ENGINEERING_QUALIFICATION_PATH = ENGINEERING_DIR / "exp026_runner_qualification.json"
-FORMAL_PIPELINE_QUALIFICATION_PATH = ENGINEERING_DIR / "exp026_formal_pipeline_qualification.json"
+# Historical 101C qualification records are preserved.  101D-R writes only
+# versioned, superseding qualification evidence.
+ENGINEERING_QUALIFICATION_PATH = ENGINEERING_DIR / "exp026_runner_qualification_101d_r.json"
+FORMAL_PIPELINE_QUALIFICATION_PATH = ENGINEERING_DIR / "exp026_formal_pipeline_qualification_101d_r.json"
 FORMAL_AUTHORIZATION_PATH = EXP_DIR / "exp026_formal_run_authorization.json"
 AUTHORIZATION_CONSUMPTION_DIR = EXP_DIR / "results" / "authorization_consumption"
 
@@ -204,6 +206,21 @@ def _atomic_write_json(path: Path, data: Any) -> str:
     return sha256_file(path)
 
 
+def _root_relative_path(root: Path, path: Path) -> Path:
+    """Resolve a repository-owned absolute path against an injected root."""
+    try:
+        return root / path.relative_to(ROOT)
+    except ValueError:
+        # Test-only injected paths may deliberately live outside the repository.
+        return path
+
+
+def _canonical_json_sha256(value: Any) -> str:
+    """Hash canonical JSON bytes for an authorization identity field."""
+    payload = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return sha256_string(payload)
+
+
 def verify_frozen_design(root: Path = ROOT) -> dict[str, Any]:
     checks = {
         "frozen_config": DESIGN_CONFIG_PATH,
@@ -215,6 +232,7 @@ def verify_frozen_design(root: Path = ROOT) -> dict[str, Any]:
     }
     actual = {}
     for key, path in checks.items():
+        path = _root_relative_path(root, path)
         if not path.is_file():
             raise ProtocolIntegrityError(f"FROZEN_AUTHORITY_MISSING_{key}")
         actual[key] = sha256_file(path)
@@ -226,7 +244,7 @@ def verify_frozen_design(root: Path = ROOT) -> dict[str, Any]:
 
 def verify_no_result_collision(root: Path = ROOT) -> None:
     for path in FORMAL_RESULT_CANDIDATES:
-        if path.exists():
+        if _root_relative_path(root, path).exists():
             raise ProtocolIntegrityError(f"FORMAL_RESULT_PATH_UNEXPECTED_{path.name}")
 
 
@@ -671,6 +689,10 @@ def _source_qualification(observations: Sequence[ExtractedObservation], num_laye
 
 
 def _condition_pool(matrix: np.ndarray) -> np.ndarray:
+    if matrix.ndim != 3 or matrix.shape[2] != len(CONDITION_ORDER):
+        raise ProtocolIntegrityError("CONDITION_POOL_REQUIRES_ALL_FROZEN_CONDITIONS")
+    if not np.isfinite(matrix).all():
+        raise TechnicalInvalidError("CONDITION_POOL_NONFINITE")
     return np.mean(matrix, axis=2).astype(np.float32)
 
 
@@ -789,6 +811,12 @@ def _summarize_point_profile(
 
 
 def _support_classes(point: dict[str, Any], bootstrap: dict[str, Any] | None) -> dict[str, Any]:
+    if point.get("status") == "NOT_EVALUABLE_SOURCE_COVERAGE":
+        return {
+            "distance_support": "NOT_EVALUABLE",
+            "sdi_class": "NOT_EVALUABLE",
+            "low_d_support": "NOT_EVALUABLE",
+        }
     distance_support = "NOT_SUPPORTED"
     if bootstrap and math.isfinite(point["distance_association"]):
         lower = bootstrap["distance_association_ci"][0]
@@ -835,22 +863,35 @@ def _bootstrap_model_summaries(
     rng: np.random.Generator,
 ) -> dict[str, Any]:
     eval_rows = filter_condition_realization(observations, "EVAL")
-    cells = {}
+    clusters: dict[str, dict[str, list[ExtractedObservation]]] = {}
     for condition in condition_order:
-        cells[condition] = {}
-        for cls in CLASS_ORDER:
-            cells[condition][cls] = [obs for obs in eval_rows if obs.condition_id == condition and obs.semantic_class == cls]
+        by_family: dict[str, list[ExtractedObservation]] = {}
+        for obs in eval_rows:
+            if obs.condition_id == condition:
+                by_family.setdefault(obs.source_family_id, []).append(obs)
+        if not by_family:
+            raise ProtocolIntegrityError("BOOTSTRAP_CONDITION_CLUSTER_EMPTY")
+        clusters[condition] = by_family
     dist_values = []
     sdi_values = []
     low_values = []
     for _ in range(replicates):
         sample = []
         for condition in condition_order:
-            for cls in CLASS_ORDER:
-                pool = cells[condition][cls]
-                if not pool:
-                    raise ProtocolIntegrityError("BOOTSTRAP_CELL_EMPTY")
-                sample.extend([pool[int(index)] for index in rng.integers(0, len(pool), size=len(pool))])
+            family_ids = sorted(clusters[condition])
+            sampled_indices = rng.integers(0, len(family_ids), size=len(family_ids))
+            # The frozen unit is a source-family cluster.  Selecting a family
+            # retains all of that family's semantic records; rows are never
+            # independently resampled.
+            for index in sampled_indices:
+                sample.extend(clusters[condition][family_ids[int(index)]])
+        if any(
+            {obs.semantic_class for obs in sample if obs.condition_id == condition} != CLASS_UNIVERSE
+            for condition in condition_order
+        ):
+            # A finite cluster bootstrap can draw no instance of a class.  This
+            # replicate is non-evaluable, not evidence for any endpoint.
+            continue
         c0_eval = _compute_c0_for_partition(sample, "EVAL", num_layers, condition_order, models)
         ccal_eval = _compute_c_cal_for_partition(sample, "EVAL", num_layers, condition_order, models, calibration)
         d_eval = np.zeros_like(c0_eval)
@@ -865,7 +906,11 @@ def _bootstrap_model_summaries(
         sdi_values.append(point["sdi"]["sdi"])
         pairs = [(i, j) for i in range(num_layers) for j in range(num_layers) if low_d_mask[i, j]]
         low_values.append(float(np.mean([float(rbar[i, j]) for i, j in pairs])) if pairs else float("nan"))
+    dist_values = [value for value in dist_values if math.isfinite(value)]
+    sdi_values = [value for value in sdi_values if math.isfinite(value)]
     low_values = [value for value in low_values if math.isfinite(value)]
+    if not sdi_values:
+        raise ProtocolIntegrityError("BOOTSTRAP_NO_EVALUABLE_REPLICATES")
     return {
         "distance_association_ci": [_percentile(dist_values, 5), _percentile(dist_values, 95)],
         "sdi_ci": [_percentile(sdi_values, 5), _percentile(sdi_values, 95)],
@@ -882,10 +927,8 @@ def compute_matrix_profile(
     bootstrap_replicates: int = 0,
     rng: np.random.Generator | None = None,
 ) -> dict[str, Any]:
-    if not condition_order:
-        raise ProtocolIntegrityError("CONDITION_ORDER_EMPTY")
-    if len(set(condition_order)) != len(condition_order):
-        raise ProtocolIntegrityError("CONDITION_ORDER_DUPLICATE")
+    if tuple(condition_order) != CONDITION_ORDER:
+        raise ProtocolIntegrityError("CONDITION_ORDER_MUST_MATCH_FROZEN_TEN")
     if num_layers <= 1:
         raise ProtocolIntegrityError("NUM_LAYERS_INVALID")
     models = _fit_source_models(observations, num_layers)
@@ -904,9 +947,21 @@ def compute_matrix_profile(
     dbar_eval = _condition_pool(d_eval)
     rbar_eval = _condition_pool(r_eval)
     dbar_diag = _condition_pool(d_diag)
-    point = _summarize_point_profile(dbar_eval, rbar_eval, qual["eligible_source_mask"], num_layers, dbar_diag)
+    if qual["source_coverage_evaluable"]:
+        point = _summarize_point_profile(dbar_eval, rbar_eval, qual["eligible_source_mask"], num_layers, dbar_diag)
+    else:
+        point = {
+            "status": "NOT_EVALUABLE_SOURCE_COVERAGE",
+            "distance_association": None,
+            "sdi": {"status": "NOT_EVALUABLE", "sdi": None},
+            "localization": {"status": "NOT_EVALUABLE", "localization": None, "boundaries": []},
+            "localization_r": {"status": "NOT_EVALUABLE", "localization": None, "boundaries": []},
+            "low_d_recovery": {"status": "NOT_EVALUABLE", "mean_recovery": None, "eligible_pair_count": 0},
+            "mean_off_diag_dbar": None,
+            "mean_off_diag_rbar": None,
+        }
     bootstrap = None
-    if bootstrap_replicates > 0:
+    if bootstrap_replicates > 0 and qual["source_coverage_evaluable"]:
         if rng is None:
             rng = np.random.default_rng(np.random.PCG64(BOOTSTRAP_SEED))
         low_mask, _ = _low_d_pair_mask(dbar_diag, qual["eligible_source_mask"], num_layers)
@@ -941,6 +996,7 @@ def compute_matrix_profile(
         "point": point,
         "bootstrap": bootstrap,
         "support": support,
+        "confirmatory_status": "EVALUABLE" if qual["source_coverage_evaluable"] else "NOT_EVALUABLE_SOURCE_COVERAGE",
     }
 
 def _boundary_intersect(localization: dict[str, Any], localization_r: dict[str, Any]) -> bool:
@@ -951,6 +1007,11 @@ def _boundary_intersect(localization: dict[str, Any], localization_r: dict[str, 
 
 def classify_route(q_summary: dict[str, Any], o_summary: dict[str, Any]) -> dict[str, Any]:
     models = {"Q": q_summary, "O": o_summary}
+    if any(not summary.get("source_qualification", {}).get("source_coverage_evaluable", True) for summary in models.values()):
+        return {
+            "p1": False, "p2": False, "p3": False, "p4": False, "p5": False,
+            "route": "NOT_EVALUABLE", "per_model": {key: {"p1": False, "p2": False, "p4": False} for key in models},
+        }
     per = {}
     for key, summary in models.items():
         point = summary["point"]
@@ -1055,7 +1116,9 @@ def build_result_payload(
     repository_commit: str,
     runner_sha256: str,
     authorization_identity: Mapping[str, Any] | None = None,
+    model_registry: Mapping[str, Mapping[str, Any]] | None = None,
 ) -> dict[str, Any]:
+    model_registry = model_registry or MODEL_REGISTRY
     return {
         "schema_version": RESULT_SCHEMA_VERSION,
         "classification": "EXP026_SCIENTIFIC_RESULT",
@@ -1064,14 +1127,57 @@ def build_result_payload(
         "runner_sha256": runner_sha256,
         "authority_hashes": authorities,
         "authorization_identity": authorization_identity,
-        "models": {key: MODEL_REGISTRY[key] for key in MODEL_REGISTRY},
+        "models": {key: model_registry[key] for key in model_profiles},
         "routing": routing,
         "model_profiles": {key: _serialize_profile(model_profiles[key], key) for key in model_profiles},
         "created_at_utc": datetime.now(timezone.utc).isoformat(),
     }
 
 
-def validate_result_schema(payload: Mapping[str, Any]) -> list[str]:
+def _valid_sha256(value: Any) -> bool:
+    return isinstance(value, str) and len(value) == 64 and all(char in "0123456789abcdef" for char in value)
+
+
+def _validate_serialized_matrix(
+    value: Any,
+    *,
+    expected_layers: int,
+    matrix_name: str,
+    errors: list[str],
+) -> None:
+    if not isinstance(value, Mapping):
+        errors.append(f"matrix_{matrix_name}_object")
+        return
+    expected_shape = [expected_layers, expected_layers]
+    if matrix_name in {"c0_eval", "d_eval", "c_cal_eval", "r_eval"}:
+        expected_shape.append(len(CONDITION_ORDER))
+    if value.get("shape") != expected_shape:
+        errors.append(f"matrix_{matrix_name}_shape")
+    if value.get("dtype") != "float32":
+        errors.append(f"matrix_{matrix_name}_dtype")
+    if value.get("source_layer_order") != list(range(expected_layers)):
+        errors.append(f"matrix_{matrix_name}_source_order")
+    if value.get("target_layer_order") != list(range(expected_layers)):
+        errors.append(f"matrix_{matrix_name}_target_order")
+    if value.get("condition_order") != list(CONDITION_ORDER):
+        errors.append(f"matrix_{matrix_name}_condition_order")
+    eligible = value.get("eligible_source_mask")
+    if not isinstance(eligible, list) or len(eligible) != expected_layers or not all(isinstance(item, bool) for item in eligible):
+        errors.append(f"matrix_{matrix_name}_eligible_mask")
+    try:
+        matrix = np.asarray(value.get("values"), dtype=float)
+        if list(matrix.shape) != expected_shape or not np.isfinite(matrix).all():
+            errors.append(f"matrix_{matrix_name}_values")
+    except (TypeError, ValueError):
+        errors.append(f"matrix_{matrix_name}_values")
+
+
+def validate_result_schema(
+    payload: Mapping[str, Any],
+    *,
+    expected_models: Mapping[str, Mapping[str, Any]] | None = None,
+) -> list[str]:
+    expected_models = expected_models or {key: MODEL_REGISTRY[key] for key in MODEL_KEYS}
     errors = []
     if payload.get("schema_version") != RESULT_SCHEMA_VERSION:
         errors.append("schema_version")
@@ -1079,40 +1185,68 @@ def validate_result_schema(payload: Mapping[str, Any]) -> list[str]:
         errors.append("classification")
     if payload.get("experiment") != EXPERIMENT:
         errors.append("experiment")
-    if not isinstance(payload.get("authority_hashes"), dict):
+    if not _valid_sha256(payload.get("runner_sha256")):
+        errors.append("runner_sha256")
+    if not isinstance(payload.get("repository_commit"), str) or len(payload["repository_commit"]) != 40:
+        errors.append("repository_commit")
+    if not isinstance(payload.get("authority_hashes"), dict) or set(payload.get("authority_hashes", {})) != set(EXPECTED_DESIGN_HASHES):
         errors.append("authority_hashes")
-    if not isinstance(payload.get("model_profiles"), dict) or set(payload.get("model_profiles", {})) != set(MODEL_KEYS):
+    if not isinstance(payload.get("authorization_identity"), Mapping):
+        errors.append("authorization_identity")
+    if not isinstance(payload.get("models"), Mapping) or set(payload.get("models", {})) != set(expected_models):
+        errors.append("models")
+    if not isinstance(payload.get("model_profiles"), dict) or set(payload.get("model_profiles", {})) != set(expected_models):
         errors.append("model_profiles")
-    for profile in payload.get("model_profiles", {}).values():
+    required_matrices = {"c0_eval", "d_eval", "c_cal_eval", "r_eval", "dbar_eval", "rbar_eval", "dbar_diag"}
+    for key, profile in payload.get("model_profiles", {}).items():
         if not isinstance(profile, dict):
             errors.append("model_profile_type")
             continue
-        if profile.get("num_layers") not in {28, 16}:
+        expected_layers = expected_models.get(key, {}).get("num_hidden_layers")
+        if profile.get("num_layers") != expected_layers:
             errors.append("model_profile_num_layers")
-        if not isinstance(profile.get("matrices"), dict):
+            continue
+        if profile.get("model_key") != key or profile.get("class_order") != list(CLASS_ORDER) or profile.get("condition_order") != list(CONDITION_ORDER):
+            errors.append("model_profile_identity")
+        qualification = profile.get("source_qualification")
+        if not isinstance(qualification, Mapping):
+            errors.append("source_qualification")
+        else:
+            mask = qualification.get("eligible_source_mask")
+            if not isinstance(mask, list) or len(mask) != expected_layers or not all(isinstance(item, bool) for item in mask):
+                errors.append("source_qualification_mask")
+            if qualification.get("source_coverage_evaluable") not in {True, False}:
+                errors.append("source_qualification_coverage")
+        matrices = profile.get("matrices")
+        if not isinstance(matrices, dict) or set(matrices) != required_matrices:
             errors.append("model_profile_matrices")
+        else:
+            for matrix_name in sorted(required_matrices):
+                _validate_serialized_matrix(matrices[matrix_name], expected_layers=expected_layers, matrix_name=matrix_name, errors=errors)
+        if not isinstance(profile.get("point"), Mapping) or not isinstance(profile.get("support"), Mapping):
+            errors.append("model_profile_summaries")
+        elif qualification and qualification.get("source_coverage_evaluable") is False:
+            if profile.get("confirmatory_status") != "NOT_EVALUABLE_SOURCE_COVERAGE":
+                errors.append("coverage_not_evaluable_status")
+            if set(profile["support"].values()) != {"NOT_EVALUABLE"}:
+                errors.append("coverage_not_evaluable_support")
+        bootstrap = profile.get("bootstrap")
+        if qualification and qualification.get("source_coverage_evaluable") is True:
+            if not isinstance(bootstrap, Mapping) or bootstrap.get("replicates", 0) <= 0:
+                errors.append("bootstrap")
+            elif any(not isinstance(bootstrap.get(name), list) or len(bootstrap[name]) != 2 for name in ("distance_association_ci", "sdi_ci", "low_d_recovery_ci")):
+                errors.append("bootstrap_ci")
     if "raw_hidden_tensors" in payload:
         errors.append("raw_hidden_tensors_forbidden")
     return errors
 
 
 def validate_synthetic_result_schema(payload: Mapping[str, Any]) -> list[str]:
-    errors = []
-    if payload.get("schema_version") != RESULT_SCHEMA_VERSION:
-        errors.append("schema_version")
-    if payload.get("classification") != "EXP026_SCIENTIFIC_RESULT":
-        errors.append("classification")
-    if payload.get("experiment") != EXPERIMENT:
-        errors.append("experiment")
-    if set(payload.get("model_profiles", {})) != {"A", "B"}:
-        errors.append("synthetic_model_profiles")
-    for key, profile in payload.get("model_profiles", {}).items():
-        expected_layers = 4 if key == "A" else 3
-        if profile.get("num_layers") != expected_layers:
-            errors.append("synthetic_model_profile_num_layers")
-        if not isinstance(profile.get("matrices"), dict):
-            errors.append("synthetic_model_profile_matrices")
-    return errors
+    synthetic_models = {
+        "A": {"num_hidden_layers": 4, "model_id": "synthetic-A", "model_revision": "synthetic"},
+        "B": {"num_hidden_layers": 3, "model_id": "synthetic-B", "model_revision": "synthetic"},
+    }
+    return validate_result_schema(payload, expected_models=synthetic_models)
 
 
 def _load_design_config(root: Path = ROOT) -> dict[str, Any]:
@@ -1121,10 +1255,12 @@ def _load_design_config(root: Path = ROOT) -> dict[str, Any]:
 
 
 def verify_no_authorization_contamination(root: Path = ROOT) -> None:
-    if FORMAL_AUTHORIZATION_PATH.exists():
+    authorization_path = _root_relative_path(root, FORMAL_AUTHORIZATION_PATH)
+    consumption_dir = _root_relative_path(root, AUTHORIZATION_CONSUMPTION_DIR)
+    if authorization_path.exists():
         raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_UNEXPECTED")
-    if AUTHORIZATION_CONSUMPTION_DIR.exists():
-        children = list(AUTHORIZATION_CONSUMPTION_DIR.glob("*.json"))
+    if consumption_dir.exists():
+        children = list(consumption_dir.glob("*.json"))
         if children:
             raise ProtocolIntegrityError("AUTHORIZATION_CONSUMPTION_UNEXPECTED")
 
@@ -1136,6 +1272,78 @@ def _authorization_path_for(root: Path, authorization_file: str | None) -> Path 
             path = root / path
         return path
     return None
+
+
+def _inherited_authority_binding(root: Path) -> dict[str, dict[str, str]]:
+    """Return the frozen data/panel identifiers declared by the authority."""
+    config = _load_design_config(root)
+    inherited = config.get("inherited_authorities", {})
+    required = ("condition_panel", "data_schema", "dataset", "exp024_preregistration", "frozen_manifest")
+    result = {}
+    for key in required:
+        path = inherited.get(f"{key}_path")
+        digest = inherited.get(f"{key}_sha256")
+        if not isinstance(path, str) or not _valid_sha256(digest):
+            raise ProtocolIntegrityError("FROZEN_INHERITED_AUTHORITY_INVALID")
+        result[key] = {"path": path.replace("\\", "/"), "sha256": digest}
+    return result
+
+
+def verify_inherited_authorities(root: Path = ROOT) -> dict[str, dict[str, str]]:
+    """Verify the frozen data/panel authority bytes only within formal mode."""
+    binding = _inherited_authority_binding(root)
+    for key, entry in binding.items():
+        path = root / Path(entry["path"])
+        if not path.is_file() or sha256_file(path) != entry["sha256"]:
+            raise ProtocolIntegrityError(f"INHERITED_AUTHORITY_HASH_MISMATCH_{key}")
+    return binding
+
+
+def formal_execution_binding(root: Path = ROOT) -> dict[str, Any]:
+    """Identity every non-scientific authority a formal authorization must bind."""
+    authorities = verify_frozen_design(root)
+    config = _load_design_config(root)
+    panel = config.get("panel", {})
+    partition_identity = {
+        "allocation": panel.get("allocation"),
+        "condition_order": panel.get("condition_order"),
+        "semantic_classes": panel.get("semantic_classes"),
+        "source_family_count": panel.get("source_family_count"),
+        "record_count": panel.get("record_count"),
+    }
+    return {
+        "repository_commit": _repository_commit(root),
+        "runner_sha256": sha256_file(Path(__file__)),
+        "frozen_authority_hashes": authorities,
+        "inherited_authorities": _inherited_authority_binding(root),
+        "panel_identity_sha256": _canonical_json_sha256(panel),
+        "partition_identity_sha256": _canonical_json_sha256(partition_identity),
+        "models": {
+            key: {"model_id": MODEL_REGISTRY[key]["model_id"], "model_revision": MODEL_REGISTRY[key]["model_revision"]}
+            for key in MODEL_KEYS
+        },
+        "readiness": "READY",
+    }
+
+
+def _qualification_binding(root: Path) -> dict[str, str]:
+    bindings = {
+        "engineering_qualification": _root_relative_path(root, ENGINEERING_QUALIFICATION_PATH),
+        "formal_pipeline_qualification": _root_relative_path(root, FORMAL_PIPELINE_QUALIFICATION_PATH),
+    }
+    result = {}
+    for key, path in bindings.items():
+        if not path.is_file():
+            raise ProtocolIntegrityError(f"FORMAL_AUTHORIZATION_QUALIFICATION_MISSING_{key}")
+        artifact = read_json(path)
+        if (
+            artifact.get("status") != "PASS"
+            or artifact.get("runner_sha256") != sha256_file(Path(__file__))
+            or artifact.get("authority_hashes") != verify_frozen_design(root)
+        ):
+            raise ProtocolIntegrityError(f"FORMAL_AUTHORIZATION_QUALIFICATION_INVALID_{key}")
+        result[key] = sha256_file(path)
+    return result
 
 
 def validate_formal_authorization(root: Path, authorization_path: Path) -> tuple[dict[str, Any], str]:
@@ -1154,25 +1362,37 @@ def validate_formal_authorization(root: Path, authorization_path: Path) -> tuple
         raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_EXECUTION_COUNT_INVALID")
     if auth.get("formal_mode") != "--formal-run":
         raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_MODE_INVALID")
-    for key in MODEL_KEYS:
-        spec = MODEL_REGISTRY[key]
-        model_auth = auth.get("models", {}).get(key, {})
-        if model_auth.get("model_id") != spec["model_id"]:
-            raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_MODEL_ID_MISMATCH")
-        if model_auth.get("model_revision") != spec["model_revision"]:
-            raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_MODEL_REVISION_MISMATCH")
-    runner_sha = sha256_file(Path(__file__))
-    if auth.get("runner_sha256") != runner_sha:
-        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_RUNNER_SHA_MISMATCH")
+    current = formal_execution_binding(root)
+    required_fields = {
+        "repository_commit", "runner_sha256", "frozen_authority_hashes", "inherited_authorities",
+        "panel_identity_sha256", "partition_identity_sha256", "models", "readiness",
+    }
+    bound = auth.get("execution_binding")
+    if not isinstance(bound, Mapping) or set(bound) != required_fields:
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_BINDING_SCHEMA_INVALID")
+    for key in required_fields:
+        if bound.get(key) != current[key]:
+            raise ProtocolIntegrityError(f"FORMAL_AUTHORIZATION_BINDING_MISMATCH_{key}")
+    qualifications = auth.get("qualification_hashes")
+    if qualifications != _qualification_binding(root):
+        raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_QUALIFICATION_HASH_MISMATCH")
     return auth, sha256_file(authorization_path)
 
 
-def consume_authorization(root: Path, authorization_path: Path, authorization: Mapping[str, Any], authorization_sha: str, run_attempt_id: str | None = None) -> tuple[dict[str, Any], str]:
+def consume_authorization(
+    root: Path,
+    authorization_path: Path,
+    authorization: Mapping[str, Any],
+    authorization_sha: str,
+    run_attempt_id: str | None = None,
+    consumption_dir: Path | None = None,
+) -> tuple[dict[str, Any], str]:
     authorization_id = str(authorization.get("authorization_id", ""))
     if not authorization_id:
         raise ProtocolIntegrityError("FORMAL_AUTHORIZATION_ID_MISSING")
     run_attempt_id = run_attempt_id or uuid.uuid4().hex
-    consumption_path = AUTHORIZATION_CONSUMPTION_DIR / f"{authorization_id}.json"
+    consumption_dir = consumption_dir or _root_relative_path(root, AUTHORIZATION_CONSUMPTION_DIR)
+    consumption_path = consumption_dir / f"{authorization_id}.json"
     record = {
         "schema_version": "1.0.0",
         "classification": "AUTHORIZATION_CONSUMPTION",
@@ -1182,6 +1402,7 @@ def consume_authorization(root: Path, authorization_path: Path, authorization: M
         "run_attempt_id": run_attempt_id,
         "repository_commit": _repository_commit(root),
         "runner_sha256": sha256_file(Path(__file__)),
+        "authority_hashes": verify_frozen_design(root),
         "authorization_path": str(authorization_path),
         "consumption_record_path": str(consumption_path),
     }
@@ -1229,6 +1450,119 @@ def _resource_snapshot() -> dict[str, Any]:
         "cuda_available": torch.cuda.is_available(),
         "torch_version": torch.__version__,
     }
+
+
+def _validate_formal_records(records: Any) -> list[Mapping[str, Any]]:
+    """Validate the inherited panel only after formal authorization is consumed."""
+    if not isinstance(records, list):
+        raise ProtocolIntegrityError("FORMAL_DATASET_TOP_LEVEL_NOT_ARRAY")
+    required = {"record_id", "source_family_id", "semantic_class", "condition_id", "partition", "record_role", "text"}
+    seen_ids: set[str] = set()
+    families: dict[str, list[Mapping[str, Any]]] = {}
+    cells: dict[tuple[str, str, str], set[str]] = {}
+    partitions: dict[str, set[str]] = {partition: set() for partition in PARTITIONS}
+    for record in records:
+        if not isinstance(record, Mapping) or required - set(record):
+            raise ProtocolIntegrityError("FORMAL_DATASET_RECORD_SCHEMA_INVALID")
+        record_id = str(record["record_id"])
+        if not record_id or record_id in seen_ids:
+            raise ProtocolIntegrityError("FORMAL_DATASET_RECORD_ID_INVALID")
+        seen_ids.add(record_id)
+        if record["semantic_class"] not in CLASS_UNIVERSE or record["condition_id"] not in CONDITION_UNIVERSE or record["partition"] not in PARTITIONS:
+            raise ProtocolIntegrityError("FORMAL_DATASET_METADATA_INVALID")
+        if not isinstance(record["text"], str) or not record["text"].strip():
+            raise ProtocolIntegrityError("FORMAL_DATASET_TEXT_INVALID")
+        family = str(record["source_family_id"])
+        if not family:
+            raise ProtocolIntegrityError("FORMAL_DATASET_FAMILY_INVALID")
+        families.setdefault(family, []).append(record)
+        partitions[record["partition"]].add(family)
+        cells.setdefault((record["condition_id"], record["partition"], record["semantic_class"]), set()).add(family)
+    if len(records) != 1760 or len(families) != 880:
+        raise ProtocolIntegrityError("FORMAL_DATASET_SIZE_INVALID")
+    for family, rows in families.items():
+        if len(rows) != 2 or {str(row["record_role"]) for row in rows} != {"reference_form", "condition_realization"}:
+            raise ProtocolIntegrityError("FORMAL_DATASET_FAMILY_ROLE_INVALID")
+        first = rows[0]
+        if any(any(row[field] != first[field] for field in ("semantic_class", "condition_id", "partition")) for row in rows[1:]):
+            raise ProtocolIntegrityError("FORMAL_DATASET_FAMILY_METADATA_INCONSISTENT")
+    if partitions["FIT"] & partitions["DIAGNOSTIC"] or partitions["FIT"] & partitions["EVAL"] or partitions["DIAGNOSTIC"] & partitions["EVAL"]:
+        raise ProtocolIntegrityError("FORMAL_DATASET_PARTITION_FAMILY_OVERLAP")
+    for condition in CONDITION_ORDER:
+        for partition in PARTITIONS:
+            for semantic_class in CLASS_ORDER:
+                if len(cells.get((condition, partition, semantic_class), set())) != ALLOCATION[partition]:
+                    raise ProtocolIntegrityError("FORMAL_DATASET_CELL_ALLOCATION_INVALID")
+    return records
+
+
+def load_production_observations(root: Path = ROOT) -> dict[str, list[ExtractedObservation]]:
+    """Extract all-block vectors from the inherited panel during formal mode only."""
+    config = _load_design_config(root)
+    dataset = verify_inherited_authorities(root)["dataset"]
+    dataset_path = root / Path(dataset["path"])
+    if sha256_file(dataset_path) != dataset["sha256"]:
+        raise ProtocolIntegrityError("FORMAL_DATASET_HASH_MISMATCH")
+    records = _validate_formal_records(read_json(dataset_path))
+    observations: dict[str, list[ExtractedObservation]] = {}
+    for model_key in MODEL_KEYS:
+        spec = MODEL_REGISTRY[model_key]
+        tokenizer, model, device, _dtype = load_runtime(model_key)
+        extracted: list[ExtractedObservation] = []
+        for record in records:
+            if record["record_role"] != "condition_realization":
+                continue
+            _input_ids, _attention_mask, vectors = extract_all_layers(tokenizer, model, device, str(record["text"]), spec["num_hidden_layers"])
+            if vectors.shape != (spec["num_hidden_layers"], spec["hidden_size"]):
+                raise TechnicalInvalidError("FORMAL_ALL_LAYER_VECTOR_SHAPE_INVALID")
+            extracted.append(ExtractedObservation(
+                record_id=str(record["record_id"]), partition=str(record["partition"]),
+                condition_id=str(record["condition_id"]), semantic_class=str(record["semantic_class"]),
+                source_family_id=str(record["source_family_id"]), vectors=vectors,
+            ))
+        observations[model_key] = extracted
+        del model
+    return observations
+
+
+def execute_scientific_executor(
+    *,
+    root: Path,
+    observations_by_model: Mapping[str, Sequence[ExtractedObservation]],
+    model_registry: Mapping[str, Mapping[str, Any]],
+    result_path: Path,
+    authorization_identity: Mapping[str, Any],
+    bootstrap_replicates: int,
+) -> dict[str, Any]:
+    """Run the sole production scientific pipeline, then publish once exclusively."""
+    if tuple(model_registry) != tuple(observations_by_model):
+        raise ProtocolIntegrityError("EXECUTOR_MODEL_OBSERVATION_SET_MISMATCH")
+    profiles: dict[str, dict[str, Any]] = {}
+    for offset, model_key in enumerate(model_registry):
+        spec = model_registry[model_key]
+        rng = np.random.default_rng(np.random.PCG64(BOOTSTRAP_SEED + offset))
+        profiles[model_key] = compute_matrix_profile(
+            observations_by_model[model_key],
+            num_layers=int(spec["num_hidden_layers"]),
+            condition_order=CONDITION_ORDER,
+            bootstrap_replicates=bootstrap_replicates,
+            rng=rng,
+        )
+    routing = classify_route(profiles["Q"], profiles["O"]) if set(profiles) == set(MODEL_KEYS) else {"route": "SYNTHETIC_NOT_ROUTED"}
+    payload = build_result_payload(
+        model_profiles=profiles,
+        routing=routing,
+        authorities=verify_frozen_design(root),
+        repository_commit=_repository_commit(root),
+        runner_sha256=sha256_file(Path(__file__)),
+        authorization_identity=authorization_identity,
+        model_registry=model_registry,
+    )
+    errors = validate_result_schema(payload, expected_models=model_registry)
+    if errors:
+        raise ProtocolIntegrityError(f"RESULT_SCHEMA_INVALID_{errors}")
+    result_sha = _publish_result_exclusive(root, result_path, payload)
+    return {"payload": payload, "profiles": profiles, "result_sha256": result_sha, "routing": routing}
 
 def run_static_preflight(root: Path = ROOT) -> dict[str, Any]:
     verify_frozen_design(root)
@@ -1294,6 +1628,7 @@ def run_engineering_qualification(root: Path = ROOT, *, publish: bool = True) ->
         "finished_at_utc": datetime.now(timezone.utc).isoformat(),
         "repository_commit": _repository_commit(root),
         "runner_sha256": sha256_file(Path(__file__)),
+        "authority_hashes": verify_frozen_design(root),
         "models": models,
         "resource": _resource_snapshot(),
         "formal_data_accessed": False,
@@ -1308,15 +1643,17 @@ def _hardcoded_synthetic_observations() -> dict[str, list[ExtractedObservation]]
     observations = {"A": [], "B": []}
     for model_key, layers in (("A", 4), ("B", 3)):
         for partition in PARTITIONS:
-            count = {"FIT": 1, "DIAGNOSTIC": 1, "EVAL": 1}[partition]
-            for cond in ("c01_lexical_relex", "c02_syntactic_restructure"):
+            # Four family clusters per condition/class make every bootstrap
+            # resample a meaningful cluster-level test fixture.
+            count = 4
+            for cond_index, cond in enumerate(CONDITION_ORDER):
                 for cls_index, cls in enumerate(CLASS_ORDER):
                     for family in range(count):
                         vectors = []
                         for layer in range(layers):
                             vec = [
-                                float(cls_index + layer * 0.25 + (0.1 if cond.endswith("restructure") else 0.0)),
-                                float((cls_index % 2) * 1.0 - 0.5),
+                                float(cls_index + layer * 0.25 + cond_index * 0.01 + family * 0.001),
+                                float((cls_index % 2) * 1.0 - 0.5 + family * 0.01),
                             ]
                             vectors.append(np.asarray(vec, dtype=np.float32))
                         observations[model_key].append(
@@ -1335,8 +1672,8 @@ def _hardcoded_synthetic_observations() -> dict[str, list[ExtractedObservation]]
 def _verify_synthetic_expected_values(profile_a: dict[str, Any], profile_b: dict[str, Any]) -> None:
     assert profile_a["num_layers"] == 4
     assert profile_b["num_layers"] == 3
-    assert profile_a["c0_eval"].shape == (4, 4, 2)
-    assert profile_b["c0_eval"].shape == (3, 3, 2)
+    assert profile_a["c0_eval"].shape == (4, 4, 10)
+    assert profile_b["c0_eval"].shape == (3, 3, 10)
     assert np.allclose(np.diagonal(profile_a["d_eval"][:, :, 0]), 0.0)
     assert np.allclose(np.diagonal(profile_b["d_eval"][:, :, 0]), 0.0)
     assert any(profile_a["source_qualification"]["eligible_source_mask"])
@@ -1346,42 +1683,95 @@ def _verify_synthetic_expected_values(profile_a: dict[str, Any], profile_b: dict
     assert "low_d_recovery" in profile_a["point"]
 
 
+def verify_independent_numeric_goldens() -> None:
+    """Check hand-specified arithmetic anchors independent of production output."""
+    known_matrix = np.stack([np.full((2, 2), value, dtype=np.float32) for value in range(10)], axis=2)
+    if not np.array_equal(_condition_pool(known_matrix), np.full((2, 2), 4.5, dtype=np.float32)):
+        raise ProtocolIntegrityError("INDEPENDENT_GOLDEN_CONDITION_POOL_FAILED")
+    known_transform = transform_with_stats(
+        np.array([[3.0, 10.0]], dtype=np.float32),
+        np.array([1.0, 2.0], dtype=np.float32),
+        np.array([2.0, 4.0], dtype=np.float32),
+    )
+    if not np.array_equal(known_transform, np.array([[1.0, 2.0]], dtype=np.float32)):
+        raise ProtocolIntegrityError("INDEPENDENT_GOLDEN_CALIBRATION_FAILED")
+    if balanced_accuracy(list(CLASS_ORDER), ["logic", "causality", "definition", "definition"]) != 0.75:
+        raise ProtocolIntegrityError("INDEPENDENT_GOLDEN_CLASS_MAPPING_FAILED")
+
+
+def _validate_synthetic_authorization(root: Path, authorization_path: Path) -> tuple[dict[str, Any], str]:
+    auth = read_json(authorization_path)
+    if auth.get("classification") != "SYNTHETIC_QUALIFICATION_AUTHORIZATION" or auth.get("single_use") is not True:
+        raise ProtocolIntegrityError("SYNTHETIC_AUTHORIZATION_INVALID")
+    if auth.get("runner_sha256") != sha256_file(Path(__file__)) or auth.get("repository_commit") != _repository_commit(root):
+        raise ProtocolIntegrityError("SYNTHETIC_AUTHORIZATION_BINDING_MISMATCH")
+    return auth, sha256_file(authorization_path)
+
+
+def _run_authorized_executor(
+    *,
+    root: Path,
+    authorization_path: Path,
+    authorization_validator: Callable[[Path, Path], tuple[dict[str, Any], str]],
+    observations_provider: Callable[[], Mapping[str, Sequence[ExtractedObservation]]],
+    model_registry: Mapping[str, Mapping[str, Any]],
+    result_path: Path,
+    bootstrap_replicates: int,
+    consumption_dir: Path | None = None,
+) -> dict[str, Any]:
+    """Shared authorization-consumption -> data -> executor control flow."""
+    authorization, authorization_sha = authorization_validator(root, authorization_path)
+    consumption, consumption_sha = consume_authorization(
+        root, authorization_path, authorization, authorization_sha, consumption_dir=consumption_dir
+    )
+    result = execute_scientific_executor(
+        root=root,
+        observations_by_model=observations_provider(),
+        model_registry=model_registry,
+        result_path=result_path,
+        authorization_identity={
+            "authorization_id": authorization["authorization_id"],
+            "authorization_sha256": authorization_sha,
+            "consumption_record_sha256": consumption_sha,
+            "classification": authorization.get("classification", "FORMAL_AUTHORIZATION"),
+        },
+        bootstrap_replicates=bootstrap_replicates,
+    )
+    result["authorization_consumption"] = consumption
+    return result
+
+
 def run_synthetic_formal_qualification(root: Path = ROOT, *, publish: bool = True) -> dict[str, Any]:
     started = datetime.now(timezone.utc)
     verify_frozen_design(root)
     verify_no_result_collision(root)
     verify_no_authorization_contamination(root)
-    fixtures = _hardcoded_synthetic_observations()
-    rng = np.random.default_rng(np.random.PCG64(BOOTSTRAP_SEED))
-    profiles = {
-        "A": compute_matrix_profile(fixtures["A"], num_layers=4, condition_order=CONDITION_ORDER[:2], bootstrap_replicates=50, rng=rng),
-        "B": compute_matrix_profile(fixtures["B"], num_layers=3, condition_order=CONDITION_ORDER[:2], bootstrap_replicates=50, rng=rng),
-    }
-    _verify_synthetic_expected_values(profiles["A"], profiles["B"])
-    routing = classify_route(profiles["A"], profiles["B"])
-    authorities = verify_frozen_design(root)
-    payload = build_result_payload(
-        model_profiles={"A": profiles["A"], "B": profiles["B"]},
-        routing=routing,
-        authorities=authorities,
-        repository_commit=_repository_commit(root),
-        runner_sha256=sha256_file(Path(__file__)),
-        authorization_identity={
-            "classification": "SYNTHETIC_QUALIFICATION_AUTHORIZATION",
-            "single_use": True,
-            "authorization_id": "EXP026_SYNTHETIC_101C",
-        },
-    )
-    schema_errors = validate_synthetic_result_schema(payload)
-    if schema_errors:
-        raise ProtocolIntegrityError(f"RESULT_SCHEMA_INVALID_{schema_errors}")
     import tempfile
-
+    verify_independent_numeric_goldens()
+    synthetic_models = {
+        "A": {"model_id": "synthetic-A", "model_revision": "synthetic", "num_hidden_layers": 4, "hidden_size": 2},
+        "B": {"model_id": "synthetic-B", "model_revision": "synthetic", "num_hidden_layers": 3, "hidden_size": 2},
+    }
     with tempfile.TemporaryDirectory(prefix="exp026_synthetic_") as tmp:
-        result_path = Path(tmp) / "exp026_synthetic_result.json"
-        result_sha = _publish_result_exclusive(root, result_path, payload)
+        tmp_path = Path(tmp)
+        authorization_path = tmp_path / "synthetic_authorization.json"
+        _atomic_write_json_exclusive(authorization_path, {
+            "classification": "SYNTHETIC_QUALIFICATION_AUTHORIZATION", "single_use": True,
+            "authorization_id": "EXP026_SYNTHETIC_101D_R", "runner_sha256": sha256_file(Path(__file__)),
+            "repository_commit": _repository_commit(root),
+        })
+        result = _run_authorized_executor(
+            root=root, authorization_path=authorization_path, authorization_validator=_validate_synthetic_authorization,
+            observations_provider=_hardcoded_synthetic_observations, model_registry=synthetic_models,
+            result_path=tmp_path / "exp026_synthetic_result.json", bootstrap_replicates=50,
+            consumption_dir=tmp_path / "consumption",
+        )
+        _verify_synthetic_expected_values(result["profiles"]["A"], result["profiles"]["B"])
+        schema_errors = validate_synthetic_result_schema(result["payload"])
+        if schema_errors:
+            raise ProtocolIntegrityError(f"RESULT_SCHEMA_INVALID_{schema_errors}")
         try:
-            _publish_result_exclusive(root, result_path, payload)
+            _publish_result_exclusive(root, tmp_path / "exp026_synthetic_result.json", result["payload"])
             raise ProtocolIntegrityError("PUBLICATION_RACE_NOT_REJECTED")
         except ProtocolIntegrityError:
             pass
@@ -1394,12 +1784,15 @@ def run_synthetic_formal_qualification(root: Path = ROOT, *, publish: bool = Tru
         "finished_at_utc": datetime.now(timezone.utc).isoformat(),
         "repository_commit": _repository_commit(root),
         "runner_sha256": sha256_file(Path(__file__)),
+        "authority_hashes": verify_frozen_design(root),
         "real_executor_connected": True,
         "synthetic_model_layers": {"A": 4, "B": 3},
-        "synthetic_result_sha256": result_sha,
-        "routing": routing,
+        "synthetic_result_sha256": result["result_sha256"],
+        "routing": result["routing"],
         "schema_validation": "PASS",
         "provenance_validation": "PASS",
+        "independent_numeric_goldens": "PASS",
+        "shared_authorized_executor": "PASS",
         "formal_data_accessed": False,
         "scientific_result_created": False,
     }
@@ -1414,9 +1807,15 @@ def run_formal_run(root: Path = ROOT, authorization_file: str | None = None) -> 
     auth_path = _authorization_path_for(root, authorization_file)
     if auth_path is None:
         raise ProtocolIntegrityError("FORMAL_RUN_REQUIRES_AUTHORIZATION")
-    authorization, auth_sha = validate_formal_authorization(root, auth_path)
-    consume_authorization(root, auth_path, authorization, auth_sha)
-    raise ProtocolIntegrityError("FORMAL_RUN_NOT_EXECUTED_IN_101C")
+    return _run_authorized_executor(
+        root=root,
+        authorization_path=auth_path,
+        authorization_validator=validate_formal_authorization,
+        observations_provider=lambda: load_production_observations(root),
+        model_registry={key: MODEL_REGISTRY[key] for key in MODEL_KEYS},
+        result_path=_root_relative_path(root, FORMAL_RESULT_PATH),
+        bootstrap_replicates=BOOTSTRAP_REPLICATES,
+    )
 
 
 def build_parser() -> argparse.ArgumentParser:
