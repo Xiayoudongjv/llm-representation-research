@@ -1,0 +1,76 @@
+{
+  "authority_hashes": {
+    "design_validator": "8bfbbb8f7c106aae4f3bd1c82fe5f1419cb8fe7d4bcc87f624eb04a59e6ee2bf",
+    "frozen_config": "ccf60c8a9dc6f3b9d3cce533910334e1f8ec33665a1cf692b98a8aaf683afb57",
+    "layer_mapping": "04c6565ff366fc04960966fcff148228c5338870756c75375baf976177d6dfb1",
+    "metric_specification": "5f58445e26eee7effddd7cd5b4ae255b7153d61fa7a76b5c0684fa1dbb08d8db",
+    "preregistration": "730175071e315b484e360b6359945f567bfe8edf4f52e6a0893c3f2a7dadf8e1",
+    "routing_rules": "4ff6be135066e1cd0bbcad54ee6c7472d693d35063df8202326b5bd0b4308856"
+  },
+  "classification": "FORMAL_PIPELINE_SYNTHETIC_QUALIFICATION",
+  "deep_schema_validation": "PASS",
+  "engineering_qualification_sha256": "bbce631a27e20762212eb905278b4398c4850485faacd62e865b2f7a286f2e2d",
+  "experiment": "EXP-026",
+  "finished_at_utc": "2026-08-20T13:29:17.629096+00:00",
+  "formal_data_accessed": false,
+  "formal_run_readiness": "READY_FOR_FINAL_R4_VERIFICATION",
+  "independent_numeric_goldens": {
+    "C0": "PASS",
+    "CCAL": "PASS",
+    "D": "PASS",
+    "DBAR": "PASS",
+    "DISTANCE_ASSOCIATION": "PASS",
+    "LOW_D_RECOVERY": "PASS",
+    "NORMALIZED_DEPTH": "PASS",
+    "NORMALIZED_PAIR_DISTANCE": "PASS",
+    "R": "PASS",
+    "RBAR": "PASS",
+    "ROUTING": "PASS",
+    "SDI": "PASS"
+  },
+  "normalized_distance_tie_semantics": {
+    "DISTANCE_RANK_CLASS_GOLDEN": "PASS",
+    "DISTANCE_RHO_TIE_GOLDEN": "PASS",
+    "NORMALIZED_DISTANCE_BOUNDARY_TEST": "PASS",
+    "NORMALIZED_DISTANCE_L16_TIE_TEST": "PASS",
+    "NORMALIZED_DISTANCE_L28_TIE_TEST": "PASS",
+    "NORMALIZED_DISTANCE_L4_TIE_TEST": "PASS",
+    "NORMALIZED_DISTANCE_SYMMETRY_TEST": "PASS",
+    "OLD_FLOAT_SUBTRACTION_SABOTAGE": "PASS",
+    "OLMO_OFFDIAGONAL_DISTANCE_CLASS_COUNT": 15,
+    "QWEN_OFFDIAGONAL_DISTANCE_CLASS_COUNT": 27,
+    "RAW_INDEX_DISTANCE_SEMANTIC_SABOTAGE": "PASS"
+  },
+  "provenance_validation": "PASS",
+  "r3_cross_object_schema_gates": {
+    "COHERENT_TRANSPOSE": "PASS",
+    "COVERAGE_PROFILE": "PASS",
+    "ELIGIBILITY_COUNT": "PASS",
+    "ELIGIBILITY_SPAN": "PASS",
+    "NOT_EVALUABLE_FIELD": "PASS",
+    "ROUTING_PROFILE": "PASS"
+  },
+  "real_executor_connected": true,
+  "repository_commit": "9b454c0ebb2ac2a5a829f268777241615c3b2f9a",
+  "routing": {
+    "conflict_resolution": "NOT_APPLICABLE",
+    "endpoint_evaluability": "SYNTHETIC_NOT_ROUTED",
+    "route": "SYNTHETIC_NOT_ROUTED",
+    "trigger_state": "SYNTHETIC_QUALIFICATION"
+  },
+  "runner_sha256": "6ab29c35889ce35b9d4bc9ee98d2665865a088312940f10815714a574d2060a0",
+  "schema_validation": "PASS",
+  "schema_version": "1.0.0",
+  "scientific_result_created": false,
+  "semantic_adversarial_test_module_sha256": "b3cd6a56853f56a451032ccd2cec8472f72c611a6927b310ccb6a593c621bd50",
+  "shared_authorized_executor": "PASS",
+  "started_at_utc": "2026-08-20T13:29:12.991868+00:00",
+  "status": "PASS",
+  "supersedes": "ea44190d0824bdacca73de58af44a700712a8a30d1f6aab6ea3b8ef92ac62da8",
+  "supersession_reason": "NORMALIZED_DISTANCE_FLOAT_TIE_SPLITTING_REPAIRED_BEFORE_SCIENTIFIC_EXPOSURE",
+  "synthetic_model_layers": {
+    "A": 4,
+    "B": 3
+  },
+  "synthetic_result_sha256": "fa41e047d2fc7e94aceaf7ec3bb30de5896694daac9d86ce7776d9ef93ca86ac"
+}
