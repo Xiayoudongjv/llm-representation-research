@@ -35,7 +35,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 
 EXPERIMENT = "EXP-026"
-RESULT_SCHEMA_VERSION = "1.0.0"
+RESULT_SCHEMA_VERSION = "1.1.0"
 QUALIFICATION_SCHEMA_VERSION = "1.0.0"
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -100,6 +100,28 @@ MODEL_REGISTRY = {
 }
 MODEL_KEYS = ("Q", "O")
 
+RESULT_MODEL_FIELDS = ("model_id", "model_revision", "num_hidden_layers", "hidden_size")
+RESULT_AUTHORIZATION_FIELDS = {
+    "authorization_id",
+    "authorization_sha256",
+    "consumption_record_sha256",
+    "run_attempt_id",
+    "classification",
+    "execution_binding",
+    "qualification_hashes",
+}
+SUPERSEDED_FORMAL_PIPELINE_QUALIFICATION_SHA256 = "8628426f28a9d13fed3c20ba16ed01e4cceb9c4a5b548ad4afebf4dc8c78ff93"
+
+
+def _result_model_identity(model_registry: Mapping[str, Mapping[str, Any]]) -> dict[str, dict[str, Any]]:
+    """Return the frozen, serializable model fields allowed in a result."""
+    result: dict[str, dict[str, Any]] = {}
+    for key, spec in model_registry.items():
+        if not isinstance(spec, Mapping) or any(field not in spec for field in RESULT_MODEL_FIELDS):
+            raise ProtocolIntegrityError("RESULT_MODEL_REGISTRY_INVALID")
+        result[str(key)] = {field: spec[field] for field in RESULT_MODEL_FIELDS}
+    return result
+
 NEUTRAL_QUALIFICATION_INPUTS = (
     "The local snapshot is loaded in offline mode.",
     "A neutral engineering forward pass checks tokenizer and carrier metadata.",
@@ -123,8 +145,8 @@ FORMAL_RESULT_CANDIDATES = (
 ENGINEERING_DIR = EXP_DIR / "engineering"
 # Historical 101C qualification records are preserved.  101D-R writes only
 # versioned, superseding qualification evidence.
-ENGINEERING_QUALIFICATION_PATH = ENGINEERING_DIR / "exp026_runner_qualification_101d_r.json"
-FORMAL_PIPELINE_QUALIFICATION_PATH = ENGINEERING_DIR / "exp026_formal_pipeline_qualification_101d_r.json"
+ENGINEERING_QUALIFICATION_PATH = ENGINEERING_DIR / "exp026_runner_qualification_101d_r2.json"
+FORMAL_PIPELINE_QUALIFICATION_PATH = ENGINEERING_DIR / "exp026_formal_pipeline_qualification_101d_r2.json"
 FORMAL_AUTHORIZATION_PATH = EXP_DIR / "exp026_formal_run_authorization.json"
 AUTHORIZATION_CONSUMPTION_DIR = EXP_DIR / "results" / "authorization_consumption"
 
@@ -388,15 +410,37 @@ def tokenize_neutral(tokenizer: Any, text: str, device: Any):
     return encoded, input_ids, attention_mask
 
 
+def logical_block_carriers(model: Any, num_layers: int) -> list[Any]:
+    """Return exactly the ordered, unnormalized logical transformer blocks."""
+    backbone = getattr(model, "model", None)
+    carriers = getattr(backbone, "layers", None)
+    if carriers is None:
+        raise ProtocolIntegrityError("LOGICAL_CARRIER_LIST_MISSING")
+    blocks = list(carriers)
+    if len(blocks) != num_layers:
+        raise ProtocolIntegrityError("LOGICAL_CARRIER_COUNT_MISMATCH")
+    if len({id(block) for block in blocks}) != num_layers:
+        raise ProtocolIntegrityError("LOGICAL_CARRIER_DUPLICATE")
+    forbidden = {
+        id(value)
+        for value in (getattr(backbone, "embed_tokens", None), getattr(backbone, "norm", None))
+        if value is not None
+    }
+    if any(id(block) in forbidden for block in blocks):
+        raise ProtocolIntegrityError("LOGICAL_CARRIER_NONBLOCK_SUBSTITUTION")
+    return blocks
+
+
 def extract_all_layers(tokenizer: Any, model: Any, device: Any, text: str, num_layers: int) -> tuple[Any, Any, np.ndarray]:
     import torch
 
     _, input_ids, attention_mask = tokenize_neutral(tokenizer, text, device)
+    layers = logical_block_carriers(model, num_layers)
     captures = [ForwardHookCapture() for _ in range(num_layers)]
     handles = []
     with torch.inference_mode():
         for index in range(num_layers):
-            module = model.model.layers[index]
+            module = layers[index]
             handle = module.register_forward_hook(
                 lambda _module, _args, output, cap=captures[index]: cap.record(output)
             )
@@ -458,7 +502,28 @@ def group_by_condition(observations: Sequence[ExtractedObservation], condition_o
 
 
 def classifier_class_mapping(model: Any) -> list[str]:
-    return [str(value) for value in model.classes_]
+    classes = getattr(model, "classes_", None)
+    if classes is None:
+        raise ProtocolIntegrityError("CLASSIFIER_CLASSES_MISSING")
+    mapping = [str(value) for value in classes]
+    if set(mapping) != CLASS_UNIVERSE or len(mapping) != len(CLASS_ORDER):
+        raise ProtocolIntegrityError("CLASSIFIER_CLASSES_INVALID")
+    return mapping
+
+
+def probability_column_index(model: Any, semantic_class: str) -> int:
+    """Resolve a probability column through ``classifier.classes_`` only."""
+    if semantic_class not in CLASS_UNIVERSE:
+        raise ProtocolIntegrityError("PROBABILITY_CLASS_UNKNOWN")
+    return classifier_class_mapping(model).index(semantic_class)
+
+
+def probability_for_class(probabilities: np.ndarray, model: Any, semantic_class: str) -> np.ndarray:
+    """Select a semantic-class probability without assuming a column order."""
+    matrix = np.asarray(probabilities, dtype=np.float32)
+    if matrix.ndim != 2 or matrix.shape[1] != len(classifier_class_mapping(model)):
+        raise ProtocolIntegrityError("PROBABILITY_MATRIX_SHAPE_INVALID")
+    return matrix[:, probability_column_index(model, semantic_class)]
 
 
 def balanced_accuracy(y_true: Sequence[str], y_pred: Sequence[str]) -> float:
@@ -656,6 +721,24 @@ def _compute_c_cal_for_partition(
                 pred = [str(value) for value in model.predict(z)]
                 matrix[source, target, c_index] = balanced_accuracy(y, pred)
     return matrix
+
+
+def delta_from_c0(c0: np.ndarray) -> np.ndarray:
+    """Compute frozen source-self baseline loss D(i,j,c)=C0(i,i,c)-C0(i,j,c)."""
+    matrix = np.asarray(c0, dtype=np.float32)
+    if matrix.ndim != 3 or matrix.shape[0] != matrix.shape[1]:
+        raise ProtocolIntegrityError("DELTA_C0_SHAPE_INVALID")
+    diagonal = np.stack([matrix[index, index, :] for index in range(matrix.shape[0])], axis=0)
+    return (diagonal[:, None, :] - matrix).astype(np.float32)
+
+
+def residual_from_calibration(c_cal: np.ndarray, c0: np.ndarray) -> np.ndarray:
+    """Compute frozen calibrated residual R=Ccal-C0 without implicit reshaping."""
+    calibrated = np.asarray(c_cal, dtype=np.float32)
+    baseline = np.asarray(c0, dtype=np.float32)
+    if calibrated.shape != baseline.shape or calibrated.ndim != 3:
+        raise ProtocolIntegrityError("RESIDUAL_MATRIX_SHAPE_INVALID")
+    return (calibrated - baseline).astype(np.float32)
 
 
 def _source_qualification(observations: Sequence[ExtractedObservation], num_layers: int, models: Sequence[Any], condition_order: Sequence[str]) -> dict[str, Any]:
@@ -894,11 +977,8 @@ def _bootstrap_model_summaries(
             continue
         c0_eval = _compute_c0_for_partition(sample, "EVAL", num_layers, condition_order, models)
         ccal_eval = _compute_c_cal_for_partition(sample, "EVAL", num_layers, condition_order, models, calibration)
-        d_eval = np.zeros_like(c0_eval)
-        for i in range(num_layers):
-            for j in range(num_layers):
-                d_eval[i, j, :] = c0_eval[i, i, :] - c0_eval[i, j, :]
-        r_eval = ccal_eval - c0_eval
+        d_eval = delta_from_c0(c0_eval)
+        r_eval = residual_from_calibration(ccal_eval, c0_eval)
         dbar = _condition_pool(d_eval)
         rbar = _condition_pool(r_eval)
         point = _summarize_point_profile(dbar, rbar, eligible_mask, num_layers, diag_dbar)
@@ -937,13 +1017,9 @@ def compute_matrix_profile(
     c0_eval = _compute_c0_for_partition(observations, "EVAL", num_layers, condition_order, models)
     c0_diag = _compute_c0_for_partition(observations, "DIAGNOSTIC", num_layers, condition_order, models)
     ccal_eval = _compute_c_cal_for_partition(observations, "EVAL", num_layers, condition_order, models, calibration)
-    d_eval = np.zeros_like(c0_eval)
-    d_diag = np.zeros_like(c0_diag)
-    for i in range(num_layers):
-        for j in range(num_layers):
-            d_eval[i, j, :] = c0_eval[i, i, :] - c0_eval[i, j, :]
-            d_diag[i, j, :] = c0_diag[i, i, :] - c0_diag[i, j, :]
-    r_eval = ccal_eval - c0_eval
+    d_eval = delta_from_c0(c0_eval)
+    d_diag = delta_from_c0(c0_diag)
+    r_eval = residual_from_calibration(ccal_eval, c0_eval)
     dbar_eval = _condition_pool(d_eval)
     rbar_eval = _condition_pool(r_eval)
     dbar_diag = _condition_pool(d_diag)
@@ -1010,7 +1086,11 @@ def classify_route(q_summary: dict[str, Any], o_summary: dict[str, Any]) -> dict
     if any(not summary.get("source_qualification", {}).get("source_coverage_evaluable", True) for summary in models.values()):
         return {
             "p1": False, "p2": False, "p3": False, "p4": False, "p5": False,
-            "route": "NOT_EVALUABLE", "per_model": {key: {"p1": False, "p2": False, "p4": False} for key in models},
+            "route": "NOT_EVALUABLE",
+            "trigger_state": "SOURCE_COVERAGE_NOT_EVALUABLE",
+            "endpoint_evaluability": "NOT_EVALUABLE",
+            "conflict_resolution": "NOT_APPLICABLE",
+            "per_model": {key: {"p1": False, "p2": False, "p4": False} for key in models},
         }
     per = {}
     for key, summary in models.items():
@@ -1054,6 +1134,9 @@ def classify_route(q_summary: dict[str, Any], o_summary: dict[str, Any]) -> dict
         "p4": p4,
         "p5": not (p1 or p2 or p3 or p4),
         "route": route,
+        "trigger_state": "EVALUABLE_REGISTERED_ENDPOINTS",
+        "endpoint_evaluability": "EVALUABLE",
+        "conflict_resolution": "P3_P1_P2_P4_P5_PRECEDENCE",
         "per_model": per,
     }
 
@@ -1119,15 +1202,26 @@ def build_result_payload(
     model_registry: Mapping[str, Mapping[str, Any]] | None = None,
 ) -> dict[str, Any]:
     model_registry = model_registry or MODEL_REGISTRY
+    model_identity = _result_model_identity(model_registry)
+    if authorization_identity is None:
+        raise ProtocolIntegrityError("RESULT_AUTHORIZATION_IDENTITY_MISSING")
     return {
         "schema_version": RESULT_SCHEMA_VERSION,
         "classification": "EXP026_SCIENTIFIC_RESULT",
         "experiment": EXPERIMENT,
         "repository_commit": repository_commit,
         "runner_sha256": runner_sha256,
-        "authority_hashes": authorities,
-        "authorization_identity": authorization_identity,
-        "models": {key: model_registry[key] for key in model_profiles},
+        "authority_hashes": dict(authorities),
+        "provenance": {
+            "repository_commit": repository_commit,
+            "runner_sha256": runner_sha256,
+            "authority_hashes": dict(authorities),
+            "models": model_identity,
+            "execution_status": "COMPLETED",
+            "technical_validity": {"status": "VALID"},
+        },
+        "authorization_identity": dict(authorization_identity),
+        "models": model_identity,
         "routing": routing,
         "model_profiles": {key: _serialize_profile(model_profiles[key], key) for key in model_profiles},
         "created_at_utc": datetime.now(timezone.utc).isoformat(),
@@ -1144,10 +1238,10 @@ def _validate_serialized_matrix(
     expected_layers: int,
     matrix_name: str,
     errors: list[str],
-) -> None:
+) -> np.ndarray | None:
     if not isinstance(value, Mapping):
         errors.append(f"matrix_{matrix_name}_object")
-        return
+        return None
     expected_shape = [expected_layers, expected_layers]
     if matrix_name in {"c0_eval", "d_eval", "c_cal_eval", "r_eval"}:
         expected_shape.append(len(CONDITION_ORDER))
@@ -1168,14 +1262,92 @@ def _validate_serialized_matrix(
         matrix = np.asarray(value.get("values"), dtype=float)
         if list(matrix.shape) != expected_shape or not np.isfinite(matrix).all():
             errors.append(f"matrix_{matrix_name}_values")
+            return None
+        return matrix.astype(np.float32)
     except (TypeError, ValueError):
         errors.append(f"matrix_{matrix_name}_values")
+        return None
+
+
+def _validate_authorization_identity(
+    identity: Any,
+    *,
+    expected_binding: Mapping[str, Any] | None,
+    expected_qualification_hashes: Mapping[str, str] | None,
+    errors: list[str],
+) -> None:
+    if not isinstance(identity, Mapping) or set(identity) != RESULT_AUTHORIZATION_FIELDS:
+        errors.append("authorization_identity")
+        return
+    if not isinstance(identity.get("authorization_id"), str) or not identity["authorization_id"]:
+        errors.append("authorization_id")
+    if not _valid_sha256(identity.get("authorization_sha256")):
+        errors.append("authorization_sha256")
+    if not _valid_sha256(identity.get("consumption_record_sha256")):
+        errors.append("consumption_record_sha256")
+    if not isinstance(identity.get("run_attempt_id"), str) or not identity["run_attempt_id"]:
+        errors.append("run_attempt_identity")
+    if not isinstance(identity.get("classification"), str) or not identity["classification"]:
+        errors.append("authorization_classification")
+    binding = identity.get("execution_binding")
+    if not isinstance(binding, Mapping) or not binding:
+        errors.append("execution_binding")
+    elif expected_binding is not None and dict(binding) != dict(expected_binding):
+        errors.append("execution_binding_mismatch")
+    qualifications = identity.get("qualification_hashes")
+    if not isinstance(qualifications, Mapping) or set(qualifications) != {"engineering_qualification", "formal_pipeline_qualification"} or not all(_valid_sha256(value) for value in qualifications.values()):
+        errors.append("qualification_hashes")
+    elif expected_qualification_hashes is not None and dict(qualifications) != dict(expected_qualification_hashes):
+        errors.append("qualification_hashes_mismatch")
+
+
+def _validate_routing(routing: Any, *, production_models: bool, errors: list[str]) -> None:
+    if not isinstance(routing, Mapping):
+        errors.append("routing")
+        return
+    route = routing.get("route")
+    if not production_models:
+        expected = {
+            "route": "SYNTHETIC_NOT_ROUTED",
+            "trigger_state": "SYNTHETIC_QUALIFICATION",
+            "endpoint_evaluability": "SYNTHETIC_NOT_ROUTED",
+            "conflict_resolution": "NOT_APPLICABLE",
+        }
+        if any(routing.get(key) != value for key, value in expected.items()):
+            errors.append("routing_synthetic")
+        return
+    required = {"p1", "p2", "p3", "p4", "p5", "route", "trigger_state", "endpoint_evaluability", "conflict_resolution", "per_model"}
+    if set(routing) != required:
+        errors.append("routing_schema")
+        return
+    flags = {key: routing[key] for key in ("p1", "p2", "p3", "p4", "p5")}
+    if not all(isinstance(value, bool) for value in flags.values()):
+        errors.append("routing_flags")
+        return
+    per_model = routing.get("per_model")
+    if not isinstance(per_model, Mapping) or set(per_model) != set(MODEL_KEYS) or any(
+        not isinstance(per_model.get(key), Mapping) or set(per_model[key]) != {"p1", "p2", "p4"}
+        or not all(isinstance(value, bool) for value in per_model[key].values())
+        for key in MODEL_KEYS
+    ):
+        errors.append("routing_per_model")
+    if route == "NOT_EVALUABLE":
+        if any(flags.values()) or routing.get("trigger_state") != "SOURCE_COVERAGE_NOT_EVALUABLE" or routing.get("endpoint_evaluability") != "NOT_EVALUABLE" or routing.get("conflict_resolution") != "NOT_APPLICABLE":
+            errors.append("routing_not_evaluable")
+        return
+    expected_route = "P3" if flags["p3"] else "P1" if flags["p1"] else "P2" if flags["p2"] else "P4" if flags["p4"] else "P5"
+    if route != expected_route or flags["p5"] != (not any(flags[key] for key in ("p1", "p2", "p3", "p4"))):
+        errors.append("routing_route")
+    if routing.get("trigger_state") != "EVALUABLE_REGISTERED_ENDPOINTS" or routing.get("endpoint_evaluability") != "EVALUABLE" or routing.get("conflict_resolution") != "P3_P1_P2_P4_P5_PRECEDENCE":
+        errors.append("routing_metadata")
 
 
 def validate_result_schema(
     payload: Mapping[str, Any],
     *,
     expected_models: Mapping[str, Mapping[str, Any]] | None = None,
+    expected_binding: Mapping[str, Any] | None = None,
+    expected_qualification_hashes: Mapping[str, str] | None = None,
 ) -> list[str]:
     expected_models = expected_models or {key: MODEL_REGISTRY[key] for key in MODEL_KEYS}
     errors = []
@@ -1185,16 +1357,30 @@ def validate_result_schema(
         errors.append("classification")
     if payload.get("experiment") != EXPERIMENT:
         errors.append("experiment")
-    if not _valid_sha256(payload.get("runner_sha256")):
+    if payload.get("runner_sha256") != sha256_file(Path(__file__)):
         errors.append("runner_sha256")
-    if not isinstance(payload.get("repository_commit"), str) or len(payload["repository_commit"]) != 40:
+    if payload.get("repository_commit") != _repository_commit(ROOT):
         errors.append("repository_commit")
-    if not isinstance(payload.get("authority_hashes"), dict) or set(payload.get("authority_hashes", {})) != set(EXPECTED_DESIGN_HASHES):
+    if payload.get("authority_hashes") != EXPECTED_DESIGN_HASHES:
         errors.append("authority_hashes")
-    if not isinstance(payload.get("authorization_identity"), Mapping):
-        errors.append("authorization_identity")
-    if not isinstance(payload.get("models"), Mapping) or set(payload.get("models", {})) != set(expected_models):
+    expected_model_identity = _result_model_identity(expected_models)
+    if payload.get("models") != expected_model_identity:
         errors.append("models")
+    provenance = payload.get("provenance")
+    expected_provenance = {
+        "repository_commit": payload.get("repository_commit"),
+        "runner_sha256": payload.get("runner_sha256"),
+        "authority_hashes": payload.get("authority_hashes"),
+        "models": payload.get("models"),
+        "execution_status": "COMPLETED",
+        "technical_validity": {"status": "VALID"},
+    }
+    if not isinstance(provenance, Mapping) or dict(provenance) != expected_provenance:
+        errors.append("provenance")
+    _validate_authorization_identity(
+        payload.get("authorization_identity"), expected_binding=expected_binding,
+        expected_qualification_hashes=expected_qualification_hashes, errors=errors,
+    )
     if not isinstance(payload.get("model_profiles"), dict) or set(payload.get("model_profiles", {})) != set(expected_models):
         errors.append("model_profiles")
     required_matrices = {"c0_eval", "d_eval", "c_cal_eval", "r_eval", "dbar_eval", "rbar_eval", "dbar_diag"}
@@ -1218,11 +1404,26 @@ def validate_result_schema(
             if qualification.get("source_coverage_evaluable") not in {True, False}:
                 errors.append("source_qualification_coverage")
         matrices = profile.get("matrices")
+        parsed: dict[str, np.ndarray] = {}
         if not isinstance(matrices, dict) or set(matrices) != required_matrices:
             errors.append("model_profile_matrices")
         else:
             for matrix_name in sorted(required_matrices):
-                _validate_serialized_matrix(matrices[matrix_name], expected_layers=expected_layers, matrix_name=matrix_name, errors=errors)
+                matrix = _validate_serialized_matrix(matrices[matrix_name], expected_layers=expected_layers, matrix_name=matrix_name, errors=errors)
+                if matrix is not None:
+                    parsed[matrix_name] = matrix
+                if qualification and isinstance(matrices[matrix_name], Mapping) and matrices[matrix_name].get("eligible_source_mask") != qualification.get("eligible_source_mask"):
+                    errors.append(f"matrix_{matrix_name}_eligibility_mismatch")
+        if {"c0_eval", "d_eval", "c_cal_eval", "r_eval", "dbar_eval", "rbar_eval"} <= set(parsed):
+            c0, delta, calibrated, residual = (parsed[name] for name in ("c0_eval", "d_eval", "c_cal_eval", "r_eval"))
+            if not np.allclose(delta, delta_from_c0(c0), atol=1e-6):
+                errors.append("matrix_delta_semantics")
+            if not np.allclose(residual, residual_from_calibration(calibrated, c0), atol=1e-6):
+                errors.append("matrix_residual_semantics")
+            if not np.allclose(parsed["dbar_eval"], _condition_pool(delta), atol=1e-6):
+                errors.append("matrix_dbar_semantics")
+            if not np.allclose(parsed["rbar_eval"], _condition_pool(residual), atol=1e-6):
+                errors.append("matrix_rbar_semantics")
         if not isinstance(profile.get("point"), Mapping) or not isinstance(profile.get("support"), Mapping):
             errors.append("model_profile_summaries")
         elif qualification and qualification.get("source_coverage_evaluable") is False:
@@ -1236,17 +1437,42 @@ def validate_result_schema(
                 errors.append("bootstrap")
             elif any(not isinstance(bootstrap.get(name), list) or len(bootstrap[name]) != 2 for name in ("distance_association_ci", "sdi_ci", "low_d_recovery_ci")):
                 errors.append("bootstrap_ci")
+    _validate_routing(payload.get("routing"), production_models=set(expected_models) == set(MODEL_KEYS), errors=errors)
     if "raw_hidden_tensors" in payload:
         errors.append("raw_hidden_tensors_forbidden")
     return errors
 
 
-def validate_synthetic_result_schema(payload: Mapping[str, Any]) -> list[str]:
-    synthetic_models = {
-        "A": {"num_hidden_layers": 4, "model_id": "synthetic-A", "model_revision": "synthetic"},
-        "B": {"num_hidden_layers": 3, "model_id": "synthetic-B", "model_revision": "synthetic"},
+def _synthetic_execution_binding(root: Path, model_registry: Mapping[str, Mapping[str, Any]]) -> dict[str, Any]:
+    return {
+        "repository_commit": _repository_commit(root),
+        "runner_sha256": sha256_file(Path(__file__)),
+        "frozen_authority_hashes": verify_frozen_design(root),
+        "models": _result_model_identity(model_registry),
+        "dataset_identity_sha256": sha256_string("EXP026_SYNTHETIC_FIXED_OBSERVATIONS_V2"),
+        "panel_identity_sha256": sha256_string("EXP026_SYNTHETIC_TEN_CONDITION_PANEL_V2"),
+        "partition_identity_sha256": sha256_string("FIT_DIAGNOSTIC_EVAL_SYNTHETIC_V2"),
     }
-    return validate_result_schema(payload, expected_models=synthetic_models)
+
+
+def _synthetic_qualification_hashes() -> dict[str, str]:
+    return {
+        "engineering_qualification": sha256_string("EXP026_SYNTHETIC_ENGINEERING_QUALIFICATION_V2"),
+        "formal_pipeline_qualification": sha256_string("EXP026_SYNTHETIC_FORMAL_PIPELINE_QUALIFICATION_V2"),
+    }
+
+
+def validate_synthetic_result_schema(payload: Mapping[str, Any], root: Path = ROOT) -> list[str]:
+    synthetic_models = {
+        "A": {"num_hidden_layers": 4, "model_id": "synthetic-A", "model_revision": "synthetic", "hidden_size": 2},
+        "B": {"num_hidden_layers": 3, "model_id": "synthetic-B", "model_revision": "synthetic", "hidden_size": 2},
+    }
+    return validate_result_schema(
+        payload,
+        expected_models=synthetic_models,
+        expected_binding=_synthetic_execution_binding(root, synthetic_models),
+        expected_qualification_hashes=_synthetic_qualification_hashes(),
+    )
 
 
 def _load_design_config(root: Path = ROOT) -> dict[str, Any]:
@@ -1548,7 +1774,12 @@ def execute_scientific_executor(
             bootstrap_replicates=bootstrap_replicates,
             rng=rng,
         )
-    routing = classify_route(profiles["Q"], profiles["O"]) if set(profiles) == set(MODEL_KEYS) else {"route": "SYNTHETIC_NOT_ROUTED"}
+    routing = classify_route(profiles["Q"], profiles["O"]) if set(profiles) == set(MODEL_KEYS) else {
+        "route": "SYNTHETIC_NOT_ROUTED",
+        "trigger_state": "SYNTHETIC_QUALIFICATION",
+        "endpoint_evaluability": "SYNTHETIC_NOT_ROUTED",
+        "conflict_resolution": "NOT_APPLICABLE",
+    }
     payload = build_result_payload(
         model_profiles=profiles,
         routing=routing,
@@ -1558,7 +1789,12 @@ def execute_scientific_executor(
         authorization_identity=authorization_identity,
         model_registry=model_registry,
     )
-    errors = validate_result_schema(payload, expected_models=model_registry)
+    errors = validate_result_schema(
+        payload,
+        expected_models=model_registry,
+        expected_binding=authorization_identity.get("execution_binding"),
+        expected_qualification_hashes=authorization_identity.get("qualification_hashes"),
+    )
     if errors:
         raise ProtocolIntegrityError(f"RESULT_SCHEMA_INVALID_{errors}")
     result_sha = _publish_result_exclusive(root, result_path, payload)
@@ -1683,11 +1919,45 @@ def _verify_synthetic_expected_values(profile_a: dict[str, Any], profile_b: dict
     assert "low_d_recovery" in profile_a["point"]
 
 
-def verify_independent_numeric_goldens() -> None:
-    """Check hand-specified arithmetic anchors independent of production output."""
-    known_matrix = np.stack([np.full((2, 2), value, dtype=np.float32) for value in range(10)], axis=2)
-    if not np.array_equal(_condition_pool(known_matrix), np.full((2, 2), 4.5, dtype=np.float32)):
-        raise ProtocolIntegrityError("INDEPENDENT_GOLDEN_CONDITION_POOL_FAILED")
+def verify_independent_numeric_goldens() -> dict[str, str]:
+    """Check hand-specified asymmetric numeric anchors against production primitives.
+
+    Every expected value below is declared independently of the helper under
+    test.  The fixture has ten distinguishable conditions, asymmetric source /
+    target cells, unequal self baselines, and tied layer distances.
+    """
+    c0 = np.array(
+        [
+            [[1.0] * 10, [0.50 if index % 2 == 0 else 0.25 for index in range(10)]],
+            [[0.25 if index % 2 == 0 else 0.50 for index in range(10)], [0.75] * 10],
+        ],
+        dtype=np.float32,
+    )
+    expected_d = np.array(
+        [
+            [[0.0] * 10, [0.50 if index % 2 == 0 else 0.75 for index in range(10)]],
+            [[0.50 if index % 2 == 0 else 0.25 for index in range(10)], [0.0] * 10],
+        ],
+        dtype=np.float32,
+    )
+    expected_r = np.array(
+        [
+            [[0.10] * 10, [-0.10 if index % 2 == 0 else 0.20 for index in range(10)]],
+            [[0.30] * 10, [-0.20] * 10],
+        ],
+        dtype=np.float32,
+    )
+    c_cal = c0 + expected_r
+    if not np.allclose(delta_from_c0(c0), expected_d, atol=1e-7):
+        raise ProtocolIntegrityError("INDEPENDENT_GOLDEN_D_FAILED")
+    if not np.allclose(residual_from_calibration(c_cal, c0), expected_r, atol=1e-7):
+        raise ProtocolIntegrityError("INDEPENDENT_GOLDEN_R_FAILED")
+    expected_dbar = np.array([[0.0, 0.625], [0.375, 0.0]], dtype=np.float32)
+    expected_rbar = np.array([[0.10, 0.05], [0.30, -0.20]], dtype=np.float32)
+    if not np.allclose(_condition_pool(expected_d), expected_dbar, atol=1e-7):
+        raise ProtocolIntegrityError("INDEPENDENT_GOLDEN_DBAR_FAILED")
+    if not np.allclose(_condition_pool(expected_r), expected_rbar, atol=1e-7):
+        raise ProtocolIntegrityError("INDEPENDENT_GOLDEN_RBAR_FAILED")
     known_transform = transform_with_stats(
         np.array([[3.0, 10.0]], dtype=np.float32),
         np.array([1.0, 2.0], dtype=np.float32),
@@ -1697,6 +1967,38 @@ def verify_independent_numeric_goldens() -> None:
         raise ProtocolIntegrityError("INDEPENDENT_GOLDEN_CALIBRATION_FAILED")
     if balanced_accuracy(list(CLASS_ORDER), ["logic", "causality", "definition", "definition"]) != 0.75:
         raise ProtocolIntegrityError("INDEPENDENT_GOLDEN_CLASS_MAPPING_FAILED")
+    distance_dbar = np.array([[0.0, 1.0, 2.0], [4.0, 0.0, 1.0], [4.0, 3.0, 0.0]], dtype=np.float32)
+    if not math.isclose(_distance_association_point(distance_dbar, [True, True, True], 3), 1.5 / math.sqrt(22.0), abs_tol=1e-7):
+        raise ProtocolIntegrityError("INDEPENDENT_GOLDEN_DISTANCE_ASSOCIATION_FAILED")
+    sdi = _sdi_point(distance_dbar, [True, True, True], 3)
+    if not (
+        math.isclose(sdi["source_variance"], 2.0 / 3.0, abs_tol=1e-7)
+        and math.isclose(sdi["target_variance"], 7.0 / 6.0, abs_tol=1e-7)
+        and math.isclose(sdi["sdi"], -3.0 / 11.0, abs_tol=1e-7)
+    ):
+        raise ProtocolIntegrityError("INDEPENDENT_GOLDEN_SDI_FAILED")
+    diag_dbar = np.array([[0.0, -1.0, 0.5], [-0.1, 0.0, 1.0], [0.2, -0.5, 0.0]], dtype=np.float32)
+    rbar = np.array([[0.0, 0.25, 99.0], [0.0, 0.0, 0.0], [0.0, -0.50, 0.0]], dtype=np.float32)
+    point = _summarize_point_profile(distance_dbar, rbar, [True, False, True], 3, diag_dbar)
+    low_d = point["low_d_recovery"]
+    if low_d.get("pairs") != [(0, 1), (2, 1)] or low_d.get("eligible_pair_count") != 2 or not math.isclose(low_d.get("mean_recovery"), -0.125, abs_tol=1e-7) or not math.isclose(low_d.get("positive_recovery_fraction"), 0.5, abs_tol=1e-7):
+        raise ProtocolIntegrityError("INDEPENDENT_GOLDEN_LOW_D_RECOVERY_FAILED")
+    route_summary = {
+        "source_qualification": {"source_coverage_evaluable": True},
+        "point": {"localization": {"localization": 0.0, "boundaries": []}, "localization_r": {"localization": 0.0, "boundaries": []}},
+        "support": {"distance_support": "POSITIVE_SUPPORTED", "sdi_class": "SOURCE_DOMINANT", "low_d_support": "NOT_SUPPORTED"},
+    }
+    alternate_summary = {
+        "source_qualification": {"source_coverage_evaluable": True},
+        "point": {"localization": {"localization": 0.0, "boundaries": []}, "localization_r": {"localization": 0.0, "boundaries": []}},
+        "support": {"distance_support": "NOT_SUPPORTED", "sdi_class": "TARGET_DOMINANT", "low_d_support": "NOT_SUPPORTED"},
+    }
+    if classify_route(route_summary, alternate_summary)["route"] != "P3":
+        raise ProtocolIntegrityError("INDEPENDENT_GOLDEN_ROUTING_FAILED")
+    return {
+        "C0": "PASS", "D": "PASS", "CCAL": "PASS", "R": "PASS", "DBAR": "PASS", "RBAR": "PASS",
+        "DISTANCE_ASSOCIATION": "PASS", "SDI": "PASS", "LOW_D_RECOVERY": "PASS", "ROUTING": "PASS",
+    }
 
 
 def _validate_synthetic_authorization(root: Path, authorization_path: Path) -> tuple[dict[str, Any], str]:
@@ -1705,6 +2007,14 @@ def _validate_synthetic_authorization(root: Path, authorization_path: Path) -> t
         raise ProtocolIntegrityError("SYNTHETIC_AUTHORIZATION_INVALID")
     if auth.get("runner_sha256") != sha256_file(Path(__file__)) or auth.get("repository_commit") != _repository_commit(root):
         raise ProtocolIntegrityError("SYNTHETIC_AUTHORIZATION_BINDING_MISMATCH")
+    synthetic_models = {
+        "A": {"model_id": "synthetic-A", "model_revision": "synthetic", "num_hidden_layers": 4, "hidden_size": 2},
+        "B": {"model_id": "synthetic-B", "model_revision": "synthetic", "num_hidden_layers": 3, "hidden_size": 2},
+    }
+    if auth.get("execution_binding") != _synthetic_execution_binding(root, synthetic_models):
+        raise ProtocolIntegrityError("SYNTHETIC_AUTHORIZATION_EXECUTION_BINDING_MISMATCH")
+    if auth.get("qualification_hashes") != _synthetic_qualification_hashes():
+        raise ProtocolIntegrityError("SYNTHETIC_AUTHORIZATION_QUALIFICATION_MISMATCH")
     return auth, sha256_file(authorization_path)
 
 
@@ -1733,7 +2043,10 @@ def _run_authorized_executor(
             "authorization_id": authorization["authorization_id"],
             "authorization_sha256": authorization_sha,
             "consumption_record_sha256": consumption_sha,
+            "run_attempt_id": consumption["run_attempt_id"],
             "classification": authorization.get("classification", "FORMAL_AUTHORIZATION"),
+            "execution_binding": authorization["execution_binding"],
+            "qualification_hashes": authorization["qualification_hashes"],
         },
         bootstrap_replicates=bootstrap_replicates,
     )
@@ -1747,7 +2060,7 @@ def run_synthetic_formal_qualification(root: Path = ROOT, *, publish: bool = Tru
     verify_no_result_collision(root)
     verify_no_authorization_contamination(root)
     import tempfile
-    verify_independent_numeric_goldens()
+    golden_checks = verify_independent_numeric_goldens()
     synthetic_models = {
         "A": {"model_id": "synthetic-A", "model_revision": "synthetic", "num_hidden_layers": 4, "hidden_size": 2},
         "B": {"model_id": "synthetic-B", "model_revision": "synthetic", "num_hidden_layers": 3, "hidden_size": 2},
@@ -1759,6 +2072,8 @@ def run_synthetic_formal_qualification(root: Path = ROOT, *, publish: bool = Tru
             "classification": "SYNTHETIC_QUALIFICATION_AUTHORIZATION", "single_use": True,
             "authorization_id": "EXP026_SYNTHETIC_101D_R", "runner_sha256": sha256_file(Path(__file__)),
             "repository_commit": _repository_commit(root),
+            "execution_binding": _synthetic_execution_binding(root, synthetic_models),
+            "qualification_hashes": _synthetic_qualification_hashes(),
         })
         result = _run_authorized_executor(
             root=root, authorization_path=authorization_path, authorization_validator=_validate_synthetic_authorization,
@@ -1791,8 +2106,14 @@ def run_synthetic_formal_qualification(root: Path = ROOT, *, publish: bool = Tru
         "routing": result["routing"],
         "schema_validation": "PASS",
         "provenance_validation": "PASS",
-        "independent_numeric_goldens": "PASS",
+        "deep_schema_validation": "PASS",
+        "independent_numeric_goldens": golden_checks,
+        "semantic_adversarial_test_module_sha256": sha256_file(ROOT / "tests" / "test_exp026_runner.py"),
         "shared_authorized_executor": "PASS",
+        "supersedes": SUPERSEDED_FORMAL_PIPELINE_QUALIFICATION_SHA256,
+        "supersession_reason": "POST_REPAIR_REREVIEW_IDENTIFIED_REMAINING_MAJOR_QUALIFICATION_GAPS",
+        "engineering_qualification_sha256": sha256_file(ENGINEERING_QUALIFICATION_PATH) if ENGINEERING_QUALIFICATION_PATH.is_file() else None,
+        "formal_run_readiness": "READY_FOR_INDEPENDENT_REREVIEW",
         "formal_data_accessed": False,
         "scientific_result_created": False,
     }
@@ -1848,7 +2169,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             result = run_synthetic_formal_qualification(root)
             print("EXP026_FORMAL_PIPELINE_QUALIFICATION = PASS")
             print("EXP026_SYNTHETIC_REAL_EXECUTOR_E2E = PASS")
-            print("EXP026_FORMAL_RUN_READINESS = READY")
+            print("EXP026_FORMAL_RUN_READINESS = READY_FOR_INDEPENDENT_REREVIEW")
             return 0
         if args.formal_run:
             run_formal_run(root, args.authorization_file)

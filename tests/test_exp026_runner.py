@@ -1,5 +1,6 @@
 import json
 import sys
+from copy import deepcopy
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -24,6 +25,40 @@ import run_exp026 as runner
 
 def _observations():
     return runner._hardcoded_synthetic_observations()
+
+
+def _synthetic_registry():
+    return {
+        "A": {"model_id": "synthetic-A", "model_revision": "synthetic", "num_hidden_layers": 4, "hidden_size": 2},
+        "B": {"model_id": "synthetic-B", "model_revision": "synthetic", "num_hidden_layers": 3, "hidden_size": 2},
+    }
+
+
+def _valid_synthetic_payload(tmp_path):
+    registry = _synthetic_registry()
+    result = runner.execute_scientific_executor(
+        root=ROOT,
+        observations_by_model=runner._hardcoded_synthetic_observations(),
+        model_registry=registry,
+        result_path=tmp_path / "synthetic_result.json",
+        authorization_identity={
+            "authorization_id": "TEST_SYNTHETIC_AUTH",
+            "authorization_sha256": "a" * 64,
+            "consumption_record_sha256": "b" * 64,
+            "run_attempt_id": "test-attempt",
+            "classification": "SYNTHETIC_QUALIFICATION_AUTHORIZATION",
+            "execution_binding": runner._synthetic_execution_binding(ROOT, registry),
+            "qualification_hashes": runner._synthetic_qualification_hashes(),
+        },
+        bootstrap_replicates=20,
+    )
+    assert runner.validate_synthetic_result_schema(result["payload"]) == []
+    return result["payload"]
+
+
+@pytest.fixture(scope="module")
+def valid_synthetic_payload(tmp_path_factory):
+    return _valid_synthetic_payload(tmp_path_factory.mktemp("exp026_deep_schema"))
 
 
 def _summary(
@@ -86,6 +121,8 @@ def test_model_registry_is_pinned():
     assert runner.MODEL_REGISTRY["O"]["num_hidden_layers"] == 16
     assert runner.MODEL_REGISTRY["Q"]["hidden_size"] == 2048
     assert runner.MODEL_REGISTRY["O"]["hidden_size"] == 2048
+    assert runner.MODEL_REGISTRY["Q"]["model_revision"] == "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e"
+    assert runner.MODEL_REGISTRY["O"]["model_revision"] == "48d788eca847d4d7548f375ad03d3c9312f6139e"
 
 
 def test_mode_requires_one_mode():
@@ -493,7 +530,7 @@ def test_bootstrap_resamples_complete_source_family_clusters(monkeypatch):
 
 def test_independent_numeric_goldens_detect_sabotaged_condition_pool(monkeypatch):
     monkeypatch.setattr(runner, "_condition_pool", lambda matrix: np.zeros((2, 2), dtype=np.float32))
-    with pytest.raises(runner.ProtocolIntegrityError, match="INDEPENDENT_GOLDEN_CONDITION_POOL_FAILED"):
+    with pytest.raises(runner.ProtocolIntegrityError, match="INDEPENDENT_GOLDEN_DBAR_FAILED"):
         runner.verify_independent_numeric_goldens()
 
 
@@ -525,3 +562,176 @@ def test_matrix_orientation_baseline_sign_and_class_mapping_contract():
     assert np.all(d[0, 1, :] > 0.0)
     assert np.all(d[1, 0, :] > 0.0)
     assert runner.classifier_class_mapping(SimpleNamespace(classes_=np.asarray(sorted(runner.CLASS_ORDER)))) == sorted(runner.CLASS_ORDER)
+
+
+@pytest.mark.parametrize(
+    ("name", "mutate"),
+    [
+        ("empty_authorities", lambda p: p.__setitem__("authority_hashes", {})),
+        ("empty_provenance", lambda p: p.__setitem__("provenance", {})),
+        ("empty_authorization", lambda p: p.__setitem__("authorization_identity", {})),
+        ("empty_consumption", lambda p: p["authorization_identity"].__setitem__("consumption_record_sha256", "")),
+        ("missing_attempt", lambda p: p["authorization_identity"].pop("run_attempt_id")),
+        ("empty_routing", lambda p: p.__setitem__("routing", {})),
+        ("wrong_model_revision", lambda p: p["models"]["A"].__setitem__("model_revision", "wrong")),
+        ("wrong_layer_count", lambda p: p["models"]["A"].__setitem__("num_hidden_layers", 99)),
+        ("wrong_source_order", lambda p: p["model_profiles"]["A"]["matrices"]["c0_eval"].__setitem__("source_layer_order", [1, 0, 2, 3])),
+        ("wrong_target_order", lambda p: p["model_profiles"]["A"]["matrices"]["c0_eval"].__setitem__("target_layer_order", [1, 0, 2, 3])),
+        ("wrong_condition_order", lambda p: p["model_profiles"]["A"]["matrices"]["c0_eval"].__setitem__("condition_order", list(reversed(runner.CONDITION_ORDER)))),
+        ("wrong_matrix_shape", lambda p: p["model_profiles"]["A"]["matrices"]["c0_eval"].__setitem__("shape", [4, 4, 9])),
+        ("invalid_eligibility", lambda p: p["model_profiles"]["A"]["matrices"]["c0_eval"].__setitem__("eligible_source_mask", [True])),
+        ("invalid_coverage", lambda p: p["model_profiles"]["A"]["source_qualification"].__setitem__("source_coverage_evaluable", "invalid")),
+        ("invalid_not_evaluable", lambda p: p["model_profiles"]["A"]["source_qualification"].__setitem__("source_coverage_evaluable", False)),
+        ("invalid_technical_validity", lambda p: p["provenance"].__setitem__("technical_validity", {"status": "INVALID"})),
+    ],
+)
+def test_deep_result_schema_rejects_nested_scientific_mutations(valid_synthetic_payload, name, mutate):
+    payload = deepcopy(valid_synthetic_payload)
+    mutate(payload)
+    assert runner.validate_synthetic_result_schema(payload), name
+
+
+def test_deep_result_schema_rejects_transposed_values_with_stale_metadata(valid_synthetic_payload):
+    payload = deepcopy(valid_synthetic_payload)
+    matrix = payload["model_profiles"]["A"]["matrices"]["c0_eval"]
+    asymmetric = np.asarray(matrix["values"], dtype=np.float32)
+    asymmetric[0, 1, :] += 0.125
+    matrix["values"] = asymmetric.swapaxes(0, 1).tolist()
+    errors = runner.validate_synthetic_result_schema(payload)
+    assert "matrix_delta_semantics" in errors
+
+
+def test_deep_result_schema_roundtrip_preserves_serialized_semantics(valid_synthetic_payload):
+    payload = valid_synthetic_payload
+    round_tripped = json.loads(json.dumps(payload, sort_keys=True))
+    assert runner.validate_synthetic_result_schema(round_tripped) == []
+
+
+class EncodedPredictionModel:
+    def __init__(self, source_column):
+        self.source_column = source_column
+        self.classes_ = np.asarray(runner.CLASS_ORDER)
+
+    def predict(self, X):
+        return [runner.CLASS_ORDER[int(round(row[self.source_column]))] for row in X]
+
+
+def _encoded_labels(correct_count):
+    return [index if index < correct_count else (index + 1) % len(runner.CLASS_ORDER) for index in range(len(runner.CLASS_ORDER))]
+
+
+def test_asymmetric_production_c0_and_delta_semantics():
+    observations = []
+    for condition_index, condition in enumerate(runner.CONDITION_ORDER):
+        target0_source0 = _encoded_labels(4)
+        target1_source0 = _encoded_labels(2 if condition_index % 2 == 0 else 1)
+        target0_source1 = _encoded_labels(1 if condition_index % 2 == 0 else 2)
+        target1_source1 = _encoded_labels(3)
+        for class_index, semantic_class in enumerate(runner.CLASS_ORDER):
+            observations.append(runner.ExtractedObservation(
+                record_id=f"golden-{condition}-{semantic_class}", partition="EVAL", condition_id=condition,
+                semantic_class=semantic_class, source_family_id=f"golden-{condition}-{semantic_class}",
+                vectors=np.asarray([
+                    [target0_source0[class_index], target0_source1[class_index]],
+                    [target1_source0[class_index], target1_source1[class_index]],
+                ], dtype=np.float32),
+            ))
+    c0 = runner._compute_c0_for_partition(observations, "EVAL", 2, runner.CONDITION_ORDER, [EncodedPredictionModel(0), EncodedPredictionModel(1)])
+    for index in range(len(runner.CONDITION_ORDER)):
+        expected = np.asarray([[1.0, 0.50 if index % 2 == 0 else 0.25], [0.25 if index % 2 == 0 else 0.50, 0.75]], dtype=np.float32)
+        assert np.array_equal(c0[:, :, index], expected)
+    delta = runner.delta_from_c0(c0)
+    assert delta[0, 1, 0] == pytest.approx(0.5)
+    assert delta[1, 0, 0] == pytest.approx(0.5)
+    assert delta[1, 0, 1] == pytest.approx(0.25)
+    assert not np.allclose(c0, c0.swapaxes(0, 1))
+    assert not np.allclose(delta, c0 - np.stack([c0[i, i, :] for i in range(2)], axis=0)[:, None, :])
+
+
+@pytest.mark.parametrize(
+    ("attribute", "replacement", "expected_error"),
+    [
+        ("delta_from_c0", lambda matrix: np.zeros_like(matrix), "INDEPENDENT_GOLDEN_D_FAILED"),
+        ("residual_from_calibration", lambda calibrated, baseline: np.zeros_like(calibrated), "INDEPENDENT_GOLDEN_R_FAILED"),
+        ("_condition_pool", lambda matrix: np.zeros((2, 2), dtype=np.float32), "INDEPENDENT_GOLDEN_DBAR_FAILED"),
+        ("_distance_association_point", lambda *_args: 0.0, "INDEPENDENT_GOLDEN_DISTANCE_ASSOCIATION_FAILED"),
+        ("_sdi_point", lambda *_args: {"source_variance": 0.0, "target_variance": 0.0, "sdi": 0.0}, "INDEPENDENT_GOLDEN_SDI_FAILED"),
+        ("_low_d_pair_mask", lambda *_args: (np.zeros((3, 3), dtype=bool), []), "INDEPENDENT_GOLDEN_LOW_D_RECOVERY_FAILED"),
+        ("classify_route", lambda *_args: {"route": "P5"}, "INDEPENDENT_GOLDEN_ROUTING_FAILED"),
+    ],
+)
+def test_independent_numeric_goldens_detect_semantic_sabotage(monkeypatch, attribute, replacement, expected_error):
+    monkeypatch.setattr(runner, attribute, replacement)
+    with pytest.raises(runner.ProtocolIntegrityError, match=expected_error):
+        runner.verify_independent_numeric_goldens()
+
+
+def test_independent_numeric_goldens_cover_registered_primitives():
+    outcome = runner.verify_independent_numeric_goldens()
+    assert set(outcome) == {"C0", "D", "CCAL", "R", "DBAR", "RBAR", "DISTANCE_ASSOCIATION", "SDI", "LOW_D_RECOVERY", "ROUTING"}
+    assert set(outcome.values()) == {"PASS"}
+
+
+def test_logical_block_carrier_adversaries_and_ordered_capture():
+    torch = pytest.importorskip("torch")
+    blocks = [FakeLayer(torch.full((1, 4, 3), float(index))) for index in range(3)]
+    model = FakeModel(blocks)
+    model.model.embed_tokens = object()
+    model.model.norm = object()
+    assert runner.logical_block_carriers(model, 3) == blocks
+    _, _, matrix = runner.extract_all_layers(FakeTokenizer(), model, torch.device("cpu"), "neutral", 3)
+    assert np.array_equal(matrix[:, 0], np.array([0.0, 1.0, 2.0], dtype=np.float32))
+    with pytest.raises(runner.ProtocolIntegrityError, match="COUNT"):
+        runner.logical_block_carriers(FakeModel(blocks[:2]), 3)
+    with pytest.raises(runner.ProtocolIntegrityError, match="DUPLICATE"):
+        runner.logical_block_carriers(FakeModel([blocks[0], blocks[0], blocks[2]]), 3)
+    embedding_model = FakeModel([model.model.embed_tokens, blocks[1], blocks[2]])
+    embedding_model.model.embed_tokens = model.model.embed_tokens
+    with pytest.raises(runner.ProtocolIntegrityError, match="NONBLOCK"):
+        runner.logical_block_carriers(embedding_model, 3)
+    norm_model = FakeModel([blocks[0], blocks[1], model.model.norm])
+    norm_model.model.norm = model.model.norm
+    with pytest.raises(runner.ProtocolIntegrityError, match="NONBLOCK"):
+        runner.logical_block_carriers(norm_model, 3)
+
+
+def test_probability_mapping_uses_noncanonical_classifier_class_order():
+    model = SimpleNamespace(classes_=np.asarray(["definition", "logic", "analogy", "causality"]))
+    probabilities = np.asarray([[0.10, 0.20, 0.30, 0.40]], dtype=np.float32)
+    assert runner.probability_column_index(model, "causality") == 3
+    assert runner.probability_for_class(probabilities, model, "causality")[0] == pytest.approx(0.40)
+    assert runner.probability_for_class(probabilities, model, "logic")[0] == pytest.approx(0.20)
+
+
+def test_distance_sdi_and_low_d_adversaries_are_semantic_not_shape_only():
+    dbar = np.asarray([[0.0, 1.0, 2.0], [4.0, 0.0, 1.0], [4.0, 3.0, 0.0]], dtype=np.float32)
+    assert runner._distance_association_point(dbar, [True, True, True], 3) == pytest.approx(1.5 / np.sqrt(22.0))
+    assert runner._distance_association_point(dbar, [True, False, True], 3) != pytest.approx(1.5 / np.sqrt(22.0))
+    target_dominant = runner._sdi_point(dbar, [True, True, True], 3)
+    assert target_dominant["sdi"] < 0.0
+    source_dominant = runner._sdi_point(dbar.T, [True, True, True], 3)
+    assert source_dominant["sdi"] > 0.0
+    flat = runner._sdi_point(np.zeros((3, 3), dtype=np.float32), [True, True, True], 3)
+    assert flat["status"] == "NO_ROW_OR_COLUMN_VARIATION" and flat["sdi"] == 0.0
+    diag = np.asarray([[0.0, -1.0, 0.5], [-0.1, 0.0, 1.0], [0.2, -0.5, 0.0]], dtype=np.float32)
+    rbar = np.asarray([[0.0, 0.25, 99.0], [0.0, 0.0, 0.0], [0.0, -0.50, 0.0]], dtype=np.float32)
+    before = runner._summarize_point_profile(dbar, rbar, [True, False, True], 3, diag)["low_d_recovery"]
+    rbar[0, 2] = -999.0
+    after = runner._summarize_point_profile(dbar, rbar, [True, False, True], 3, diag)["low_d_recovery"]
+    assert before["pairs"] == after["pairs"] == [(0, 1), (2, 1)]
+    assert before["mean_recovery"] == after["mean_recovery"]
+
+
+def test_publication_race_preserves_preexisting_bytes(tmp_path, monkeypatch):
+    path = tmp_path / "race.json"
+    original_open = runner.os.open
+    original_bytes = b'{"preexisting":"race"}\n'
+
+    def race_open(name, flags, mode):
+        Path(name).write_bytes(original_bytes)
+        return original_open(name, flags, mode)
+
+    monkeypatch.setattr(runner.os, "open", race_open)
+    with pytest.raises(runner.ProtocolIntegrityError, match="PATH_ALREADY_EXISTS"):
+        runner._publish_result_exclusive(ROOT, path, {"new": "payload"})
+    assert path.read_bytes() == original_bytes
