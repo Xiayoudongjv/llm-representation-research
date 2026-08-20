@@ -16,7 +16,7 @@ scientific panel.
 - Serialized `D`, `R`, `Dbar`, and `Rbar` must agree with their registered
   `C0` and `Ccal` inputs; stale metadata paired with transposed values fails.
 - The synthetic qualification uses a ten-condition asymmetric independent
-  golden fixture for `D`, `R`, pooled matrices, distance association, SDI,
+  golden fixture for production `C0`, `D`, `R`, pooled matrices, distance association, SDI,
   low-D recovery, and routing.
 - Focused tests include nested-schema rejection cases, semantic sabotage
   cases, carrier identity checks, asymmetric production `C0`, noncanonical
@@ -26,10 +26,10 @@ scientific panel.
 
 The former synthetic formal-pipeline qualification
 `8628426f28a9d13fed3c20ba16ed01e4cceb9c4a5b548ad4afebf4dc8c78ff93` is
-retained as historical evidence only. The versioned R2 qualification artifact
+retained as historical evidence only. The versioned R2B qualification artifact
 supersedes it because 101D-RR identified remaining major qualification gaps.
 
-The R2 artifact must bind the committed runner identity, the six frozen
+The R2B artifact must bind the committed runner identity, the six frozen
 authority hashes, the new engineering qualification identity, and the focused
 test-module hash. Qualification may establish only
 `READY_FOR_INDEPENDENT_REREVIEW`; it neither creates a formal authorization nor

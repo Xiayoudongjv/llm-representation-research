@@ -651,6 +651,7 @@ def test_asymmetric_production_c0_and_delta_semantics():
 @pytest.mark.parametrize(
     ("attribute", "replacement", "expected_error"),
     [
+        ("_compute_c0_for_partition", lambda *_args: np.zeros((2, 2, 10), dtype=np.float32), "INDEPENDENT_GOLDEN_C0_FAILED"),
         ("delta_from_c0", lambda matrix: np.zeros_like(matrix), "INDEPENDENT_GOLDEN_D_FAILED"),
         ("residual_from_calibration", lambda calibrated, baseline: np.zeros_like(calibrated), "INDEPENDENT_GOLDEN_R_FAILED"),
         ("_condition_pool", lambda matrix: np.zeros((2, 2), dtype=np.float32), "INDEPENDENT_GOLDEN_DBAR_FAILED"),

@@ -145,8 +145,8 @@ FORMAL_RESULT_CANDIDATES = (
 ENGINEERING_DIR = EXP_DIR / "engineering"
 # Historical 101C qualification records are preserved.  101D-R writes only
 # versioned, superseding qualification evidence.
-ENGINEERING_QUALIFICATION_PATH = ENGINEERING_DIR / "exp026_runner_qualification_101d_r2.json"
-FORMAL_PIPELINE_QUALIFICATION_PATH = ENGINEERING_DIR / "exp026_formal_pipeline_qualification_101d_r2.json"
+ENGINEERING_QUALIFICATION_PATH = ENGINEERING_DIR / "exp026_runner_qualification_101d_r2b.json"
+FORMAL_PIPELINE_QUALIFICATION_PATH = ENGINEERING_DIR / "exp026_formal_pipeline_qualification_101d_r2b.json"
 FORMAL_AUTHORIZATION_PATH = EXP_DIR / "exp026_formal_run_authorization.json"
 AUTHORIZATION_CONSUMPTION_DIR = EXP_DIR / "results" / "authorization_consumption"
 
@@ -1919,6 +1919,50 @@ def _verify_synthetic_expected_values(profile_a: dict[str, Any], profile_b: dict
     assert "low_d_recovery" in profile_a["point"]
 
 
+class _GoldenC0Classifier:
+    """Minimal fixed classifier used only for an independent C0 qualification."""
+
+    def __init__(self, source_column: int):
+        self.source_column = source_column
+        self.classes_ = np.asarray(CLASS_ORDER)
+
+    def predict(self, X: np.ndarray) -> list[str]:
+        return [CLASS_ORDER[int(round(row[self.source_column]))] for row in X]
+
+
+def _encoded_golden_labels(correct_count: int) -> list[int]:
+    return [index if index < correct_count else (index + 1) % len(CLASS_ORDER) for index in range(len(CLASS_ORDER))]
+
+
+def _verify_asymmetric_c0_golden() -> None:
+    """Compare production C0 computation with declared ten-condition values."""
+    observations = []
+    for condition_index, condition in enumerate(CONDITION_ORDER):
+        target0_source0 = _encoded_golden_labels(4)
+        target1_source0 = _encoded_golden_labels(2 if condition_index % 2 == 0 else 1)
+        target0_source1 = _encoded_golden_labels(1 if condition_index % 2 == 0 else 2)
+        target1_source1 = _encoded_golden_labels(3)
+        for class_index, semantic_class in enumerate(CLASS_ORDER):
+            observations.append(ExtractedObservation(
+                record_id=f"golden-{condition}-{semantic_class}", partition="EVAL", condition_id=condition,
+                semantic_class=semantic_class, source_family_id=f"golden-{condition}-{semantic_class}",
+                vectors=np.asarray([
+                    [target0_source0[class_index], target0_source1[class_index]],
+                    [target1_source0[class_index], target1_source1[class_index]],
+                ], dtype=np.float32),
+            ))
+    c0 = _compute_c0_for_partition(
+        observations, "EVAL", 2, CONDITION_ORDER, [_GoldenC0Classifier(0), _GoldenC0Classifier(1)]
+    )
+    for index in range(len(CONDITION_ORDER)):
+        expected = np.asarray(
+            [[1.0, 0.50 if index % 2 == 0 else 0.25], [0.25 if index % 2 == 0 else 0.50, 0.75]],
+            dtype=np.float32,
+        )
+        if not np.array_equal(c0[:, :, index], expected):
+            raise ProtocolIntegrityError("INDEPENDENT_GOLDEN_C0_FAILED")
+
+
 def verify_independent_numeric_goldens() -> dict[str, str]:
     """Check hand-specified asymmetric numeric anchors against production primitives.
 
@@ -1926,6 +1970,7 @@ def verify_independent_numeric_goldens() -> dict[str, str]:
     test.  The fixture has ten distinguishable conditions, asymmetric source /
     target cells, unequal self baselines, and tied layer distances.
     """
+    _verify_asymmetric_c0_golden()
     c0 = np.array(
         [
             [[1.0] * 10, [0.50 if index % 2 == 0 else 0.25 for index in range(10)]],
