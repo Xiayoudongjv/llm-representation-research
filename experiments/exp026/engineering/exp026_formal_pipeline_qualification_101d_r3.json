@@ -1,0 +1,63 @@
+{
+  "authority_hashes": {
+    "design_validator": "8bfbbb8f7c106aae4f3bd1c82fe5f1419cb8fe7d4bcc87f624eb04a59e6ee2bf",
+    "frozen_config": "ccf60c8a9dc6f3b9d3cce533910334e1f8ec33665a1cf692b98a8aaf683afb57",
+    "layer_mapping": "04c6565ff366fc04960966fcff148228c5338870756c75375baf976177d6dfb1",
+    "metric_specification": "5f58445e26eee7effddd7cd5b4ae255b7153d61fa7a76b5c0684fa1dbb08d8db",
+    "preregistration": "730175071e315b484e360b6359945f567bfe8edf4f52e6a0893c3f2a7dadf8e1",
+    "routing_rules": "4ff6be135066e1cd0bbcad54ee6c7472d693d35063df8202326b5bd0b4308856"
+  },
+  "classification": "FORMAL_PIPELINE_SYNTHETIC_QUALIFICATION",
+  "deep_schema_validation": "PASS",
+  "engineering_qualification_sha256": "4849c65e7f04257c05fc5dd04f710a8bdf62a48ab27ef3eab6480ffd317a4725",
+  "experiment": "EXP-026",
+  "finished_at_utc": "2026-08-20T09:58:10.862415+00:00",
+  "formal_data_accessed": false,
+  "formal_run_readiness": "READY_FOR_FINAL_TARGETED_R3_REREVIEW",
+  "independent_numeric_goldens": {
+    "C0": "PASS",
+    "CCAL": "PASS",
+    "D": "PASS",
+    "DBAR": "PASS",
+    "DISTANCE_ASSOCIATION": "PASS",
+    "LOW_D_RECOVERY": "PASS",
+    "NORMALIZED_DEPTH": "PASS",
+    "NORMALIZED_PAIR_DISTANCE": "PASS",
+    "R": "PASS",
+    "RBAR": "PASS",
+    "ROUTING": "PASS",
+    "SDI": "PASS"
+  },
+  "provenance_validation": "PASS",
+  "r3_cross_object_schema_gates": {
+    "COHERENT_TRANSPOSE": "PASS",
+    "COVERAGE_PROFILE": "PASS",
+    "ELIGIBILITY_COUNT": "PASS",
+    "ELIGIBILITY_SPAN": "PASS",
+    "NOT_EVALUABLE_FIELD": "PASS",
+    "ROUTING_PROFILE": "PASS"
+  },
+  "real_executor_connected": true,
+  "repository_commit": "deaa9468b96810d701f6f52d429af7215aa76b36",
+  "routing": {
+    "conflict_resolution": "NOT_APPLICABLE",
+    "endpoint_evaluability": "SYNTHETIC_NOT_ROUTED",
+    "route": "SYNTHETIC_NOT_ROUTED",
+    "trigger_state": "SYNTHETIC_QUALIFICATION"
+  },
+  "runner_sha256": "fe588621c2e4699e068180cc7787101a24a8337c0a94c6cd25db42bb466b9605",
+  "schema_validation": "PASS",
+  "schema_version": "1.0.0",
+  "scientific_result_created": false,
+  "semantic_adversarial_test_module_sha256": "a6159bcd1a6fbb65dfbbd06985097c809d7b4fe887b326cde954c203a9528534",
+  "shared_authorized_executor": "PASS",
+  "started_at_utc": "2026-08-20T09:58:06.092231+00:00",
+  "status": "PASS",
+  "supersedes": "1665c116a48d7d000bd833caa19c574dd62804238fb1384b154405e483caa495",
+  "supersession_reason": "FINAL_REREVIEW_IDENTIFIED_CROSS_OBJECT_CCAL_CARRIER_DEPTH_AND_SERIALIZATION_GAPS",
+  "synthetic_model_layers": {
+    "A": 4,
+    "B": 3
+  },
+  "synthetic_result_sha256": "5ad0cd6a15c8a76b807fd739c9847dea8db66a4f49024a90faa578a89838c368"
+}
