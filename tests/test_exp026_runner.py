@@ -276,6 +276,7 @@ def test_fake_all_layer_extraction():
         for i in range(3)
     ]
     model = FakeModel(layers)
+    runner.bind_logical_block_carriers(model, 3)
     _, _, matrix = runner.extract_all_layers(FakeTokenizer(), model, torch.device("cpu"), "neutral", 3)
     assert matrix.shape == (3, 3)
     assert matrix.dtype == np.float32
@@ -652,6 +653,7 @@ def test_asymmetric_production_c0_and_delta_semantics():
     ("attribute", "replacement", "expected_error"),
     [
         ("_compute_c0_for_partition", lambda *_args: np.zeros((2, 2, 10), dtype=np.float32), "INDEPENDENT_GOLDEN_C0_FAILED"),
+        ("_compute_c_cal_for_partition", lambda *_args: np.zeros((2, 2, 10), dtype=np.float32), "INDEPENDENT_GOLDEN_CCAL_FAILED"),
         ("delta_from_c0", lambda matrix: np.zeros_like(matrix), "INDEPENDENT_GOLDEN_D_FAILED"),
         ("residual_from_calibration", lambda calibrated, baseline: np.zeros_like(calibrated), "INDEPENDENT_GOLDEN_R_FAILED"),
         ("_condition_pool", lambda matrix: np.zeros((2, 2), dtype=np.float32), "INDEPENDENT_GOLDEN_DBAR_FAILED"),
@@ -659,6 +661,7 @@ def test_asymmetric_production_c0_and_delta_semantics():
         ("_sdi_point", lambda *_args: {"source_variance": 0.0, "target_variance": 0.0, "sdi": 0.0}, "INDEPENDENT_GOLDEN_SDI_FAILED"),
         ("_low_d_pair_mask", lambda *_args: (np.zeros((3, 3), dtype=bool), []), "INDEPENDENT_GOLDEN_LOW_D_RECOVERY_FAILED"),
         ("classify_route", lambda *_args: {"route": "P5"}, "INDEPENDENT_GOLDEN_ROUTING_FAILED"),
+        ("normalized_depth", lambda index, _layers: float(index), "INDEPENDENT_GOLDEN_NORMALIZED_DEPTH_FAILED"),
     ],
 )
 def test_independent_numeric_goldens_detect_semantic_sabotage(monkeypatch, attribute, replacement, expected_error):
@@ -669,7 +672,7 @@ def test_independent_numeric_goldens_detect_semantic_sabotage(monkeypatch, attri
 
 def test_independent_numeric_goldens_cover_registered_primitives():
     outcome = runner.verify_independent_numeric_goldens()
-    assert set(outcome) == {"C0", "D", "CCAL", "R", "DBAR", "RBAR", "DISTANCE_ASSOCIATION", "SDI", "LOW_D_RECOVERY", "ROUTING"}
+    assert set(outcome) == {"C0", "D", "CCAL", "R", "DBAR", "RBAR", "DISTANCE_ASSOCIATION", "SDI", "LOW_D_RECOVERY", "ROUTING", "NORMALIZED_DEPTH", "NORMALIZED_PAIR_DISTANCE"}
     assert set(outcome.values()) == {"PASS"}
 
 
@@ -679,21 +682,31 @@ def test_logical_block_carrier_adversaries_and_ordered_capture():
     model = FakeModel(blocks)
     model.model.embed_tokens = object()
     model.model.norm = object()
+    runner.bind_logical_block_carriers(model, 3)
     assert runner.logical_block_carriers(model, 3) == blocks
     _, _, matrix = runner.extract_all_layers(FakeTokenizer(), model, torch.device("cpu"), "neutral", 3)
     assert np.array_equal(matrix[:, 0], np.array([0.0, 1.0, 2.0], dtype=np.float32))
     with pytest.raises(runner.ProtocolIntegrityError, match="COUNT"):
-        runner.logical_block_carriers(FakeModel(blocks[:2]), 3)
+        runner._raw_logical_block_carriers(FakeModel(blocks[:2]), 3)
     with pytest.raises(runner.ProtocolIntegrityError, match="DUPLICATE"):
-        runner.logical_block_carriers(FakeModel([blocks[0], blocks[0], blocks[2]]), 3)
+        runner._raw_logical_block_carriers(FakeModel([blocks[0], blocks[0], blocks[2]]), 3)
     embedding_model = FakeModel([model.model.embed_tokens, blocks[1], blocks[2]])
     embedding_model.model.embed_tokens = model.model.embed_tokens
     with pytest.raises(runner.ProtocolIntegrityError, match="NONBLOCK"):
-        runner.logical_block_carriers(embedding_model, 3)
+        runner._raw_logical_block_carriers(embedding_model, 3)
     norm_model = FakeModel([blocks[0], blocks[1], model.model.norm])
     norm_model.model.norm = model.model.norm
     with pytest.raises(runner.ProtocolIntegrityError, match="NONBLOCK"):
-        runner.logical_block_carriers(norm_model, 3)
+        runner._raw_logical_block_carriers(norm_model, 3)
+    for invalid in (
+        [blocks[2], blocks[1], blocks[0]],
+        [blocks[1], blocks[2], blocks[0]],
+        [blocks[0], blocks[2], blocks[1]],
+        [FakeLayer(torch.zeros((1, 4, 3))) for _ in range(3)],
+    ):
+        model.model.layers = invalid
+        with pytest.raises(runner.ProtocolIntegrityError, match="IDENTITY_OR_ORDER"):
+            runner.logical_block_carriers(model, 3)
 
 
 def test_probability_mapping_uses_noncanonical_classifier_class_order():
@@ -736,3 +749,100 @@ def test_publication_race_preserves_preexisting_bytes(tmp_path, monkeypatch):
     with pytest.raises(runner.ProtocolIntegrityError, match="PATH_ALREADY_EXISTS"):
         runner._publish_result_exclusive(ROOT, path, {"new": "payload"})
     assert path.read_bytes() == original_bytes
+
+
+def test_cross_object_schema_rejects_coherent_transpose_with_stale_axis_binding(valid_synthetic_payload):
+    payload = deepcopy(valid_synthetic_payload)
+    for profile in payload["model_profiles"].values():
+        matrix = profile["matrices"]["dbar_diag"]
+        values = np.asarray(matrix["values"], dtype=np.float32)
+        values[0, 1] = 0.375
+        matrix["values"] = values.tolist()
+        matrix["axis_binding"] = runner._matrix_axis_binding(values, list(range(values.shape[0])), list(range(values.shape[1])))
+    for profile in payload["model_profiles"].values():
+        for matrix in profile["matrices"].values():
+            matrix["values"] = np.asarray(matrix["values"], dtype=np.float32).swapaxes(0, 1).tolist()
+    errors = runner.validate_synthetic_result_schema(payload)
+    assert any(error.endswith("_axis_binding") for error in errors)
+
+
+@pytest.mark.parametrize(
+    ("matrix_name", "expected_error"),
+    [("d_eval", "matrix_delta_semantics"), ("r_eval", "matrix_residual_semantics"),
+     ("dbar_eval", "matrix_dbar_semantics"), ("rbar_eval", "matrix_rbar_semantics")],
+)
+def test_cross_object_schema_rejects_matrix_relation_mutations(valid_synthetic_payload, matrix_name, expected_error):
+    payload = deepcopy(valid_synthetic_payload)
+    matrix = payload["model_profiles"]["A"]["matrices"][matrix_name]
+    values = np.asarray(matrix["values"], dtype=np.float32)
+    values.flat[0] += 0.25
+    matrix["values"] = values.tolist()
+    matrix["axis_binding"] = runner._matrix_axis_binding(values, list(range(values.shape[0])), list(range(values.shape[1])))
+    assert expected_error in runner.validate_synthetic_result_schema(payload)
+
+
+def test_cross_object_schema_rejects_coverage_and_eligibility_contradictions(valid_synthetic_payload):
+    payload = deepcopy(valid_synthetic_payload)
+    payload["model_profiles"]["A"]["confirmatory_status"] = "NOT_EVALUABLE_SOURCE_COVERAGE"
+    assert "coverage_evaluable_status" in runner.validate_synthetic_result_schema(payload)
+    payload = deepcopy(valid_synthetic_payload)
+    payload["model_profiles"]["A"]["source_qualification"]["eligible_source_count"] = 0
+    assert "source_qualification_count_mismatch" in runner.validate_synthetic_result_schema(payload)
+    payload = deepcopy(valid_synthetic_payload)
+    payload["model_profiles"]["A"]["source_qualification"]["eligible_depth_span"] = 0.0
+    assert "source_qualification_span_mismatch" in runner.validate_synthetic_result_schema(payload)
+
+
+def test_cross_object_schema_rejects_routing_endpoint_contradiction():
+    summary = _summary()
+    summary["source_qualification"] = {"source_coverage_evaluable": True}
+    profiles = {"Q": deepcopy(summary), "O": deepcopy(summary)}
+    routing = runner.classify_route(profiles["Q"], profiles["O"])
+    profiles["Q"]["support"]["sdi_class"] = "SOURCE_DOMINANT"
+    errors = []
+    runner._validate_routing_against_profiles(routing, profiles, errors)
+    assert errors == ["routing_profile_mismatch"]
+
+
+def test_production_ccal_golden_and_r_integration():
+    runner._verify_production_ccal_golden()
+
+
+def test_normalized_depth_vector_and_pair_distance_goldens():
+    assert [runner.normalized_depth(index, 4) for index in range(4)] == pytest.approx([0.0, 1 / 3, 2 / 3, 1.0])
+    assert runner.normalized_pair_distance(0, 1, 4) == pytest.approx(1 / 3)
+    assert runner.normalized_pair_distance(0, 3, 4) == pytest.approx(1.0)
+    assert runner.normalized_pair_distance(1, 3, 4) == pytest.approx(2 / 3)
+
+
+def test_coverage_failure_profile_serialization_validation_roundtrip(monkeypatch):
+    monkeypatch.setattr(
+        runner, "_source_qualification",
+        lambda _obs, layers, _models, _conditions: {
+            "ba_diag_self": [0.0] * layers, "eligible_source_mask": [False] * layers,
+            "eligible_source_count": 0, "eligible_depth_span": 0.0,
+            "source_coverage_evaluable": False,
+        },
+    )
+    observations = runner._hardcoded_synthetic_observations()
+    profiles = {key: runner.compute_matrix_profile(rows, num_layers=(4 if key == "A" else 3), bootstrap_replicates=20) for key, rows in observations.items()}
+    registry = _synthetic_registry()
+    auth = {
+        "authorization_id": "COVERAGE_FAILURE_FIXTURE", "authorization_sha256": "a" * 64,
+        "consumption_record_sha256": "b" * 64, "run_attempt_id": "coverage-failure",
+        "classification": "SYNTHETIC_QUALIFICATION_AUTHORIZATION",
+        "execution_binding": runner._synthetic_execution_binding(ROOT, registry),
+        "qualification_hashes": runner._synthetic_qualification_hashes(),
+    }
+    payload = runner.build_result_payload(
+        model_profiles=profiles,
+        routing={"route": "SYNTHETIC_NOT_ROUTED", "trigger_state": "SYNTHETIC_QUALIFICATION", "endpoint_evaluability": "SYNTHETIC_NOT_ROUTED", "conflict_resolution": "NOT_APPLICABLE"},
+        authorities=runner.verify_frozen_design(ROOT), repository_commit=runner._repository_commit(ROOT),
+        runner_sha256=runner.sha256_file(Path(runner.__file__)), authorization_identity=auth,
+        model_registry=registry,
+    )
+    assert all(profile["confirmatory_status"] == "NOT_EVALUABLE_SOURCE_COVERAGE" for profile in payload["model_profiles"].values())
+    assert runner.validate_synthetic_result_schema(payload) == []
+    broken = deepcopy(payload)
+    broken["model_profiles"]["A"].pop("confirmatory_status")
+    assert runner.validate_synthetic_result_schema(broken)

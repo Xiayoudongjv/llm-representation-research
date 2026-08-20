@@ -18,6 +18,7 @@ does so only after consuming a valid single-use formal authorization.
 from __future__ import annotations
 
 import argparse
+import copy
 import hashlib
 import json
 import math
@@ -99,6 +100,8 @@ MODEL_REGISTRY = {
     },
 }
 MODEL_KEYS = ("Q", "O")
+EXPECTED_MODEL_CLASS_NAMES = {"Q": "Qwen3ForCausalLM", "O": "Olmo2ForCausalLM"}
+EXPECTED_BLOCK_CLASS_NAMES = {"Q": "Qwen3DecoderLayer", "O": "Olmo2DecoderLayer"}
 
 RESULT_MODEL_FIELDS = ("model_id", "model_revision", "num_hidden_layers", "hidden_size")
 RESULT_AUTHORIZATION_FIELDS = {
@@ -110,7 +113,7 @@ RESULT_AUTHORIZATION_FIELDS = {
     "execution_binding",
     "qualification_hashes",
 }
-SUPERSEDED_FORMAL_PIPELINE_QUALIFICATION_SHA256 = "8628426f28a9d13fed3c20ba16ed01e4cceb9c4a5b548ad4afebf4dc8c78ff93"
+SUPERSEDED_FORMAL_PIPELINE_QUALIFICATION_SHA256 = "1665c116a48d7d000bd833caa19c574dd62804238fb1384b154405e483caa495"
 
 
 def _result_model_identity(model_registry: Mapping[str, Mapping[str, Any]]) -> dict[str, dict[str, Any]]:
@@ -145,8 +148,8 @@ FORMAL_RESULT_CANDIDATES = (
 ENGINEERING_DIR = EXP_DIR / "engineering"
 # Historical 101C qualification records are preserved.  101D-R writes only
 # versioned, superseding qualification evidence.
-ENGINEERING_QUALIFICATION_PATH = ENGINEERING_DIR / "exp026_runner_qualification_101d_r2b.json"
-FORMAL_PIPELINE_QUALIFICATION_PATH = ENGINEERING_DIR / "exp026_formal_pipeline_qualification_101d_r2b.json"
+ENGINEERING_QUALIFICATION_PATH = ENGINEERING_DIR / "exp026_runner_qualification_101d_r3.json"
+FORMAL_PIPELINE_QUALIFICATION_PATH = ENGINEERING_DIR / "exp026_formal_pipeline_qualification_101d_r3.json"
 FORMAL_AUTHORIZATION_PATH = EXP_DIR / "exp026_formal_run_authorization.json"
 AUTHORIZATION_CONSUMPTION_DIR = EXP_DIR / "results" / "authorization_consumption"
 
@@ -304,6 +307,7 @@ def _load_model(model_key: str):
 def load_runtime(model_key: str):
     tokenizer = _load_tokenizer(model_key)
     model, device, dtype = _load_model(model_key)
+    bind_logical_block_carriers(model, MODEL_REGISTRY[model_key]["num_hidden_layers"], model_key=model_key)
     return tokenizer, model, device, dtype
 
 
@@ -410,8 +414,7 @@ def tokenize_neutral(tokenizer: Any, text: str, device: Any):
     return encoded, input_ids, attention_mask
 
 
-def logical_block_carriers(model: Any, num_layers: int) -> list[Any]:
-    """Return exactly the ordered, unnormalized logical transformer blocks."""
+def _raw_logical_block_carriers(model: Any, num_layers: int) -> list[Any]:
     backbone = getattr(model, "model", None)
     carriers = getattr(backbone, "layers", None)
     if carriers is None:
@@ -428,6 +431,33 @@ def logical_block_carriers(model: Any, num_layers: int) -> list[Any]:
     }
     if any(id(block) in forbidden for block in blocks):
         raise ProtocolIntegrityError("LOGICAL_CARRIER_NONBLOCK_SUBSTITUTION")
+    return blocks
+
+
+def bind_logical_block_carriers(model: Any, num_layers: int, *, model_key: str | None = None) -> tuple[Any, ...]:
+    """Freeze the exact canonical decoder-block objects before extraction."""
+    blocks = _raw_logical_block_carriers(model, num_layers)
+    if model_key is not None:
+        if model_key not in MODEL_REGISTRY:
+            raise ProtocolIntegrityError("LOGICAL_CARRIER_MODEL_KEY_INVALID")
+        if type(model).__name__ != EXPECTED_MODEL_CLASS_NAMES[model_key]:
+            raise ProtocolIntegrityError("LOGICAL_CARRIER_MODEL_CLASS_MISMATCH")
+        if any(type(block).__name__ != EXPECTED_BLOCK_CLASS_NAMES[model_key] for block in blocks):
+            raise ProtocolIntegrityError("LOGICAL_CARRIER_BLOCK_CLASS_MISMATCH")
+    frozen = tuple(blocks)
+    setattr(model, "_exp026_logical_block_carriers", frozen)
+    setattr(model, "_exp026_logical_block_model_key", model_key)
+    return frozen
+
+
+def logical_block_carriers(model: Any, num_layers: int) -> list[Any]:
+    """Return the bound canonical block sequence, rejecting later substitutions."""
+    frozen = getattr(model, "_exp026_logical_block_carriers", None)
+    if not isinstance(frozen, tuple) or len(frozen) != num_layers:
+        raise ProtocolIntegrityError("LOGICAL_CARRIER_IDENTITY_NOT_BOUND")
+    blocks = _raw_logical_block_carriers(model, num_layers)
+    if any(current is not expected for current, expected in zip(blocks, frozen)):
+        raise ProtocolIntegrityError("LOGICAL_CARRIER_IDENTITY_OR_ORDER_MISMATCH")
     return blocks
 
 
@@ -633,6 +663,11 @@ def normalized_depth(layer_index: int, num_layers: int) -> float:
     return layer_index / (num_layers - 1)
 
 
+def normalized_pair_distance(source_layer: int, target_layer: int, num_layers: int) -> float:
+    """Return the registered cross-layer distance in normalized-depth units."""
+    return abs(normalized_depth(source_layer, num_layers) - normalized_depth(target_layer, num_layers))
+
+
 def _matrix_from_observations(observations: Sequence[ExtractedObservation], layer: int) -> tuple[np.ndarray, list[str]]:
     if not observations:
         raise ProtocolIntegrityError("EMPTY_OBSERVATION_GROUP")
@@ -788,7 +823,7 @@ def _distance_association_point(dbar: np.ndarray, eligible_mask: Sequence[bool],
         for j in range(num_layers):
             if i == j:
                 continue
-            pairs_x.append(abs(normalized_depth(i, num_layers) - normalized_depth(j, num_layers)))
+            pairs_x.append(normalized_pair_distance(i, j, num_layers))
             pairs_y.append(float(dbar[i, j]))
     if len(pairs_x) < 2:
         return float("nan")
@@ -1141,6 +1176,24 @@ def classify_route(q_summary: dict[str, Any], o_summary: dict[str, Any]) -> dict
     }
 
 
+def _matrix_axis_binding(
+    matrix: np.ndarray, source_order: Sequence[int], target_order: Sequence[int]
+) -> dict[str, Any]:
+    array = np.asarray(matrix, dtype=np.float32)
+    return {
+        "source_axis_role": "source_probe_layer",
+        "target_axis_role": "target_representation_layer",
+        "source_layer_ids": [f"source_layer_{index}" for index in source_order],
+        "target_layer_ids": [f"target_layer_{index}" for index in target_order],
+        "source_slice_sha256": [
+            _canonical_json_sha256(_json_safe(array[index].tolist())) for index in range(array.shape[0])
+        ],
+        "target_slice_sha256": [
+            _canonical_json_sha256(_json_safe(array[:, index].tolist())) for index in range(array.shape[1])
+        ],
+    }
+
+
 def _matrix_serialization(
     matrix: np.ndarray,
     *,
@@ -1149,14 +1202,17 @@ def _matrix_serialization(
     condition_order: Sequence[str],
     eligible_source_mask: Sequence[bool],
 ) -> dict[str, Any]:
+    array = np.asarray(matrix, dtype=np.float32)
+    axis_binding = _matrix_axis_binding(array, source_order, target_order)
     return {
-        "values": _json_safe(matrix.tolist()),
-        "shape": list(matrix.shape),
-        "dtype": str(matrix.dtype),
+        "values": _json_safe(array.tolist()),
+        "shape": list(array.shape),
+        "dtype": str(array.dtype),
         "source_layer_order": list(source_order),
         "target_layer_order": list(target_order),
         "condition_order": list(condition_order),
         "eligible_source_mask": list(eligible_source_mask),
+        "axis_binding": axis_binding,
     }
 
 
@@ -1188,6 +1244,7 @@ def _serialize_profile(profile: dict[str, Any], model_key: str) -> dict[str, Any
         "point": _json_safe(profile["point"]),
         "bootstrap": _json_safe(profile["bootstrap"]),
         "support": _json_safe(profile["support"]),
+        "confirmatory_status": profile["confirmatory_status"],
     }
 
 
@@ -1263,7 +1320,13 @@ def _validate_serialized_matrix(
         if list(matrix.shape) != expected_shape or not np.isfinite(matrix).all():
             errors.append(f"matrix_{matrix_name}_values")
             return None
-        return matrix.astype(np.float32)
+        matrix = matrix.astype(np.float32)
+        expected_axis_binding = _matrix_axis_binding(
+            matrix, list(range(expected_layers)), list(range(expected_layers))
+        )
+        if value.get("axis_binding") != expected_axis_binding:
+            errors.append(f"matrix_{matrix_name}_axis_binding")
+        return matrix
     except (TypeError, ValueError):
         errors.append(f"matrix_{matrix_name}_values")
         return None
@@ -1342,6 +1405,59 @@ def _validate_routing(routing: Any, *, production_models: bool, errors: list[str
         errors.append("routing_metadata")
 
 
+def _validate_source_qualification(
+    qualification: Mapping[str, Any], expected_layers: int, errors: list[str]
+) -> bool | None:
+    required = {
+        "ba_diag_self", "eligible_source_mask", "eligible_source_count",
+        "eligible_depth_span", "source_coverage_evaluable",
+    }
+    if set(qualification) != required:
+        errors.append("source_qualification_schema")
+    mask = qualification.get("eligible_source_mask")
+    scores = qualification.get("ba_diag_self")
+    if not isinstance(mask, list) or len(mask) != expected_layers or not all(isinstance(item, bool) for item in mask):
+        errors.append("source_qualification_mask")
+        return None
+    if not isinstance(scores, list) or len(scores) != expected_layers or not all(
+        isinstance(item, (int, float)) and math.isfinite(float(item)) for item in scores
+    ):
+        errors.append("source_qualification_scores")
+    elif mask != [float(value) >= SOURCE_TECHNICAL_FLOOR for value in scores]:
+        errors.append("source_qualification_mask_score_mismatch")
+    eligible = [index for index, value in enumerate(mask) if value]
+    expected_count = len(eligible)
+    expected_span = (
+        normalized_pair_distance(min(eligible), max(eligible), expected_layers) if eligible else 0.0
+    )
+    expected_coverage = (
+        expected_count >= math.ceil(expected_layers * SOURCE_COVERAGE_MIN_FRACTION)
+        and expected_span >= SOURCE_COVERAGE_MIN_SPAN
+    )
+    if qualification.get("eligible_source_count") != expected_count:
+        errors.append("source_qualification_count_mismatch")
+    span = qualification.get("eligible_depth_span")
+    if not isinstance(span, (int, float)) or not math.isclose(float(span), expected_span, abs_tol=1e-12):
+        errors.append("source_qualification_span_mismatch")
+    if qualification.get("source_coverage_evaluable") is not expected_coverage:
+        errors.append("source_qualification_coverage_mismatch")
+    return expected_coverage
+
+
+def _validate_routing_against_profiles(
+    routing: Any, profiles: Mapping[str, Any], errors: list[str]
+) -> None:
+    if set(profiles) != set(MODEL_KEYS):
+        errors.append("routing_profile_model_set")
+        return
+    try:
+        expected_routing = classify_route(profiles["Q"], profiles["O"])
+        if routing != expected_routing:
+            errors.append("routing_profile_mismatch")
+    except (KeyError, TypeError, ValueError):
+        errors.append("routing_profile_unverifiable")
+
+
 def validate_result_schema(
     payload: Mapping[str, Any],
     *,
@@ -1394,15 +1510,18 @@ def validate_result_schema(
             continue
         if profile.get("model_key") != key or profile.get("class_order") != list(CLASS_ORDER) or profile.get("condition_order") != list(CONDITION_ORDER):
             errors.append("model_profile_identity")
+        required_profile_fields = {
+            "model_key", "num_layers", "class_order", "condition_order", "source_qualification",
+            "matrices", "point", "bootstrap", "support", "confirmatory_status",
+        }
+        if set(profile) != required_profile_fields:
+            errors.append("model_profile_schema")
         qualification = profile.get("source_qualification")
+        coverage: bool | None = None
         if not isinstance(qualification, Mapping):
             errors.append("source_qualification")
         else:
-            mask = qualification.get("eligible_source_mask")
-            if not isinstance(mask, list) or len(mask) != expected_layers or not all(isinstance(item, bool) for item in mask):
-                errors.append("source_qualification_mask")
-            if qualification.get("source_coverage_evaluable") not in {True, False}:
-                errors.append("source_qualification_coverage")
+            coverage = _validate_source_qualification(qualification, expected_layers, errors)
         matrices = profile.get("matrices")
         parsed: dict[str, np.ndarray] = {}
         if not isinstance(matrices, dict) or set(matrices) != required_matrices:
@@ -1418,6 +1537,8 @@ def validate_result_schema(
             c0, delta, calibrated, residual = (parsed[name] for name in ("c0_eval", "d_eval", "c_cal_eval", "r_eval"))
             if not np.allclose(delta, delta_from_c0(c0), atol=1e-6):
                 errors.append("matrix_delta_semantics")
+            if not np.allclose(np.diagonal(delta, axis1=0, axis2=1), 0.0, atol=1e-6):
+                errors.append("matrix_delta_diagonal")
             if not np.allclose(residual, residual_from_calibration(calibrated, c0), atol=1e-6):
                 errors.append("matrix_residual_semantics")
             if not np.allclose(parsed["dbar_eval"], _condition_pool(delta), atol=1e-6):
@@ -1426,18 +1547,28 @@ def validate_result_schema(
                 errors.append("matrix_rbar_semantics")
         if not isinstance(profile.get("point"), Mapping) or not isinstance(profile.get("support"), Mapping):
             errors.append("model_profile_summaries")
-        elif qualification and qualification.get("source_coverage_evaluable") is False:
+        elif coverage is False:
             if profile.get("confirmatory_status") != "NOT_EVALUABLE_SOURCE_COVERAGE":
                 errors.append("coverage_not_evaluable_status")
             if set(profile["support"].values()) != {"NOT_EVALUABLE"}:
                 errors.append("coverage_not_evaluable_support")
+            if profile["point"].get("status") != "NOT_EVALUABLE_SOURCE_COVERAGE":
+                errors.append("coverage_not_evaluable_point")
+            if profile.get("bootstrap") is not None:
+                errors.append("coverage_not_evaluable_bootstrap")
+        elif coverage is True and profile.get("confirmatory_status") != "EVALUABLE":
+            errors.append("coverage_evaluable_status")
         bootstrap = profile.get("bootstrap")
-        if qualification and qualification.get("source_coverage_evaluable") is True:
+        if coverage is True:
             if not isinstance(bootstrap, Mapping) or bootstrap.get("replicates", 0) <= 0:
                 errors.append("bootstrap")
             elif any(not isinstance(bootstrap.get(name), list) or len(bootstrap[name]) != 2 for name in ("distance_association_ci", "sdi_ci", "low_d_recovery_ci")):
                 errors.append("bootstrap_ci")
     _validate_routing(payload.get("routing"), production_models=set(expected_models) == set(MODEL_KEYS), errors=errors)
+    if set(expected_models) == set(MODEL_KEYS) and isinstance(payload.get("model_profiles"), Mapping):
+        profiles = payload["model_profiles"]
+        if set(profiles) == set(MODEL_KEYS):
+            _validate_routing_against_profiles(payload.get("routing"), profiles, errors)
     if "raw_hidden_tensors" in payload:
         errors.append("raw_hidden_tensors_forbidden")
     return errors
@@ -1473,6 +1604,58 @@ def validate_synthetic_result_schema(payload: Mapping[str, Any], root: Path = RO
         expected_binding=_synthetic_execution_binding(root, synthetic_models),
         expected_qualification_hashes=_synthetic_qualification_hashes(),
     )
+
+
+def verify_r3_schema_gates(payload: Mapping[str, Any], root: Path = ROOT) -> dict[str, str]:
+    """Execute the R3 cross-object rejection gates on a valid synthetic payload."""
+    if validate_synthetic_result_schema(payload, root):
+        raise ProtocolIntegrityError("R3_SCHEMA_BASELINE_INVALID")
+    asymmetric_payload = copy.deepcopy(payload)
+    for profile in asymmetric_payload["model_profiles"].values():
+        matrix = profile["matrices"]["dbar_diag"]
+        values = np.asarray(matrix["values"], dtype=np.float32)
+        values[0, 1] = 0.375
+        matrix["values"] = values.tolist()
+        matrix["axis_binding"] = _matrix_axis_binding(
+            values, list(range(values.shape[0])), list(range(values.shape[1]))
+        )
+    checks: dict[str, Callable[[dict[str, Any]], None]] = {
+        "COHERENT_TRANSPOSE": lambda value: [
+            matrix.__setitem__("values", np.asarray(matrix["values"], dtype=np.float32).swapaxes(0, 1).tolist())
+            for profile in value["model_profiles"].values() for matrix in profile["matrices"].values()
+        ],
+        "COVERAGE_PROFILE": lambda value: value["model_profiles"]["A"].__setitem__(
+            "confirmatory_status", "NOT_EVALUABLE_SOURCE_COVERAGE"
+        ),
+        "ELIGIBILITY_COUNT": lambda value: value["model_profiles"]["A"]["source_qualification"].__setitem__(
+            "eligible_source_count", 0
+        ),
+        "ELIGIBILITY_SPAN": lambda value: value["model_profiles"]["A"]["source_qualification"].__setitem__(
+            "eligible_depth_span", 0.0
+        ),
+        "NOT_EVALUABLE_FIELD": lambda value: value["model_profiles"]["A"].pop("confirmatory_status"),
+    }
+    result: dict[str, str] = {}
+    for name, mutate in checks.items():
+        candidate = copy.deepcopy(asymmetric_payload if name == "COHERENT_TRANSPOSE" else payload)
+        mutate(candidate)
+        if not validate_synthetic_result_schema(candidate, root):
+            raise ProtocolIntegrityError(f"R3_SCHEMA_GATE_NOT_REJECTED_{name}")
+        result[name] = "PASS"
+    summary = {
+        "source_qualification": {"source_coverage_evaluable": True},
+        "point": {"localization": {"localization": 0.0, "boundaries": []}, "localization_r": {"localization": 0.0, "boundaries": []}},
+        "support": {"distance_support": "NOT_SUPPORTED", "sdi_class": "NO_DOMINANCE", "low_d_support": "NOT_SUPPORTED"},
+    }
+    profiles = {"Q": copy.deepcopy(summary), "O": copy.deepcopy(summary)}
+    routing = classify_route(profiles["Q"], profiles["O"])
+    profiles["Q"]["support"]["sdi_class"] = "SOURCE_DOMINANT"
+    route_errors: list[str] = []
+    _validate_routing_against_profiles(routing, profiles, route_errors)
+    if "routing_profile_mismatch" not in route_errors:
+        raise ProtocolIntegrityError("R3_SCHEMA_GATE_NOT_REJECTED_ROUTING_PROFILE")
+    result["ROUTING_PROFILE"] = "PASS"
+    return result
 
 
 def _load_design_config(root: Path = ROOT) -> dict[str, Any]:
@@ -1854,6 +2037,8 @@ def run_engineering_qualification(root: Path = ROOT, *, publish: bool = True) ->
             "neutral_input_count": len(NEUTRAL_QUALIFICATION_INPUTS),
             "determinism_max_abs_diff": max_diff,
             "identity": identity,
+            "carrier_identity_binding": "PASS",
+            "carrier_class": EXPECTED_BLOCK_CLASS_NAMES.get(key, "SYNTHETIC_TEST_DOUBLE"),
         }
     artifact = {
         "schema_version": QUALIFICATION_SCHEMA_VERSION,
@@ -1963,6 +2148,54 @@ def _verify_asymmetric_c0_golden() -> None:
             raise ProtocolIntegrityError("INDEPENDENT_GOLDEN_C0_FAILED")
 
 
+def _verify_production_ccal_golden() -> None:
+    """Exercise production pair calibration against hand-specified constants."""
+    observations: list[ExtractedObservation] = []
+    target_stats: list[list[tuple[np.ndarray, np.ndarray]]] = [[], []]
+    expected = np.zeros((2, 2, len(CONDITION_ORDER)), dtype=np.float32)
+    for condition_index, condition in enumerate(CONDITION_ORDER):
+        source1_target0 = _encoded_golden_labels(2 if condition_index % 2 == 0 else 1)
+        source0_target1 = _encoded_golden_labels(3)
+        means = (np.asarray([10.0, 20.0], dtype=np.float32), np.asarray([-10.0, -20.0], dtype=np.float32))
+        scales = (np.asarray([2.0, 4.0], dtype=np.float32), np.asarray([0.5, 2.0], dtype=np.float32))
+        target_stats[0].append((means[0], scales[0]))
+        target_stats[1].append((means[1], scales[1]))
+        expected[:, :, condition_index] = np.asarray(
+            [[1.0, 0.75], [0.50 if condition_index % 2 == 0 else 0.25, 1.0]], dtype=np.float32
+        )
+        for class_index, semantic_class in enumerate(CLASS_ORDER):
+            z0 = np.asarray([class_index, source1_target0[class_index]], dtype=np.float32)
+            z1 = np.asarray([source0_target1[class_index], class_index], dtype=np.float32)
+            observations.append(ExtractedObservation(
+                record_id=f"ccal-{condition}-{semantic_class}", partition="EVAL", condition_id=condition,
+                semantic_class=semantic_class, source_family_id=f"ccal-{condition}-{semantic_class}",
+                vectors=np.stack([means[0] + scales[0] * z0, means[1] + scales[1] * z1]).astype(np.float32),
+            ))
+    calibration = {"source_stats": [], "target_by_layer_condition": target_stats}
+    observed = _compute_c_cal_for_partition(
+        observations, "EVAL", 2, CONDITION_ORDER,
+        [_GoldenC0Classifier(0), _GoldenC0Classifier(1)], calibration,
+    )
+    if not np.array_equal(observed, expected):
+        raise ProtocolIntegrityError("INDEPENDENT_GOLDEN_CCAL_FAILED")
+    independent_c0 = np.asarray(
+        [[[0.75] * 10, [0.50] * 10], [[0.25] * 10, [0.75] * 10]], dtype=np.float32
+    )
+    expected_r = expected - independent_c0
+    if not np.array_equal(residual_from_calibration(observed, independent_c0), expected_r):
+        raise ProtocolIntegrityError("INDEPENDENT_GOLDEN_R_FAILED")
+
+
+def _verify_normalized_depth_golden() -> None:
+    expected = [0.0, 1.0 / 3.0, 2.0 / 3.0, 1.0]
+    observed = [normalized_depth(index, 4) for index in range(4)]
+    if not np.allclose(observed, expected, atol=1e-12):
+        raise ProtocolIntegrityError("INDEPENDENT_GOLDEN_NORMALIZED_DEPTH_FAILED")
+    expected_pairs = {(0, 1): 1.0 / 3.0, (0, 3): 1.0, (1, 3): 2.0 / 3.0}
+    if any(not math.isclose(normalized_pair_distance(i, j, 4), value, abs_tol=1e-12) for (i, j), value in expected_pairs.items()):
+        raise ProtocolIntegrityError("INDEPENDENT_GOLDEN_NORMALIZED_PAIR_DISTANCE_FAILED")
+
+
 def verify_independent_numeric_goldens() -> dict[str, str]:
     """Check hand-specified asymmetric numeric anchors against production primitives.
 
@@ -1971,6 +2204,8 @@ def verify_independent_numeric_goldens() -> dict[str, str]:
     target cells, unequal self baselines, and tied layer distances.
     """
     _verify_asymmetric_c0_golden()
+    _verify_production_ccal_golden()
+    _verify_normalized_depth_golden()
     c0 = np.array(
         [
             [[1.0] * 10, [0.50 if index % 2 == 0 else 0.25 for index in range(10)]],
@@ -1992,7 +2227,13 @@ def verify_independent_numeric_goldens() -> dict[str, str]:
         ],
         dtype=np.float32,
     )
-    c_cal = c0 + expected_r
+    c_cal = np.array(
+        [
+            [[1.10] * 10, [0.40 if index % 2 == 0 else 0.45 for index in range(10)]],
+            [[0.55 if index % 2 == 0 else 0.80 for index in range(10)], [0.55] * 10],
+        ],
+        dtype=np.float32,
+    )
     if not np.allclose(delta_from_c0(c0), expected_d, atol=1e-7):
         raise ProtocolIntegrityError("INDEPENDENT_GOLDEN_D_FAILED")
     if not np.allclose(residual_from_calibration(c_cal, c0), expected_r, atol=1e-7):
@@ -2043,6 +2284,7 @@ def verify_independent_numeric_goldens() -> dict[str, str]:
     return {
         "C0": "PASS", "D": "PASS", "CCAL": "PASS", "R": "PASS", "DBAR": "PASS", "RBAR": "PASS",
         "DISTANCE_ASSOCIATION": "PASS", "SDI": "PASS", "LOW_D_RECOVERY": "PASS", "ROUTING": "PASS",
+        "NORMALIZED_DEPTH": "PASS", "NORMALIZED_PAIR_DISTANCE": "PASS",
     }
 
 
@@ -2130,6 +2372,7 @@ def run_synthetic_formal_qualification(root: Path = ROOT, *, publish: bool = Tru
         schema_errors = validate_synthetic_result_schema(result["payload"])
         if schema_errors:
             raise ProtocolIntegrityError(f"RESULT_SCHEMA_INVALID_{schema_errors}")
+        r3_schema_gates = verify_r3_schema_gates(result["payload"], root)
         try:
             _publish_result_exclusive(root, tmp_path / "exp026_synthetic_result.json", result["payload"])
             raise ProtocolIntegrityError("PUBLICATION_RACE_NOT_REJECTED")
@@ -2152,13 +2395,14 @@ def run_synthetic_formal_qualification(root: Path = ROOT, *, publish: bool = Tru
         "schema_validation": "PASS",
         "provenance_validation": "PASS",
         "deep_schema_validation": "PASS",
+        "r3_cross_object_schema_gates": r3_schema_gates,
         "independent_numeric_goldens": golden_checks,
         "semantic_adversarial_test_module_sha256": sha256_file(ROOT / "tests" / "test_exp026_runner.py"),
         "shared_authorized_executor": "PASS",
         "supersedes": SUPERSEDED_FORMAL_PIPELINE_QUALIFICATION_SHA256,
-        "supersession_reason": "POST_REPAIR_REREVIEW_IDENTIFIED_REMAINING_MAJOR_QUALIFICATION_GAPS",
+        "supersession_reason": "FINAL_REREVIEW_IDENTIFIED_CROSS_OBJECT_CCAL_CARRIER_DEPTH_AND_SERIALIZATION_GAPS",
         "engineering_qualification_sha256": sha256_file(ENGINEERING_QUALIFICATION_PATH) if ENGINEERING_QUALIFICATION_PATH.is_file() else None,
-        "formal_run_readiness": "READY_FOR_INDEPENDENT_REREVIEW",
+        "formal_run_readiness": "READY_FOR_FINAL_TARGETED_R3_REREVIEW",
         "formal_data_accessed": False,
         "scientific_result_created": False,
     }
@@ -2214,7 +2458,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             result = run_synthetic_formal_qualification(root)
             print("EXP026_FORMAL_PIPELINE_QUALIFICATION = PASS")
             print("EXP026_SYNTHETIC_REAL_EXECUTOR_E2E = PASS")
-            print("EXP026_FORMAL_RUN_READINESS = READY_FOR_INDEPENDENT_REREVIEW")
+            print("EXP026_FORMAL_RUN_READINESS = READY_FOR_FINAL_TARGETED_R3_REREVIEW")
             return 0
         if args.formal_run:
             run_formal_run(root, args.authorization_file)
