@@ -113,7 +113,7 @@ RESULT_AUTHORIZATION_FIELDS = {
     "execution_binding",
     "qualification_hashes",
 }
-SUPERSEDED_FORMAL_PIPELINE_QUALIFICATION_SHA256 = "1665c116a48d7d000bd833caa19c574dd62804238fb1384b154405e483caa495"
+SUPERSEDED_FORMAL_PIPELINE_QUALIFICATION_SHA256 = "ea44190d0824bdacca73de58af44a700712a8a30d1f6aab6ea3b8ef92ac62da8"
 
 
 def _result_model_identity(model_registry: Mapping[str, Mapping[str, Any]]) -> dict[str, dict[str, Any]]:
@@ -148,8 +148,8 @@ FORMAL_RESULT_CANDIDATES = (
 ENGINEERING_DIR = EXP_DIR / "engineering"
 # Historical 101C qualification records are preserved.  101D-R writes only
 # versioned, superseding qualification evidence.
-ENGINEERING_QUALIFICATION_PATH = ENGINEERING_DIR / "exp026_runner_qualification_101d_r3.json"
-FORMAL_PIPELINE_QUALIFICATION_PATH = ENGINEERING_DIR / "exp026_formal_pipeline_qualification_101d_r3.json"
+ENGINEERING_QUALIFICATION_PATH = ENGINEERING_DIR / "exp026_runner_qualification_101d_r4.json"
+FORMAL_PIPELINE_QUALIFICATION_PATH = ENGINEERING_DIR / "exp026_formal_pipeline_qualification_101d_r4.json"
 FORMAL_AUTHORIZATION_PATH = EXP_DIR / "exp026_formal_run_authorization.json"
 AUTHORIZATION_CONSUMPTION_DIR = EXP_DIR / "results" / "authorization_consumption"
 
@@ -665,7 +665,12 @@ def normalized_depth(layer_index: int, num_layers: int) -> float:
 
 def normalized_pair_distance(source_layer: int, target_layer: int, num_layers: int) -> float:
     """Return the registered cross-layer distance in normalized-depth units."""
-    return abs(normalized_depth(source_layer, num_layers) - normalized_depth(target_layer, num_layers))
+    if num_layers <= 1:
+        raise ValueError("num_layers must be greater than one.")
+    if source_layer < 0 or source_layer >= num_layers or target_layer < 0 or target_layer >= num_layers:
+        raise ValueError("layer_index out of range.")
+    integer_gap = abs(source_layer - target_layer)
+    return integer_gap / (num_layers - 1)
 
 
 def _matrix_from_observations(observations: Sequence[ExtractedObservation], layer: int) -> tuple[np.ndarray, list[str]]:
@@ -792,7 +797,7 @@ def _source_qualification(observations: Sequence[ExtractedObservation], num_laye
     span = 0.0
     eligible_indices = [i for i, value in enumerate(eligible) if value]
     if eligible_indices:
-        span = abs(normalized_depth(max(eligible_indices), num_layers) - normalized_depth(min(eligible_indices), num_layers))
+        span = normalized_pair_distance(min(eligible_indices), max(eligible_indices), num_layers)
     coverage = (
         len(eligible_indices) >= math.ceil(num_layers * SOURCE_COVERAGE_MIN_FRACTION)
         and span >= SOURCE_COVERAGE_MIN_SPAN
@@ -2191,9 +2196,94 @@ def _verify_normalized_depth_golden() -> None:
     observed = [normalized_depth(index, 4) for index in range(4)]
     if not np.allclose(observed, expected, atol=1e-12):
         raise ProtocolIntegrityError("INDEPENDENT_GOLDEN_NORMALIZED_DEPTH_FAILED")
-    expected_pairs = {(0, 1): 1.0 / 3.0, (0, 3): 1.0, (1, 3): 2.0 / 3.0}
-    if any(not math.isclose(normalized_pair_distance(i, j, 4), value, abs_tol=1e-12) for (i, j), value in expected_pairs.items()):
+    expected_pairs = {
+        (0, 1): 1.0 / 3.0, (1, 2): 1.0 / 3.0, (2, 3): 1.0 / 3.0,
+        (0, 2): 2.0 / 3.0, (1, 3): 2.0 / 3.0, (0, 3): 1.0,
+    }
+    if any(normalized_pair_distance(i, j, 4) != value for (i, j), value in expected_pairs.items()):
         raise ProtocolIntegrityError("INDEPENDENT_GOLDEN_NORMALIZED_PAIR_DISTANCE_FAILED")
+
+
+def verify_normalized_distance_tie_semantics() -> dict[str, Any]:
+    """Verify exact registered distance ties and an independent rank/rho anchor."""
+    class_counts: dict[int, int] = {}
+    for num_layers in (4, 16, 28):
+        by_gap: dict[int, list[float]] = {gap: [] for gap in range(1, num_layers)}
+        all_distances = []
+        for source in range(num_layers):
+            if normalized_pair_distance(source, source, num_layers) != 0.0:
+                raise ProtocolIntegrityError("NORMALIZED_DISTANCE_ZERO_BOUNDARY_FAILED")
+            for target in range(num_layers):
+                observed = normalized_pair_distance(source, target, num_layers)
+                if observed != normalized_pair_distance(target, source, num_layers):
+                    raise ProtocolIntegrityError("NORMALIZED_DISTANCE_SYMMETRY_FAILED")
+                if source != target:
+                    gap = abs(source - target)
+                    by_gap[gap].append(observed)
+                    all_distances.append(observed)
+        if normalized_pair_distance(0, num_layers - 1, num_layers) != 1.0:
+            raise ProtocolIntegrityError("NORMALIZED_DISTANCE_ONE_BOUNDARY_FAILED")
+        if any(len(set(values)) != 1 for values in by_gap.values()):
+            raise ProtocolIntegrityError(f"NORMALIZED_DISTANCE_TIE_CLASS_SPLIT_L{num_layers}")
+        class_counts[num_layers] = len(set(all_distances))
+        if class_counts[num_layers] != num_layers - 1:
+            raise ProtocolIntegrityError(f"NORMALIZED_DISTANCE_CLASS_COUNT_FAILED_L{num_layers}")
+
+    fixture = np.asarray(
+        [[0.0, 1.0, 2.0, 3.0], [4.0, 0.0, 2.0, 1.0],
+         [3.0, 2.0, 0.0, 4.0], [1.0, 3.0, 4.0, 0.0]],
+        dtype=np.float32,
+    )
+    integer_gaps = [
+        abs(source - target)
+        for source in range(4) for target in range(4) if source != target
+    ]
+    normalized_distances = [
+        normalized_pair_distance(source, target, 4)
+        for source in range(4) for target in range(4) if source != target
+    ]
+    fixture_values = [
+        float(fixture[source, target])
+        for source in range(4) for target in range(4) if source != target
+    ]
+    expected_distance_ranks = [3.5, 8.5, 11.5, 3.5, 3.5, 8.5, 8.5, 3.5, 3.5, 11.5, 8.5, 3.5]
+    expected_value_ranks = [2.0, 5.0, 8.0, 11.0, 5.0, 2.0, 8.0, 5.0, 11.0, 2.0, 8.0, 11.0]
+    expected_rho = -0.30641293851417056
+    if average_rank(integer_gaps) != expected_distance_ranks:
+        raise ProtocolIntegrityError("INDEPENDENT_GOLDEN_INTEGER_GAP_RANK_FAILED")
+    if average_rank(normalized_distances) != expected_distance_ranks:
+        raise ProtocolIntegrityError("INDEPENDENT_GOLDEN_NORMALIZED_DISTANCE_RANK_FAILED")
+    if average_rank(fixture_values) != expected_value_ranks:
+        raise ProtocolIntegrityError("INDEPENDENT_GOLDEN_DISTANCE_VALUE_RANK_FAILED")
+    observed_rho = _distance_association_point(fixture, [True] * 4, 4)
+    if observed_rho != expected_rho:
+        raise ProtocolIntegrityError("INDEPENDENT_GOLDEN_DISTANCE_TIE_RHO_FAILED")
+
+    old_distances = [
+        abs(source / 3.0 - target / 3.0)
+        for source in range(4) for target in range(4) if source != target
+    ]
+    if average_rank(old_distances) == expected_distance_ranks:
+        raise ProtocolIntegrityError("OLD_FLOAT_SUBTRACTION_SABOTAGE_NOT_DETECTED")
+    if spearman_rho(old_distances, fixture_values) == expected_rho:
+        raise ProtocolIntegrityError("OLD_FLOAT_SUBTRACTION_RHO_SABOTAGE_NOT_DETECTED")
+    raw_gap_distances = [float(value) for value in integer_gaps]
+    if raw_gap_distances == normalized_distances:
+        raise ProtocolIntegrityError("RAW_INDEX_DISTANCE_SEMANTIC_SABOTAGE_NOT_DETECTED")
+
+    return {
+        "NORMALIZED_DISTANCE_L4_TIE_TEST": "PASS",
+        "NORMALIZED_DISTANCE_L16_TIE_TEST": "PASS",
+        "NORMALIZED_DISTANCE_L28_TIE_TEST": "PASS",
+        "NORMALIZED_DISTANCE_SYMMETRY_TEST": "PASS",
+        "NORMALIZED_DISTANCE_BOUNDARY_TEST": "PASS",
+        "DISTANCE_RANK_CLASS_GOLDEN": "PASS",
+        "DISTANCE_RHO_TIE_GOLDEN": "PASS",
+        "OLD_FLOAT_SUBTRACTION_SABOTAGE": "PASS",
+        "RAW_INDEX_DISTANCE_SEMANTIC_SABOTAGE": "PASS",
+        "QWEN_OFFDIAGONAL_DISTANCE_CLASS_COUNT": class_counts[28],
+        "OLMO_OFFDIAGONAL_DISTANCE_CLASS_COUNT": class_counts[16],
+    }
 
 
 def verify_independent_numeric_goldens() -> dict[str, str]:
@@ -2281,6 +2371,7 @@ def verify_independent_numeric_goldens() -> dict[str, str]:
     }
     if classify_route(route_summary, alternate_summary)["route"] != "P3":
         raise ProtocolIntegrityError("INDEPENDENT_GOLDEN_ROUTING_FAILED")
+    verify_normalized_distance_tie_semantics()
     return {
         "C0": "PASS", "D": "PASS", "CCAL": "PASS", "R": "PASS", "DBAR": "PASS", "RBAR": "PASS",
         "DISTANCE_ASSOCIATION": "PASS", "SDI": "PASS", "LOW_D_RECOVERY": "PASS", "ROUTING": "PASS",
@@ -2348,6 +2439,7 @@ def run_synthetic_formal_qualification(root: Path = ROOT, *, publish: bool = Tru
     verify_no_authorization_contamination(root)
     import tempfile
     golden_checks = verify_independent_numeric_goldens()
+    normalized_distance_checks = verify_normalized_distance_tie_semantics()
     synthetic_models = {
         "A": {"model_id": "synthetic-A", "model_revision": "synthetic", "num_hidden_layers": 4, "hidden_size": 2},
         "B": {"model_id": "synthetic-B", "model_revision": "synthetic", "num_hidden_layers": 3, "hidden_size": 2},
@@ -2397,12 +2489,13 @@ def run_synthetic_formal_qualification(root: Path = ROOT, *, publish: bool = Tru
         "deep_schema_validation": "PASS",
         "r3_cross_object_schema_gates": r3_schema_gates,
         "independent_numeric_goldens": golden_checks,
+        "normalized_distance_tie_semantics": normalized_distance_checks,
         "semantic_adversarial_test_module_sha256": sha256_file(ROOT / "tests" / "test_exp026_runner.py"),
         "shared_authorized_executor": "PASS",
         "supersedes": SUPERSEDED_FORMAL_PIPELINE_QUALIFICATION_SHA256,
-        "supersession_reason": "FINAL_REREVIEW_IDENTIFIED_CROSS_OBJECT_CCAL_CARRIER_DEPTH_AND_SERIALIZATION_GAPS",
+        "supersession_reason": "NORMALIZED_DISTANCE_FLOAT_TIE_SPLITTING_REPAIRED_BEFORE_SCIENTIFIC_EXPOSURE",
         "engineering_qualification_sha256": sha256_file(ENGINEERING_QUALIFICATION_PATH) if ENGINEERING_QUALIFICATION_PATH.is_file() else None,
-        "formal_run_readiness": "READY_FOR_FINAL_TARGETED_R3_REREVIEW",
+        "formal_run_readiness": "READY_FOR_FINAL_R4_VERIFICATION",
         "formal_data_accessed": False,
         "scientific_result_created": False,
     }

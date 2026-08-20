@@ -810,9 +810,89 @@ def test_production_ccal_golden_and_r_integration():
 
 def test_normalized_depth_vector_and_pair_distance_goldens():
     assert [runner.normalized_depth(index, 4) for index in range(4)] == pytest.approx([0.0, 1 / 3, 2 / 3, 1.0])
-    assert runner.normalized_pair_distance(0, 1, 4) == pytest.approx(1 / 3)
-    assert runner.normalized_pair_distance(0, 3, 4) == pytest.approx(1.0)
-    assert runner.normalized_pair_distance(1, 3, 4) == pytest.approx(2 / 3)
+    assert runner.normalized_pair_distance(0, 1, 4) == 1 / 3
+    assert runner.normalized_pair_distance(0, 3, 4) == 1.0
+    assert runner.normalized_pair_distance(1, 3, 4) == 2 / 3
+
+
+def _distance_fixture_values():
+    matrix = np.asarray(
+        [[0.0, 1.0, 2.0, 3.0], [4.0, 0.0, 2.0, 1.0],
+         [3.0, 2.0, 0.0, 4.0], [1.0, 3.0, 4.0, 0.0]],
+        dtype=np.float32,
+    )
+    return [float(matrix[i, j]) for i in range(4) for j in range(4) if i != j], matrix
+
+
+def _production_distances(num_layers):
+    return {
+        gap: [
+            runner.normalized_pair_distance(i, j, num_layers)
+            for i in range(num_layers) for j in range(num_layers)
+            if i != j and abs(i - j) == gap
+        ]
+        for gap in range(1, num_layers)
+    }
+
+
+def test_normalized_distance_l4_tie_test():
+    groups = _production_distances(4)
+    assert all(len(set(values)) == 1 for values in groups.values())
+    assert groups[1][0] == 1 / 3
+    assert groups[2][0] == 2 / 3
+    assert groups[3][0] == 1.0
+
+
+def test_normalized_distance_l16_tie_test():
+    groups = _production_distances(16)
+    assert all(len(set(values)) == 1 for values in groups.values())
+    assert len({values[0] for values in groups.values()}) == 15
+
+
+def test_normalized_distance_l28_tie_test():
+    groups = _production_distances(28)
+    assert all(len(set(values)) == 1 for values in groups.values())
+    assert len({values[0] for values in groups.values()}) == 27
+
+
+def test_normalized_distance_symmetry_test():
+    for num_layers in (4, 16, 28):
+        for i in range(num_layers):
+            for j in range(num_layers):
+                assert runner.normalized_pair_distance(i, j, num_layers) == runner.normalized_pair_distance(j, i, num_layers)
+
+
+def test_normalized_distance_boundary_test():
+    for num_layers in (4, 16, 28):
+        assert all(runner.normalized_pair_distance(i, i, num_layers) == 0.0 for i in range(num_layers))
+        assert runner.normalized_pair_distance(0, num_layers - 1, num_layers) == 1.0
+
+
+def test_distance_rank_class_golden():
+    expected_ranks = [3.5, 8.5, 11.5, 3.5, 3.5, 8.5, 8.5, 3.5, 3.5, 11.5, 8.5, 3.5]
+    distances = [runner.normalized_pair_distance(i, j, 4) for i in range(4) for j in range(4) if i != j]
+    assert runner.average_rank(distances) == expected_ranks
+
+
+def test_distance_rho_tie_golden():
+    _values, matrix = _distance_fixture_values()
+    assert runner._distance_association_point(matrix, [True] * 4, 4) == -0.30641293851417056
+
+
+def test_old_float_subtraction_sabotage():
+    expected_ranks = [3.5, 8.5, 11.5, 3.5, 3.5, 8.5, 8.5, 3.5, 3.5, 11.5, 8.5, 3.5]
+    values, _matrix = _distance_fixture_values()
+    old_distances = [abs(i / 3.0 - j / 3.0) for i in range(4) for j in range(4) if i != j]
+    assert runner.average_rank(old_distances) != expected_ranks
+    assert runner.spearman_rho(old_distances, values) != -0.30641293851417056
+
+
+def test_raw_index_distance_semantic_sabotage():
+    normalized = [runner.normalized_pair_distance(i, j, 4) for i in range(4) for j in range(4) if i != j]
+    raw = [float(abs(i - j)) for i in range(4) for j in range(4) if i != j]
+    assert raw != normalized
+    assert normalized[0] == 1 / 3
+    assert raw[0] == 1.0
 
 
 def test_coverage_failure_profile_serialization_validation_roundtrip(monkeypatch):
