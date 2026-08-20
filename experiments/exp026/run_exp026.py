@@ -2551,7 +2551,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             result = run_synthetic_formal_qualification(root)
             print("EXP026_FORMAL_PIPELINE_QUALIFICATION = PASS")
             print("EXP026_SYNTHETIC_REAL_EXECUTOR_E2E = PASS")
-            print("EXP026_FORMAL_RUN_READINESS = READY_FOR_FINAL_TARGETED_R3_REREVIEW")
+            print("EXP026_FORMAL_RUN_READINESS = READY_FOR_FINAL_R4_VERIFICATION")
             return 0
         if args.formal_run:
             run_formal_run(root, args.authorization_file)
