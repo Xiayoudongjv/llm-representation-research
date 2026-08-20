@@ -1,0 +1,33 @@
+{
+  "authority_hashes": {
+    "design_validator": "8bfbbb8f7c106aae4f3bd1c82fe5f1419cb8fe7d4bcc87f624eb04a59e6ee2bf",
+    "frozen_config": "ccf60c8a9dc6f3b9d3cce533910334e1f8ec33665a1cf692b98a8aaf683afb57",
+    "layer_mapping": "04c6565ff366fc04960966fcff148228c5338870756c75375baf976177d6dfb1",
+    "metric_specification": "5f58445e26eee7effddd7cd5b4ae255b7153d61fa7a76b5c0684fa1dbb08d8db",
+    "preregistration": "730175071e315b484e360b6359945f567bfe8edf4f52e6a0893c3f2a7dadf8e1",
+    "routing_rules": "4ff6be135066e1cd0bbcad54ee6c7472d693d35063df8202326b5bd0b4308856"
+  },
+  "classification": "FORMAL_PIPELINE_SYNTHETIC_QUALIFICATION",
+  "experiment": "EXP-026",
+  "finished_at_utc": "2026-08-20T06:39:58.524683+00:00",
+  "formal_data_accessed": false,
+  "independent_numeric_goldens": "PASS",
+  "provenance_validation": "PASS",
+  "real_executor_connected": true,
+  "repository_commit": "ab50873685e9e68f61e3b5d2abedc9057e23bd4f",
+  "routing": {
+    "route": "SYNTHETIC_NOT_ROUTED"
+  },
+  "runner_sha256": "938961564165b7c9f66cc110b341917e8104e1ff37056de907c8cb677c611541",
+  "schema_validation": "PASS",
+  "schema_version": "1.0.0",
+  "scientific_result_created": false,
+  "shared_authorized_executor": "PASS",
+  "started_at_utc": "2026-08-20T06:39:54.973714+00:00",
+  "status": "PASS",
+  "synthetic_model_layers": {
+    "A": 4,
+    "B": 3
+  },
+  "synthetic_result_sha256": "55b1a168ad66d2ba4be9b380dc216900cad03afce39c5c68e7ec31eb7e9ceeba"
+}
