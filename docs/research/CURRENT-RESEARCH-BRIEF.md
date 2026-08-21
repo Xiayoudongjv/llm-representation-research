@@ -23,7 +23,7 @@ recalibrated or transported across layers and interventions?
 - EXP-023 independently returns `NO_REPLICATION`: strong Split-A rescue, null Split B.
 - EXP-024 returns a valid condition-panel primary `NOT_SUPPORTED` for the simple degradation-magnitude predictor, while 10/10 conditions show positive `S_diag` and `G_eval` descriptively.
 - EXP-025 returns a valid OLMo cross-model panel result: `D-` / `G+`; degradation breadth is not established, recovery support is limited.
-- EXP-026 has a frozen `FROZEN_DESIGN_NOT_RUN` full source/target model-depth compatibility matrix design; it has not been executed.
+- EXP-026 has completed as a valid registered result: model-dependent compatibility organization, registered route `P3`.
 
 ## 4. Current claim boundaries
 
@@ -84,6 +84,20 @@ recalibrated or transported across layers and interventions?
 - Cross-model recovery: `LIMITED_SUPPORT`.
 - Transport / functional binding: `NOT_TESTED`.
 
+## 5d. EXP-026 exact scientific synthesis
+
+- Canonical result: `experiments/exp026/results/exp026_results.json`
+- Canonical result SHA-256: `9a5bed41b432e2f89b0873869d76e1f5775f9b38caff9472553fca335bbba551`
+- Registered route: `P3`
+- Scientific status: `P3_MATERIALLY_DIFFERENT_MODEL_SIGNATURES`
+- Qwen distance association: `0.7049462571528698`, `POSITIVE_SUPPORTED`.
+- Qwen SDI: `-0.17355352410373298`, `TARGET_DOMINANT`.
+- Qwen LOW-D recovery: `NOT_SUPPORTED` (mean `0.00013923267534205524`, effective n `202`).
+- OLMo distance association: `0.7519250367843754`, `POSITIVE_SUPPORTED`.
+- OLMo SDI: `0.5249651786448143`, `SOURCE_DOMINANT`.
+- OLMo LOW-D recovery: `SUPPORTED` (mean `0.04785714308465166`, effective n `35`).
+- Interpretation ceiling: model-dependent structural difference; no architecture/family causality, transport, invariance, binding, or behavior claim.
+
 ## 6. Active hypotheses
 
 - `HYP-CALIBRATION-001`: `NOT_SUPPORTED_AS_GENERAL_CROSS_SPLIT_REPLICATION`
@@ -92,6 +106,11 @@ recalibrated or transported across layers and interventions?
 - `HYP-TRANSPORT-001`: `ACTIVE_BUT_DEFERRED_BEHIND_CALIBRATION`
 - `HYP-COVER-001`: `INCUBATING_CONCEPTUAL`
 - `HYP-OPERATOR-001`: `DEPENDENT_FUTURE`
+- `HYP-EXP026-COMPAT-ORG-001`: `SUPPORTED_IN_BOTH_TESTED_MODELS`
+- `HYP-EXP026-LOCALIZED-TRANSITION-002`: `NOT_PRIMARY_REGISTERED_ROUTE`
+- `HYP-EXP026-SOURCE-REFERENCE-003`: `SUPPORTED_BUT_MODEL_DEPENDENT`
+- `HYP-EXP026-MODEL-ORGANIZATION-004`: `SUPPORTED`
+- `HYP-EXP026-RECALIBRATABILITY-005`: `CONDITIONAL_MODEL_DEPENDENT_SUPPORT`
 - `HYP-BELIEF-001`: `LONG_TERM_EMBODIED_BRANCH`
 
 ## 7. Deferred hypotheses
@@ -117,10 +136,10 @@ Task 100F has now archived the valid EXP-025 recovery result. The next research
 direction is `MODEL_DEPTH_COMPATIBILITY_PROFILE`; backup is
 `OPERATOR_CAPACITY_MINIMUM_SUFFICIENT_ALIGNMENT`.
 
-Task 101B has now frozen the EXP-026 full source/target compatibility matrix
-design. EXP-026 remains `FROZEN_DESIGN_NOT_RUN`; no runner, GPU run, formal
-authorization, or scientific result was created. The next task is
-`101C_EXP026_RUNNER_IMPLEMENTATION_AND_SYNTHETIC_QUALIFICATION`.
+Task 101G validated the EXP-026 canonical result as `VALID_REGISTERED_RESULT`
+with `ATTEMPT_STATUS = COMPLETED_AND_PUBLISHED_ONCE`. Task 101H recorded the
+registered interpretation and route `P3`. The next task is
+`102A_EXP027_THIRD_MODEL_SELECTION_AND_DESIGN_AUDIT`; do not rerun EXP-026.
 
 ## 9. Frozen authority links/hashes
 
@@ -161,6 +180,13 @@ authorization, or scientific result was created. The next task is
   - SHA-256: `ccf60c8a9dc6f3b9d3cce533910334e1f8ec33665a1cf692b98a8aaf683afb57`
 - EXP-026 preregistration: `experiments/exp026/EXP-026-PREREGISTRATION.md`
   - SHA-256: `730175071e315b484e360b6359945f567bfe8edf4f52e6a0893c3f2a7dadf8e1`
+- EXP-026 canonical result: `experiments/exp026/results/exp026_results.json`
+  - SHA-256: `9a5bed41b432e2f89b0873869d76e1f5775f9b38caff9472553fca335bbba551`
+- EXP-026 authorization: `experiments/exp026/exp026_formal_run_authorization.json`
+  - SHA-256: `83adcafa0648e94d8a50b7132bc9713abf2d9ee58bb930690b775ec93248dcd2`
+- EXP-026 consumption:
+  `experiments/exp026/results/authorization_consumption/b3763f43-d365-4a24-86fc-263f53dc84cb.json`
+  - SHA-256: `4a35bfed3622ef82540e6bd42a843a56c9b5c465a686c1e2201ea5de012cd82a`
 
 ## 10. Instructions to future AI
 
@@ -172,6 +198,8 @@ authorization, or scientific result was created. The next task is
 - Do not modify frozen EXP-023 protocol after outcome.
 - Do not modify frozen EXP-024 protocol after outcome.
 - Do not modify the archived EXP-025 result or recovery provenance.
+- Do not rerun the EXP-026 formal run; it has already completed exactly once.
+- Do not modify the EXP-026 canonical result or authorization consumption evidence.
 
 ## 11. Long-Horizon Research Asset Map
 

@@ -925,8 +925,8 @@ These are `PROSPECTIVE_INTERPRETATION_TEMPLATES`, not results.
 
 #### Future Experiment Relationship
 
-- Potential future direction: `EXP-026-like Operator-Capacity Mechanism Diagnosis`.
-- `EXP-026` is not created; no protocol, dataset, or active hypothesis is created.
+- Potential future direction: operator-capacity mechanism diagnosis.
+- Terminology guard: `EXP-026` now refers to the completed model-depth fixed-readout compatibility matrix, not operator-capacity diagnosis. Do not conflate the completed `EXP-026` with this deferred operator-capacity direction.
 - Priority: `DEFERRED_BEHIND_CROSS_MODEL_REPLICATION` (`EXP025_DIRECTION = CROSS_MODEL_REPLICATION`).
 - A KAN-like operator would be `T_diag-nonlinear`: `T(h)_i = phi_i(h_i)`, with low-degree-of-freedom spline/KAN-like basis FIT-only learned, compared fairly against `T_identity`, `T_diagonal-affine`, `T_low-rank`.
 - Purpose is `MECHANISM_DIAGNOSIS`, not performance optimization.

@@ -178,6 +178,33 @@ the following narrow claim-level updates:
 Existing C4/C5/C7/C12 remain correct for their original scope; their limiting
 evidence now also includes the EXP-025 cross-model result where applicable.
 
+## EXP-026 Claim Updates
+
+EXP-026 is a completed valid registered result with route `P3`. It permits one
+narrow Paper-A update and no broad rewrite.
+
+- **Depth-structured fixed-readout compatibility in both tested models:**
+  Status: `SUPPORTED_IN_BOTH_TESTED_MODELS`. Evidence: Qwen and OLMo both
+  registered `POSITIVE_SUPPORTED` distance association.
+- **Cross-model source/target organization:**
+  Status: `MATERIALLY_DIFFERENT`. Evidence: Qwen `TARGET_DOMINANT`, OLMo
+  `SOURCE_DOMINANT`.
+- **Qwen LOW-D recovery:** Status: `NOT_SUPPORTED`.
+- **OLMo LOW-D recovery:** Status: `SUPPORTED`.
+- **Recalibratability uniformly reducible to raw degradation:**
+  Status: `NOT_SUPPORTED_AS_UNIFORM_MODEL_CLAIM`. Evidence: OLMo supported
+  recovery while Qwen did not.
+- **Architecture/family causality / cross-model mechanism replication:**
+  Status: `NOT_ESTABLISHED` / `NOT_CLAIMED`.
+
+Allowed Paper-A wording: depth-structured fixed-readout compatibility is
+observed in both tested models, while organization differs materially across
+models.
+
+Forbidden Paper-A wording: same mechanism replicated cross-model; architecture
+or family causality; universality; transport; invariance; functional binding;
+behavioral effect.
+
 ## Matrix Summary
 
 | ID | Statement | Status | Supporting | Limiting | Paper section |
@@ -194,6 +221,11 @@ evidence now also includes the EXP-025 cross-model result where applicable.
 | C10 | functional binding not tested | `NOT_TESTED` | none | no binding result | 5.4 |
 | C11 | panel-bounded calibration benefit observed descriptively | `SUPPORTED_DESCRIPTIVELY` | EXP-024 10/10 G_eval positive | descriptive only | 4.6 |
 | C12 | simple degradation-magnitude susceptibility prediction | `NOT_SUPPORTED` | EXP-024 rho=0.284, p=0.2115 | one panel, low resolution | 4.6/5.3/5.7 |
+| C13 | depth-distance-associated fixed-readout compatibility structure | `SUPPORTED_IN_BOTH_TESTED_MODELS` | EXP-026 Qwen and OLMo distance support | two tested models only | Results 4.7 |
+| C14 | materially different cross-model source/target organization | `MATERIALLY_DIFFERENT` | EXP-026 Qwen TARGET_DOMINANT, OLMo SOURCE_DOMINANT | model-dependent, not architecture-causal | Results 4.7 |
+| C15 | OLMo LOW-D recovery support | `SUPPORTED` | EXP-026 OLMo LOW-D SUPPORTED | OLMo model/panel only | Results 4.7 |
+| C16 | Qwen LOW-D recovery support | `NOT_SUPPORTED` | EXP-026 Qwen LOW-D NOT_SUPPORTED | Qwen model/panel only | Results 4.7 |
+| C17 | architecture/family causality or cross-model mechanism replication | `NOT_ESTABLISHED` / `NOT_CLAIMED` | EXP-026 claim ceiling | no causal attribution | Discussion 5.8 |
 
 
 ## 099C Revision Alignment

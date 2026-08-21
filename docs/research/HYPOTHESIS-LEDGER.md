@@ -136,3 +136,59 @@ not be cited as findings or moved into `CLAIM-LEDGER.md` as fact.
 - Dependencies: `HYP-CALIBRATION-001`, `HYP-TRANSPORT-001`, potentially `HYP-OPERATOR-001`.
 - Next discriminating experiment: Candidate future test would apply a preregistered representation transformation at an internal checkpoint, continue the frozen forward computation, and measure predicted changes in Q/K relations, attention matrices, value transport, downstream representations, and eventually behavior.
 - Claim boundary: Not active; no direct empirical support; EXP-023 does not test attention routing or attention–geometry coupling.
+
+## EXP-026 Mechanism Hypothesis Disposition
+
+EXP-026 is a completed, valid registered scientific result. These are prospective
+mechanism statuses, not causal findings. They map the Task 101H `H1`-`H5`
+updates without creating duplicate or conflicting hypothesis IDs.
+
+### HYP-EXP026-COMPAT-ORG-001
+
+- ID: `HYP-EXP026-COMPAT-ORG-001`
+- Title: Depth-associated fixed-readout compatibility organization
+- Origin: EXP-026 full source/target compatibility matrix across Qwen and OLMo.
+- Hypothesis: Fixed-readout compatibility is structured by depth distance.
+- Current evidence: Qwen distance association `0.7049462571528698`, CI `[0.6851830380886905, 0.7080622074980855]`, `POSITIVE_SUPPORTED`; OLMo distance association `0.7519250367843754`, CI `[0.7438987161061725, 0.7582397801058931]`, `POSITIVE_SUPPORTED`.
+- Status: `SUPPORTED_IN_BOTH_TESTED_MODELS`
+- Claim boundary: This is depth-distance structure in two tested models only; it is not a causal depth law.
+
+### HYP-EXP026-LOCALIZED-TRANSITION-002
+
+- ID: `HYP-EXP026-LOCALIZED-TRANSITION-002`
+- Title: Localized transition explanation of compatibility change
+- Origin: EXP-026 registered route `P1` did not trigger globally.
+- Hypothesis: A specific localized transition plus concentrated recovery would identify an operator-capacity target.
+- Current evidence: The registered route did not select `P1`; localization values were evaluable but below the route threshold.
+- Status: `NOT_PRIMARY_REGISTERED_ROUTE`
+- Claim boundary: Frozen secondary descriptive evidence is retained only; no localized transition mechanism is established.
+
+### HYP-EXP026-SOURCE-REFERENCE-003
+
+- ID: `HYP-EXP026-SOURCE-REFERENCE-003`
+- Title: Source/reference dependence of fixed-readout compatibility
+- Origin: EXP-026 SDI endpoint and registered `P2`.
+- Hypothesis: Source/reference organization is a dominant registered signal for compatibility.
+- Current evidence: OLMo `SDI = 0.5249651786448143`, class `SOURCE_DOMINANT`; Qwen `SDI = -0.17355352410373298`, class `TARGET_DOMINANT`.
+- Status: `SUPPORTED_BUT_MODEL_DEPENDENT`
+- Claim boundary: Source dominance was registered in OLMo, not both models; it is not a universal reference-dependence claim.
+
+### HYP-EXP026-MODEL-ORGANIZATION-004
+
+- ID: `HYP-EXP026-MODEL-ORGANIZATION-004`
+- Title: Model-dependent compatibility organization
+- Origin: EXP-026 registered `P3` route.
+- Hypothesis: The two tested models organize source/target fixed-readout compatibility differently.
+- Current evidence: `SDI_CLASS[Q] != SDI_CLASS[O]`, both in `{SOURCE_DOMINANT, TARGET_DOMINANT}`; registered route `P3`.
+- Status: `SUPPORTED`
+- Claim boundary: This establishes material model-dependent difference, not architecture/family causality.
+
+### HYP-EXP026-RECALIBRATABILITY-005
+
+- ID: `HYP-EXP026-RECALIBRATABILITY-005`
+- Title: Recalibratability is partly independent of raw degradation
+- Origin: EXP-026 LOW-D recovery endpoint and prior EXP-025 `G+`.
+- Hypothesis: FIT-only recovery benefit is not uniformly reducible to raw fixed-readout degradation magnitude.
+- Current evidence: OLMo `LOW_D_SUPPORT = SUPPORTED`; Qwen `LOW_D_SUPPORT = NOT_SUPPORTED`.
+- Status: `CONDITIONAL_MODEL_DEPENDENT_SUPPORT`
+- Claim boundary: Conditional model-dependent support only; no transport, preserved-information, or universal recovery claim.

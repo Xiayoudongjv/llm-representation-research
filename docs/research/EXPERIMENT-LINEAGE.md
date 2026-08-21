@@ -15,7 +15,7 @@ Canonical experimental artifacts outrank it.
 - EXP-023 -> independent preregistered `NO_REPLICATION`; one strong featurewise-calibration rescue split and one null split.
 - EXP-024 -> valid condition-panel susceptibility test; simple independent degradation-magnitude predictor `NOT_SUPPORTED`; broad descriptive calibration benefit observed in 10/10 conditions.
 - EXP-025 -> cross-model panel replication on `allenai/OLMo-2-0425-1B-Instruct`; registered `D-_G+`.
-- EXP-026 -> model-depth source/target fixed-readout compatibility matrix design frozen; not run.
+- EXP-026 -> completed valid registered result; material model-dependent compatibility organization; route `P3`.
 
 ## EXP-022A Result Summary
 
@@ -62,6 +62,20 @@ Canonical experimental artifacts outrank it.
   chain; cross-model degradation breadth is not established; recovery has
   limited second-family support.
 
+## EXP-026 Result Summary
+
+- Canonical result SHA-256:
+  `9a5bed41b432e2f89b0873869d76e1f5775f9b38caff9472553fca335bbba551`
+- Authorization ID: `b3763f43-d365-4a24-86fc-263f53dc84cb`
+- Authorization SHA-256: `83adcafa0648e94d8a50b7132bc9713abf2d9ee58bb930690b775ec93248dcd2`
+- Consumption SHA-256: `4a35bfed3622ef82540e6bd42a843a56c9b5c465a686c1e2201ea5de012cd82a`
+- Runner SHA-256: `6ab29c35889ce35b9d4bc9ee98d2665865a088312940f10815714a574d2060a0`
+- Registered route: `P3`
+- Scientific status: `P3_MATERIALLY_DIFFERENT_MODEL_SIGNATURES`
+- Qwen: distance `POSITIVE_SUPPORTED`; SDI `TARGET_DOMINANT`; LOW-D `NOT_SUPPORTED`.
+- OLMo: distance `POSITIVE_SUPPORTED`; SDI `SOURCE_DOMINANT`; LOW-D `SUPPORTED`.
+- Claim boundary: model-dependent structural difference; no architecture/family causality.
+
 ## Result-Conditioned Decision Tree
 
 - A0 degradation: present directionally in both splits; primary-supported only in Split B.
@@ -93,13 +107,17 @@ Post-EXP-025 branch:
 - Backup next direction:
   `OPERATOR_CAPACITY_MINIMUM_SUFFICIENT_ALIGNMENT`.
 
-Post-Task-101B branch:
+Post-EXP-026 branch:
+
+- EXP-026 completed as a valid registered result with route `P3`.
+- Primary next scientific task: `THIRD_MODEL_INDEPENDENT_VALIDATION`.
+- `P4` operator-capacity route remains `LIVE_BUT_DEFERRED`.
+- Next task: `102A_EXP027_THIRD_MODEL_SELECTION_AND_DESIGN_AUDIT`.
+
+Post-Task-101B branch (superseded):
 
 - Task 101B froze the EXP-026 full source/target compatibility matrix design.
-- EXP-026 remains `FROZEN_DESIGN_NOT_RUN`.
-- Next task, if design validation remains `PASS` and specification gaps remain
-  `0`, is `101C_EXP026_RUNNER_IMPLEMENTATION_AND_SYNTHETIC_QUALIFICATION`.
-- EXP-026 is design-only; no runner, GPU run, formal authorization, or
-  scientific result was created.
+- Later tasks implemented, qualified, authorized, executed, and audited EXP-026;
+  the valid canonical result is now the authoritative post-design state.
 
 This is an experimental-priority decision, not a scientific claim.

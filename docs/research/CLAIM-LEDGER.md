@@ -1,4 +1,4 @@
-﻿# Claim Ledger
+# Claim Ledger
 
 | Claim | Status | Evidence |
 | --- | --- | --- |
@@ -31,6 +31,17 @@
 | coordinate transport | NOT_TESTED | no canonical result |
 | functional binding / behavioral control | NOT_SUPPORTED / NOT_TESTED_BY_EXP022A | EXP-017; EXP-022A did not directly test this claim |
 
+| depth-distance-associated fixed-readout compatibility structure | SUPPORTED_IN_BOTH_TESTED_MODELS | EXP-026 canonical result: Qwen distance association `0.7049462571528698`, `POSITIVE_SUPPORTED`; OLMo distance association `0.7519250367843754`, `POSITIVE_SUPPORTED` |
+| materially different cross-model source/target organization | SUPPORTED | EXP-026 canonical result: Qwen `TARGET_DOMINANT`, OLMo `SOURCE_DOMINANT`; registered route `P3` |
+| Qwen target-dominant fixed-readout organization | SUPPORTED | EXP-026 canonical result: Qwen SDI `-0.17355352410373298`, class `TARGET_DOMINANT` |
+| OLMo source-dominant fixed-readout organization | SUPPORTED | EXP-026 canonical result: OLMo SDI `0.5249651786448143`, class `SOURCE_DOMINANT` |
+| LOW-D recalibration recovery in OLMo | SUPPORTED | EXP-026 canonical result: OLMo mean recovery `0.04785714308465166`, positive fraction `0.8285714285714286`, `SUPPORTED` |
+| LOW-D recalibration recovery in Qwen | NOT_SUPPORTED | EXP-026 canonical result: Qwen mean recovery `0.00013923267534205524`, positive fraction `0.07425742574257425`, `NOT_SUPPORTED` |
+| recalibratability uniformly reducible to raw degradation | NOT_SUPPORTED_AS_UNIFORM_MODEL_CLAIM | EXP-026 OLMo `SUPPORTED` vs Qwen `NOT_SUPPORTED` LOW-D recovery; not uniform across tested models |
+| architecture/family causality for EXP-026 organization | NOT_ESTABLISHED | EXP-026 registered claim ceiling prohibits architecture/family causal attribution |
+| cross-model mechanism replication | NOT_CLAIMED | EXP-026 allows model-dependent structural difference, not same-mechanism cross-model replication |
+| coordinate transport / invariance / functional binding / behavior | NOT_TESTED | no EXP-026 canonical result for these constructs |
+
 ## Status semantics
 
 - `SUPPORTED`: canonical result supports the claim.
@@ -48,4 +59,8 @@
 - `HYPOTHESIS_GENERATING / SIMPLE_PREDICTOR_NOT_SUPPORTED`: conditional hypothesis remains, but the simple preregistered susceptibility predictor did not meet its support rule.
 - `SECONDARY_DESCRIPTIVE`: preregistered secondary/descriptive decomposition only.
 - `NOT_SUPPORTED_IN_EXP022A`: the named experiment did not provide preregistered support.
-- `NOT_TESTED_BY_EXP022A`: outside the named experiment's primary scope.
+- `NOT_TESTED_BY_EXP022A`: outside the named experiment''s primary scope.
+- `SUPPORTED_IN_BOTH_TESTED_MODELS`: the registered result supports the claim in both EXP-026 tested models, not in general.
+- `MATERIALLY_DIFFERENT`: registered structural signatures differ materially across the compared models; this is descriptive comparative support, not causal attribution.
+- `NOT_SUPPORTED_AS_UNIFORM_MODEL_CLAIM`: the registered result contradicts a uniform across-model simplification.
+- `NOT_CLAIMED`: deliberately outside the registered claim ceiling.

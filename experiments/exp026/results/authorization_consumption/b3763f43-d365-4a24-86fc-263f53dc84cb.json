@@ -1,0 +1,20 @@
+{
+  "authority_hashes": {
+    "design_validator": "8bfbbb8f7c106aae4f3bd1c82fe5f1419cb8fe7d4bcc87f624eb04a59e6ee2bf",
+    "frozen_config": "ccf60c8a9dc6f3b9d3cce533910334e1f8ec33665a1cf692b98a8aaf683afb57",
+    "layer_mapping": "04c6565ff366fc04960966fcff148228c5338870756c75375baf976177d6dfb1",
+    "metric_specification": "5f58445e26eee7effddd7cd5b4ae255b7153d61fa7a76b5c0684fa1dbb08d8db",
+    "preregistration": "730175071e315b484e360b6359945f567bfe8edf4f52e6a0893c3f2a7dadf8e1",
+    "routing_rules": "4ff6be135066e1cd0bbcad54ee6c7472d693d35063df8202326b5bd0b4308856"
+  },
+  "authorization_id": "b3763f43-d365-4a24-86fc-263f53dc84cb",
+  "authorization_path": "D:\\Research\\llm-representation-research\\experiments\\exp026\\exp026_formal_run_authorization.json",
+  "authorization_sha256": "83adcafa0648e94d8a50b7132bc9713abf2d9ee58bb930690b775ec93248dcd2",
+  "classification": "AUTHORIZATION_CONSUMPTION",
+  "consumed_at_utc": "2026-08-20T13:54:28.493485+00:00",
+  "consumption_record_path": "D:\\Research\\llm-representation-research\\experiments\\exp026\\results\\authorization_consumption\\b3763f43-d365-4a24-86fc-263f53dc84cb.json",
+  "repository_commit": "f5713f398b4c9fa17e790bd1d03388f36460a45a",
+  "run_attempt_id": "f5e6aadca9a946fbb1061154fe14211a",
+  "runner_sha256": "6ab29c35889ce35b9d4bc9ee98d2665865a088312940f10815714a574d2060a0",
+  "schema_version": "1.0.0"
+}
