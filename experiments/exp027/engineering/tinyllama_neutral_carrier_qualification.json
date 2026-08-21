@@ -1,0 +1,105 @@
+{
+  "add_special_tokens_observed": true,
+  "all_selected_finite": true,
+  "bos_token": "<s>",
+  "captured_layer_shapes": [
+    [
+      2048
+    ],
+    [
+      2048
+    ],
+    [
+      2048
+    ],
+    [
+      2048
+    ],
+    [
+      2048
+    ],
+    [
+      2048
+    ],
+    [
+      2048
+    ],
+    [
+      2048
+    ],
+    [
+      2048
+    ],
+    [
+      2048
+    ],
+    [
+      2048
+    ],
+    [
+      2048
+    ],
+    [
+      2048
+    ],
+    [
+      2048
+    ],
+    [
+      2048
+    ],
+    [
+      2048
+    ],
+    [
+      2048
+    ],
+    [
+      2048
+    ],
+    [
+      2048
+    ],
+    [
+      2048
+    ],
+    [
+      2048
+    ],
+    [
+      2048
+    ]
+  ],
+  "carrier_excludes_embedding_and_norm": true,
+  "carrier_identity_ok": true,
+  "chat_template_available": true,
+  "device": "cuda:0",
+  "eos_token": "</s>",
+  "finished_at_utc": "2026-08-21T12:16:12.784781+00:00",
+  "formal_run_authorized": false,
+  "gpu_name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+  "hidden_size": 2048,
+  "input_ids_shape": [
+    1,
+    14
+  ],
+  "last_token_extraction_ok": true,
+  "last_valid_token_index": 13,
+  "layer_count_ok": true,
+  "model_class": "LlamaForCausalLM",
+  "model_id": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+  "model_revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+  "model_type": "llama",
+  "num_hidden_layers": 22,
+  "pad_token": "</s>",
+  "qualification_classification": "NEUTRAL_ENGINEERING_MODEL_QUALIFICATION_ONLY",
+  "real_panel_accessed": false,
+  "runtime_dtype": "torch.bfloat16",
+  "schema_version": "1.0.0",
+  "snapshot_path": "D:\\AI_Cache\\huggingface\\hub\\models--TinyLlama--TinyLlama-1.1B-Chat-v1.0\\snapshots\\fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+  "started_at_utc": "2026-08-21T12:16:05.930512+00:00",
+  "tokenizer_class": "LlamaTokenizer",
+  "unk_token": "<unk>",
+  "vram_peak_allocated_bytes": 2238022656,
+  "vram_peak_reserved_bytes": 2332033024
+}
