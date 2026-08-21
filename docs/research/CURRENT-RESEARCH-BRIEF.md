@@ -227,3 +227,12 @@ routing + composition + invariant validation.
 - Attention–Geometry Coupling: representation state may affect routing; attention-mediated transport may reshape later representation.
 - Status for both: `LONG_TERM` / `PRIOR_ART_REQUIRED` / `NOT_TESTED`.
 - Active scientific priority is now a bounded Paper-A full draft; EXP-024 completed the susceptibility follow-up with a valid negative primary.
+
+## 14. Residual-Flow Hypothesis (Prospective Theory Asset)
+
+- Canonical asset: `RESEARCH-ASSET-MAP.md` under `ASSET-RESIDUAL-FLOW-001`.
+- Hypothesis ledger: `HYP-RESIDUAL-FLOW-001`.
+- Status: `PROSPECTIVE` / `NOT_YET_VALIDATED` / high-value Paper B candidate.
+- Relation to EXP-027: `NO_CHANGE_TO_REGISTERED_EMPIRICAL_ROUTE`; EXP-027 remains `THIRD_MODEL_INDEPENDENT_TRIANGULATION`.
+- Relation to EXP-026: `CONSISTENT_MOTIVATION_NOT_CONFIRMATION`.
+- Residual-Flow does not establish functional binding.

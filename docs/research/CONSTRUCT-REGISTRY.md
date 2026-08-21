@@ -143,6 +143,42 @@ The attention-score stage that weights relationships between positions.
 The attention-output stage that aggregates value vectors across token positions.
 ```
 
+## Representation Flow
+
+```text
+h_0 -> h_1 -> ... -> h_L
+```
+
+A network trajectory viewed as successive representation states.
+
+## Incremental operator
+
+```text
+h_{l+1} = T_l(h_l) = h_l + F_l(h_l) for residual-style systems
+```
+
+`F_l` is the layer-local incremental transformation.
+
+## Accumulated Compatibility Distortion
+
+A prospective operational interpretation of `D(i,j)` as a measure of how much
+a composed representation transformation disrupts compatibility with a
+source-trained fixed readout. `D(i,j)` is not yet a geometric distance,
+information-loss, causal-distortion, or transport-cost measure.
+
+## Representation Trajectory Conserved Structure
+
+A prospective invariant along a representation trajectory:
+`I(h_{l+1}) ≈ I(h_l)`, or continuous approximation `dI(h(t))/dt ≈ 0`.
+
+No specific invariant has been validated.
+
+## Near-identity deviation from identity
+
+For residual form `T = I + Δ`, future measures may include `||Δ||`,
+Jacobian deviation `J_l - I`, operator norm, low-rank update magnitude, and
+other prospectively defined complexity measures. No specific norm is frozen.
+
 ## Scope
 
 This file defines constructs only. It does not assign claim status or freeze an

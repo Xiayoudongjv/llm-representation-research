@@ -121,3 +121,9 @@ Post-Task-101B branch (superseded):
   the valid canonical result is now the authoritative post-design state.
 
 This is an experimental-priority decision, not a scientific claim.
+
+Post-102A-ASSET theory registration:
+
+- Residual-Flow registered as a prospective theoretical asset; no new experiment was created.
+- EXP-027 remains `THIRD_MODEL_INDEPENDENT_TRIANGULATION`.
+- Paper B candidate: minimum near-identity compatibility correction with registered structural preservation; not committed.

@@ -72,6 +72,7 @@ World Model + Structured Belief Representation + Operator Selection -> Embodied 
 Kakeya / Covering / Packing -> Overlap / Multiplicity inspiration -> Representation Interference questions
 Huang's-Law-style structural scaling inspiration -> future Representational Scaling Profile
 KAN / constrained operator family -> operator-complexity ladder -> future minimum sufficient alignment operator
+Residual-Flow Hypothesis -> Accumulated Compatibility Distortion -> Minimum Sufficient Alignment -> Invariant/Conserved Structure
 ```
 
 ## Foundation and Background Assets
@@ -954,6 +955,155 @@ These are `PROSPECTIVE_INTERPRETATION_TEMPLATES`, not results.
 #### Bounded Summary
 
 Kolmogorov-Arnold Networks provide a concrete architectural example of function-valued edges and compositional nonlinear operators. This is structurally relevant to the project's state/operator research direction, but does not validate the project's historical cognitive-folding, transport, or invariant claims. Its main value is as an operator-family prior for future mechanism experiments that compare the minimum complexity required to restore held-out readout compatibility.
+
+## Residual-Flow Hypothesis Assets
+
+### ASSET-RESIDUAL-FLOW-001 - Residual-Flow Hypothesis
+
+- ID: `ASSET-RESIDUAL-FLOW-001`
+- Name: Residual-Flow Hypothesis
+- Chinese Name: `残差表征流假设`
+- Category: `THEORETICAL_ASSET`
+- Origin / Provenance: `PROJECT_SYNTHESIS` + `ESTABLISHED_RESEARCH_PARADIGM` residual-architecture incremental form
+- Core Insight: A deep network trajectory `h_0 -> h_1 -> ... -> h_L` can be studied as an incremental operator chain `h_{l+1} = T_l(h_l)`, with the residual-style specialization `T_l ≈ I + Δ_l` or `h_{l+1} = h_l + F_l(h_l)`.
+- Connection to Current Research: Provides a prospective mechanistic language for cross-depth fixed-readout compatibility change. EXP-026 depth-distance association and model-dependent source/target organization are motivation, not confirmation.
+- Connection to Experiments: Not directly tested. EXP-027 remains `THIRD_MODEL_INDEPENDENT_TRIANGULATION`; Residual-Flow is not a new EXP-027 endpoint.
+- Potential Scientific Value: A falsifiable operator-dynamics framework for accumulated compatibility distortion and minimum near-identity correction.
+- Potential Engineering Value: Future diagnostics such as `J_l = I + ∂F_l/∂h_l`, singular spectra, condition number, and deviation-from-identity magnitude.
+- Potential Formalization: `T_{i→j} = T_{j-1} ∘ ... ∘ T_i`; `T* = argmin_T Complexity(T)` subject to `Recovery(T) ≥ τ` and `InvariantViolation(T) ≤ ε`. `τ`, `ε`, `Complexity()`, and the operator family are not frozen.
+- Potential Testable Consequence: Predictions RF-1 through RF-5 below.
+- Dependencies: `HYP-EXP026-*`, `HYP-OPERATOR-001`, Minimum Sufficient Alignment Operator, invariant/conserved-structure assets.
+- Current Evidence: `MOTIVATED_BY_EXISTING_ARCHITECTURES_AND_CURRENT_EMPIRICAL_PATTERN`; `NOT_CONFIRMED_BY_RESNET`, `NOT_CONFIRMED_BY_EXP026`, `NOT_CONFIRMED_BY_EXP027`.
+- Counterevidence / Limitations: `D(i,j)` is an operational compatibility-loss quantity, not a geometric distance, information-loss measure, causal-distortion measure, or transport cost. Dynamic residual routing is adjacent prior art. Curvature and manifold-collapse claims require independent prospective definitions and measurement.
+- Overclaim Boundary: `PROSPECTIVE_MECHANISTIC_HYPOTHESIS`; not `THEORY_CONFIRMED`, `GENERAL_LAW`, `UNIVERSAL_LLM_PRINCIPLE`, `RESNET_EXPLANATION`, or `COGNITIVE_GEOMETRY_PROOF`.
+- Priority: `TIER 2`
+- Activation Trigger: Only after EXP-027 triangulation if cross-model evidence continues to motivate operator-capacity diagnosis or a separately preregistered cross-domain residual test.
+- Related Constructs: Representation state, transformation operator, incremental operator, accumulated compatibility distortion, representation trajectory conserved structure, minimum sufficient alignment operator.
+- Related Hypotheses: `HYP-RESIDUAL-FLOW-001`, `HYP-OPERATOR-001`, `HYP-TRANSPORT-001`.
+- Related Claims: None.
+- Possible Paper Role: High-value candidate Paper B theory asset; `CANDIDATE_DIRECTION`, `NOT_COMMITTED`.
+- Verification Status: `PROSPECTIVE` / `NOT_YET_VALIDATED`
+
+#### Core Equations
+
+```text
+h_{l+1} = T_l(h_l)
+h_{l+1} = h_l + F_l(h_l)          # residual-style specialization
+T_{i→j} = T_{j-1} ∘ ... ∘ T_i
+J_l = ∂h_{l+1}/∂h_l = I + ∂F_l/∂h_l
+```
+
+#### Operational Interpretation
+
+`D(i,j)` may serve as an operational proxy for accumulated compatibility
+distortion, but it is not established as a geometric distance, information
+loss, causal distortion, or transport cost.
+
+#### Relationship to Residual Networks
+
+Residual architectures motivate a tractable operator-dynamics formulation of
+representation evolution. Residual parameterizations naturally expose
+representation evolution as a sequence of identity-biased incremental
+transformations. This is a motivating architectural analogue, not validation.
+
+#### Relationship to EXP-026
+
+EXP-026 is motivation only. Registered observations are consistent with
+studying compatibility organization but do not prove near-identity operator
+accumulation, residual flow, or invariant-preserving transport.
+
+#### Relationship to EXP-027
+
+`RESIDUAL_FLOW_EXP027_RELATION = NO_CHANGE_TO_REGISTERED_EMPIRICAL_ROUTE`.
+EXP-027 remains `THIRD_MODEL_INDEPENDENT_TRIANGULATION` and must not add
+Residual-Flow as a confirmatory endpoint unless separately preregistered
+before scientific data access.
+
+#### Relationship to Minimum Sufficient Alignment Operator
+
+Candidate future specialization:
+
+```text
+T = I + Δ
+minimize the required correction away from identity
+```
+
+The scientific question is not only whether nonlinear beats linear; it is what
+minimum transformation away from identity is required to restore compatibility
+while preserving registered structure.
+
+#### Relationship to Invariant / Conserved Structure
+
+Register `REPRESENTATION_TRAJECTORY_CONSERVED_STRUCTURE` prospectively:
+
+```text
+I(h_{l+1}) ≈ I(h_l)
+```
+
+or continuous approximation `dI(h(t))/dt ≈ 0`.
+
+No specific invariant has been validated.
+
+#### Prospective Falsifiable Predictions
+
+- RF-1 Accumulation: if degradation accumulates through many small changes, cross-depth compatibility loss should depend systematically on layer distance. Current EXP-026 status: `CONSISTENT_WITH_RF1`, `NOT_CONFIRMATORY_OF_RF1`.
+- RF-2 Localized-transition alternative: concentrated localized transitions would dominate profiles. Status: `OPEN`.
+- RF-3 Model-dependent flow organization: models may share depth-distance structure but differ in source/target organization. Current EXP-026 status: `MOTIVATING_MODEL_DEPENDENT_EVIDENCE`, `NOT_PROOF_OF_OPERATOR_DYNAMICS`.
+- RF-4 Minimal correction: a small near-identity transformation may recover compatibility in some regimes. Status: `OPEN`.
+- RF-5 Structure-preserving recovery: a meaningful alignment operator should preserve independently defined registered structure. Status: `OPEN`.
+
+#### Disconfirmation Conditions
+
+- Cross-depth compatibility shows no systematic accumulated structure across additional models/domains.
+- Observed compatibility changes are almost entirely explained by a small number of discrete transitions.
+- Near-identity operators fail while qualitatively different mappings are consistently required.
+- Apparent invariant preservation does not generalize held-out.
+- Recovery is obtainable only with high-capacity arbitrary mappings.
+- Compatibility recovery fails to predict or affect downstream functional behavior.
+
+#### Claim Ceiling
+
+`PROSPECTIVE_MECHANISTIC_HYPOTHESIS`
+
+Do not promote to `THEORY_CONFIRMED`, `GENERAL_LAW`, `UNIVERSAL_LLM_PRINCIPLE`,
+`RESNET_EXPLANATION`, or `COGNITIVE_GEOMETRY_PROOF`.
+
+#### Prior-Art Warning
+
+Dynamic residual routing, context-conditioned residual gates, adaptive
+computation, input-dependent skip behavior, Highway Networks, gated residual
+connections, stochastic depth, SkipNet-like routing, conditional computation,
+dynamic convolution, CondConv, SE/FiLM-style modulation, Mixture-of-Experts,
+and dynamic ViT variants are not assumed novel. Novelty must not be framed as
+merely making residual connections dynamic.
+
+#### Future Experiments
+
+- Vision cross-domain testbed: construct a ResNet or ViT cross-depth
+  compatibility matrix `C(i,j)`, define `D(i,j)=C(i,i)-C(i,j)`, and study
+  depth-distance association, source/target organization, localization, and
+  alignment recovery. Status: `FUTURE_CROSS_DOMAIN_VALIDATION_ASSET`.
+- Controlled residual parameterization test: compare PlainNet vs ResidualNet
+  while controlling depth, width, data, optimization, capacity, and training
+  budget. Candidate hypothesis: residual parameterization alters the
+  accumulation profile of cross-depth compatibility loss. Status:
+  `FUTURE_PROSPECTIVE_EXPERIMENT`.
+
+#### Open Mathematical Questions
+
+- Which operator-magnitude measure best operationalizes deviation from identity?
+- Which registered structure should serve as the invariant criterion?
+- When is the composed operator `T_{i→j}` usefully approximated as a chain of small near-identity increments?
+- Does residual parameterization change the local Jacobian spectrum or condition-number profile in a way that predicts compatibility loss?
+
+#### Bounded Summary
+
+Residual architectures motivate an identity-biased incremental-operator view of
+representation evolution. The Residual-Flow Hypothesis registers this as a
+prospective mechanistic framework for accumulated compatibility distortion,
+minimum sufficient near-identity alignment, and conserved structure. It is not
+a confirmed theory, does not prove functional binding, and does not change the
+registered EXP-027 third-model triangulation route.
 
 ## Mathematical and Analogy Assets
 
@@ -1899,6 +2049,10 @@ These are valuable because they constrain future claims.
 - KV caching != multi-hypothesis belief representation.
 - Planning != causal-mask softening.
 - KAN architectural inspiration != validation of project transport, invariant, cognitive-folding, or functional-binding theory.
+
+- Residual architectures motivate identity-biased incremental transformation language; they do not validate Residual-Flow as a universal law.
+- EXP-026 depth-distance association and model-dependent organization are motivation for operator-dynamics study, not confirmation of near-identity accumulation.
+- Dynamic residual routing / gated or adaptive skip behavior is adjacent prior art, not a novel contribution.
 
 ## Future Prior-Art Review Triggers
 

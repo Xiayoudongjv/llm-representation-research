@@ -137,6 +137,20 @@ not be cited as findings or moved into `CLAIM-LEDGER.md` as fact.
 - Next discriminating experiment: Candidate future test would apply a preregistered representation transformation at an internal checkpoint, continue the frozen forward computation, and measure predicted changes in Q/K relations, attention matrices, value transport, downstream representations, and eventually behavior.
 - Claim boundary: Not active; no direct empirical support; EXP-023 does not test attention routing or attention–geometry coupling.
 
+## HYP-RESIDUAL-FLOW-001
+
+- ID: `HYP-RESIDUAL-FLOW-001`
+- Title: Residual-Flow Hypothesis
+- Origin: Task 102A-ASSET prospective theory registration; residual-architecture incremental form and EXP-026 registered compatibility-profile pattern.
+- Hypothesis: Cross-depth fixed-readout compatibility change can be productively studied as an accumulated consequence of layerwise identity-biased incremental operators, `h_{l+1} = h_l + F_l(h_l)`.
+- Current evidence: `MOTIVATED_BY_EXISTING_ARCHITECTURES_AND_CURRENT_EMPIRICAL_PATTERN`; not confirmed by ResNet, EXP-026, or EXP-027.
+- Counterevidence / limitations: `D(i,j)` is operational only; ResNet is an architectural analogue; Kakeya/covering ideas are distant inspiration; dynamic residual routing is prior art; functional binding is not established.
+- Status: `PROSPECTIVE` / `NOT_YET_VALIDATED` / `DEFERRED_BEHIND_EXP027`
+- Dependencies: `HYP-EXP026-*`, `HYP-OPERATOR-001`, Minimum Sufficient Alignment Operator, future invariant/conserved-structure definitions.
+- Next discriminating experiment: Deferred until after EXP-027. Candidate future tests are the vision/ResNet cross-depth compatibility matrix and the controlled residual-vs-non-residual parameterization test.
+- Predictions: RF-1 through RF-5 are registered under `ASSET-RESIDUAL-FLOW-001` in `RESEARCH-ASSET-MAP.md`; each is `PROSPECTIVE`.
+- Claim boundary: `PROSPECTIVE_MECHANISTIC_HYPOTHESIS`; not a confirmed theory, not functional binding, and not a new EXP-027 endpoint.
+
 ## EXP-026 Mechanism Hypothesis Disposition
 
 EXP-026 is a completed, valid registered scientific result. These are prospective
