@@ -1,0 +1,68 @@
+{
+  "all_mapped_tensors_match": true,
+  "converted_checkpoint_path": "D:\\AI_Cache\\llama_hf\\Llama3.2-1B-Instruct-meta-converted-v4463-attempt3",
+  "converted_sha256": {
+    "config.json": "bd89aaf5151393a7ae25c5a1fbfb96c98a825d611c3a6e950db636ca2ee4b8d9",
+    "generation_config.json": "82b9ac122eb7faddde243b84d8971c17323fd215a9ec5480c059f723bcd4577b",
+    "model.safetensors": "1ff795ff6a07e6a68085d206fb84417da2f083f68391c2843cd2b8ac6df8538f",
+    "special_tokens_map.json": "ae9d6a4c878d14cc04cfdfa7483c92c46d04ce7675792522eda0bf5915d3435d",
+    "tokenizer.json": "6b9e4e7fb171f92fd137b777cc2714bf87d11576700a1dcd7a399e7bbe39537b",
+    "tokenizer_config.json": "c8ff00dfc90bf2c34c774beddbac0ca7c54f9256c260ff8ccd7985b535bdc89a"
+  },
+  "converted_tensor_count": 146,
+  "direct_mapping_exact_tensors": {
+    "down_proj": 16,
+    "embedding": 1,
+    "final_norm": 1,
+    "gate_proj": 16,
+    "input_layernorm": 16,
+    "k_proj_permute": 16,
+    "o_proj": 16,
+    "post_attention_layernorm": 16,
+    "q_proj_permute": 16,
+    "tied_output_embedding": 1,
+    "up_proj": 16,
+    "v_proj": 16
+  },
+  "finished_at_utc": "2026-08-21T14:43:47.119947+00:00",
+  "k_proj_permutation": {
+    "compared_tensors": 16,
+    "exact_tensors": 16,
+    "max_abs_diff": 0.0
+  },
+  "max_abs_diffs": {
+    "down_proj": 0.0,
+    "embedding": 0.0,
+    "final_norm": 0.0,
+    "gate_proj": 0.0,
+    "input_layernorm": 0.0,
+    "k_proj_permute": 0.0,
+    "o_proj": 0.0,
+    "post_attention_layernorm": 0.0,
+    "q_proj_permute": 0.0,
+    "tied_output_embedding": 0.0,
+    "up_proj": 0.0,
+    "v_proj": 0.0
+  },
+  "mismatch_reasons": [],
+  "native_checkpoint_path": "D:\\AI_Cache\\llama_home\\.llama\\checkpoints\\Llama3.2-1B-Instruct",
+  "native_sha256": {
+    "checklist.chk": "efefc79fc47ecce1c3e06a6ae77a4cddc7e6078f822efba22e4fc7f9da02400e",
+    "consolidated.00.pth": "fc17d497df5e4175b3a8acb4f5865b26f7fc1b009b25bef814b95fde10e8a1f3",
+    "params.json": "1d616a44f3cdac29b9288cf14718b76eb1bed56ed38be1f7e39b06ed139e3733",
+    "tokenizer.model": "82e9d31979e92ab929cd544440f129d9ecd797b69e327f80f17e1c50d5551b55"
+  },
+  "native_tensor_count": 147,
+  "provenance_status": "PASS",
+  "q_proj_permutation": {
+    "compared_tensors": 16,
+    "exact_tensors": 16,
+    "max_abs_diff": 0.0
+  },
+  "qualification_classification": "NATIVE_CONVERTED_PROVENANCE_QUALIFICATION_ONLY",
+  "schema_version": "1.0.0",
+  "scientific_data_accessed": false,
+  "scientific_outcome_computed": false,
+  "started_at_utc": "2026-08-21T14:43:38.160527+00:00",
+  "tied_output_embedding_exact": true
+}

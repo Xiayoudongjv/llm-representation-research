@@ -1,0 +1,146 @@
+{
+  "all_selected_finite": true,
+  "bos_token": "<|begin_of_text|>",
+  "bos_token_id": 128000,
+  "carrier_api": "FORWARD_HOOK_DECODER_BLOCK_OUTPUT",
+  "carrier_mapping_verified": true,
+  "chat_template_available": false,
+  "converted_checkpoint_path": "D:\\AI_Cache\\llama_hf\\Llama3.2-1B-Instruct-meta-converted-v4463-attempt3",
+  "converted_sha256": {
+    "config.json": "bd89aaf5151393a7ae25c5a1fbfb96c98a825d611c3a6e950db636ca2ee4b8d9",
+    "generation_config.json": "82b9ac122eb7faddde243b84d8971c17323fd215a9ec5480c059f723bcd4577b",
+    "model.safetensors": "1ff795ff6a07e6a68085d206fb84417da2f083f68391c2843cd2b8ac6df8538f",
+    "special_tokens_map.json": "ae9d6a4c878d14cc04cfdfa7483c92c46d04ce7675792522eda0bf5915d3435d",
+    "tokenizer.json": "6b9e4e7fb171f92fd137b777cc2714bf87d11576700a1dcd7a399e7bbe39537b",
+    "tokenizer_config.json": "c8ff00dfc90bf2c34c774beddbac0ca7c54f9256c260ff8ccd7985b535bdc89a"
+  },
+  "converted_sha256_match": {
+    "config.json": true,
+    "generation_config.json": true,
+    "model.safetensors": true,
+    "special_tokens_map.json": true,
+    "tokenizer.json": true,
+    "tokenizer_config.json": true
+  },
+  "device": "cuda:0",
+  "eos_token": "<|end_of_text|>",
+  "eos_token_id": 128001,
+  "eot_token_id": 128009,
+  "final_hidden_state_semantics": "POST_FINAL_NORM_CONFIRMED",
+  "finished_at_utc": "2026-08-21T14:05:10.572906+00:00",
+  "formal_run_authorized": false,
+  "gpu_name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+  "hidden_size": 2048,
+  "intermediate_size": 8192,
+  "logits_shape": [
+    1,
+    13,
+    128256
+  ],
+  "max_position_embeddings": 131072,
+  "model_class": "LlamaForCausalLM",
+  "model_source": "META_OFFICIAL_NATIVE_DISTRIBUTION",
+  "model_type": "llama",
+  "native_checkpoint_path": "D:\\AI_Cache\\llama_home\\.llama\\checkpoints\\Llama3.2-1B-Instruct",
+  "native_sha256": {
+    "checklist.chk": "efefc79fc47ecce1c3e06a6ae77a4cddc7e6078f822efba22e4fc7f9da02400e",
+    "consolidated.00.pth": "fc17d497df5e4175b3a8acb4f5865b26f7fc1b009b25bef814b95fde10e8a1f3",
+    "params.json": "1d616a44f3cdac29b9288cf14718b76eb1bed56ed38be1f7e39b06ed139e3733",
+    "tokenizer.model": "82e9d31979e92ab929cd544440f129d9ecd797b69e327f80f17e1c50d5551b55"
+  },
+  "native_sha256_match": {
+    "checklist.chk": true,
+    "consolidated.00.pth": true,
+    "params.json": true,
+    "tokenizer.model": true
+  },
+  "neutral_input_ids_shape": [
+    1,
+    13
+  ],
+  "non_final_block_hook_hidden_max_abs_diff": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "normed_final_vs_final_hidden_max_abs_diff": 0.0,
+  "num_attention_heads": 32,
+  "num_hidden_layers": 16,
+  "num_key_value_heads": 8,
+  "peak_vram_reserved_bytes": 2529165312,
+  "qualification_classification": "MODEL_AUTHORITY_AND_NEUTRAL_RUNTIME_QUALIFICATION_ONLY",
+  "raw_final_vs_final_hidden_max_abs_diff": 13.125,
+  "real_panel_accessed": false,
+  "rope_theta": 500000.0,
+  "runtime_dtype": "torch.bfloat16",
+  "schema_version": "1.0.0",
+  "scientific_matrix_computed": false,
+  "selected_carrier_shapes": [
+    [
+      2048
+    ],
+    [
+      2048
+    ],
+    [
+      2048
+    ],
+    [
+      2048
+    ],
+    [
+      2048
+    ],
+    [
+      2048
+    ],
+    [
+      2048
+    ],
+    [
+      2048
+    ],
+    [
+      2048
+    ],
+    [
+      2048
+    ],
+    [
+      2048
+    ],
+    [
+      2048
+    ],
+    [
+      2048
+    ],
+    [
+      2048
+    ],
+    [
+      2048
+    ],
+    [
+      2048
+    ]
+  ],
+  "selected_model": "Meta-Llama-3.2-1B-Instruct",
+  "started_at_utc": "2026-08-21T14:04:58.863378+00:00",
+  "tie_word_embeddings": true,
+  "tokenizer_class": "TokenizersBackend",
+  "tokenizer_vocab": 128256,
+  "vocab_size": 128256
+}
