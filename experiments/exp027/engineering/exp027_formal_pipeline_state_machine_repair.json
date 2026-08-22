@@ -1,0 +1,41 @@
+{
+  "classification": "EXP027_FORMAL_PIPELINE_STATE_MACHINE_REPAIR",
+  "created_at_utc": "2026-08-22T04:42:27.722608+00:00",
+  "defect": "EXP027 formal runner reused the pristine preregistration validator after authorization and consumption artifacts were expected to exist.",
+  "entry_head": "4bb72e332b92e6132c338831237c6fc0e2fc6c93",
+  "formal_authorization_consumed": false,
+  "formal_authorization_created": false,
+  "formal_data_accessed": false,
+  "formal_run_performed": false,
+  "modified_files": {
+    "formal_pipeline_tests": {
+      "path": "tests/test_exp027_formal_pipeline.py",
+      "sha256": "9aa7b922c78238a2e247979e3314ca8a00d6ac3fc0d9f25d3a4795db734d0220"
+    },
+    "preregistration_validator": {
+      "path": "experiments/exp027/validate_exp027_preregistration.py",
+      "sha256": "76000919f87a06facc64dac011bd66ec3e8d43510d4e2d6931aaf32cce5856fc"
+    },
+    "runner": {
+      "path": "experiments/exp027/run_exp027.py",
+      "sha256": "d2a21c589f00bdd4811e3001896be19a68e251cbde73e386375021919fa0b746"
+    }
+  },
+  "new_runner_sha256": "d2a21c589f00bdd4811e3001896be19a68e251cbde73e386375021919fa0b746",
+  "next_task": "102E_EXP027_SINGLE_USE_FORMAL_AUTHORIZATION_RETRY",
+  "old_runner_sha256": "0b61655d47b464dc204f92d85bab314aaaceb23fd4d751345c6e314de62bcd4b",
+  "pristine_validator_semantics_preserved": true,
+  "repair_scope": "Separated immutable preregistration/design content validation from pristine run-state absence, added formal lifecycle classification/validation, and added dataset/manifest hash verification before authorization consumption.",
+  "schema_version": "1.0.0",
+  "scientific_code_changed": false,
+  "scientific_result_created": false,
+  "state_machine_tests": "PASS",
+  "static_preflight": "PASS",
+  "status": "EXP027_102D_STATE_MACHINE_REPAIR_COMPLETE",
+  "targeted_test_results": {
+    "preregistration_validator": "PASS",
+    "test_exp027_formal_pipeline": "43 passed",
+    "test_exp027_preregistration": "17 passed"
+  },
+  "task": "102D-R_EXP027_FORMAL_RUN_STATE_MACHINE_REPAIR"
+}

@@ -419,3 +419,113 @@ def test_runner_has_no_automatic_retry_loop():
     source = _read_source(RUNNER_PATH)
     for forbidden in ("while True", "for attempt in range", "watchdog", "restart", "retry"):
         assert forbidden not in source
+
+
+# ---------------------------------------------------------------------------
+# Lifecycle state-machine repair regression tests
+# ---------------------------------------------------------------------------
+
+def test_lifecycle_state_classification(tmp_path):
+    auth = tmp_path / "auth.json"
+    consumption = tmp_path / "consumption"
+    result = tmp_path / "result.json"
+
+    assert r.classify_exp027_lifecycle(None, consumption, result) == "S0_PRISTINE_UNAUTHORIZED"
+
+    auth.write_text("{}", encoding="utf-8")
+    assert r.classify_exp027_lifecycle(auth, consumption, result) == "S1_AUTHORIZED_UNUSED"
+
+    consumption.mkdir()
+    (consumption / "102d-test-auth.json").write_text("{}", encoding="utf-8")
+    assert r.classify_exp027_lifecycle(auth, consumption, result) == "S2_CONSUMED_IN_PROGRESS"
+
+    result.write_text("{}", encoding="utf-8")
+    assert r.classify_exp027_lifecycle(auth, consumption, result) == "S3_PUBLISHED"
+
+    auth.unlink()
+    assert r.classify_exp027_lifecycle(None, consumption, result) == "SX_INVALID_STATE"
+
+
+def test_lifecycle_validator_accepts_s1_and_rejects_consumed_states():
+    assert r.validate_formal_lifecycle("S1_AUTHORIZED_UNUSED") == "S1_AUTHORIZED_UNUSED"
+    with pytest.raises(r.Exp027ProtocolIntegrityError, match="FORMAL_AUTHORIZATION_ALREADY_CONSUMED"):
+        r.validate_formal_lifecycle("S2_CONSUMED_IN_PROGRESS")
+
+    with pytest.raises(r.Exp027ProtocolIntegrityError, match="FORMAL_RUN_REQUIRES_AUTHORIZATION"):
+        r.validate_formal_lifecycle("S0_PRISTINE_UNAUTHORIZED")
+    with pytest.raises(r.Exp027ProtocolIntegrityError, match="CANONICAL_RESULT_ALREADY_EXISTS"):
+        r.validate_formal_lifecycle("S3_PUBLISHED")
+    with pytest.raises(r.Exp027ProtocolIntegrityError, match="FORMAL_LIFECYCLE_INVALID_STATE"):
+        r.validate_formal_lifecycle("SX_INVALID_STATE")
+
+
+def test_s1_authorized_state_does_not_invalidate_immutable_authorities(tmp_path):
+    auth = tmp_path / "auth.json"
+    auth.write_text("{}", encoding="utf-8")
+    consumption = tmp_path / "consumption"
+    result = tmp_path / "result.json"
+
+    assert r.classify_exp027_lifecycle(auth, consumption, result) == "S1_AUTHORIZED_UNUSED"
+    # The immutable authority binding must remain available after an authorization exists.
+    binding = r.verify_exp027_authorities(r.ROOT)
+    assert binding["runner_sha256"] == r.sha256_file(r.RUNNER_PATH if hasattr(r, "RUNNER_PATH") else Path(__file__).parents[1] / "experiments" / "exp027" / "run_exp027.py")
+
+
+def test_s2_consumed_state_keeps_authorities_and_rejects_second_launch(tmp_path):
+    payload = _valid_auth_payload()
+    auth_path = _write_auth(tmp_path, payload)
+    authorization, authorization_sha = r.validate_exp027_authorization(r.ROOT, auth_path)
+
+    consumption = tmp_path / "consumption"
+    consumption.mkdir()
+    (consumption / f"{payload['authorization_id']}.json").write_text("{}", encoding="utf-8")
+    result = tmp_path / "result.json"
+
+    assert r.classify_exp027_lifecycle(auth_path, consumption, result) == "S2_CONSUMED_IN_PROGRESS"
+    assert r.verify_exp027_authorities(r.ROOT)
+
+    with pytest.raises(r.Exp027ProtocolIntegrityError, match="FORMAL_AUTHORIZATION_ALREADY_CONSUMED"):
+        r.consume_exp027_authorization(
+            r.ROOT,
+            authorization,
+            authorization_sha,
+            consumption_dir=consumption,
+        )
+
+
+def test_s3_published_collision_is_rejected_before_inference(tmp_path, monkeypatch):
+    auth = tmp_path / "auth.json"
+    auth.write_text("{}", encoding="utf-8")
+    consumption = tmp_path / "consumption"
+    consumption.mkdir()
+    (consumption / "one.json").write_text("{}", encoding="utf-8")
+    result = tmp_path / "result.json"
+    result.write_text("{}", encoding="utf-8")
+
+    assert r.classify_exp027_lifecycle(auth, consumption, result) == "S3_PUBLISHED"
+    with pytest.raises(r.Exp027ProtocolIntegrityError, match="CANONICAL_RESULT_ALREADY_EXISTS"):
+        r.validate_formal_lifecycle("S3_PUBLISHED")
+
+
+def test_invalid_lifecycle_fails_closed(tmp_path):
+    auth = tmp_path / "auth.json"
+    consumption = tmp_path / "consumption"
+    result = tmp_path / "result.json"
+
+    # consumption without authorization
+    consumption.mkdir()
+    (consumption / "orphan.json").write_text("{}", encoding="utf-8")
+    assert r.classify_exp027_lifecycle(None, consumption, result) == "SX_INVALID_STATE"
+
+    # multiple consumption records
+    auth.write_text("{}", encoding="utf-8")
+    (consumption / "second.json").write_text("{}", encoding="utf-8")
+    assert r.classify_exp027_lifecycle(auth, consumption, result) == "SX_INVALID_STATE"
+
+    # canonical result without valid lifecycle provenance
+    auth.unlink()
+    result.write_text("{}", encoding="utf-8")
+    assert r.classify_exp027_lifecycle(None, consumption, result) == "SX_INVALID_STATE"
+
+    with pytest.raises(r.Exp027ProtocolIntegrityError, match="FORMAL_LIFECYCLE_INVALID_STATE"):
+        r.validate_formal_lifecycle("SX_INVALID_STATE")

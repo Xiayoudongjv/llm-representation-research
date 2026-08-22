@@ -117,14 +117,12 @@ def _repository_commit(root: Path = ROOT) -> str:
 
 
 def _load_frozen_design(root: Path = ROOT) -> dict[str, Any]:
-    if design_validator.validate_file():
-        raise Exp027ProtocolIntegrityError("EXP027_FROZEN_DESIGN_VALIDATOR_FAILED")
+    if design_validator.validate_immutable_content():
+        raise Exp027ProtocolIntegrityError("EXP027_IMMUTABLE_AUTHORITIES_INVALID")
     return read_json(root / FROZEN_DESIGN_PATH)
 
 
 def verify_exp027_authorities(root: Path = ROOT) -> dict[str, Any]:
-    if design_validator.validate_file():
-        raise Exp027ProtocolIntegrityError("EXP027_FROZEN_DESIGN_VALIDATOR_FAILED")
     design = _load_frozen_design(root)
     prereg = root / PREREG_PATH
     if not prereg.is_file():
@@ -170,6 +168,58 @@ def verify_no_authorization_contamination(root: Path = ROOT) -> None:
         records = list(consumption_dir.glob("*.json"))
         if records:
             raise Exp027ProtocolIntegrityError("FORMAL_AUTHORIZATION_CONSUMPTION_ALREADY_EXISTS")
+
+def verify_exp027_dataset_hashes(root: Path = ROOT) -> None:
+    design = _load_frozen_design(root)
+    manifest = design["dataset_manifest"]
+    expected = design["dataset_hashes"]
+    required = {
+        manifest["dataset_path"]: expected["dataset_sha256"],
+        manifest["condition_panel_path"]: expected["condition_panel_sha256"],
+        manifest["data_schema_path"]: expected["data_schema_sha256"],
+        manifest["frozen_manifest_path"]: expected["frozen_manifest_sha256"],
+        manifest["exp024_preregistration_path"]: expected["exp024_preregistration_sha256"],
+    }
+    for relative_path, expected_hash in required.items():
+        actual_hash = sha256_file(root / relative_path)
+        if actual_hash != expected_hash:
+            raise Exp027ProtocolIntegrityError("EXP027_DATASET_HASH_MISMATCH")
+
+
+def classify_exp027_lifecycle(
+    authorization_path: Path | None,
+    consumption_dir: Path,
+    result_path: Path,
+) -> str:
+    authorization_path = Path(authorization_path) if authorization_path is not None else None
+    consumption_dir = Path(consumption_dir)
+    result_path = Path(result_path)
+    auth_exists = authorization_path is not None and authorization_path.is_file()
+    consumption_records = list(consumption_dir.glob("*.json")) if consumption_dir.exists() else []
+    result_exists = result_path.exists()
+
+    if not auth_exists and not consumption_records and not result_exists:
+        return "S0_PRISTINE_UNAUTHORIZED"
+    if auth_exists and not consumption_records and not result_exists:
+        return "S1_AUTHORIZED_UNUSED"
+    if auth_exists and len(consumption_records) == 1 and not result_exists:
+        return "S2_CONSUMED_IN_PROGRESS"
+    if auth_exists and len(consumption_records) == 1 and result_exists:
+        return "S3_PUBLISHED"
+    return "SX_INVALID_STATE"
+
+
+def validate_formal_lifecycle(lifecycle: str) -> str:
+    if lifecycle == "S0_PRISTINE_UNAUTHORIZED":
+        raise Exp027ProtocolIntegrityError("FORMAL_RUN_REQUIRES_AUTHORIZATION")
+    if lifecycle == "S2_CONSUMED_IN_PROGRESS":
+        raise Exp027ProtocolIntegrityError("FORMAL_AUTHORIZATION_ALREADY_CONSUMED")
+    if lifecycle == "S3_PUBLISHED":
+        raise Exp027ProtocolIntegrityError("CANONICAL_RESULT_ALREADY_EXISTS")
+    if lifecycle == "SX_INVALID_STATE":
+        raise Exp027ProtocolIntegrityError("FORMAL_LIFECYCLE_INVALID_STATE")
+    return lifecycle
+
 
 def validate_exp027_authorization(root: Path, authorization_path: Path) -> tuple[dict[str, Any], str]:
     if not authorization_path.is_file():
@@ -577,9 +627,17 @@ def run_formal_run(
     progress_reporter = progress.OutcomeBlindProgress(state_path=state_path)
     progress_reporter.report("AUTHORIZATION_VALIDATION", completed=0, total=1, heartbeat=True)
     auth_path = _authorization_path_for(root, authorization_file)
+    lifecycle = classify_exp027_lifecycle(
+        auth_path,
+        root / CONSUMPTION_DIR,
+        root / RESULT_PATH,
+    )
+    validate_formal_lifecycle(lifecycle)
     if auth_path is None:
         raise Exp027ProtocolIntegrityError("FORMAL_RUN_REQUIRES_AUTHORIZATION")
     authorization, authorization_sha = validate_exp027_authorization(root, auth_path)
+    verify_exp027_dataset_hashes(root)
+    _verify_expected_model_provenance(root)
     progress_reporter.report("AUTHORIZATION_VALIDATED", completed=1, total=1, heartbeat=True)
     consumption, consumption_sha = consume_exp027_authorization(
         root,

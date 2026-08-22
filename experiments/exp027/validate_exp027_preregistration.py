@@ -314,14 +314,24 @@ def validate(config: dict[str, Any]) -> list[str]:
     return errors
 
 
-def validate_file(config_path: Path = CONFIG_PATH, root: Path = ROOT) -> list[str]:
+def validate_immutable_content(config_path: Path = CONFIG_PATH) -> list[str]:
+    """Validate only the frozen preregistration/design content and expected hashes.
+
+    This is the content-only authority check used by the formal runner after a
+    valid authorization may exist. It intentionally does not check the pristine
+    run-state absence enforced by :func:`validate_file`.
+    """
     if not config_path.exists():
         return ["missing exp027_frozen_design.json"]
     try:
         config = read_json(config_path)
     except Exception as exc:  # pragma: no cover
         return [f"config parse failure: {exc}"]
-    errors = validate(config)
+    return validate(config)
+
+
+def validate_file(config_path: Path = CONFIG_PATH, root: Path = ROOT) -> list[str]:
+    errors = validate_immutable_content(config_path)
     for path in FORBIDDEN_RESULT_PATHS:
         if path.exists():
             errors.append(f"forbidden result/authorization path exists: {path}")
