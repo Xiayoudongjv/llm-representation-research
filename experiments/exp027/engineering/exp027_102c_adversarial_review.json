@@ -1,0 +1,84 @@
+{
+  "schema_version": "1.0.0",
+  "task_id": "102C_EXP027_ENGINEERING_AND_ADVERSARIAL_REVIEW",
+  "experiment": "EXP-027",
+  "review_classification": "ENGINEERING_ADVERSARIAL_REVIEW_ONLY",
+  "review_status": "EXP027_102C_ENGINEERING_AND_ADVERSARIAL_REVIEW_COMPLETE",
+  "entry_head": "f36e84a7fc883a3e5f5d777d3193e76cf6fcce13",
+  "final_head": "f36e84a7fc883a3e5f5d777d3193e76cf6fcce13",
+  "repository_commit": "f36e84a7fc883a3e5f5d777d3193e76cf6fcce13",
+  "origin_main": "f36e84a7fc883a3e5f5d777d3193e76cf6fcce13",
+  "branch": "main",
+  "worktree_state": "TRACKED_CLEAN_WITH_EXPECTED_UNTRACKED_EVIDENCE",
+  "staging_state": "EMPTY",
+  "created_at_utc": "2026-08-22T01:36:45.2209217Z",
+  "exp027_frozen_design": {
+    "path": "experiments/exp027/exp027_frozen_design.json",
+    "sha256": "B37BFD9C3D57BF891EF1993B3A1D7737FCEDBE143813D61F5C7AE9ECB0BC5B1A"
+  },
+  "exp027_preregistration": {
+    "path": "docs/experiments/EXP-027-PREREGISTRATION.md",
+    "sha256": "83BA4BB14E87334A6C52A8746F86874EAB9578E646ABC736057FBD1F4E6322FE"
+  },
+  "exp026_reference": {
+    "runner_path": "experiments/exp026/run_exp026.py",
+    "runner_sha256": "6ab29c35889ce35b9d4bc9ee98d2665865a088312940f10815714a574d2060a0",
+    "result_path": "experiments/exp026/results/exp026_results.json",
+    "result_sha256": "9a5bed41b432e2f89b0873869d76e1f5775f9b38caff9472553fca335bbba551"
+  },
+  "review_findings": {
+    "EXP026_TO_EXP027_SEMANTIC_DRIFT": "NONE",
+    "ARCHITECTURE_ADAPTATIONS": [
+      "normalized-depth denominator 27 -> 15 for Llama-3.2-1B",
+      "source-coverage ceil(L/2) -> 8 for 16 decoder blocks"
+    ],
+    "STATISTICAL_SEMANTICS_VERIFIED": true,
+    "DEPTH_NORMALIZATION_VERIFIED": true,
+    "MATRIX_ORIENTATION_VERIFIED": true,
+    "CONDITION_POOLING_VERIFIED": true,
+    "LOW_D_LEAKAGE_FIREWALL_VERIFIED": true,
+    "TECHNICAL_VALIDITY_BOUNDARIES_VERIFIED": true,
+    "PROFILE_EXACT_MATCH_ROUTING_VERIFIED": true,
+    "INVALIDITY_PRECEDES_ROUTING": true,
+    "CARRIER_CALL_PATH_VERIFIED": true,
+    "FINAL_RMSNORM_TRAP_COVERED": true,
+    "TOKEN_SELECTION_VERIFIED": true,
+    "CLASS_ORDER_MAPPING_VERIFIED": true,
+    "SCIENTIFIC_OVERRIDE_SURFACES": "NONE",
+    "OUTCOME_BLIND_PROGRESS_VERIFIED": true,
+    "THEORY_CONTAMINATION": "NONE"
+  },
+  "firewall": {
+    "REAL_FIT_ACCESSED": false,
+    "REAL_DIAG_ACCESSED": false,
+    "REAL_EVAL_ACCESSED": false,
+    "LLAMA_SCIENTIFIC_INFERENCE_PERFORMED": false,
+    "SCIENTIFIC_MATRIX_COMPUTED": false,
+    "SCIENTIFIC_RESULT_CREATED": false,
+    "FORMAL_AUTHORIZATION_CREATED": false,
+    "FORMAL_RUN_PERFORMED": false
+  },
+  "test_commands": {
+    "validator": {
+      "command": "python experiments/exp027/validate_exp027_preregistration.py",
+      "result": "PASS"
+    },
+    "prereg_tests": {
+      "command": "python -m pytest tests/test_exp027_preregistration.py -q",
+      "result": "17 passed in 0.16s"
+    },
+    "adversarial_tests": {
+      "command": "python -m pytest tests/test_exp027_102c_adversarial.py -q",
+      "result": "105 passed in 5.69s"
+    },
+    "regression_tests": {
+      "command": "python -m pytest tests/test_exp027_bootstrap_optimized_prototype.py tests/test_exp027_progress.py -q",
+      "result": "13 passed, 72 warnings in 21.37s"
+    },
+    "py_compile": {
+      "command": "python -m py_compile tests/test_exp027_102c_adversarial.py",
+      "result": "PASS"
+    }
+  },
+  "next_task": "102D_EXP027_FORMAL_PIPELINE_QUALIFICATION"
+}
