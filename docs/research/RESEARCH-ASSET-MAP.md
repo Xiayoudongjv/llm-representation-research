@@ -2077,3 +2077,15 @@ The following assets require future literature review before activation:
 - KAN / learnable univariate operators; geometry-aware or constraint-aware KAN variants; attention/vision KAN variants.
 
 No full prior-art search is performed by this task.
+
+
+## Innovation Candidates
+
+- Asset class: `INNOVATION_CANDIDATE`
+- Canonical registry: `docs/theory/INNOVATION-CANDIDATE-REGISTRY.md`
+- Machine-readable mirror: `docs/theory/innovation_candidate_registry.json`
+- Epistemic level: lower authority than registered hypothesis, preregistered experiment, canonical result, and supported claim.
+- Default epistemic status: `UNTESTED_PROSPECTIVE_SYNTHESIS`
+- Scientific authority: `NONE_BY_DEFAULT`
+- Promotion rule: `AUTO_PROMOTION_ALLOWED = false`; promotion requires a separate scientific route review.
+- Purpose: retain promising synthesis without treating conceptual novelty, analogy, terminology, or combination as scientific evidence.
