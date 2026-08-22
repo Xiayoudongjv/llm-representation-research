@@ -1,0 +1,19 @@
+{
+  "classification": "EXP027_RECOVERY_AUTHORIZATION_IDENTITY_PATCH",
+  "created_at_utc": "2026-08-22T05:50:07.093953+00:00",
+  "defect": "Lifecycle classifier treated any consumption record as consuming the current authorization, blocking recovery authorization identity.",
+  "entry_head": "25fe3c0d114465fe26fc38435c0bbbf9b84bb40b",
+  "formal_rerun_performed": false,
+  "historical_attempt_1_preserved": true,
+  "identity_aware_consumption_rule": "Consumption status is matched to current authorization_id; historical consumption records are validated and preserved without blocking an unused recovery authorization.",
+  "new_authorization_created": false,
+  "new_runner_sha256": "bcbfcf304b356a849ace6158c75c1da86f9c832aeb684b44e0796f3e5f276ca8",
+  "old_runner_sha256": "3b06236e3075ebc5963a98cab019c61273397f71123358fe4fb985a4ba7a6ceb",
+  "schema_version": "1.0.0",
+  "scientific_code_changed": false,
+  "scientific_result_created": false,
+  "status": "EXP027_102F_RECOVERY_AUTHORIZATION_IDENTITY_PATCH_COMPLETE",
+  "synthetic_lifecycle_check": "PASS",
+  "targeted_tests": "tests/test_exp027_formal_pipeline.py = 48 passed",
+  "task": "102F-R2A_EXP027_RECOVERY_AUTHORIZATION_IDENTITY_PATCH"
+}

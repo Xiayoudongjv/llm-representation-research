@@ -429,25 +429,51 @@ def test_runner_has_no_automatic_retry_loop():
 # Lifecycle state-machine repair regression tests
 # ---------------------------------------------------------------------------
 
+def _write_identity_authorization(tmp_path: Path, authorization_id: str) -> Path:
+    payload = _valid_auth_payload()
+    payload["authorization_id"] = authorization_id
+    path = tmp_path / f"{authorization_id}.auth.json"
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    return path
+
+
+def _write_identity_consumption(consumption_dir: Path, authorization_id: str) -> Path:
+    consumption_dir.mkdir(parents=True, exist_ok=True)
+    path = consumption_dir / f"{authorization_id}.json"
+    record = {
+        "schema_version": "1.0.0",
+        "classification": "AUTHORIZATION_CONSUMPTION",
+        "authorization_id": authorization_id,
+        "authorization_sha256": "a" * 64,
+        "consumed_at_utc": "2026-08-22T00:00:00+00:00",
+        "run_attempt_id": f"attempt-{authorization_id[:8]}",
+        "repository_commit": "c" * 40,
+        "runner_sha256": "d" * 64,
+        "authority_binding": {},
+    }
+    path.write_text(json.dumps(record), encoding="utf-8")
+    return path
+
+
 def test_lifecycle_state_classification(tmp_path):
-    auth = tmp_path / "auth.json"
+    auth_a = _write_identity_authorization(tmp_path, "auth-a")
+    auth_b = _write_identity_authorization(tmp_path, "auth-b")
     consumption = tmp_path / "consumption"
     result = tmp_path / "result.json"
 
     assert r.classify_exp027_lifecycle(None, consumption, result) == "S0_PRISTINE_UNAUTHORIZED"
 
-    auth.write_text("{}", encoding="utf-8")
-    assert r.classify_exp027_lifecycle(auth, consumption, result) == "S1_AUTHORIZED_UNUSED"
+    # A consumed, B unused, no canonical result: B is authorized-unused.
+    _write_identity_consumption(consumption, "auth-a")
+    assert r.classify_exp027_lifecycle(auth_b, consumption, result) == "S1_AUTHORIZED_UNUSED"
 
-    consumption.mkdir()
-    (consumption / "102d-test-auth.json").write_text("{}", encoding="utf-8")
-    assert r.classify_exp027_lifecycle(auth, consumption, result) == "S2_CONSUMED_IN_PROGRESS"
+    # B consumed, no canonical result: B is consumed-in-progress.
+    _write_identity_consumption(consumption, "auth-b")
+    assert r.classify_exp027_lifecycle(auth_b, consumption, result) == "S2_CONSUMED_IN_PROGRESS"
 
+    # Canonical result exists: no further launch regardless of identity.
     result.write_text("{}", encoding="utf-8")
-    assert r.classify_exp027_lifecycle(auth, consumption, result) == "S3_PUBLISHED"
-
-    auth.unlink()
-    assert r.classify_exp027_lifecycle(None, consumption, result) == "SX_INVALID_STATE"
+    assert r.classify_exp027_lifecycle(auth_b, consumption, result) == "S3_PUBLISHED"
 
 
 def test_lifecycle_validator_accepts_s1_and_rejects_consumed_states():
@@ -464,15 +490,14 @@ def test_lifecycle_validator_accepts_s1_and_rejects_consumed_states():
 
 
 def test_s1_authorized_state_does_not_invalidate_immutable_authorities(tmp_path):
-    auth = tmp_path / "auth.json"
-    auth.write_text("{}", encoding="utf-8")
+    auth = _write_identity_authorization(tmp_path, "auth-b")
     consumption = tmp_path / "consumption"
+    _write_identity_consumption(consumption, "auth-a")
     result = tmp_path / "result.json"
 
     assert r.classify_exp027_lifecycle(auth, consumption, result) == "S1_AUTHORIZED_UNUSED"
-    # The immutable authority binding must remain available after an authorization exists.
     binding = r.verify_exp027_authorities(r.ROOT)
-    assert binding["runner_sha256"] == r.sha256_file(r.RUNNER_PATH if hasattr(r, "RUNNER_PATH") else Path(__file__).parents[1] / "experiments" / "exp027" / "run_exp027.py")
+    assert binding["runner_sha256"] == r.sha256_file(Path(__file__).parents[1] / "experiments" / "exp027" / "run_exp027.py")
 
 
 def test_s2_consumed_state_keeps_authorities_and_rejects_second_launch(tmp_path):
@@ -481,8 +506,7 @@ def test_s2_consumed_state_keeps_authorities_and_rejects_second_launch(tmp_path)
     authorization, authorization_sha = r.validate_exp027_authorization(r.ROOT, auth_path)
 
     consumption = tmp_path / "consumption"
-    consumption.mkdir()
-    (consumption / f"{payload['authorization_id']}.json").write_text("{}", encoding="utf-8")
+    _write_identity_consumption(consumption, payload["authorization_id"])
     result = tmp_path / "result.json"
 
     assert r.classify_exp027_lifecycle(auth_path, consumption, result) == "S2_CONSUMED_IN_PROGRESS"
@@ -498,11 +522,9 @@ def test_s2_consumed_state_keeps_authorities_and_rejects_second_launch(tmp_path)
 
 
 def test_s3_published_collision_is_rejected_before_inference(tmp_path, monkeypatch):
-    auth = tmp_path / "auth.json"
-    auth.write_text("{}", encoding="utf-8")
+    auth = _write_identity_authorization(tmp_path, "auth-b")
     consumption = tmp_path / "consumption"
-    consumption.mkdir()
-    (consumption / "one.json").write_text("{}", encoding="utf-8")
+    _write_identity_consumption(consumption, "auth-a")
     result = tmp_path / "result.json"
     result.write_text("{}", encoding="utf-8")
 
@@ -512,27 +534,50 @@ def test_s3_published_collision_is_rejected_before_inference(tmp_path, monkeypat
 
 
 def test_invalid_lifecycle_fails_closed(tmp_path):
-    auth = tmp_path / "auth.json"
+    auth = _write_identity_authorization(tmp_path, "auth-b")
     consumption = tmp_path / "consumption"
     result = tmp_path / "result.json"
 
-    # consumption without authorization
-    consumption.mkdir()
+    # Malformed historical consumption record must fail closed.
+    consumption.mkdir(parents=True, exist_ok=True)
     (consumption / "orphan.json").write_text("{}", encoding="utf-8")
-    assert r.classify_exp027_lifecycle(None, consumption, result) == "SX_INVALID_STATE"
+    with pytest.raises(r.Exp027ProtocolIntegrityError):
+        r.classify_exp027_lifecycle(auth, consumption, result)
 
-    # multiple consumption records
-    auth.write_text("{}", encoding="utf-8")
-    (consumption / "second.json").write_text("{}", encoding="utf-8")
-    assert r.classify_exp027_lifecycle(auth, consumption, result) == "SX_INVALID_STATE"
+    # Filename identity mismatch must fail closed.
+    (consumption / "orphan.json").unlink()
+    (consumption / "wrong-name.json").write_text(json.dumps({
+        "schema_version": "1.0.0",
+        "classification": "AUTHORIZATION_CONSUMPTION",
+        "authorization_id": "auth-a",
+    }), encoding="utf-8")
+    with pytest.raises(r.Exp027ProtocolIntegrityError, match="FORMAL_CONSUMPTION_RECORD_IDENTITY_MISMATCH"):
+        r.classify_exp027_lifecycle(auth, consumption, result)
 
-    # canonical result without valid lifecycle provenance
-    auth.unlink()
-    result.write_text("{}", encoding="utf-8")
-    assert r.classify_exp027_lifecycle(None, consumption, result) == "SX_INVALID_STATE"
+    # A conflicting second record for the same authorization identity must fail closed.
+    (consumption / "wrong-name.json").unlink()
+    _write_identity_consumption(consumption, "auth-a")
+    (consumption / "auth-a-copy.json").write_text(json.dumps({
+        "schema_version": "1.0.0",
+        "classification": "AUTHORIZATION_CONSUMPTION",
+        "authorization_id": "auth-a",
+    }), encoding="utf-8")
+    with pytest.raises(r.Exp027ProtocolIntegrityError, match="FORMAL_CONSUMPTION_RECORD_IDENTITY_MISMATCH"):
+        r.classify_exp027_lifecycle(auth, consumption, result)
 
-    with pytest.raises(r.Exp027ProtocolIntegrityError, match="FORMAL_LIFECYCLE_INVALID_STATE"):
-        r.validate_formal_lifecycle("SX_INVALID_STATE")
+
+def test_prior_attempt_remains_consumed_after_new_lifecycle_classification(tmp_path):
+    auth_a = _write_identity_authorization(tmp_path, "auth-a")
+    auth_b = _write_identity_authorization(tmp_path, "auth-b")
+    consumption = tmp_path / "consumption"
+    _write_identity_consumption(consumption, "auth-a")
+    result = tmp_path / "result.json"
+
+    assert r.classify_exp027_lifecycle(auth_b, consumption, result) == "S1_AUTHORIZED_UNUSED"
+    assert r.classify_exp027_lifecycle(auth_a, consumption, result) == "S2_CONSUMED_IN_PROGRESS"
+
+    with pytest.raises(r.Exp027ProtocolIntegrityError, match="FORMAL_AUTHORIZATION_ALREADY_CONSUMED"):
+        r.validate_formal_lifecycle("S2_CONSUMED_IN_PROGRESS")
 
 
 # ---------------------------------------------------------------------------

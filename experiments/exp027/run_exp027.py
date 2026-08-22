@@ -190,6 +190,50 @@ def verify_exp027_dataset_hashes(root: Path = ROOT) -> None:
             raise Exp027ProtocolIntegrityError("EXP027_DATASET_HASH_MISMATCH")
 
 
+def _authorization_identity_from_path(authorization_path: Path | None) -> str | None:
+    authorization_path = Path(authorization_path) if authorization_path is not None else None
+    if authorization_path is None or not authorization_path.is_file():
+        return None
+    try:
+        authorization = read_json(authorization_path)
+    except Exception as exc:
+        raise Exp027ProtocolIntegrityError("FORMAL_AUTHORIZATION_FILE_INVALID") from exc
+    authorization_id = authorization.get("authorization_id")
+    if not authorization_id:
+        raise Exp027ProtocolIntegrityError("FORMAL_AUTHORIZATION_ID_MISSING")
+    return str(authorization_id)
+
+
+def validate_exp027_consumption_history(consumption_dir: Path) -> list[tuple[str, dict[str, Any]]]:
+    consumption_dir = Path(consumption_dir)
+    if not consumption_dir.exists():
+        return []
+    records: list[tuple[str, dict[str, Any]]] = []
+    seen_ids: set[str] = set()
+    for path in sorted(consumption_dir.glob("*.json")):
+        try:
+            record = read_json(path)
+        except Exception as exc:
+            raise Exp027ProtocolIntegrityError("FORMAL_CONSUMPTION_RECORD_INVALID") from exc
+        if not isinstance(record, dict):
+            raise Exp027ProtocolIntegrityError("FORMAL_CONSUMPTION_RECORD_INVALID")
+        if record.get("schema_version") != "1.0.0":
+            raise Exp027ProtocolIntegrityError("FORMAL_CONSUMPTION_RECORD_SCHEMA_INVALID")
+        if record.get("classification") != "AUTHORIZATION_CONSUMPTION":
+            raise Exp027ProtocolIntegrityError("FORMAL_CONSUMPTION_RECORD_CLASSIFICATION_INVALID")
+        authorization_id = record.get("authorization_id")
+        if not authorization_id:
+            raise Exp027ProtocolIntegrityError("FORMAL_CONSUMPTION_RECORD_ID_MISSING")
+        authorization_id = str(authorization_id)
+        if path.stem != authorization_id:
+            raise Exp027ProtocolIntegrityError("FORMAL_CONSUMPTION_RECORD_IDENTITY_MISMATCH")
+        if authorization_id in seen_ids:
+            raise Exp027ProtocolIntegrityError("FORMAL_CONSUMPTION_RECORD_DUPLICATE")
+        seen_ids.add(authorization_id)
+        records.append((authorization_id, record))
+    return records
+
+
 def classify_exp027_lifecycle(
     authorization_path: Path | None,
     consumption_dir: Path,
@@ -198,18 +242,21 @@ def classify_exp027_lifecycle(
     authorization_path = Path(authorization_path) if authorization_path is not None else None
     consumption_dir = Path(consumption_dir)
     result_path = Path(result_path)
-    auth_exists = authorization_path is not None and authorization_path.is_file()
-    consumption_records = list(consumption_dir.glob("*.json")) if consumption_dir.exists() else []
+    current_authorization_id = _authorization_identity_from_path(authorization_path)
+    consumption_records = validate_exp027_consumption_history(consumption_dir)
     result_exists = result_path.exists()
+    matching_consumption_count = sum(
+        1 for record_id, _ in consumption_records if record_id == current_authorization_id
+    )
 
-    if not auth_exists and not consumption_records and not result_exists:
-        return "S0_PRISTINE_UNAUTHORIZED"
-    if auth_exists and not consumption_records and not result_exists:
-        return "S1_AUTHORIZED_UNUSED"
-    if auth_exists and len(consumption_records) == 1 and not result_exists:
-        return "S2_CONSUMED_IN_PROGRESS"
-    if auth_exists and len(consumption_records) == 1 and result_exists:
+    if result_exists:
         return "S3_PUBLISHED"
+    if current_authorization_id is None:
+        return "S0_PRISTINE_UNAUTHORIZED"
+    if matching_consumption_count == 0:
+        return "S1_AUTHORIZED_UNUSED"
+    if matching_consumption_count == 1:
+        return "S2_CONSUMED_IN_PROGRESS"
     return "SX_INVALID_STATE"
 
 
