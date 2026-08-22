@@ -1,0 +1,368 @@
+{
+  "schema_version": "1.0.0",
+  "experiment_id": "EXP-028",
+  "working_name": "PAIRED_INFORMATION_BEYOND_MARGINAL_RECALIBRATION",
+  "task_id": "103B_EXP028_AUTHORITY_BINDING_AND_PREREGISTRATION_DRAFT",
+  "design_status": "FROZEN_DESIGN_NOT_RUN",
+  "authority_commit": "cb581bcfa3640d72f121c34b1cdd59cc3cc672c9",
+  "freeze_commit": "cb581bcfa3640d72f121c34b1cdd59cc3cc672c9",
+  "scientific_question": "Given a fixed source-layer readout and a deeper target representation, does a FIT-only, label-free, coordinatewise affine map learned from paired representations provide held-out improvement beyond inherited marginal mean/scale recalibration in direct representation matching and fixed-readout compatibility?",
+  "origin_class": "RESULT_CONDITIONED_ASSET_DERIVED_CANDIDATE",
+  "ancestry": [
+    "EXP-007: transformation_success != transformation_validity",
+    "EXP-022A: measurement_frame_decomposition / A_mu_sigma",
+    "EXP-026: cross_model_full_source_target_organization",
+    "EXP-027: third_registered_compatibility_profile",
+    "HYP-TRANSPORT-001: constrained_alignment / transport_precursor",
+    "MSA: minimum_operator_complexity_motivation",
+    "Residual-Flow RF-4: minimal_correction_relevance_only"
+  ],
+  "explicit_scope": {
+    "FULL_RESIDUAL_FLOW_TEST": false,
+    "FULL_MSA_TEST": false,
+    "TRANSPORT_TEST": false,
+    "INVARIANT_TEST": false,
+    "FUNCTIONAL_BINDING_TEST": false
+  },
+  "authority_binding": {
+    "path": "experiments/exp028/exp028_authority_binding.json",
+    "sha256": "72fd5e1f52c5be19bc5fd8cb4558b3e6e9eea5b2e6b615ef7e568d23ef627727"
+  },
+  "models": {
+    "Qwen": {
+      "model_id": "Qwen/Qwen3-1.7B",
+      "model_revision": "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e",
+      "model_family": "Qwen3",
+      "model_class": "Qwen3ForCausalLM",
+      "model_type": "qwen3",
+      "hidden_size": 2048,
+      "num_hidden_layers": 28,
+      "first_layer_index": 0,
+      "last_layer_index": 27,
+      "tokenizer_class": "Qwen2Tokenizer"
+    },
+    "OLMo": {
+      "model_id": "allenai/OLMo-2-0425-1B-Instruct",
+      "model_revision": "48d788eca847d4d7548f375ad03d3c9312f6139e",
+      "model_family": "OLMo2",
+      "model_class": "Olmo2ForCausalLM",
+      "model_type": "olmo2",
+      "hidden_size": 2048,
+      "num_hidden_layers": 16,
+      "first_layer_index": 0,
+      "last_layer_index": 15,
+      "tokenizer_class": "GPT2Tokenizer"
+    },
+    "Llama": {
+      "model_id": "Meta-Llama-3.2-1B-Instruct",
+      "model_family": "Llama-3.2",
+      "model_class": "LlamaForCausalLM",
+      "model_type": "llama",
+      "hidden_size": 2048,
+      "num_hidden_layers": 16,
+      "first_layer_index": 0,
+      "last_layer_index": 15,
+      "tokenizer_class": "TokenizersBackend"
+    }
+  },
+  "layer_domain": {
+    "orientation": "source_layer_i_to_deeper_target_layer_j",
+    "ordering_rule": "j > i",
+    "all_ordered_forward_pairs": true,
+    "equal_weight_layer_pairs": true,
+    "layer_subset_shopping": false,
+    "distance_weighting": "none",
+    "profile_weighting": "none",
+    "low_d_subset_selection": "none"
+  },
+  "carrier_semantics": {
+    "api": "FORWARD_HOOK_DECODER_BLOCK_OUTPUT",
+    "logical_layer_module_path": "model.model.layers[l]",
+    "hook_output": "post_decoder_block_residual_before_next_block_and_before_model_final_norm",
+    "forbidden_carrier": "outputs.hidden_states[-1]",
+    "excluded_states": [
+      "embedding_state",
+      "lm_head_logits",
+      "post_lm_head_state",
+      "inconsistent_final_normalized_only_carrier"
+    ]
+  },
+  "tokenizer_contract": {
+    "add_special_tokens": true,
+    "return_tensors": "pt",
+    "padding": false,
+    "truncation": false,
+    "last_valid_token_rule": "attention_mask_sum_minus_one",
+    "analysis_dtype": "float32"
+  },
+  "probe_contract": {
+    "classifier": "LogisticRegression",
+    "solver": "lbfgs",
+    "penalty": "L2",
+    "C": 1.0,
+    "fit_intercept": true,
+    "tol": 0.0001,
+    "class_weight": null,
+    "dual": false,
+    "max_iter": 1000,
+    "warm_start": false,
+    "class_order": ["logic", "causality", "analogy", "definition"],
+    "probability_mapping": "classifier.classes_",
+    "fit_only_rule": "FIT_condition_realization_only",
+    "scaler_contract": "StandardScaler(with_mean=true, with_std=true)"
+  },
+  "moment_recalibration": {
+    "name": "A_mu_sigma",
+    "definition": "T_mu_sigma(h_j)_k = ((h_j,k - mu_j,k^FIT) / sigma_j,k^FIT) * sigma_i,k^FIT + mu_i,k^FIT",
+    "orientation": "target_representation_to_source_measurement_frame",
+    "fit_only_rule": "all_moments_from_FIT_paired_representations_only",
+    "variance_convention": "population_variance_ddof_0",
+    "reference_authority": "docs/experiments/EXP-024-PREREGISTRATION.md"
+  },
+  "operator_families": {
+    "primary_conditions": ["T0_IDENTITY_RAW_FIXED_FRAME", "T1_INHERITED_MOMENT_RECALIBRATION", "T2_PAIRED_COORDINATEWISE_AFFINE_ALIGNMENT"],
+    "T0": {
+      "name": "IDENTITY_RAW_FIXED_FRAME",
+      "mapping": "T0(h_j) = h_j"
+    },
+    "T1": {
+      "name": "INHERITED_MOMENT_RECALIBRATION",
+      "mapping": "T_mu_sigma(h_j)_k = ((h_j,k - mu_j,k^FIT) / sigma_j,k^FIT) * sigma_i,k^FIT + mu_i,k^FIT",
+      "label_free": true,
+      "fit_only": true
+    },
+    "T2": {
+      "name": "PAIRED_COORDINATEWISE_AFFINE_ALIGNMENT",
+      "mapping": "T_pair_diag(h_j)_k = a_k * h_j,k + b_k",
+      "fitting": "closed_form_coordinatewise_OLS_on_FIT_paired_representations",
+      "label_free": true,
+      "fit_only": true,
+      "cross_coordinate_mixing": false,
+      "hyperparameter_search": false,
+      "task_loss_optimization": false
+    },
+    "primary_comparator": "T_pair_diag_vs_T_mu_sigma",
+    "coordinatewise_only": true,
+    "prohibited_families": [
+      "dense_affine_matrix",
+      "low_rank_cross_coordinate_map",
+      "orthogonal_Procrustes",
+      "MLP",
+      "KAN",
+      "spline_adapter",
+      "attention_adapter",
+      "learned_residual_network"
+    ]
+  },
+  "numerical_edge_rules": {
+    "epsilon": 0.0,
+    "variance_convention": "population_variance_ddof_0",
+    "zero_variance_action": "TECHNICALLY_INVALID_MODEL",
+    "near_zero_positive_variance_action": "COMPUTE_WITHOUT_EPSILON_AND_INVALIDATE_IF_NONFINITE",
+    "nonfinite_variance_action": "TECHNICALLY_INVALID_MODEL",
+    "nonfinite_covariance_action": "TECHNICALLY_INVALID_MODEL",
+    "nonfinite_fitted_coefficient_action": "TECHNICALLY_INVALID_MODEL",
+    "source_denominator_rule": "TECHNICALLY_INVALID_MODEL_IF_SOURCE_SIGMA_LE_0_OR_NONFINITE",
+    "no_tunable_epsilon": true,
+    "no_post_outcome_tuning": true
+  },
+  "primary_endpoints": {
+    "representation_endpoint": {
+      "name": "DELTA_RM",
+      "definition": "DELTA_RM = E(T_mu_sigma) - E(T_pair_diag)",
+      "E_definition": "mean_over_fresh_EVAL_item_and_coordinate_of_square((T(h_j)_k - h_i,k) / sigma_i,k^FIT)",
+      "positive_meaning": "paired_information_improves_direct_representation_matching_beyond_marginal_recalibration"
+    },
+    "readout_endpoint": {
+      "name": "DELTA_RO",
+      "definition": "DELTA_RO = C_pair - C_mu_sigma",
+      "C_pair": "balanced_accuracy_of_frozen_source_probe_P_i_on_T_pair_diag(h_j)_fresh_EVAL",
+      "C_mu_sigma": "balanced_accuracy_of_frozen_source_probe_P_i_on_T_mu_sigma(h_j)_fresh_EVAL",
+      "positive_meaning": "paired_coordinate_information_contributes_fixed_readout_recovery_beyond_marginal_recalibration"
+    },
+    "balanced_accuracy": "macro_average_per_class_recall_over_logic_causality_analogy_definition",
+    "probe_fitting": "FIT_only",
+    "operator_fitting": "label_free_FIT_only",
+    "no_optimize_T_pair_diag_against_DELTA_RO": true
+  },
+  "model_state_routing": {
+    "RM_SUPPORTED_rule": "lower_bound_of_registered_bootstrap_CI_for_DELTA_RM_gt_0",
+    "RO_SUPPORTED_rule": "lower_bound_of_registered_bootstrap_CI_for_DELTA_RO_gt_0",
+    "states": {
+      "(RM+, RO+)": "JOINT_ALIGNMENT_CONTRIBUTION",
+      "(RM+, RO-)": "REPRESENTATION_ONLY",
+      "(RM-, RO+)": "READOUT_ONLY_ARTIFACT_RISK",
+      "(RM-, RO-)": "NO_PAIRED_COORDINATE_CONTRIBUTION"
+    },
+    "READOUT_ONLY_ARTIFACT_RISK_interpretation": "cautionary_registered_interpretation_not_alignment_success"
+  },
+  "three_model_routing": {
+    "method": "EXACT_STATE_ONLY",
+    "no_majority_vote": true,
+    "no_endpoint_voting": true,
+    "no_nearest_profile_routing": true,
+    "no_post_hoc_grouping": true,
+    "rules": [
+      "if_any_model_technically_invalid_then_NOT_FULLY_ADJUDICATED",
+      "if_all_three_models_JOINT_ALIGNMENT_CONTRIBUTION_then_THREE_MODEL_JOINT_COORDINATEWISE_COMPONENT",
+      "if_all_three_models_share_another_exact_state_then_THREE_MODEL_COMMON_STATE",
+      "otherwise_MODEL_DEPENDENT_ALIGNMENT_STATE"
+    ]
+  },
+  "bootstrap": {
+    "design": "condition_stratified_source_family_cluster_bootstrap",
+    "resampling_unit": "source_family",
+    "statistical_unit": "source_family_cluster",
+    "strata": "condition",
+    "row_multiplicity": "all_records_of_sampled_source_family",
+    "bit_generator": "numpy.random.PCG64",
+    "seed": 20260819,
+    "rng_construction": "numpy.random.Generator(numpy.random.PCG64(20260819))",
+    "replicates": 5000,
+    "ci_level": 0.95,
+    "ci_method": "percentile",
+    "quantile_method": "numpy.percentile_method_linear",
+    "one_sided_positive_lower_bound": 5,
+    "one_sided_negative_upper_bound": 95,
+    "invalid_replicate_handling": "skip_replicates_that_do_not_preserve_all_four_classes",
+    "no_operator_refit_inside_EVAL_bootstrap": true,
+    "no_probe_refit_inside_EVAL_bootstrap": true,
+    "bootstrap_shopping": false,
+    "justification": "inherits_EXP026_and_EXP027_source_family_cluster_bootstrap_conventions"
+  },
+  "aggregation_order": {
+    "item_source_family": "mean_over_fresh_EVAL_source_family_item_level_paired_representations",
+    "condition": "arithmetic_mean_over_all_10_conditions_equal_weight",
+    "layer_pair": "arithmetic_mean_over_all_preregistered_ordered_forward_pairs_j_gt_i_equal_weight",
+    "model": "independent_per_model",
+    "forbidden_weighting": [
+      "token_count",
+      "layer_distance",
+      "EXP027_profile_weighting",
+      "LOW_D_subset_selection",
+      "interesting_layer_selection"
+    ]
+  },
+  "diag_role": {
+    "role": "TECHNICAL_ONLY",
+    "may_check": [
+      "probe_qualification",
+      "finite_operator_coefficients",
+      "required_layer_source_coverage",
+      "normalized_depth_span",
+      "class_integrity",
+      "source_family_integrity"
+    ],
+    "must_not": [
+      "select_favorable_layer_pairs",
+      "select_favorable_models",
+      "change_operator_family",
+      "change_endpoint",
+      "change_bootstrap",
+      "change_threshold",
+      "determine_whether_EVAL_is_worth_running"
+    ],
+    "source_technical_floor": 0.75,
+    "source_technical_floor_evaluated_on": "DIAGNOSTIC",
+    "source_coverage_min_count": 8,
+    "source_coverage_min_fraction": 0.5,
+    "source_coverage_min_normalized_depth_span": 0.5
+  },
+  "pair_break_control": {
+    "status": "SECONDARY_ONLY",
+    "purpose": "test_whether_paired_map_behavior_depends_on_true_item_correspondence_rather_than_marginal_statistics_only",
+    "procedure": "within_FIT_sort_source_family_ids_lexicographically_and_assign_target_sequence_by_cyclic_shift_of_one",
+    "preserved": [
+      "source_marginal_sample",
+      "target_marginal_sample",
+      "sample_count",
+      "coordinates"
+    ],
+    "same_operator_family": "coordinatewise_OLS",
+    "rng": "none_deterministic_cyclic_shift",
+    "cannot_rescue_primary_failure": true
+  },
+  "operator_capacity_firewall": {
+    "evidence_gated_escalation": "only_a_prospectively_adjudicated_EXP028_result_may_motivate_a_later_cross_coordinate_capacity_experiment",
+    "EXP028_remains_coordinatewise": true,
+    "prohibited_post_hoc_rescue_families": [
+      "dense_affine_matrix",
+      "low_rank_cross_coordinate_map",
+      "orthogonal_Procrustes",
+      "MLP",
+      "KAN",
+      "spline_adapter",
+      "attention_adapter",
+      "learned_residual_network"
+    ]
+  },
+  "claim_ceiling": "Even the strongest registered EXP-028 outcome may support only: paired item-level coordinate information contributes held-out direct representation matching and fixed-readout compatibility beyond marginal feature recalibration in the tested model(s).",
+  "not_established": [
+    "transport",
+    "semantic_equivalence",
+    "information_preservation",
+    "invariant_preservation",
+    "Functional_Binding",
+    "reasoning_causality",
+    "universal_transformer_law",
+    "Residual-Flow_confirmation",
+    "MSA_confirmation"
+  ],
+  "terminology": {
+    "use": [
+      "cross-depth_fixed-readout_compatibility",
+      "marginal_recalibration",
+      "paired_coordinate_information",
+      "coordinatewise_alignment",
+      "representation-match_contribution",
+      "fixed-readout_contribution"
+    ],
+    "avoid_confirmatory_use": [
+      "true_semantic_axis",
+      "semantic_transport",
+      "representation_preservation",
+      "latent_equivalence",
+      "causal_transformation",
+      "valid_transport"
+    ]
+  },
+  "fresh_data_firewall": {
+    "no_prior_scientific_items_in_EXP028": true,
+    "panel_structure": {
+      "n_conditions": 10,
+      "semantic_classes": ["logic", "causality", "analogy", "definition"],
+      "target_allocation": {
+        "FIT": 6,
+        "DIAGNOSTIC": 8,
+        "EVAL": 8
+      },
+      "units": "items_per_class_per_condition"
+    },
+    "fresh_panel_generation_deferred_to_103C_or_later": true,
+    "duplicate_normalization": "unicodedata.normalize_NFKC_then_strip_then_collapse_each_maximal_Unicode_whitespace_run_to_single_ASCII_space",
+    "duplicate_hash": "sha256_of_utf8_normalized_text",
+    "required_freshness_checks": [
+      "no_normalized_raw_text_sha256_collision_with_prior_scientific_panels",
+      "no_prior_source_family_reuse_where_source_family_identity_exists",
+      "no_paraphrase_family_leakage_where_such_identity_exists",
+      "panel_frozen_before_scientific_model_inference",
+      "no_item_replacement_after_real_hidden_state_extraction_begins"
+    ],
+    "if_prior_metadata_insufficient": "record_limitation_and_use_strongest_auditable_rule_normalized_text_sha256_collision_plus_source_family_id_when_present"
+  },
+  "formal_run_policy": {
+    "formal_authorization_created": false,
+    "formal_run_status": "NOT_RUN",
+    "scientific_result_created": false,
+    "real_FIT_accessed": false,
+    "real_DIAG_accessed": false,
+    "real_EVAL_accessed": false,
+    "scientific_inference_performed": false
+  },
+  "forbidden_claims": [
+    "PAIRED_ALIGNMENT_CONTRIBUTION_is_TRANSPORT",
+    "TRANSFORMATION_SUCCESS_is_TRANSFORMATION_VALIDITY",
+    "KAN_validates_project_operator_theory",
+    "Residual_Flow_confirmed"
+  ]
+}
