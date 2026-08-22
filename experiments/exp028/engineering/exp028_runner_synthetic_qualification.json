@@ -1,0 +1,44 @@
+{
+  "authority_binding_sha256": "72fd5e1f52c5be19bc5fd8cb4558b3e6e9eea5b2e6b615ef7e568d23ef627727",
+  "authorization_created": false,
+  "classification": "EXP028_ENGINEERING_SYNTHETIC_QUALIFICATION",
+  "frozen_config_sha256": "05a835f95a89e601d16e10ff6f18d79f39928eafbdc1ad8e6101d73f8c86a266",
+  "real_DIAG_accessed": false,
+  "real_EVAL_accessed": false,
+  "real_FIT_accessed": false,
+  "real_model_inference_performed": false,
+  "runner_sha256": "b6d988b525cbcb93c99240c0f34266a9abb48bcd7e681f8ce1e5d03c5881a0ce",
+  "scenario_count": 4,
+  "scenario_pass_count": 4,
+  "scenarios": [
+    {
+      "actual": "THREE_MODEL_JOINT_COORDINATEWISE_COMPONENT",
+      "case": "THREE_MODEL_JOINT_COORDINATEWISE_COMPONENT",
+      "expected": "THREE_MODEL_JOINT_COORDINATEWISE_COMPONENT",
+      "pass": true
+    },
+    {
+      "actual": "THREE_MODEL_COMMON_STATE",
+      "case": "THREE_MODEL_COMMON_STATE",
+      "expected": "THREE_MODEL_COMMON_STATE",
+      "pass": true
+    },
+    {
+      "actual": "MODEL_DEPENDENT_ALIGNMENT_STATE",
+      "case": "MODEL_DEPENDENT_ALIGNMENT_STATE",
+      "expected": "MODEL_DEPENDENT_ALIGNMENT_STATE",
+      "pass": true
+    },
+    {
+      "actual": "NOT_FULLY_ADJUDICATED",
+      "case": "NOT_FULLY_ADJUDICATED",
+      "expected": "NOT_FULLY_ADJUDICATED",
+      "pass": true
+    }
+  ],
+  "schema_version": "1.0.0",
+  "scientific_result_created": false,
+  "status": "PASS",
+  "synthetic_only": true,
+  "test_suite": "tests/test_exp028_runner.py"
+}
