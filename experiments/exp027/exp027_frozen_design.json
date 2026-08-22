@@ -1,0 +1,381 @@
+{
+  "schema_version": "1.0.0",
+  "experiment_id": "EXP-027",
+  "task_id": "102B_EXP027_PREREGISTRATION_AND_FROZEN_DESIGN",
+  "design_status": "FROZEN_DESIGN_NOT_RUN",
+  "scientific_question": "Does Meta-Llama-3.2-1B-Instruct exhibit the Qwen-like registered profile, the OLMo-like registered profile, or a valid third registered profile on the inherited EXP-026 full source-target fixed-readout compatibility matrix design?",
+  "authority_commit": "e2c846554192b67d27aab2bdacd30b43970ac6b3",
+  "freeze_commit": "e2c846554192b67d27aab2bdacd30b43970ac6b3",
+  "reference_models": {
+    "Qwen": {
+      "model_id": "Qwen/Qwen3-1.7B",
+      "model_revision": "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e",
+      "model_family": "Qwen3",
+      "model_class": "Qwen3ForCausalLM",
+      "model_type": "qwen3",
+      "num_hidden_layers": 28,
+      "hidden_size": 2048
+    },
+    "OLMo": {
+      "model_id": "allenai/OLMo-2-0425-1B-Instruct",
+      "model_revision": "48d788eca847d4d7548f375ad03d3c9312f6139e",
+      "model_family": "OLMo2",
+      "model_class": "Olmo2ForCausalLM",
+      "model_type": "olmo2",
+      "num_hidden_layers": 16,
+      "hidden_size": 2048
+    }
+  },
+  "reference_profiles": {
+    "QWEN_REFERENCE_PROFILE": {
+      "distance_association_status": "POSITIVE_SUPPORTED",
+      "dominance_status": "TARGET_DOMINANT",
+      "low_d_recovery_status": "NOT_SUPPORTED"
+    },
+    "OLMO_REFERENCE_PROFILE": {
+      "distance_association_status": "POSITIVE_SUPPORTED",
+      "dominance_status": "SOURCE_DOMINANT",
+      "low_d_recovery_status": "SUPPORTED"
+    }
+  },
+  "third_model_identity": {
+    "model_id": "Meta-Llama-3.2-1B-Instruct",
+    "model_source": "META_OFFICIAL_NATIVE_DISTRIBUTION",
+    "model_family": "Llama-3.2",
+    "model_class": "LlamaForCausalLM",
+    "model_type": "llama",
+    "native_checkpoint_path": "D:\\AI_Cache\\llama_home\\.llama\\checkpoints\\Llama3.2-1B-Instruct",
+    "converted_checkpoint_path": "D:\\AI_Cache\\llama_hf\\Llama3.2-1B-Instruct-meta-converted-v4463-attempt3",
+    "converted_model_hash": "1ff795ff6a07e6a68085d206fb84417da2f083f68391c2843cd2b8ac6df8538f",
+    "hidden_size": 2048,
+    "intermediate_size": 8192,
+    "logical_decoder_blocks": 16,
+    "attention_heads": 32,
+    "kv_heads": 8,
+    "vocab_size": 128256,
+    "max_position_embeddings": 131072,
+    "rope_theta": 500000.0,
+    "tie_word_embeddings": true,
+    "runtime_dtype": "torch.bfloat16",
+    "gpu_name": "NVIDIA GeForce RTX 5060 Laptop GPU"
+  },
+  "native_model_hashes": {
+    "checklist.chk": {
+      "sha256": "efefc79fc47ecce1c3e06a6ae77a4cddc7e6078f822efba22e4fc7f9da02400e"
+    },
+    "consolidated.00.pth": {
+      "sha256": "fc17d497df5e4175b3a8acb4f5865b26f7fc1b009b25bef814b95fde10e8a1f3",
+      "md5": "5b6352294a545ebeb2e41d5638656a27"
+    },
+    "params.json": {
+      "sha256": "1d616a44f3cdac29b9288cf14718b76eb1bed56ed38be1f7e39b06ed139e3733",
+      "md5": "69582ec3cc4a5f0bf8e2b1fcc04c3c6a"
+    },
+    "tokenizer.model": {
+      "sha256": "82e9d31979e92ab929cd544440f129d9ecd797b69e327f80f17e1c50d5551b55",
+      "md5": "08292403f8b173e7524d7fba7bbbd2d3"
+    }
+  },
+  "native_md5_verified": true,
+  "tokenizer_identity": {
+    "vocab_size": 128256,
+    "bos_token_id": 128000,
+    "eos_token_id": 128001,
+    "eot_token_id": 128009,
+    "tokenizer_class": "TokenizersBackend",
+    "chat_template_used": false
+  },
+  "input_mode": "RAW_TEXT",
+  "tokenizer_invocation": {
+    "raw_text_field": "text",
+    "add_special_tokens": true,
+    "return_tensors": "pt",
+    "padding": false,
+    "truncation": false,
+    "max_length": "none",
+    "attention_mask_source": "tokenizer_output",
+    "last_valid_token_rule": "attention_mask_sum_minus_one",
+    "bos_eos_policy": "tokenizer_default_with_add_special_tokens_true"
+  },
+  "carrier_api": "FORWARD_HOOK_DECODER_BLOCK_OUTPUT",
+  "carrier_semantics": {
+    "logical_layer_l_module_path": "model.model.layers[l]",
+    "block_0_to_14_hook_output": "post_decoder_block_residual_before_next_block",
+    "block_15_hook_output": "post_decoder_block_residual_before_model_final_RMSNorm",
+    "final_hidden_state_semantics": "POST_FINAL_NORM_CONFIRMED",
+    "output_hidden_states_use": "oracle_verification_only",
+    "forbidden_carrier": "outputs.hidden_states[-1]"
+  },
+  "logical_decoder_blocks": 16,
+  "source_target_domain": {
+    "source_indices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "target_indices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "ordered_pair_semantics": "source_layer_i_classifier_evaluated_on_target_layer_j",
+    "matrix_orientation": "rows_source_layers_columns_target_layers",
+    "diagonal_treatment": "C0_self_identity_D_i_i_zero_by_construction_and_excluded_from_off_diagonal_structural_summaries",
+    "layer_subset_shopping": false
+  },
+  "dataset_manifest": {
+    "dataset_path": "experiments/exp024/data/exp024_condition_panel_frozen.json",
+    "condition_panel_path": "experiments/exp024/condition_panel_spec.json",
+    "data_schema_path": "experiments/exp024/data_schema.json",
+    "frozen_manifest_path": "experiments/exp024/exp024_frozen_manifest.json",
+    "exp024_preregistration_path": "docs/experiments/EXP-024-PREREGISTRATION.md"
+  },
+  "dataset_hashes": {
+    "dataset_sha256": "46c832b68b6ac95704bf5143badc1431627d7f935648842a78971491b13ee404",
+    "condition_panel_sha256": "a3b8d565a94ef6041fbe6a29d73102ab4156cc19cfc07ccaeb06206d589f7954",
+    "data_schema_sha256": "e27c33c864c6305522aec0c92839634fb5885aeb50099372b9bf46da7f2fe3ec",
+    "frozen_manifest_sha256": "1409a33e300463067ffc060afa58ceb238fda8d6dc2479563c886a8474748f59",
+    "exp024_preregistration_sha256": "55f9604d904fd389da28c6214082028faca081f7e3a0c87c8ba8d961f792d810"
+  },
+  "split_identity": {
+    "partitions": [
+      "FIT",
+      "DIAGNOSTIC",
+      "EVAL"
+    ],
+    "record_role": "condition_realization",
+    "allocation": {
+      "FIT": 6,
+      "DIAGNOSTIC": 8,
+      "EVAL": 8
+    },
+    "n_conditions": 10,
+    "record_count": 1760,
+    "source_family_count": 880,
+    "new_split_created": false,
+    "item_filtering_allowed": false
+  },
+  "class_order": [
+    "logic",
+    "causality",
+    "analogy",
+    "definition"
+  ],
+  "condition_order": [
+    "c01_lexical_relex",
+    "c02_syntactic_restructure",
+    "c03_controlled_compression",
+    "c04_controlled_elaboration",
+    "c05_relation_explicit",
+    "c06_relation_implicit",
+    "c07_register_formal",
+    "c08_register_informal",
+    "c09_neutral_distractor_prefix",
+    "c10_anaphoric_reference"
+  ],
+  "matrix_semantics": {
+    "c0_definition": "BA(source_layer_i_classifier_applied_directly_to_target_layer_j_EVAL_representations_condition_c)",
+    "cself_definition": "C0_i_i_c",
+    "d_definition": "Cself-C0",
+    "ccal_definition": "BA(source_layer_i_classifier_applied_to_A_mu_sigma_calibrated_target_layer_j_EVAL_representations_condition_c)",
+    "r_definition": "Ccal-C0",
+    "condition_pooling": "arithmetic_mean_over_all_10_conditions_equal_weight",
+    "balanced_accuracy": "macro_average_per_class_recall_over_logic_causality_analogy_definition"
+  },
+  "readout_semantics": {
+    "classifier": "LogisticRegression",
+    "solver": "lbfgs",
+    "penalty": "L2",
+    "C": 1.0,
+    "fit_intercept": true,
+    "tol": 0.0001,
+    "class_weight": null,
+    "dual": false,
+    "max_iter": 1000,
+    "warm_start": false,
+    "class_mapping": "classifier.classes_",
+    "fit_data": "FIT_condition_realization_only",
+    "recalibration_variant": "A_mu_sigma",
+    "scaler_contract": "StandardScaler(with_mean=true, with_std=true)"
+  },
+  "distance_definition": {
+    "normalized_depth": "layer_index/(num_layers-1)",
+    "pair_distance": "abs(source_layer-target_layer)/(num_layers-1)",
+    "num_layers": 16
+  },
+  "distance_association": {
+    "dependent_quantity": "Dbar_m(i,j)",
+    "independent_quantity": "abs(d(i)-d(j))",
+    "eligible_cells": "confirmatory_eligible_source_rows_x_all_off_diagonal_target_pairs",
+    "statistic": "Spearman_rho",
+    "tie_handling": "average_ranks",
+    "implementation_identity": "custom_average_rank_spearman",
+    "support_rule": "POSITIVE_SUPPORTED_if_point_estimate_and_one_sided_95_percent_cluster_bootstrap_lower_bound_gt_0_else_NOT_SUPPORTED",
+    "p_value_used": false
+  },
+  "sdi": {
+    "formula": "SDI=(SOURCE_VARIANCE-TARGET_VARIANCE)/(SOURCE_VARIANCE+TARGET_VARIANCE)",
+    "source_variance_input": "row_means_of_off_diagonal_Dbar_over_eligible_source_rows",
+    "target_variance_input": "column_means_of_off_diagonal_Dbar_over_eligible_source_rows",
+    "variance_convention": "numpy.var(ddof=0)",
+    "zero_denominator": "SDI=0_status=NO_ROW_OR_COLUMN_VARIATION",
+    "support_classes": [
+      "SOURCE_DOMINANT",
+      "TARGET_DOMINANT",
+      "NO_DOMINANCE",
+      "NO_ROW_OR_COLUMN_VARIATION"
+    ],
+    "support_rule": "SOURCE_DOMINANT_if_SDI_gt_0_and_lower_gt_0; TARGET_DOMINANT_if_SDI_lt_0_and_upper_lt_0"
+  },
+  "low_d": {
+    "mask_definition": "DIAGNOSTIC_Dbar_m(i,j)<=0_for_eligible_off_diagonal_pairs",
+    "mask_frozen_across_bootstrap": true,
+    "estimand": "mean_Rbar_eval_m(i,j)_over_frozen_DIAGNOSTIC_selected_pair_set",
+    "additional_reports": [
+      "eligible_pair_count",
+      "positive_recovery_pair_fraction"
+    ],
+    "effective_n_zero": "NOT_EVALUABLE",
+    "support_rule": "SUPPORTED_if_point_estimate_gt_0_and_one_sided_95_percent_lower_bound_gt_0_else_NOT_SUPPORTED"
+  },
+  "bootstrap": {
+    "design": "condition_stratified_source_family_cluster_bootstrap",
+    "resampling_unit": "source_family",
+    "statistical_unit": "source_family_cluster",
+    "strata": "condition",
+    "row_multiplicity": "all_records_of_sampled_source_family",
+    "bit_generator": "numpy.random.PCG64",
+    "seed": 20260819,
+    "rng_construction": "numpy.random.Generator(numpy.random.PCG64(20260819))",
+    "replicates": 5000,
+    "ci_level": 0.95,
+    "ci_method": "percentile",
+    "quantile_method": "numpy.percentile_method_linear",
+    "one_sided_positive_lower_bound": 5,
+    "one_sided_negative_upper_bound": 95,
+    "invalid_replicate_handling": "skip_replicates_that_do_not_preserve_all_four_classes",
+    "optimized_implementation": {
+      "path": "experiments/exp027/engineering/exp027_bootstrap_optimized_prototype.py",
+      "reference_preserved": true,
+      "equivalence": [
+        "draw_sequence",
+        "registered_statistic",
+        "classification",
+        "routing"
+      ],
+      "synthetic_speedup": 7.6059
+    }
+  },
+  "technical_validity": {
+    "source_technical_floor": 0.75,
+    "source_technical_floor_evaluated_on": "DIAGNOSTIC",
+    "source_coverage_min_count": 8,
+    "source_coverage_min_fraction": 0.5,
+    "source_coverage_min_normalized_depth_span": 0.5,
+    "carrier_capture_exactly_once": true,
+    "last_valid_token_must_be_mask_derived": true,
+    "analysis_dtype": "float32",
+    "nonfinite_representation": "TECHNICALLY_INVALID"
+  },
+  "measurement_validity": {
+    "invalid_when_source_coverage_not_evaluable": true,
+    "invalid_when_technical_invalid": true,
+    "invalid_result_status": "UNOBSERVED_OR_INVALID",
+    "invalid_profile_route": "NOT_ASSIGNED",
+    "measurement_failure_does_not_imply_absence": true
+  },
+  "profile_routing": {
+    "method": "EXACT_MATCH_ONLY",
+    "no_continuous_similarity": true,
+    "rules": [
+      "if_technical_or_measurement_invalid_then_RESULT_STATUS_UNOBSERVED_OR_INVALID_and_SCIENTIFIC_PROFILE_ROUTE_NOT_ASSIGNED",
+      "if_llama_profile_exactly_equals_QWEN_REFERENCE_PROFILE_then_EXP026_PROFILE_MATCH_QWEN",
+      "if_llama_profile_exactly_equals_OLMO_REFERENCE_PROFILE_then_EXP026_PROFILE_MATCH_OLMO",
+      "else_THIRD_REGISTERED_PROFILE"
+    ],
+    "third_registered_profile_means_only": "valid_registered_three_component_profile_did_not_exactly_equal_either_frozen_reference"
+  },
+  "outcome_blind_progress_policy": {
+    "allowed": [
+      "timestamp",
+      "stage",
+      "completed",
+      "total",
+      "percentage",
+      "elapsed",
+      "eta",
+      "heartbeat",
+      "publication_status"
+    ],
+    "forbidden_before_publication": [
+      "rho",
+      "SDI",
+      "LOW_D",
+      "CI",
+      "p_value",
+      "support",
+      "profile_route",
+      "condition_level_values",
+      "matrix_cells",
+      "best_worst_layers"
+    ],
+    "atomic_state_file": true,
+    "no_hidden_preview": true,
+    "no_console_preview": true,
+    "no_automatic_retry": true
+  },
+  "formal_run_policy": {
+    "formal_authorization_created": false,
+    "formal_run_performed": false,
+    "scientific_result_created": false,
+    "next_task": "102C_EXP027_ENGINEERING_AND_ADVERSARIAL_REVIEW",
+    "future_formal_run_requires": [
+      "102C_success",
+      "formal_pipeline_qualification",
+      "single_use_authorization",
+      "exactly_one_human_launch"
+    ]
+  },
+  "forbidden_claims": [
+    "architecture_causality",
+    "model_family_causality",
+    "universality",
+    "coordinate_transport",
+    "functional_binding",
+    "invariant_validation",
+    "residual_flow_confirmation",
+    "information_disappearance",
+    "behavioral_control"
+  ],
+  "authorization_required": true,
+  "formal_run_status": "NOT_PERFORMED",
+  "scientific_result_status": "NOT_CREATED",
+  "formal_authorization_created": false,
+  "unresolved_primary_critical_fields": []
+}
