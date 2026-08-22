@@ -3,8 +3,9 @@
 **Experiment:** EXP-028
 **Working name:** PAIRED_INFORMATION_BEYOND_MARGINAL_RECALIBRATION
 **Status:** `FROZEN_DESIGN_NOT_RUN`
+**103C correction:** prospective preregistration clarification; see `EXP-028-103C-PREREGISTRATION-CORRECTION.md`
 **Preregistration task:** `103B_EXP028_AUTHORITY_BINDING_AND_PREREGISTRATION_DRAFT`
-**Authority/freeze commit:** `cb581bcfa3640d72f121c34b1cdd59cc3cc672c9`
+**Authority/freeze commit:** `86c120f56ee615540ecff15bb62f8d05eaca7700`
 
 ## Scientific Question
 
@@ -88,7 +89,9 @@ Three frozen primary conditions:
 - no task-loss optimization;
 - not optimized against `DELTA_RO`.
 
-Primary comparator: `T_pair_diag vs T_mu_sigma`.
+Primary comparator: `T_pair_diag vs T_mu_sigma` (`T2_MINUS_T1`).
+Frozen baseline: `T1_MOMENT_RECALIBRATION`. Frozen contrast: `T2_MINUS_T1`.
+`T0` remains baseline/descriptive context and may not replace `T1` as the primary comparator.
 
 ## Numerical Edge-Case Rules
 
@@ -130,8 +133,9 @@ Balanced accuracy is macro-average per-class recall over `logic`, `causality`,
 
 ## Model-Level State Routing
 
-- `RM_SUPPORTED` iff one-sided 95% cluster-bootstrap lower bound for `DELTA_RM > 0`
-- `RO_SUPPORTED` iff one-sided 95% cluster-bootstrap lower bound for `DELTA_RO > 0`
+- `RM_SUPPORTED` iff `ONE_SIDED_95_PERCENT_LOWER_PERCENTILE_BOUND` for `DELTA_RM` is greater than `0`
+- `RO_SUPPORTED` iff `ONE_SIDED_95_PERCENT_LOWER_PERCENTILE_BOUND` for `DELTA_RO` is greater than `0`
+- The central 90% interval `[q_0.05, q_0.95]` is descriptive only and does not determine support.
 
 | State | Registered interpretation |
 |---|---|
@@ -164,11 +168,32 @@ One invalid model is never dropped to create a two-model success claim.
 - Bit generator: `numpy.random.PCG64`
 - Seed: `20260819`
 - Replicates: `5000`
-- CI level: `0.95`
 - CI method: percentile
 - Quantile method: `numpy.percentile_method_linear`
+
+Primary support decision:
+
+- `primary_support_ci = ONE_SIDED_95_PERCENT_LOWER_PERCENTILE_BOUND`
+- Level: `0.95`
+- Side: lower
+- Percentile: `5`
+- A primary endpoint is supported iff its one-sided 95% lower percentile
+  bootstrap bound is greater than `0`.
+
+Descriptive interval only:
+
+- `descriptive_central_interval = CENTRAL_90_PERCENT_PERCENTILE_INTERVAL`
+- Level: `0.90`
+- Lower percentile: `5`
+- Upper percentile: `95`
+- This is a central 90% interval and does **not** determine support.
+- `two_sided_95_percent_ci_used = false`
+
+Additional operational quantiles:
+
 - One-sided positive lower bound: `5`
 - One-sided negative upper bound: `95`
+
 - Invalid replicate handling: skip replicates that do not preserve all four classes
 - No operator refit and no probe refit inside EVAL bootstrap
 - No bootstrap shopping
@@ -178,15 +203,20 @@ conventions.
 
 ## Aggregation Order
 
-For each model, in this order:
+For each model, in this exact order:
 
 1. `item/source_family`: mean over fresh EVAL source-family item-level pairs
-2. `condition`: arithmetic mean over all 10 conditions, equal weight
-3. `layer_pair`: arithmetic mean over all preregistered ordered forward pairs `j > i`, equal weight
-4. `model`: independent per model
+2. `source_family`: mean over fresh EVAL source families, equal weight
+3. `condition`: arithmetic mean over all 10 conditions, equal weight
+4. `layer_pair`: arithmetic mean over all preregistered ordered forward pairs `j > i`, equal weight
+5. `model`: independent per model
 
 Forbidden weighting: token count, layer distance, EXP-027 profile weighting,
 LOW-D subset selection, and interesting-layer selection.
+
+The primary statistics cannot be altered by token count, layer distance,
+number of items per family, LOW-D status, EXP-027 profile, or
+interesting-layer selection.
 
 ## DIAG Role
 
@@ -209,11 +239,17 @@ Inherited qualification floors:
 ## Pair-Break Control
 
 - Status: `SECONDARY_ONLY`
-- Within FIT, source-family IDs are sorted lexicographically and the target
-  sequence is assigned by a deterministic cyclic shift of one.
-- This preserves source marginals, target marginals, sample count, and
-  coordinates.
-- The same coordinatewise OLS family is fitted.
+- Purpose: test whether paired-map behavior depends on true item correspondence
+  rather than marginal statistics only
+- Scope: `within_FIT_per_condition_per_layer_pair`
+- Ordering: lexicographic source-family ID
+- Condition handling: independent per condition
+- Source-family handling: preserve source-family count and marginals
+- Procedure: within FIT, sort source-family IDs lexicographically and assign the
+  target sequence by a deterministic cyclic shift of one
+- Preserves source marginals, target marginals, sample count, and coordinates
+- Same operator family: coordinatewise OLS
+- RNG: none (deterministic cyclic shift)
 - It cannot rescue a failed primary endpoint.
 
 ## Operator Capacity Firewall
@@ -247,8 +283,13 @@ DIAG, or EVAL item may become EXP-028 confirmatory scientific evidence.
 
 Prior-panel exclusion authorities:
 
-- EXP-023 controlled panel: `experiments/exp023/data/exp023_independent_controlled.json`
-- EXP-024 frozen dataset: `experiments/exp024/data/exp024_condition_panel_frozen.json`
+| Authority | Path | SHA-256 |
+|---|---|---|
+| EXP-023 independent controlled panel | `experiments/exp023/data/exp023_independent_controlled.json` | `9143ceceab106c71dedb806190e146401975bf6bd84cb99b3b4cb7adc75afa2a` |
+| EXP-024 frozen condition panel dataset | `experiments/exp024/data/exp024_condition_panel_frozen.json` | `46c832b68b6ac95704bf5143badc1431627d7f935648842a78971491b13ee404` |
+| EXP-024 condition panel specification | `experiments/exp024/condition_panel_spec.json` | `a3b8d565a94ef6041fbe6a29d73102ab4156cc19cfc07ccaeb06206d589f7954` |
+| EXP-024 data schema | `experiments/exp024/data_schema.json` | `e27c33c864c6305522aec0c92839634fb5885aeb50099372b9bf46da7f2fe3ec` |
+| EXP-024 frozen manifest | `experiments/exp024/exp024_frozen_manifest.json` | `1409a33e300463067ffc060afa58ceb238fda8d6dc2479563c886a8474748f59` |
 
 Freshness normalization: NFKC normalization, strip, then collapse each maximal
 Unicode whitespace run to a single ASCII space. Duplicate hash is SHA-256 of the
@@ -262,7 +303,7 @@ Required freshness checks:
 4. panel frozen before scientific model inference;
 5. no item replacement after real hidden-state extraction begins.
 
-The final scientific panel is **not** generated in 103B.
+The final scientific panel is **not** generated in 103B or 103C.
 
 ## Terminology
 
@@ -282,6 +323,7 @@ transport.
 - `EXP028_SCIENTIFIC_INFERENCE_PERFORMED = false`
 - `EXP028_RESULT_CREATED = false`
 - `EXP028_AUTHORIZATION_CREATED = false`
+- `EXP028_FORMAL_RUN_PERFORMED = false`
 
 ## Validator
 
@@ -292,4 +334,4 @@ file. It does not load a model or access real scientific data.
 
 ## Next Step
 
-`103C_EXP028_PREREGISTRATION_REREVIEW_AND_ENGINEERING_SPEC`
+`103D_EXP028_RUNNER_IMPLEMENTATION_AND_SYNTHETIC_QUALIFICATION`

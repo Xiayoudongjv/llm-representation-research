@@ -24,7 +24,7 @@ EXPECTED_WORKING_NAME = "PAIRED_INFORMATION_BEYOND_MARGINAL_RECALIBRATION"
 EXPECTED_TASK_ID = "103B_EXP028_AUTHORITY_BINDING_AND_PREREGISTRATION_DRAFT"
 EXPECTED_DESIGN_STATUS = "FROZEN_DESIGN_NOT_RUN"
 EXPECTED_ORIGIN_CLASS = "RESULT_CONDITIONED_ASSET_DERIVED_CANDIDATE"
-EXPECTED_HEAD = "cb581bcfa3640d72f121c34b1cdd59cc3cc672c9"
+EXPECTED_HEAD = "86c120f56ee615540ecff15bb62f8d05eaca7700"
 EXPECTED_AUTHORITY_BINDING_PATH = "experiments/exp028/exp028_authority_binding.json"
 EXPECTED_AUTHORITY_BINDING_SHA256 = "72fd5e1f52c5be19bc5fd8cb4558b3e6e9eea5b2e6b615ef7e568d23ef627727"
 
@@ -226,6 +226,8 @@ def validate(config: dict[str, Any]) -> list[str]:
 
     operators = config.get("operator_families", {})
     check(operators.get("primary_comparator") == "T_pair_diag_vs_T_mu_sigma", "primary comparator mismatch")
+    check(operators.get("primary_comparator_baseline") == "T1_MOMENT_RECALIBRATION", "primary comparator baseline mismatch")
+    check(operators.get("primary_contrast") == "T2_MINUS_T1", "primary contrast mismatch")
     check(operators.get("coordinatewise_only") is True, "operator must be coordinatewise only")
     check(operators.get("T2", {}).get("label_free") is True, "T_pair_diag must be label-free")
     check(operators.get("T2", {}).get("fit_only") is True, "T_pair_diag must be FIT-only")
@@ -246,8 +248,10 @@ def validate(config: dict[str, Any]) -> list[str]:
     read = endpoints.get("readout_endpoint", {})
     check(rep.get("name") == "DELTA_RM", "representation endpoint name mismatch")
     check(rep.get("definition") == "DELTA_RM = E(T_mu_sigma) - E(T_pair_diag)", "DELTA_RM definition mismatch")
+    check("DELTA_RM = E(T_mu_sigma) - E(T_pair_diag)" in rep.get("sign_convention", ""), "DELTA_RM sign convention mismatch")
     check(read.get("name") == "DELTA_RO", "readout endpoint name mismatch")
     check(read.get("definition") == "DELTA_RO = C_pair - C_mu_sigma", "DELTA_RO definition mismatch")
+    check("DELTA_RO = C_pair - C_mu_sigma" in read.get("sign_convention", ""), "DELTA_RO sign convention mismatch")
     check(endpoints.get("balanced_accuracy") == "macro_average_per_class_recall_over_logic_causality_analogy_definition", "balanced accuracy mismatch")
     check(endpoints.get("probe_fitting") == "FIT_only", "probe fitting firewall mismatch")
     check(endpoints.get("operator_fitting") == "label_free_FIT_only", "operator fitting firewall mismatch")
@@ -255,6 +259,7 @@ def validate(config: dict[str, Any]) -> list[str]:
 
     model_routing = config.get("model_state_routing", {})
     check(model_routing.get("RM_SUPPORTED_rule") == "lower_bound_of_registered_bootstrap_CI_for_DELTA_RM_gt_0", "RM support rule mismatch")
+    check(model_routing.get("support_decision_uses") == "ONE_SIDED_95_PERCENT_LOWER_PERCENTILE_BOUND", "model support decision source mismatch")
     check(model_routing.get("RO_SUPPORTED_rule") == "lower_bound_of_registered_bootstrap_CI_for_DELTA_RO_gt_0", "RO support rule mismatch")
     states = model_routing.get("states", {})
     check(states.get("(RM+, RO+)") == "JOINT_ALIGNMENT_CONTRIBUTION", "state routing mismatch")
@@ -279,7 +284,18 @@ def validate(config: dict[str, Any]) -> list[str]:
     check(bootstrap.get("bit_generator") == "numpy.random.PCG64", "bootstrap bit generator mismatch")
     check(bootstrap.get("seed") == 20260819, "bootstrap seed mismatch")
     check(bootstrap.get("replicates") == 5000, "bootstrap replicates mismatch")
-    check(bootstrap.get("ci_level") == 0.95, "bootstrap CI level mismatch")
+    check("ci_level" not in bootstrap, "ambiguous legacy ci_level must be removed")
+    support_ci = bootstrap.get("primary_support_ci", {})
+    check(support_ci.get("name") == "ONE_SIDED_95_PERCENT_LOWER_PERCENTILE_BOUND", "primary support bound mismatch")
+    check(support_ci.get("level") == 0.95, "primary support level mismatch")
+    check(support_ci.get("side") == "lower", "primary support side mismatch")
+    check(support_ci.get("percentile") == 5, "primary support percentile mismatch")
+    desc = bootstrap.get("descriptive_central_interval", {})
+    check(desc.get("name") == "CENTRAL_90_PERCENT_PERCENTILE_INTERVAL", "descriptive interval name mismatch")
+    check(desc.get("level") == 0.90, "descriptive interval level mismatch")
+    check(desc.get("lower_percentile") == 5 and desc.get("upper_percentile") == 95, "descriptive interval percentiles mismatch")
+    check(bootstrap.get("two_sided_95_percent_ci_used") is False, "two-sided 95 CI must not be used")
+    check(bootstrap.get("support_decision_uses") == "ONE_SIDED_95_PERCENT_LOWER_PERCENTILE_BOUND", "support decision source mismatch")
     check(bootstrap.get("ci_method") == "percentile", "bootstrap CI method mismatch")
     check(bootstrap.get("quantile_method") == "numpy.percentile_method_linear", "bootstrap quantile method mismatch")
     check(bootstrap.get("one_sided_positive_lower_bound") == 5, "bootstrap lower bound mismatch")
@@ -289,6 +305,7 @@ def validate(config: dict[str, Any]) -> list[str]:
     check(bootstrap.get("bootstrap_shopping") is False, "bootstrap shopping forbidden")
 
     aggregation = config.get("aggregation_order", {})
+    check(aggregation.get("source_family") == "mean_over_fresh_EVAL_source_families_equal_weight", "source-family aggregation mismatch")
     check(aggregation.get("condition") == "arithmetic_mean_over_all_10_conditions_equal_weight", "condition aggregation mismatch")
     check(aggregation.get("layer_pair") == "arithmetic_mean_over_all_preregistered_ordered_forward_pairs_j_gt_i_equal_weight", "layer-pair aggregation mismatch")
     check("token_count" in aggregation.get("forbidden_weighting", []), "token-count weighting must be forbidden")
@@ -305,6 +322,10 @@ def validate(config: dict[str, Any]) -> list[str]:
     check(pair_break.get("status") == "SECONDARY_ONLY", "pair-break control must be secondary")
     check(pair_break.get("cannot_rescue_primary_failure") is True, "pair-break control must not rescue primary")
     check(pair_break.get("procedure") == "within_FIT_sort_source_family_ids_lexicographically_and_assign_target_sequence_by_cyclic_shift_of_one", "pair-break procedure mismatch")
+    check(pair_break.get("scope") == "within_FIT_per_condition_per_layer_pair", "pair-break scope mismatch")
+    check(pair_break.get("ordering") == "lexicographic_source_family_id", "pair-break ordering mismatch")
+    check(pair_break.get("condition_handling") == "independent_per_condition", "pair-break condition handling mismatch")
+    check(pair_break.get("source_family_handling") == "preserve_source_family_count_and_marginals", "pair-break source-family handling mismatch")
 
     capacity = config.get("operator_capacity_firewall", {})
     check(capacity.get("EXP028_remains_coordinatewise") is True, "EXP-028 must remain coordinatewise")
@@ -317,6 +338,7 @@ def validate(config: dict[str, Any]) -> list[str]:
 
     fresh = config.get("fresh_data_firewall", {})
     check(fresh.get("no_prior_scientific_items_in_EXP028") is True, "fresh-data firewall missing")
+    check(isinstance(fresh.get("prior_panel_authorities"), list) and len(fresh.get("prior_panel_authorities", [])) >= 2, "prior panel authorities not enumerated")
     check(fresh.get("fresh_panel_generation_deferred_to_103C_or_later") is True, "fresh panel generation must be deferred")
     check(fresh.get("duplicate_normalization") == "unicodedata.normalize_NFKC_then_strip_then_collapse_each_maximal_Unicode_whitespace_run_to_single_ASCII_space", "duplicate normalization mismatch")
     check(fresh.get("duplicate_hash") == "sha256_of_utf8_normalized_text", "duplicate hash mismatch")
