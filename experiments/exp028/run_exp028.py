@@ -39,6 +39,8 @@ RESULT_PATH = EXP_DIR / "results" / "exp028_results.json"
 AUTHORIZATION_PATH = EXP_DIR / "exp028_formal_run_authorization.json"
 CONSUMPTION_DIR = EXP_DIR / "results" / "authorization_consumption"
 QUALIFICATION_PATH = ENGINEERING_DIR / "exp028_runner_synthetic_qualification.json"
+DEFAULT_EXCLUSION_INDEX_PATH = ENGINEERING_DIR / "exp028_historical_exclusion_index.json"
+DEFAULT_EXCLUSION_INDEX_PATH = ENGINEERING_DIR / "exp028_historical_exclusion_index.json"
 BOOTSTRAP_SEED = 20260819
 BOOTSTRAP_REPLICATES = 5000
 
@@ -51,6 +53,7 @@ _AUTHORIZATION_FILE_FLAG = "--authorization-file"
 if str(EXP_DIR) not in sys.path:
     sys.path.insert(0, str(EXP_DIR))
 
+import exp028_panel_lib as panel_lib
 import validate_exp028_preregistration as design_validator
 import validate_exp028_result as result_validator
 
@@ -219,6 +222,32 @@ def verify_exp028_authorities(root: Path = ROOT) -> dict[str, Any]:
 def verify_no_result_collision(result_path: Path = RESULT_PATH) -> None:
     if result_path.exists():
         raise Exp028ProtocolIntegrityError("CANONICAL_RESULT_ALREADY_EXISTS")
+
+
+def load_and_validate_formal_panel(
+    panel_path: Path | str | None,
+    exclusion_index_path: Path | str | None = None,
+    expected_panel_sha256: str | None = None,
+) -> tuple[dict[str, Any], str, str]:
+    """Validate the frozen formal panel and return (panel, panel_sha, index_sha)."""
+    if panel_path is None:
+        raise Exp028ProtocolIntegrityError("FORMAL_RUN_REQUIRES_FROZEN_PANEL")
+    panel_path = Path(panel_path)
+    if not panel_path.exists():
+        raise Exp028ProtocolIntegrityError("FORMAL_RUN_PANEL_MISSING")
+    panel_sha = sha256_file(panel_path)
+    if expected_panel_sha256 and panel_sha.casefold() != expected_panel_sha256.casefold():
+        raise Exp028ProtocolIntegrityError("FORMAL_RUN_PANEL_SHA256_MISMATCH")
+
+    exclusion_path = Path(exclusion_index_path) if exclusion_index_path else DEFAULT_EXCLUSION_INDEX_PATH
+    if not exclusion_path.exists():
+        raise Exp028ProtocolIntegrityError("FORMAL_RUN_EXCLUSION_INDEX_MISSING")
+    panel = read_json(panel_path)
+    exclusion_index = panel_lib.load_exclusion_index(exclusion_path)
+    errors = panel_lib.validate_panel(panel, exclusion_index=exclusion_index, formal=True)
+    if errors:
+        raise Exp028ProtocolIntegrityError(f"FORMAL_RUN_PANEL_INVALID_{errors}")
+    return panel, panel_sha, sha256_file(exclusion_path)
 
 
 # ---------------------------------------------------------------------------
@@ -786,6 +815,8 @@ def validate_authorization(authorization_path: Path, root: Path = ROOT) -> tuple
     binding = authorization.get("execution_binding", {})
     if binding.get("runner_sha256") != sha256_file(Path(__file__)):
         raise Exp028ProtocolIntegrityError("AUTHORIZATION_RUNNER_SHA_MISMATCH")
+    if binding.get("repository_commit") != repository_commit(root):
+        raise Exp028ProtocolIntegrityError("AUTHORIZATION_HEAD_MISMATCH")
     if not authorization.get("authorization_id") or not authorization.get("run_attempt_id"):
         raise Exp028ProtocolIntegrityError("AUTHORIZATION_IDENTITY_INCOMPLETE")
     return authorization, sha256_file(authorization_path)
@@ -902,19 +933,32 @@ def run_synthetic_qualification(root: Path = ROOT, publish: bool = True) -> dict
     return artifact
 
 
-def run_formal_run(root: Path = ROOT, authorization_file: str | None = None) -> dict[str, Any]:
+def run_formal_run(
+    root: Path = ROOT,
+    authorization_file: str | None = None,
+    *,
+    panel_manifest: str | None = None,
+    panel_sha256: str | None = None,
+    exclusion_index: str | None = None,
+) -> dict[str, Any]:
     binding = verify_exp028_authorities(root)
     verify_no_result_collision(root / RESULT_PATH)
     progress = OutcomeBlindProgress()
+    progress.report("PANEL_VALIDATION", completed=0, total=1, heartbeat=True)
+    panel_payload, actual_panel_sha, exclusion_sha = load_and_validate_formal_panel(
+        panel_manifest,
+        exclusion_index_path=exclusion_index,
+        expected_panel_sha256=panel_sha256,
+    )
     progress.report("AUTHORIZATION_VALIDATION", completed=0, total=1, heartbeat=True)
     auth_path = Path(authorization_file).resolve() if authorization_file else None
     lifecycle = classify_authorization_lifecycle(auth_path, root / CONSUMPTION_DIR, root / RESULT_PATH)
     if lifecycle != "AUTHORIZED_UNUSED":
         raise Exp028ProtocolIntegrityError(f"FORMAL_LIFECYCLE_{lifecycle}")
     authorization, authorization_sha = validate_authorization(auth_path, root)
-    # Real scientific execution requires a frozen panel manifest and extracted
-    # representation archive. Task 103D deliberately does not generate those.
-    raise Exp028ProtocolIntegrityError("FORMAL_SCIENTIFIC_EXECUTION_REQUIRES_FROZEN_PANEL_AND_EXTRACTIONS")
+    # Real scientific execution requires extracted representations. Task 103E
+    # does not generate those and does not invoke formal-run.
+    raise Exp028ProtocolIntegrityError("FORMAL_SCIENTIFIC_EXECUTION_REQUIRES_EXTRACTED_REPRESENTATIONS")
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -925,6 +969,9 @@ def build_parser() -> argparse.ArgumentParser:
     modes.add_argument(_FORMAL_FLAG, action="store_true")
     parser.add_argument(_REPO_ROOT_FLAG, default=None)
     parser.add_argument(_AUTHORIZATION_FILE_FLAG, default=None)
+    parser.add_argument("--panel-manifest", default=None)
+    parser.add_argument("--panel-sha256", default=None)
+    parser.add_argument("--exclusion-index", default=None)
     return parser
 
 
@@ -943,7 +990,13 @@ def main(argv: Sequence[str] | None = None) -> int:
             print(json.dumps(json_safe(result), indent=2, sort_keys=True))
             return 0 if result["status"] == "PASS" else 1
         if args.formal_run:
-            run_formal_run(root, args.authorization_file)
+            run_formal_run(
+                root,
+                args.authorization_file,
+                panel_manifest=args.panel_manifest,
+                panel_sha256=args.panel_sha256,
+                exclusion_index=args.exclusion_index,
+            )
             return 0
     except Exp028ProtocolIntegrityError as exc:
         print("EXP028_MODE = FAIL")
