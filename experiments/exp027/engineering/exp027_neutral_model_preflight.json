@@ -1,0 +1,10 @@
+{
+  "classification": "EXP027_NEUTRAL_MODEL_PREFLIGHT",
+  "evidence_path": "D:\\Research\\llm-representation-research\\experiments\\exp027\\engineering\\llama32_model_authority_qualification.json",
+  "experiment": "EXP-027",
+  "justification": "EXP027_102A_LQ neutral Llama runtime/carrier qualification already completed; real-panel access false.",
+  "real_panel_accessed": false,
+  "schema_version": "1.0.0",
+  "scientific_matrix_computed": false,
+  "status": "NOT_REQUIRED_WITH_JUSTIFICATION"
+}

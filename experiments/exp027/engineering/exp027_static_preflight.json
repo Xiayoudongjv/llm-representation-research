@@ -1,0 +1,21 @@
+{
+  "carrier_contract": {
+    "block_0_to_14_hook_output": "post_decoder_block_residual_before_next_block",
+    "block_15_hook_output": "post_decoder_block_residual_before_model_final_RMSNorm",
+    "final_hidden_state_semantics": "POST_FINAL_NORM_CONFIRMED",
+    "forbidden_carrier": "outputs.hidden_states[-1]",
+    "logical_layer_l_module_path": "model.model.layers[l]",
+    "output_hidden_states_use": "oracle_verification_only"
+  },
+  "classification": "EXP027_STATIC_PREFLIGHT",
+  "experiment": "EXP-027",
+  "frozen_authorities_match": true,
+  "model_provenance_present": true,
+  "no_authorization": true,
+  "no_authorization_consumption": true,
+  "no_formal_result": true,
+  "repository_commit": "b9155a71986697a33b12c17e179a0ff650752fcb",
+  "runner_sha256": "0b61655d47b464dc204f92d85bab314aaaceb23fd4d751345c6e314de62bcd4b",
+  "schema_version": "1.0.0",
+  "status": "PASS"
+}

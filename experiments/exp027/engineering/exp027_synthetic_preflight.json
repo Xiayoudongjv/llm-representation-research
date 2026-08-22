@@ -1,0 +1,16 @@
+{
+  "bootstrap_replicates": 20,
+  "classification": "EXP027_SYNTHETIC_PREFLIGHT",
+  "experiment": "EXP-027",
+  "formal_data_accessed": false,
+  "integrated_profile_route": "THIRD_REGISTERED_PROFILE",
+  "integrated_result_status": "VALID_REGISTERED_RESULT",
+  "reference_optimized_ci_equivalent": true,
+  "repository_commit": "b9155a71986697a33b12c17e179a0ff650752fcb",
+  "runner_sha256": "0b61655d47b464dc204f92d85bab314aaaceb23fd4d751345c6e314de62bcd4b",
+  "schema_version": "1.0.0",
+  "scientific_result_created": false,
+  "status": "PASS",
+  "synthetic_layers": 4,
+  "synthetic_model": "synthetic-A"
+}

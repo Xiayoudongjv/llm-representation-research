@@ -1,0 +1,114 @@
+{
+  "branch": "main",
+  "classification": "EXP027_FORMAL_PIPELINE_QUALIFICATION",
+  "completion_gate": {
+    "ALL_TARGETED_TESTS_PASS": true,
+    "ATOMIC_PUBLICATION_VERIFIED": true,
+    "AUTHORIZATION_FAIL_CLOSED": true,
+    "CRASH_SEMANTICS_VERIFIED": true,
+    "FINAL_RMSNORM_TRAP_PRESERVED": true,
+    "FORMAL_RUNNER_IMPLEMENTED": true,
+    "FORMAL_RUNNER_MATCHES_FROZEN_DESIGN": true,
+    "LOW_D_LEAKAGE_FIREWALL_PRESERVED": true,
+    "NEUTRAL_MODEL_PREFLIGHT_NOT_REQUIRED_WITH_JUSTIFICATION": true,
+    "NEUTRAL_MODEL_PREFLIGHT_PASS": false,
+    "NO_AUTOMATIC_RETRY": true,
+    "NO_QWEN_OLMO_RERUN_PATH": true,
+    "NO_SCIENTIFIC_RUNTIME_OVERRIDES": true,
+    "OPTIMIZED_BOOTSTRAP_INTEGRATION_EQUIVALENT": true,
+    "OUTCOME_BLIND_PROGRESS_VERIFIED": true,
+    "RATE_LIMITED_PROGRESS_VERIFIED": true,
+    "RESULT_COLLISION_FAIL_CLOSED": true,
+    "RESULT_SCHEMA_VALIDATED": true,
+    "SINGLE_USE_CONSUMPTION_CONTRACT_VERIFIED": true,
+    "STATIC_PREFLIGHT_PASS": true,
+    "SYNTHETIC_END_TO_END_PASS": true
+  },
+  "created_at_utc": "2026-08-22T03:47:09.211549+00:00",
+  "entry_head": "b9155a71986697a33b12c17e179a0ff650752fcb",
+  "existing_test_results": {
+    "exp027_102c_adversarial": "105 passed",
+    "exp027_bootstrap_optimized_prototype_and_progress": "13 passed",
+    "exp027_formal_pipeline": "37 passed",
+    "exp027_preregistration": "17 passed"
+  },
+  "experiment": "EXP-027",
+  "frozen_authorities": {
+    "dataset_hashes": {
+      "condition_panel_sha256": "a3b8d565a94ef6041fbe6a29d73102ab4156cc19cfc07ccaeb06206d589f7954",
+      "data_schema_sha256": "e27c33c864c6305522aec0c92839634fb5885aeb50099372b9bf46da7f2fe3ec",
+      "dataset_sha256": "46c832b68b6ac95704bf5143badc1431627d7f935648842a78971491b13ee404",
+      "exp024_preregistration_sha256": "55f9604d904fd389da28c6214082028faca081f7e3a0c87c8ba8d961f792d810",
+      "frozen_manifest_sha256": "1409a33e300463067ffc060afa58ceb238fda8d6dc2479563c886a8474748f59"
+    },
+    "frozen_design_sha256": "b37bfd9c3d57bf891ef1993b3a1d7737fcedbe143813d61f5c7ae9ecb0bc5b1a",
+    "model": {
+      "converted_model_hash": "1ff795ff6a07e6a68085d206fb84417da2f083f68391c2843cd2b8ac6df8538f",
+      "model_class": "LlamaForCausalLM",
+      "model_id": "Meta-Llama-3.2-1B-Instruct",
+      "model_source": "META_OFFICIAL_NATIVE_DISTRIBUTION"
+    },
+    "preregistration_sha256": "83ba4bb14e87334a6c52a8746f86874eab9578e646abc736057fbd1f4e6322fe"
+  },
+  "future_formal_command_not_authorized": true,
+  "next_task": "102E_EXP027_SINGLE_USE_FORMAL_AUTHORIZATION",
+  "preflight": {
+    "neutral_model": {
+      "artifact": "experiments/exp027/engineering/exp027_neutral_model_preflight.json",
+      "artifact_sha256": "efd535c53eae33191cb1fd384435d1b49fc4e759240317a48d332189c145dde3",
+      "justification": "EXP027_102A_LQ neutral Llama runtime/carrier qualification already completed; real-panel access false.",
+      "real_panel_accessed": false,
+      "status": "NOT_REQUIRED_WITH_JUSTIFICATION"
+    },
+    "static": {
+      "artifact": "experiments/exp027/engineering/exp027_static_preflight.json",
+      "artifact_sha256": "efb73a9c0443e492bb16dcf3b957c0596fa5389cf4bafe08578d7b7ed06c61e5",
+      "status": "PASS"
+    },
+    "synthetic": {
+      "artifact": "experiments/exp027/engineering/exp027_synthetic_preflight.json",
+      "artifact_sha256": "9f3c227e6dcc0b4dce246a72552b96340166139564e0e9e67f08b8b87546e8fa",
+      "reference_optimized_ci_equivalent": true,
+      "route": "THIRD_REGISTERED_PROFILE",
+      "status": "PASS"
+    }
+  },
+  "qualification_status": "EXP027_102D_FORMAL_PIPELINE_QUALIFICATION_COMPLETE",
+  "repository_commit": "b9155a71986697a33b12c17e179a0ff650752fcb",
+  "result_validator": {
+    "path": "experiments/exp027/validate_exp027_result.py",
+    "sha256": "ee888a3122cf85c67a987ae6c05ef0079678e267d559e40a0a77c77efe63f21d"
+  },
+  "runner": {
+    "path": "experiments/exp027/run_exp027.py",
+    "scientific_override_surfaces": [],
+    "sha256": "0b61655d47b464dc204f92d85bab314aaaceb23fd4d751345c6e314de62bcd4b",
+    "supported_modes": [
+      "--static-preflight",
+      "--synthetic-preflight",
+      "--neutral-model-preflight",
+      "--formal-run"
+    ]
+  },
+  "schema_version": "1.0.0",
+  "scientific_firewall": {
+    "FORMAL_AUTHORIZATION_CONSUMED": false,
+    "FORMAL_AUTHORIZATION_CREATED": false,
+    "FORMAL_RUN_PERFORMED": false,
+    "LLAMA_SCIENTIFIC_INFERENCE_PERFORMED": false,
+    "REAL_DIAG_ACCESSED": false,
+    "REAL_EVAL_ACCESSED": false,
+    "REAL_FIT_ACCESSED": false,
+    "SCIENTIFIC_MATRIX_COMPUTED": false,
+    "SCIENTIFIC_RESULT_CREATED": false
+  },
+  "staging_empty_at_qualification": true,
+  "status": "PASS",
+  "task_id": "102D_EXP027_FORMAL_PIPELINE_QUALIFICATION",
+  "test_suite": {
+    "path": "tests/test_exp027_formal_pipeline.py",
+    "result": "37 passed",
+    "sha256": "ac4c85be23e2e0e47334f6bcbb79db75d119597c56ec5641d0ee69c2b2889c87"
+  },
+  "tracked_tree_clean_at_qualification": true
+}
