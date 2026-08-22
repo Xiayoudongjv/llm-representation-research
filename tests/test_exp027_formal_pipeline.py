@@ -120,7 +120,8 @@ def _minimal_result_payload() -> dict[str, Any]:
 # Static, synthetic, neutral
 # ---------------------------------------------------------------------------
 
-def test_static_preflight_passes_without_model_or_formal_data():
+def test_static_preflight_passes_without_model_or_formal_data(monkeypatch):
+    monkeypatch.setattr(r, "verify_no_authorization_contamination", lambda root: None)
     artifact = r.run_static_preflight(publish=False)
     assert artifact["status"] == "PASS"
     assert artifact["no_formal_result"] is True
@@ -150,6 +151,7 @@ def test_formal_run_rejects_missing_authorization(monkeypatch):
     monkeypatch.setattr(r, "verify_exp027_authorities", lambda root: {})
     monkeypatch.setattr(r, "verify_no_result_collision", lambda root: None)
     monkeypatch.setattr(r, "_authorization_path_for", lambda root, auth_file: None)
+    monkeypatch.setattr(r, "classify_exp027_lifecycle", lambda *args, **kwargs: "S0_PRISTINE_UNAUTHORIZED")
     with pytest.raises(r.Exp027ProtocolIntegrityError, match="FORMAL_RUN_REQUIRES_AUTHORIZATION"):
         r.run_formal_run(r.ROOT)
 
@@ -243,6 +245,8 @@ def test_formal_progress_is_outcome_blind_and_stage_level(tmp_path, monkeypatch,
     monkeypatch.setattr(r, "verify_exp027_authorities", lambda root: {})
     monkeypatch.setattr(r, "verify_no_result_collision", lambda root: None)
     monkeypatch.setattr(r, "_authorization_path_for", lambda root, auth_file: auth_path)
+    monkeypatch.setattr(r, "classify_exp027_lifecycle", lambda *args, **kwargs: "S1_AUTHORIZED_UNUSED")
+    monkeypatch.setattr(r, "validate_formal_lifecycle", lambda lifecycle: lifecycle)
     monkeypatch.setattr(r, "validate_exp027_authorization", lambda root, auth_path: (authorization, authorization_sha))
     monkeypatch.setattr(r, "consume_exp027_authorization", lambda *args, **kwargs: (fake_consumption, "b" * 64))
     monkeypatch.setattr(r, "load_exp027_observations", lambda root: [])
@@ -529,3 +533,119 @@ def test_invalid_lifecycle_fails_closed(tmp_path):
 
     with pytest.raises(r.Exp027ProtocolIntegrityError, match="FORMAL_LIFECYCLE_INVALID_STATE"):
         r.validate_formal_lifecycle("SX_INVALID_STATE")
+
+
+# ---------------------------------------------------------------------------
+# Serialization-only recovery repair regression tests
+# ---------------------------------------------------------------------------
+
+def _production_shaped_profile_archive() -> dict[str, Any]:
+    base = np.array(
+        [
+            [[0.0, 1.0], [2.0, 3.0]],
+            [[4.0, 5.0], [6.0, 7.0]],
+        ],
+        dtype=np.float32,
+    )
+    return {
+        "c0_diag": base,
+        "c0_eval": base + 0.5,
+        "c_cal_eval": base + 1.0,
+        "d_diag": base + 1.5,
+        "d_eval": base + 2.0,
+        "dbar_diag": base + 2.5,
+        "dbar_eval": base + 3.0,
+        "r_eval": base + 3.5,
+        "rbar_eval": base + 4.0,
+        "point": {
+            "low_d_recovery": {
+                "pair_mask": np.array([[True, False], [False, True]], dtype=bool),
+                "pairs": [(0, 1), (1, 0)],
+            }
+        },
+    }
+
+
+def test_recursive_json_safe_production_shaped_profile():
+    original = _production_shaped_profile_archive()
+    safe = r._json_safe(original)
+    text = json.dumps(safe, sort_keys=True)
+    decoded = json.loads(text)
+
+    for key in (
+        "c0_diag",
+        "c0_eval",
+        "c_cal_eval",
+        "d_diag",
+        "d_eval",
+        "dbar_diag",
+        "dbar_eval",
+        "r_eval",
+        "rbar_eval",
+    ):
+        np.testing.assert_allclose(
+            np.asarray(decoded[key], dtype=np.float32),
+            original[key],
+        )
+    assert decoded["point"]["low_d_recovery"]["pair_mask"] == [[True, False], [False, True]]
+    assert decoded["point"]["low_d_recovery"]["pairs"] == [[0, 1], [1, 0]]
+
+
+def test_recursive_json_safe_nested_numpy_scalars():
+    payload = {
+        "outer": {
+            "float_value": np.float32(1.25),
+            "int_value": np.int64(3),
+            "bool_value": np.bool_(True),
+        }
+    }
+    safe = r._json_safe(payload)
+    assert safe == {
+        "outer": {
+            "float_value": 1.25,
+            "int_value": 3,
+            "bool_value": True,
+        }
+    }
+    assert json.dumps(safe)
+    assert isinstance(safe["outer"]["float_value"], float)
+    assert isinstance(safe["outer"]["int_value"], int)
+    assert isinstance(safe["outer"]["bool_value"], bool)
+
+
+def test_recursive_json_safe_is_boundary_only(monkeypatch):
+    def fail_if_called(*args, **kwargs):
+        raise AssertionError("scientific computation function was called by _json_safe")
+
+    monkeypatch.setattr(r, "compute_exp027_profile", fail_if_called)
+    monkeypatch.setattr(r, "build_exp027_result_payload", fail_if_called)
+    monkeypatch.setattr(r, "_runtime_environment", fail_if_called)
+
+    payload = {
+        "matrix": np.arange(4).reshape(2, 2),
+        "point": {"pair_mask": np.array([True, False])},
+    }
+    assert r._json_safe(payload) == {
+        "matrix": [[0, 1], [2, 3]],
+        "point": {"pair_mask": [True, False]},
+    }
+
+
+def test_production_shaped_serialization_pipeline(tmp_path):
+    payload = _minimal_result_payload()
+    payload["profile_archive"] = _production_shaped_profile_archive()
+    assert result_validator.validate_result_payload(payload) == []
+
+    safe = r._json_safe(payload)
+    target = tmp_path / "exp027_results.json"
+    r._atomic_write_json(target, safe)
+    reloaded = json.loads(target.read_text(encoding="utf-8"))
+
+    assert reloaded["classification"] == payload["classification"]
+    assert reloaded["experiment"] == payload["experiment"]
+    assert reloaded["route"] == payload["route"]
+    for key in ("c0_diag", "c0_eval", "c_cal_eval", "d_diag", "d_eval", "dbar_diag", "dbar_eval", "r_eval", "rbar_eval"):
+        np.testing.assert_allclose(
+            np.asarray(reloaded["profile_archive"][key], dtype=np.float32),
+            payload["profile_archive"][key],
+        )
