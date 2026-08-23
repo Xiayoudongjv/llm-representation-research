@@ -1,0 +1,23 @@
+{
+    "schema_version":  "1.0.0",
+    "binding_id":  "PA-EXT-A-CONTENT-DESIGN-V3-BINDING",
+    "bound_at_task":  "PA-EXT-A-002C",
+    "protocol_path":  "experiments/paper_a_ext_a/paper_a_ext_a_frozen_config.json",
+    "protocol_sha256":  "78e58c43c7fabfafaa03084ef17f9c5ff4c02665d242aa57b9f70a9d3b793e5d",
+    "panel_content_design_path":  "experiments/paper_a_ext_a/paper_a_ext_a_panel_content_design_v3.json",
+    "panel_content_design_sha256":  "205376bbd8704862de2cafeb1fd09719b498688532e6c54aec3a2326b71f0462",
+    "predecessor_content_design_path":  "experiments/paper_a_ext_a/paper_a_ext_a_panel_content_design.json",
+    "predecessor_content_design_sha256":  "82dd8d944691c49d5586defdf999d0afdb70f95bd5b4f568ffa5c72642829ce6",
+    "preregistration_state":  "FINAL_FROZEN_PRE_DATA_V3_CONTENT_PRODUCTION_SIMPLIFICATION",
+    "panel_content_status":  "PANEL_CONTENT_NOT_YET_CREATED",
+    "protocol_authority_unchanged":  true,
+    "measurement_contract_modified":  false,
+    "statistical_contract_modified":  false,
+    "outcome_routing_modified":  false,
+    "model_contract_modified":  false,
+    "carrier_contract_modified":  false,
+    "task_family_set_modified":  false,
+    "semantic_relation_set_modified":  false,
+    "dataset_shape_modified":  false,
+    "next_task":  "PA-EXT-A-003_GENERATOR_VALIDATOR_IMPLEMENTATION_AND_SYNTHETIC_QUALIFICATION"
+}
