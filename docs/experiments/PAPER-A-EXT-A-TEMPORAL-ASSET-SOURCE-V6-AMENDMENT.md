@@ -1,0 +1,184 @@
+﻿# PAPER-A EXT-A Temporal Asset Source V6 Amendment
+
+Status: `FINAL_FROZEN_PRE_DATA_TEMPORAL_ASSET_SOURCE_POLICY_V6`
+
+This is a prospective pre-data amendment. It replaces only the
+temporal-asset provenance/construction source for the already frozen V3
+temporal construct. It does not change the scientific question, task families,
+semantic relations, dataset shape, generator, models/carriers, measurement
+contract, statistics, outcome routing, or the one-extension stopping rule.
+
+## 1. Historical Chronology
+
+- V4 froze `TEMPORAL_SOURCE_POLICY = INTERNAL_STRUCTURED_ASSET_BANK`.
+- V5 made that internal route executable in principle by freezing a
+  deterministic human-authored event-pair construction procedure.
+- V5 created no real 220 event-pair values; its manifest explicitly recorded
+  `real_asset_values_not_created = true`.
+- `PA-EXT-A-005R` confirmed that the V5 route still had no real event values.
+  That retry was blocked on the missing temporal real-value authority.
+- The repository remained pre-inference and outcome-unexposed: no real EXT-A
+  semantic asset bank, panel, model inference, result, or authorization exists.
+- V6 resolves only the temporal provenance/construction source by adopting a
+  deterministic Wikidata structured event-date source.
+
+## 2. Authority Preservation
+
+The V5 authority is historically preserved and is not rewritten.
+
+- V5 temporal manifest path:
+  `experiments/paper_a_ext_a/paper_a_ext_a_temporal_asset_source_manifest.json`
+- V5 temporal manifest SHA-256:
+  `50970d406d437874309ac528c6efc0ab9615e030ecb84a1b12945c34c55d4659`
+
+Other unchanged authority hashes:
+
+- Protocol SHA-256:
+  `78e58c43c7fabfafaa03084ef17f9c5ff4c02665d242aa57b9f70a9d3b793e5d`
+- V3 content-design SHA-256:
+  `205376bbd8704862de2cafeb1fd09719b498688532e6c54aec3a2326b71f0462`
+- V3 pipeline generator SHA-256:
+  `6508490ec2141f0531f7e61a24c3496e00705fd85d34bc5ca725d24bd38b3953`
+- V3 pipeline validator SHA-256:
+  `c344ff526948b9b0e98f305095164a643478080427f84786d02668776fb22cb1`
+- V4 source manifest SHA-256:
+  `72bf8de42c315e390269eeb874ee89828c7cc1541e2d4171fd5dc8ae2215faf9`
+- V4 binding SHA-256:
+  `b23fc6329b7863bfa0a7f80c06bf582706ce1457c5b04ecffaefd74bfefddc7f`
+
+## 3. Selected Route
+
+- `SELECTED_TEMPORAL_ROUTE = ADOPT_WIKIDATA_STRUCTURED_EVENT_DATE_SOURCE`
+- `NEW_TEMPORAL_SOURCE_POLICY = WIKIDATA_STRUCTURED_EVENT_DATE_SOURCE`
+- `TEMPORAL_DATE_PROPERTY = P585`
+
+Wikidata structured data is used under its CC0 structured-data license.
+Access is through the official Wikidata Query Service / SPARQL endpoint.
+Wikipedia article text is not used, and final benchmark questions or text are
+not imported.
+
+## 4. Frozen Wikidata Temporal Candidate Contract
+
+### 4.1 Source identity
+
+- `source_id = wikidata_structured_event_date_v1`
+- English labels only.
+- Only structured fields are used: Wikidata item ID, English label,
+  occurrence/event type authority, `P585` point-in-time value, date precision,
+  and calendar model where required.
+
+### 4.2 Event eligibility
+
+- `?item wdt:P31/wdt:P279* wd:Q1190554`
+- `Q1190554 = occurrence`
+- Static instance/subclass relation; no arbitrary P585 carrier is accepted.
+
+### 4.3 Date contract
+
+- Accepted property: `P585` only.
+- One canonical `P585` value per item; items with multiple unresolved `P585`
+  values are excluded.
+- Accepted calendar model: proleptic Gregorian calendar
+  (`wikibase:timeCalendarModel wd:Q1985727`).
+- Minimum precision: day or finer (`wikibase:timePrecision >= 11`).
+- Missing or ambiguous dates are excluded.
+- Equal-date pairs are excluded prospectively.
+
+### 4.4 Surface date-leakage filter
+
+Before extraction, English labels are normalized and deterministically
+rejected if they contain:
+
+- Arabic digits (`0-9`),
+- four-digit-year tokens,
+- English month names,
+- full date strings,
+- era tokens `AD`, `BC`, `BCE`, or `CE`.
+
+No model, embedding, or tested-model behavior is used for this filter.
+
+### 4.5 Relation derivation
+
+- `date_A < date_B` => `BEFORE`
+- `date_A > date_B` => `AFTER`
+- `date_A == date_B` => excluded prospectively
+
+Temporal relation is never inferred from text and no LLM is used.
+
+### 4.6 Deterministic pairing
+
+Eligible events are ordered by ascending canonical date value, with QID as
+the tie-break. Consecutive unequal-date eligible event pairs are selected in
+that order until exactly 220 pairs are produced for the frozen V3 temporal
+source-family allocation. No random sampling, familiarity ranking, manual
+selection, or model-outcome ranking is used.
+
+### 4.7 Snapshot reproducibility
+
+The future real extraction must freeze:
+
+- retrieval timestamp,
+- query-text SHA-256,
+- raw result SHA-256,
+- Wikidata endpoint/version/snapshot metadata.
+
+Live-query-only identity is not acceptable as scientific identity. No live
+retrieval is performed in this task.
+
+## 5. Final Text Policy
+
+Wikidata structured labels may serve only as frozen semantic lexical assets
+for the V3 deterministic renderer. Final EXT-A sentences remain generated by
+the qualified V3 deterministic renderer.
+
+- `FINAL_BENCHMARK_TEXT_REUSED = false`
+- `EXTERNAL_RAW_TEXT_USED_AS_FINAL_PANEL_TEXT = false`
+- `LLM_GENERATED_TEMPORAL_CONTENT = false`
+
+## 6. Scientific Interpretation Boundary
+
+This task does not test unseen factual knowledge. Public Wikidata facts may
+have appeared in model pretraining. The experiment tests cross-task
+fixed-readout compatibility under a new temporal semantic/task panel.
+
+- `NOVEL_FACT_GENERALIZATION_CLAIM_ALLOWED = false`
+
+## 7. What Does Not Change
+
+- `SCIENTIFIC_QUESTION_MODIFIED = false`
+- `TASK_FAMILY_SET_MODIFIED = false`
+- `SEMANTIC_RELATION_SET_MODIFIED = false`
+- `DATASET_SHAPE_MODIFIED = false`
+- `GENERATOR_MODIFIED = false`
+- `MEASUREMENT_CONTRACT_MODIFIED = false`
+- `STATISTICAL_CONTRACT_MODIFIED = false`
+- `OUTCOME_ROUTING_MODIFIED = false`
+- `MODEL_CONTRACT_MODIFIED = false`
+- `CARRIER_CONTRACT_MODIFIED = false`
+
+The V3 temporal construct remains:
+
+- task family: `exta_tf_temporal`
+- semantic relation: `exta_rel_temporal_order`
+- argument types: `EVENT`, `EVENT`
+- source-family allocation: 220 event-pair source assets
+- final temporal record count: 440
+
+## 8. Hard Flags
+
+- `REAL_EXT_A_TEMPORAL_ASSETS_CREATED = false`
+- `REAL_EXT_A_SEMANTIC_ASSET_BANK_CREATED = false`
+- `REAL_EXT_A_SOURCE_BANK_CREATED = false`
+- `REAL_EXT_A_PANEL_CREATED = false`
+- `REAL_EXT_A_MODEL_INFERENCE_PERFORMED = false`
+- `REAL_EXT_A_RESULTS_CREATED = false`
+- `REAL_EXT_A_AUTHORIZATION_CREATED = false`
+- `V3_PIPELINE_MODIFIED = false`
+- `V4_AUTHORITY_PRESERVED = true`
+- `V5_AUTHORITY_PRESERVED = true`
+- `PAPER_A_MANUSCRIPT_MODIFIED = false`
+- `EXP028_MODIFIED = false`
+
+## 9. Next Task
+
+`PA-EXT-A-005_REAL_SEMANTIC_ASSET_CURATION_AND_PANEL_FREEZE_RETRY_2`

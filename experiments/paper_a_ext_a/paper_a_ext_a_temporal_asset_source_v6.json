@@ -1,0 +1,193 @@
+{
+  "schema_version": "1.0.0",
+  "manifest_id": "PA-EXT-A-TEMPORAL-ASSET-SOURCE-V6-MANIFEST",
+  "experiment_id": "PAPER-A-EXT-A",
+  "task_id": "PA-EXT-A-005T2",
+  "status": "FINAL_FROZEN_PRE_DATA_TEMPORAL_ASSET_SOURCE_POLICY_V6",
+  "bound_head": "40cff5c21f4ce03543eed3dd9804b2e3f2aee9ee",
+  "entry_head": "40cff5c21f4ce03543eed3dd9804b2e3f2aee9ee",
+  "next_task": "PA-EXT-A-005_REAL_SEMANTIC_ASSET_CURATION_AND_PANEL_FREEZE_RETRY_2",
+  "protocol_path": "experiments/paper_a_ext_a/paper_a_ext_a_frozen_config.json",
+  "protocol_sha256": "78e58c43c7fabfafaa03084ef17f9c5ff4c02665d242aa57b9f70a9d3b793e5d",
+  "v3_content_design_path": "experiments/paper_a_ext_a/paper_a_ext_a_panel_content_design_v3.json",
+  "v3_content_design_sha256": "205376bbd8704862de2cafeb1fd09719b498688532e6c54aec3a2326b71f0462",
+  "v3_pipeline_generator_path": "experiments/paper_a_ext_a/pa_ext_a_v3_pipeline.py",
+  "v3_pipeline_generator_sha256": "6508490ec2141f0531f7e61a24c3496e00705fd85d34bc5ca725d24bd38b3953",
+  "v3_pipeline_validator_path": "experiments/paper_a_ext_a/validate_pa_ext_a_v3_pipeline.py",
+  "v3_pipeline_validator_sha256": "c344ff526948b9b0e98f305095164a643478080427f84786d02668776fb22cb1",
+  "v4_source_manifest_path": "experiments/paper_a_ext_a/paper_a_ext_a_external_asset_source_manifest.json",
+  "v4_source_manifest_sha256": "72bf8de42c315e390269eeb874ee89828c7cc1541e2d4171fd5dc8ae2215faf9",
+  "v4_binding_path": "experiments/paper_a_ext_a/paper_a_ext_a_external_asset_source_v4_binding.json",
+  "v4_binding_sha256": "b23fc6329b7863bfa0a7f80c06bf582706ce1457c5b04ecffaefd74bfefddc7f",
+  "v5_temporal_manifest_path": "experiments/paper_a_ext_a/paper_a_ext_a_temporal_asset_source_manifest.json",
+  "v5_temporal_manifest_sha256": "50970d406d437874309ac528c6efc0ab9615e030ecb84a1b12945c34c55d4659",
+  "v5_amendment_path": "docs/experiments/PAPER-A-EXT-A-TEMPORAL-ASSET-SOURCE-V5-AMENDMENT.md",
+  "v6_amendment_path": "docs/experiments/PAPER-A-EXT-A-TEMPORAL-ASSET-SOURCE-V6-AMENDMENT.md",
+  "v3_pipeline_modified": false,
+  "v4_authority_preserved": true,
+  "v5_authority_preserved": true,
+  "selected_temporal_route": "ADOPT_WIKIDATA_STRUCTURED_EVENT_DATE_SOURCE",
+  "new_temporal_source_policy": "WIKIDATA_STRUCTURED_EVENT_DATE_SOURCE",
+  "temporal_date_property": "P585",
+  "event_type_rule": {
+    "wikidata_event_class_qid": "Q1190554",
+    "event_class_name": "occurrence",
+    "eligibility_pattern": "?item wdt:P31/wdt:P279* wd:Q1190554",
+    "arbitrary_p585_carrier_accepted": false,
+    "static_pre_data_rule": true,
+    "candidate_item_fields": [
+      "wikidata_item_id",
+      "english_label",
+      "event_type_authority",
+      "p585_point_in_time_value",
+      "date_precision",
+      "calendar_model"
+    ]
+  },
+  "date_rule": {
+    "accepted_property": "P585",
+    "accepted_property_set": [
+      "P585"
+    ],
+    "canonical_value_count": "EXACTLY_ONE",
+    "multiple_unresolved_values": "EXCLUDE",
+    "missing_or_ambiguous": "EXCLUDE",
+    "calendar_model_rule": "WIKIBASE_TIME_CALENDAR_MODEL_Q1985727_PROLEPTIC_GREGORIAN",
+    "calendar_model_qid": "Q1985727",
+    "minimum_time_precision": 11,
+    "minimum_precision_label": "DAY_OR_FINER",
+    "equal_date_pair_rule": "EXCLUDE",
+    "no_human_adjudication": true
+  },
+  "surface_date_leakage_filter": {
+    "enabled": true,
+    "normalization": "NFKC_WHITESPACE_COLLAPSE_CASE_INSENSITIVE_FOR_TOKEN_CLASSES",
+    "reject_arabic_digits": true,
+    "reject_four_digit_year_tokens": true,
+    "reject_english_month_names": true,
+    "english_month_names": [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ],
+    "reject_full_date_strings": true,
+    "reject_era_tokens": true,
+    "era_token_list": [
+      "AD",
+      "BC",
+      "BCE",
+      "CE"
+    ],
+    "no_model_or_embedding": true,
+    "no_tested_model_behavior_inspection": true
+  },
+  "relation_derivation": {
+    "mechanical_only": true,
+    "date_a_before_date_b": "BEFORE",
+    "date_a_after_date_b": "AFTER",
+    "date_a_equal_date_b": "EXCLUDE",
+    "no_text_inference": true,
+    "no_llm": true
+  },
+  "deterministic_pairing": {
+    "target_pair_count": 220,
+    "primary_order_key": "date_value_ascending",
+    "secondary_order_key": "wikidata_qid_ascending",
+    "pair_method": "CONSECUTIVE_UNEQUAL_DATE_ELIGIBLE_EVENT_PAIRS",
+    "random_sampling_forbidden": true,
+    "manual_selection_forbidden": true,
+    "familiarity_ranking_forbidden": true,
+    "model_outcome_ranking_forbidden": true,
+    "exact_count_or_block": true,
+    "failure_policy": "BLOCK_WITHOUT_IMPROVISING"
+  },
+  "snapshot_provenance_rule": {
+    "future_retrieval_required_fields": [
+      "retrieval_timestamp",
+      "query_text_sha256",
+      "raw_result_sha256",
+      "endpoint_url",
+      "endpoint_version_or_snapshot_metadata"
+    ],
+    "live_query_only_identity_allowed": false,
+    "this_task_performed_live_retrieval": false,
+    "snapshot_sha256": "NONE_REAL_RETRIEVAL_NOT_PERFORMED",
+    "retrieval_timestamp": "NONE"
+  },
+  "source_identity": {
+    "source_id": "wikidata_structured_event_date_v1",
+    "source_name": "Wikidata Structured Event-Date Source",
+    "license": "CC0-1.0",
+    "license_status": "PASS_STRUCTURED_DATA_CC0",
+    "access": "OFFICIAL_WIKIDATA_QUERY_SERVICE_SPARQL",
+    "wikipedia_article_text_used": false,
+    "final_benchmark_questions_imported": false,
+    "english_labels_only": true,
+    "real_values_created": false
+  },
+  "final_text_policy": {
+    "final_benchmark_text_reused": false,
+    "external_raw_text_used_as_final_panel_text": false,
+    "llm_generated_temporal_content": false,
+    "wikidata_label_role": "FROZEN_SEMANTIC_LEXICAL_ASSET_RENDERER_INPUT_ONLY",
+    "final_text_authority": "pa_ext_a_v3_pipeline.py"
+  },
+  "scientific_boundaries": {
+    "novel_fact_generalization_claim_allowed": false,
+    "unseen_world_knowledge_reasoning_claim_allowed": false,
+    "purpose": "cross_task_fixed_readout_compatibility_under_new_temporal_panel",
+    "wikidata_pretraining_exposure_possible": true
+  },
+  "v3_compatibility": {
+    "task_family_id": "exta_tf_temporal",
+    "semantic_relation_id": "exta_rel_temporal_order",
+    "argument_a_type": "EVENT",
+    "argument_b_type": "EVENT",
+    "temporal_source_family_count": 220,
+    "temporal_final_record_count": 440,
+    "pipeline_slot_contract_preserved": true,
+    "v3_content_design_unchanged": true,
+    "v3_pipeline_modified": false,
+    "schema_compatibility": "PASS",
+    "new_task_family_created": false,
+    "new_semantic_relation_created": false
+  },
+  "scientific_contract_unchanged": {
+    "scientific_question_modified": false,
+    "task_family_set_modified": false,
+    "semantic_relation_set_modified": false,
+    "dataset_shape_modified": false,
+    "generator_modified": false,
+    "measurement_contract_modified": false,
+    "statistical_contract_modified": false,
+    "outcome_routing_modified": false,
+    "model_contract_modified": false,
+    "carrier_contract_modified": false
+  },
+  "hard_flags": {
+    "REAL_EXT_A_TEMPORAL_ASSETS_CREATED": false,
+    "REAL_EXT_A_SEMANTIC_ASSET_BANK_CREATED": false,
+    "REAL_EXT_A_SOURCE_BANK_CREATED": false,
+    "REAL_EXT_A_PANEL_CREATED": false,
+    "REAL_EXT_A_MODEL_INFERENCE_PERFORMED": false,
+    "REAL_EXT_A_RESULTS_CREATED": false,
+    "REAL_EXT_A_AUTHORIZATION_CREATED": false,
+    "V3_PIPELINE_MODIFIED": false,
+    "V4_AUTHORITY_PRESERVED": true,
+    "V5_AUTHORITY_PRESERVED": true,
+    "PAPER_A_MANUSCRIPT_MODIFIED": false,
+    "EXP028_MODIFIED": false,
+    "FINAL_BENCHMARK_TEXT_REUSED": false,
+    "EXTERNAL_RAW_TEXT_USED_AS_FINAL_PANEL_TEXT": false,
+    "LLM_GENERATED_TEMPORAL_CONTENT": false
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0.0",
+  "binding_id": "PA-EXT-A-TEMPORAL-ASSET-SOURCE-V6-BINDING",
+  "bound_at_task": "PA-EXT-A-005T2",
+  "bound_head": "40cff5c21f4ce03543eed3dd9804b2e3f2aee9ee",
+  "predecessor_binding_path": "experiments/paper_a_ext_a/paper_a_ext_a_external_asset_source_v4_binding.json",
+  "predecessor_binding_sha256": "b23fc6329b7863bfa0a7f80c06bf582706ce1457c5b04ecffaefd74bfefddc7f",
+  "protocol_path": "experiments/paper_a_ext_a/paper_a_ext_a_frozen_config.json",
+  "protocol_sha256": "78e58c43c7fabfafaa03084ef17f9c5ff4c02665d242aa57b9f70a9d3b793e5d",
+  "v3_content_design_path": "experiments/paper_a_ext_a/paper_a_ext_a_panel_content_design_v3.json",
+  "v3_content_design_sha256": "205376bbd8704862de2cafeb1fd09719b498688532e6c54aec3a2326b71f0462",
+  "v3_pipeline_generator_path": "experiments/paper_a_ext_a/pa_ext_a_v3_pipeline.py",
+  "v3_pipeline_generator_sha256": "6508490ec2141f0531f7e61a24c3496e00705fd85d34bc5ca725d24bd38b3953",
+  "v3_pipeline_validator_path": "experiments/paper_a_ext_a/validate_pa_ext_a_v3_pipeline.py",
+  "v3_pipeline_validator_sha256": "c344ff526948b9b0e98f305095164a643478080427f84786d02668776fb22cb1",
+  "v4_source_manifest_path": "experiments/paper_a_ext_a/paper_a_ext_a_external_asset_source_manifest.json",
+  "v4_source_manifest_sha256": "72bf8de42c315e390269eeb874ee89828c7cc1541e2d4171fd5dc8ae2215faf9",
+  "v5_temporal_manifest_path": "experiments/paper_a_ext_a/paper_a_ext_a_temporal_asset_source_manifest.json",
+  "v5_temporal_manifest_sha256": "50970d406d437874309ac528c6efc0ab9615e030ecb84a1b12945c34c55d4659",
+  "v6_temporal_manifest_path": "experiments/paper_a_ext_a/paper_a_ext_a_temporal_asset_source_v6.json",
+  "v6_temporal_manifest_sha256": "6df26d9d2940bfabb25058f561229070c59ca3e8a288cf2f543656b770a9acbe",
+  "amendment_path": "docs/experiments/PAPER-A-EXT-A-TEMPORAL-ASSET-SOURCE-V6-AMENDMENT.md",
+  "amendment_scope": [
+    "temporal_source_policy",
+    "temporal_provenance",
+    "temporal_candidate_query_filter_pairing_rules"
+  ],
+  "scientific_contract_unchanged": {
+    "scientific_question_modified": false,
+    "task_family_set_modified": false,
+    "semantic_relation_set_modified": false,
+    "dataset_shape_modified": false,
+    "generator_modified": false,
+    "measurement_contract_modified": false,
+    "statistical_contract_modified": false,
+    "outcome_routing_modified": false,
+    "model_contract_modified": false,
+    "carrier_contract_modified": false
+  },
+  "pre_data_status": {
+    "real_ext_a_temporal_assets_created": false,
+    "real_ext_a_semantic_asset_bank_created": false,
+    "real_ext_a_source_bank_created": false,
+    "real_ext_a_panel_created": false,
+    "real_ext_a_model_inference_performed": false,
+    "real_ext_a_results_created": false,
+    "real_ext_a_authorization_created": false
+  },
+  "v3_pipeline_modified": false,
+  "v4_authority_preserved": true,
+  "v5_authority_preserved": true,
+  "next_task": "PA-EXT-A-005_REAL_SEMANTIC_ASSET_CURATION_AND_PANEL_FREEZE_RETRY_2"
+}
