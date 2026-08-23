@@ -1,0 +1,42 @@
+{
+  "classification": "SYNTHETIC_NON_SCIENTIFIC_NOT_FOR_FORMAL_RUN",
+  "determinism_status": "PASS",
+  "diag_records": 640,
+  "diag_source_families": 320,
+  "entry_head": "e6d1be903e0d11f7ca417742a07f3c4a474c3e2b",
+  "eval_records": 640,
+  "eval_source_families": 320,
+  "final_panel_size": 1760,
+  "fit_records": 480,
+  "fit_source_families": 240,
+  "formal_panel_allowed": false,
+  "generator_sha256": "6508490ec2141f0531f7e61a24c3496e00705fd85d34bc5ca725d24bd38b3953",
+  "historical_exclusion_record_count": 1760,
+  "partition_integrity_status": "PASS",
+  "protocol_authority_unchanged": true,
+  "protocol_sha256": "78e58c43c7fabfafaa03084ef17f9c5ff4c02665d242aa57b9f70a9d3b793e5d",
+  "real_data_flags": {
+    "EXP028_MODIFIED": false,
+    "PAPER_A_MANUSCRIPT_MODIFIED": false,
+    "REAL_EXT_A_AUTHORIZATION_CREATED": false,
+    "REAL_EXT_A_MODEL_INFERENCE_PERFORMED": false,
+    "REAL_EXT_A_PANEL_CREATED": false,
+    "REAL_EXT_A_RESULTS_CREATED": false,
+    "REAL_EXT_A_SEMANTIC_ASSET_BANK_CREATED": false,
+    "REAL_EXT_A_SOURCE_BANK_CREATED": false
+  },
+  "scientific_use_allowed": false,
+  "source_bank_size": 880,
+  "status": "PASS",
+  "synthetic": true,
+  "synthetic_qualification_status": "PASS",
+  "test_totals": {
+    "failed": 0,
+    "passed": 15,
+    "total": 15
+  },
+  "tests": "15/15",
+  "v3_content_authority_unchanged": true,
+  "v3_design_sha256": "205376bbd8704862de2cafeb1fd09719b498688532e6c54aec3a2326b71f0462",
+  "validator_sha256": "c344ff526948b9b0e98f305095164a643478080427f84786d02668776fb22cb1"
+}
