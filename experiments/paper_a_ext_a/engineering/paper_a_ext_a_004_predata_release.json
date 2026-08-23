@@ -1,0 +1,103 @@
+{
+  "schema_version": "1.0.0",
+  "artifact_id": "PA-EXT-A-004-PREDATA-RELEASE",
+  "experiment_id": "PAPER-A-EXT-A",
+  "task_id": "PA-EXT-A-004",
+  "status": "COMPLETE",
+  "release_decision": {
+    "REAL_ASSET_CURATION_RELEASED": true,
+    "release_scope": "PERMISSION_FOR_NEXT_TASK_ONLY"
+  },
+  "entry_head": "e79f459301c5ec7cce1ba6244df1cd82110e0217",
+  "authority_hashes": {
+    "protocol": {
+      "path": "experiments/paper_a_ext_a/paper_a_ext_a_frozen_config.json",
+      "sha256": "78e58c43c7fabfafaa03084ef17f9c5ff4c02665d242aa57b9f70a9d3b793e5d"
+    },
+    "v3_content_design": {
+      "path": "experiments/paper_a_ext_a/paper_a_ext_a_panel_content_design_v3.json",
+      "sha256": "205376bbd8704862de2cafeb1fd09719b498688532e6c54aec3a2326b71f0462"
+    },
+    "v3_content_design_binding": {
+      "path": "experiments/paper_a_ext_a/paper_a_ext_a_content_design_v3_binding.json",
+      "sha256": "73b572853ae13d597677a7ca421e06dbd623172416f7e04dc5244f0ce586c80e"
+    },
+    "v3_generator": {
+      "path": "experiments/paper_a_ext_a/pa_ext_a_v3_pipeline.py",
+      "sha256": "6508490ec2141f0531f7e61a24c3496e00705fd85d34bc5ca725d24bd38b3953"
+    },
+    "v3_pipeline_validator": {
+      "path": "experiments/paper_a_ext_a/validate_pa_ext_a_v3_pipeline.py",
+      "sha256": "c344ff526948b9b0e98f305095164a643478080427f84786d02668776fb22cb1"
+    },
+    "v3_content_validator": {
+      "path": "experiments/paper_a_ext_a/validate_paper_a_ext_a_content_design_v3.py",
+      "sha256": "704df4bda0f92426cd6298672646a954649c31b990065d57717f3fdc358b18ab"
+    },
+    "source_manifest": {
+      "path": "experiments/paper_a_ext_a/paper_a_ext_a_external_asset_source_manifest.json",
+      "sha256": "72bf8de42c315e390269eeb874ee89828c7cc1541e2d4171fd5dc8ae2215faf9"
+    },
+    "v4_source_binding": {
+      "path": "experiments/paper_a_ext_a/paper_a_ext_a_external_asset_source_v4_binding.json",
+      "sha256": "b23fc6329b7863bfa0a7f80c06bf582706ce1457c5b04ecffaefd74bfefddc7f"
+    },
+    "pipeline_qualification_report": {
+      "path": "experiments/paper_a_ext_a/engineering/paper_a_ext_a_003_pipeline_qualification.json",
+      "sha256": "a41b4a1c06b6366fb95152c1e0c9ffaec5ab789307aaae5dcc50deb52dc91da0"
+    }
+  },
+  "release_gates": {
+    "GATE_1_AUTHORITY_INTEGRITY": "PASS",
+    "GATE_2_PIPELINE_QUALIFICATION": "PASS",
+    "GATE_3_SELECTION_FIREWALL": "PASS",
+    "GATE_4_PRE_DATA_STATE": "PASS",
+    "GATE_5_PROVENANCE_AND_DETERMINISM": "PASS"
+  },
+  "v4_scope": {
+    "V4_SCOPE_VALID": "PASS",
+    "amendment_scope": [
+      "semantic_asset_source_policy",
+      "external_source_provenance",
+      "external_source_license_policy"
+    ],
+    "scientific_contract_unchanged": {
+      "scientific_question_modified": false,
+      "task_family_set_modified": false,
+      "semantic_relation_set_modified": false,
+      "dataset_shape_modified": false,
+      "generator_semantics_modified": false,
+      "measurement_contract_modified": false,
+      "statistical_contract_modified": false,
+      "outcome_routing_modified": false,
+      "model_contract_modified": false,
+      "carrier_contract_modified": false
+    }
+  },
+  "source_policies": {
+    "SPATIAL_SOURCE_POLICY": "EXTERNAL_STRUCTURED_ASSET_SOURCE",
+    "TEMPORAL_SOURCE_POLICY": "INTERNAL_STRUCTURED_ASSET_BANK",
+    "QUANTITATIVE_SOURCE_POLICY": "PROGRAMMATIC_GENERATION",
+    "MEREOLOGICAL_SOURCE_POLICY": "EXTERNAL_STRUCTURED_ASSET_SOURCE"
+  },
+  "license_and_text_firewall": {
+    "ALL_SELECTED_LICENSES_VERIFIED": true,
+    "FINAL_BENCHMARK_TEXT_REUSED": false,
+    "EXTERNAL_RAW_TEXT_USED_AS_FINAL_PANEL_TEXT": false
+  },
+  "real_data_firewall": {
+    "REAL_EXT_A_SEMANTIC_ASSET_BANK_CREATED": false,
+    "REAL_EXT_A_SOURCE_BANK_CREATED": false,
+    "REAL_EXT_A_PANEL_CREATED": false,
+    "REAL_EXT_A_FIT_DATA_CREATED": false,
+    "REAL_EXT_A_DIAG_DATA_CREATED": false,
+    "REAL_EXT_A_EVAL_DATA_CREATED": false,
+    "REAL_EXT_A_MODEL_INFERENCE_PERFORMED": false,
+    "REAL_EXT_A_HIDDEN_STATES_ACCESSED": false,
+    "REAL_EXT_A_RESULTS_CREATED": false,
+    "REAL_EXT_A_AUTHORIZATION_CREATED": false,
+    "PAPER_A_MANUSCRIPT_MODIFIED": false,
+    "EXP028_MODIFIED": false
+  },
+  "next_task": "PA-EXT-A-005_REAL_SEMANTIC_ASSET_CURATION_AND_PANEL_FREEZE"
+}
