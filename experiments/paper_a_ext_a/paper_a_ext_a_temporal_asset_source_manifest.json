@@ -1,0 +1,221 @@
+{
+  "bound_head": "ff6dea2b9acdf77306e4feba02126c69da16bb9f",
+  "canonical_relation_mapping": {
+    "allowed_orientations": [
+      {
+        "canonical_relation_lex": "occurs before",
+        "causal_implication": "NONE",
+        "meaning": "ARG_A occurs before ARG_B",
+        "orientation_id": "exta_temporal_before"
+      },
+      {
+        "canonical_relation_lex": "occurs after",
+        "causal_implication": "NONE",
+        "meaning": "ARG_A occurs after ARG_B",
+        "orientation_id": "exta_temporal_after"
+      },
+      {
+        "canonical_relation_lex": "occurs simultaneously with",
+        "causal_implication": "NONE",
+        "meaning": "ARG_A occurs simultaneously with ARG_B",
+        "orientation_id": "exta_temporal_simultaneous"
+      }
+    ],
+    "discard": [
+      "causal_marker",
+      "counterfactual_dependence",
+      "question",
+      "answer",
+      "passage",
+      "final_benchmark_text"
+    ],
+    "forbidden_output": [
+      "causation",
+      "counterfactual_dependence",
+      "logical_entailment",
+      "analogy",
+      "definition",
+      "atemporal_state"
+    ],
+    "output_argument_slots": [
+      "ARG_A",
+      "ARG_B"
+    ],
+    "output_semantic_relation_id": "exta_rel_temporal_order"
+  },
+  "deterministic_creation_rule": {
+    "cell_mapping": "canonical_lexicographic_by_condition_partition_within_cell_index_to_sorted_event_pair_asset_id",
+    "event_pair_source_asset_count": 220,
+    "final_record_count": 440,
+    "method": "FIXED_EVENT_PAIR_TABLE_PLUS_CELL_DETERMINISTIC_MAPPING",
+    "no_llm_generation": true,
+    "no_model_outcome_filtering": true,
+    "no_post_hoc_selection": true,
+    "no_surplus_authoring": true,
+    "real_asset_values_not_created": true,
+    "slot_asset_total": 1100,
+    "slot_assets_per_source_family": 5,
+    "slot_composition": [
+      "ARG_A",
+      "ARG_B",
+      "RELATION",
+      "CONTEXT_PHRASE",
+      "CONTEXT_PREFIX"
+    ],
+    "surface_rendering_authority": "pa_ext_a_v3_pipeline.py",
+    "temporal_source_family_count": 220
+  },
+  "entry_head": "ff6dea2b9acdf77306e4feba02126c69da16bb9f",
+  "excluded_relation_or_question_types": [
+    "causal_marker",
+    "counterfactual_dependence",
+    "logical_entailment",
+    "analogy",
+    "definition",
+    "atemporal_state",
+    "missing_event_argument",
+    "ambiguous_temporal_order",
+    "figurative_temporal_language",
+    "benchmark_question_or_passage_as_final_text"
+  ],
+  "experiment_id": "PAPER-A-EXT-A",
+  "hard_flags": {
+    "EXP028_MODIFIED": false,
+    "EXTERNAL_RAW_TEXT_USED_AS_FINAL_PANEL_TEXT": false,
+    "FINAL_BENCHMARK_TEXT_REUSED": false,
+    "LLM_GENERATED_TEMPORAL_CONTENT": false,
+    "PAPER_A_MANUSCRIPT_MODIFIED": false,
+    "REAL_EXT_A_AUTHORIZATION_CREATED": false,
+    "REAL_EXT_A_MODEL_INFERENCE_PERFORMED": false,
+    "REAL_EXT_A_PANEL_CREATED": false,
+    "REAL_EXT_A_RESULTS_CREATED": false,
+    "REAL_EXT_A_SEMANTIC_ASSET_BANK_CREATED": false,
+    "REAL_EXT_A_SOURCE_BANK_CREATED": false,
+    "REAL_EXT_A_TEMPORAL_ASSETS_CREATED": false,
+    "V3_PIPELINE_MODIFIED": false,
+    "V4_AUTHORITY_PRESERVED": true
+  },
+  "historical_freshness_policy": {
+    "must_reject": [
+      "exact_raw_text_recurrence",
+      "normalized_text_recurrence",
+      "source_family_recurrence",
+      "semantic_source_recurrence",
+      "template_recurrence_where_available"
+    ],
+    "new_id_prefix": "exta_",
+    "old_panel_temporal_or_causal_reuse_forbidden": true
+  },
+  "manifest_id": "PA-EXT-A-TEMPORAL-ASSET-SOURCE-V5-MANIFEST",
+  "new_temporal_source_policy": "EXECUTABLE_INTERNAL_STRUCTURED_ASSET_BANK",
+  "next_task": "PA-EXT-A-005_REAL_SEMANTIC_ASSET_CURATION_AND_PANEL_FREEZE_RETRY",
+  "protocol_path": "experiments/paper_a_ext_a/paper_a_ext_a_frozen_config.json",
+  "protocol_sha256": "78e58c43c7fabfafaa03084ef17f9c5ff4c02665d242aa57b9f70a9d3b793e5d",
+  "provenance_requirements": {
+    "every_generated_asset_must_record": [
+      "source_id",
+      "source_version",
+      "license",
+      "allowed_relation_type",
+      "canonicalization_rule_id",
+      "manifest_id",
+      "manifest_sha256"
+    ],
+    "final_panel_item_must_not_contain": [
+      "external_raw_text",
+      "benchmark_question",
+      "benchmark_answer",
+      "source_story",
+      "causal_marker",
+      "counterfactual_dependence"
+    ],
+    "provenance_trace_required": true
+  },
+  "raw_text_policy": {
+    "event_surface_atoms_allowed_only_as_renderer_inputs": true,
+    "external_raw_text_used_as_final_panel_text": false,
+    "final_benchmark_text_reused": false,
+    "final_text_renderer": "deterministic_frozen_template",
+    "source_question_answer_story_import_forbidden": true
+  },
+  "route_evaluation": {
+    "EXECUTABLE_INTERNAL": {
+      "decision": "SELECTED",
+      "eligible": true,
+      "route": "RETAIN_INTERNAL_STRUCTURED_ASSET_BANK_WITH_EXECUTABLE_NON_LLM_RULE"
+    },
+    "MATRES": {
+      "decision": "DO_NOT_SELECT",
+      "license_gate": "FAIL",
+      "route": "EXTERNAL_STRUCTURED_ASSET_SOURCE_MATRES",
+      "structure_compatibility": "PASS_STRUCTURALLY",
+      "v3_schema_compatibility": "FAIL"
+    },
+    "PROGRAMMATIC_INTERNAL": {
+      "decision": "INELIGIBLE",
+      "eligible": false,
+      "reason": "V3 temporal arguments are natural-language EVENT assets; placeholder-only programmatic tokens would materially change the frozen construct.",
+      "route": "PROGRAMMATIC_INTERNAL_TEMPORAL_ASSETS"
+    },
+    "TORQUE": {
+      "decision": "DO_NOT_SELECT",
+      "deterministic_extraction": "FAIL",
+      "final_text_reuse": "FAIL",
+      "license_gate": "FAIL",
+      "route": "EXTERNAL_STRUCTURED_ASSET_SOURCE_TORQUE",
+      "v3_schema_compatibility": "FAIL"
+    }
+  },
+  "schema_version": "1.0.0",
+  "scope": "temporal_semantic_asset_source_and_executable_procedure_only",
+  "selected_route": "ADOPT_EXECUTABLE_INTERNAL_TEMPORAL_SOURCE",
+  "source_identity": {
+    "commit": "NONE_REAL_ASSETS_NOT_CREATED",
+    "external_source_used": false,
+    "license": "INTERNAL_PROJECT_AUTHORED",
+    "license_status": "NOT_APPLICABLE_NO_THIRD_PARTY_DATA",
+    "real_asset_values_created": false,
+    "source_id": "exta_temporal_internal_v1",
+    "source_name": "Internal Human-Authored Structured Temporal Event Lexicon",
+    "version": "1.0.0"
+  },
+  "source_policy": {
+    "external_license_exposure": "NONE",
+    "external_raw_text_used_as_final_panel_text": false,
+    "final_benchmark_text_reused": false,
+    "llm_generated_temporal_content": false,
+    "model_outcome_based_filtering_forbidden": true,
+    "post_hoc_source_selection_forbidden": true,
+    "principle": "INTERNAL_STRUCTURED_EVENT_ASSETS_UNDER_FROZEN_DETERMINISTIC_RULE"
+  },
+  "status": "FINAL_FROZEN_PRE_DATA_TEMPORAL_ASSET_SOURCE_POLICY",
+  "task_family_id": "exta_tf_temporal",
+  "task_id": "PA-EXT-A-005T",
+  "temporal_selected_source": "NONE",
+  "v3_compatibility": {
+    "argument_a_type": "EVENT",
+    "argument_b_type": "EVENT",
+    "pipeline_slot_contract_preserved": true,
+    "relation_source": "frozen_temporal_relation_asset",
+    "schema_compatibility": "PASS",
+    "v3_content_design_unchanged": true
+  },
+  "v3_content_design_path": "experiments/paper_a_ext_a/paper_a_ext_a_panel_content_design_v3.json",
+  "v3_content_design_sha256": "205376bbd8704862de2cafeb1fd09719b498688532e6c54aec3a2326b71f0462",
+  "v3_pipeline_generator_sha256": "6508490ec2141f0531f7e61a24c3496e00705fd85d34bc5ca725d24bd38b3953",
+  "v3_pipeline_modified": false,
+  "v3_pipeline_validator_sha256": "c344ff526948b9b0e98f305095164a643478080427f84786d02668776fb22cb1",
+  "v4_authority_preserved": true,
+  "v4_binding_path": "experiments/paper_a_ext_a/paper_a_ext_a_external_asset_source_v4_binding.json",
+  "v4_binding_sha256": "b23fc6329b7863bfa0a7f80c06bf582706ce1457c5b04ecffaefd74bfefddc7f",
+  "v4_relationship": {
+    "v4_authority_preserved": true,
+    "v4_gap": "INTERNAL_STRUCTURED_ASSET_BANK had no frozen executable source procedure",
+    "v4_temporal_policy_retained": true,
+    "v5_resolution": "freezes the missing executable internal procedure; does not switch to an external or programmatic source"
+  },
+  "v4_source_manifest_path": "experiments/paper_a_ext_a/paper_a_ext_a_external_asset_source_manifest.json",
+  "v4_source_manifest_sha256": "72bf8de42c315e390269eeb874ee89828c7cc1541e2d4171fd5dc8ae2215faf9",
+  "v4_temporal_route_status": "OPERATIONALLY_INCOMPLETE_UNDER_005T",
+  "v5_amendment_path": "docs/experiments/PAPER-A-EXT-A-TEMPORAL-ASSET-SOURCE-V5-AMENDMENT.md"
+}
