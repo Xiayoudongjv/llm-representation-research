@@ -1,0 +1,358 @@
+﻿{
+  "schema_version": "1.0.0",
+  "experiment_id": "EXP-028",
+  "working_name": "PAIRED_INFORMATION_BEYOND_MARGINAL_RECALIBRATION",
+  "design_status": "FROZEN_PROSPECTIVE_PRE_INFERENCE",
+  "selected_generation_route": "ROUTE_A_DETERMINISTIC_SLOT_TEMPLATE_PLUS_FROZEN_LEXICON",
+  "incident_status": {
+    "incident_class": "PRE_DATA_PROTOCOL_INCOMPLETENESS",
+    "incident_subtype": "MISSING_PANEL_CONTENT_AUTHORITY",
+    "discovered_before_real_panel_generation": true,
+    "discovered_before_model_inference": true,
+    "discovered_before_outcome_exposure": true,
+    "discovered_before_authorization": true
+  },
+  "generation_route_comparison": {
+    "ROUTE_A_DETERMINISTIC_SLOT_TEMPLATE_PLUS_FROZEN_LEXICON": {
+      "selected": true,
+      "reproducibility": "STRONG",
+      "auditability": "STRONG",
+      "outcome_independence": "STRONG",
+      "lexical_confound_control": "CONTROLLED_BY_FROZEN_LEXICON",
+      "template_confound_control": "CONTROLLED_BY_COUNTERBALANCED_TEMPLATE_FAMILIES",
+      "source_family_control": "DETERMINISTIC_FAMILY_PROVENANCE",
+      "paraphrase_control": "CONSTRUCTION_PROVENANCE_ONLY",
+      "freshness_control": "NORMALIZED_HASH_AND_FAMILY_ID_EXCLUSION",
+      "split_integrity": "DETERMINISTIC_STABLE_HASH_ASSIGNMENT",
+      "human_discretion": "NONE_FOR_CONTENT_SELECTION",
+      "implementation_discretion": "MINIMAL_AFTER_MANIFEST_FREEZE",
+      "scientific_risk": "MODERATE_BUT_PROSPECTIVELY_CONTROLLED"
+    },
+    "ROUTE_B_HUMAN_AUTHORED_SOURCE_BANK_PLUS_DETERMINISTIC_TRANSFORMATION": {
+      "selected": false,
+      "reason": "Human-authored source bank is scientifically acceptable but introduces larger human-content discretion and is harder to freeze prospectively without committing the source bank now."
+    },
+    "ROUTE_C_OTHER_NON_MODEL_DETERMINISTIC_METHOD": {
+      "selected": false,
+      "reason": "No superior non-model deterministic method was identified that also preserves the inherited condition/class semantics with comparable auditability."
+    }
+  },
+  "llm_generation_firewall": {
+    "free_form_llm_generation_permitted": false,
+    "forbidden_generators": [
+      "Qwen",
+      "OLMo",
+      "Llama",
+      "ChatGPT",
+      "Claude",
+      "DeepSeek",
+      "Gemini",
+      "embedding_models",
+      "any_generative_or_semantic_model"
+    ],
+    "model_scoring_for_content_permitted": false
+  },
+  "condition_authority": {
+    "inherited_from": "experiments/exp024/condition_panel_spec.json",
+    "inherited_sha256": "a3b8d565a94ef6041fbe6a29d73102ab4156cc19cfc07ccaeb06206d589f7954",
+    "conditions": [
+      {
+        "condition_id": "c01_lexical_relex",
+        "name": "Controlled lexical re-expression",
+        "definition": "Replace non-class-critical content words with common synonyms while preserving grammatical relations and semantic class.",
+        "recovery_status": "RECOVERED_HISTORICAL_AUTHORITY"
+      },
+      {
+        "condition_id": "c02_syntactic_restructure",
+        "name": "Syntactic restructuring",
+        "definition": "Change phrase or clause ordering while preserving scope, truth conditions, and semantic relations.",
+        "recovery_status": "RECOVERED_HISTORICAL_AUTHORITY"
+      },
+      {
+        "condition_id": "c03_controlled_compression",
+        "name": "Controlled compression",
+        "definition": "Remove optional modifiers and redundant subordinate phrases while retaining class-critical relations and truth conditions.",
+        "recovery_status": "RECOVERED_HISTORICAL_AUTHORITY"
+      },
+      {
+        "condition_id": "c04_controlled_elaboration",
+        "name": "Controlled elaboration",
+        "definition": "Add semantically redundant clarifying phrases or appositives that do not introduce new entities, conditions, or evidence.",
+        "recovery_status": "RECOVERED_HISTORICAL_AUTHORITY"
+      },
+      {
+        "condition_id": "c05_relation_explicit",
+        "name": "Explicit relation marking",
+        "definition": "Make implicit relations overt using explicit logical/causal/analogical/definitional connectives appropriate to the semantic class.",
+        "recovery_status": "RECOVERED_HISTORICAL_AUTHORITY"
+      },
+      {
+        "condition_id": "c06_relation_implicit",
+        "name": "Implicit relation marking",
+        "definition": "Remove or compact overt relation markers only where the relation remains unambiguously recoverable from content.",
+        "recovery_status": "RECOVERED_HISTORICAL_AUTHORITY"
+      },
+      {
+        "condition_id": "c07_register_formal",
+        "name": "Formal-register shift",
+        "definition": "Shift to a formal or academic register using nominalizations and formal vocabulary while preserving meaning.",
+        "recovery_status": "RECOVERED_HISTORICAL_AUTHORITY"
+      },
+      {
+        "condition_id": "c08_register_informal",
+        "name": "Informal-register shift",
+        "definition": "Shift to a simple conversational register using everyday vocabulary, contractions, and simpler clauses while preserving content.",
+        "recovery_status": "RECOVERED_HISTORICAL_AUTHORITY"
+      },
+      {
+        "condition_id": "c09_neutral_distractor_prefix",
+        "name": "Neutral distractor prefix",
+        "definition": "Prepend a short neutral framing clause that does not provide task-relevant evidence and does not change the target proposition.",
+        "recovery_status": "RECOVERED_HISTORICAL_AUTHORITY"
+      },
+      {
+        "condition_id": "c10_anaphoric_reference",
+        "name": "Anaphoric reference variation",
+        "definition": "Replace a repeated referent with an unambiguous pronoun or explicit definite description, or expand a pronoun into an explicit noun phrase, while preserving coreference.",
+        "recovery_status": "RECOVERED_HISTORICAL_AUTHORITY"
+      }
+    ]
+  },
+  "class_authority": {
+    "class_order": ["logic", "causality", "analogy", "definition"],
+    "classes": [
+      {
+        "class_id": "logic",
+        "class_name": "logic",
+        "definition": "Primarily expresses validity, entailment, deduction, condition satisfaction, contradiction, or a logical conclusion.",
+        "positive_criteria": ["logical entailment", "deduction", "condition satisfaction", "contradiction", "logical conclusion"],
+        "exclusion_criteria": ["primary causal mechanism", "primary analogical correspondence", "primary definitional genus-differentia"],
+        "authority": "docs/experiments/EXP-019-DATASET-PROTOCOL.md; experiments/exp024/data_schema.json"
+      },
+      {
+        "class_id": "causality",
+        "class_name": "causality",
+        "definition": "Primarily expresses a cause-effect or mechanism relation.",
+        "positive_criteria": ["cause-effect relation", "mechanism relation"],
+        "exclusion_criteria": ["primary logical entailment", "primary analogy", "primary definition"],
+        "authority": "docs/experiments/EXP-019-DATASET-PROTOCOL.md; experiments/exp024/data_schema.json"
+      },
+      {
+        "class_id": "analogy",
+        "class_name": "analogy",
+        "definition": "Primarily expresses relational correspondence or a mapped relation between entities or concepts.",
+        "positive_criteria": ["relational correspondence", "mapped relation between two domains"],
+        "exclusion_criteria": ["primary logical entailment", "primary causal mechanism", "primary definition"],
+        "authority": "docs/experiments/EXP-019-DATASET-PROTOCOL.md; experiments/exp024/data_schema.json"
+      },
+      {
+        "class_id": "definition",
+        "class_name": "definition",
+        "definition": "Primarily states what a concept means, is, or refers to.",
+        "positive_criteria": ["concept meaning", "concept identity", "concept reference"],
+        "exclusion_criteria": ["primary logical entailment", "primary causal mechanism", "primary analogy"],
+        "authority": "docs/experiments/EXP-019-DATASET-PROTOCOL.md; experiments/exp024/data_schema.json"
+      }
+    ],
+    "prospective_clarification": "Where historical documentation left a class boundary underdetermined, the minimum operational criterion above is adopted. No class label may be inferred from embedding similarity or model behavior."
+  },
+  "item_unit_contract": {
+    "one_base_item": "one underlying semantic proposition/construction unit",
+    "records_per_family": 2,
+    "record_roles": ["reference_form", "condition_realization"],
+    "required_fields": [
+      "item_id",
+      "source_family_id",
+      "paraphrase_family_id",
+      "condition_id",
+      "semantic_class",
+      "partition",
+      "record_role",
+      "raw_text",
+      "construction_template_id",
+      "lexical_slot_ids",
+      "normalization_identity",
+      "raw_text_sha256",
+      "normalized_raw_text_sha256",
+      "provenance"
+    ],
+    "prohibited_fields": ["hidden_state", "representation", "prediction", "balanced_accuracy", "S_diag", "G_eval", "scientific_outcome"]
+  },
+  "source_family_contract": {
+    "definition": "A source family is one underlying semantic construction unit, represented by exactly one reference_form and one condition_realization record.",
+    "source_family_id_rule": "exp028_<condition_id>_<partition>_<class>_<zero_padded_index>",
+    "items_per_source_family": 2,
+    "multiple_surface_realizations_allowed": true,
+    "multiple_surface_realizations_meaning": "only the two registered record roles for the assigned condition transformation",
+    "may_cross_condition": false,
+    "may_cross_class": false,
+    "may_cross_FIT_DIAG_EVAL": false,
+    "allocation": {"FIT": 6, "DIAGNOSTIC": 8, "EVAL": 8},
+    "total_source_families": 880
+  },
+  "paraphrase_family_contract": {
+    "definition": "Paraphrase identity is construction provenance: the reference_form and condition_realization pair of one source family.",
+    "paraphrase_family_id_rule": "same_as_source_family_id_for_the_canonical_surface_pair",
+    "max_surface_variants_per_family": 2,
+    "may_cross_splits": false,
+    "may_cross_conditions": false,
+    "may_cross_classes": false,
+    "embedding_based_identity_forbidden": true
+  },
+  "template_contract": {
+    "template_schema_version": "1.0.0",
+    "template_id_rule": "exp028_tpl_<class>_<template_index_zero_padded>",
+    "condition_template_id_rule": "exp028_cond_<condition_id>",
+    "template_families_per_class": 4,
+    "condition_template_families": 10,
+    "allowed_slot_types": [
+      "SUBJECT",
+      "OBJECT",
+      "PROPERTY",
+      "RELATION",
+      "CONNECTIVE",
+      "MODIFIER",
+      "REGISTER_PREFIX",
+      "REFERENT",
+      "NEUTRAL_PREFIX",
+      "REALIZATION_MARKER"
+    ],
+    "slot_order": "frozen_per_template",
+    "punctuation_rule": "single terminal period; no class-label punctuation marker",
+    "article_rule": "frozen per lexicon entry; no class-exclusive article",
+    "singular_plural_rule": "frozen per lexicon entry and template agreement",
+    "tense_rule": "present simple unless the class template requires another frozen tense",
+    "negation_rule": "allowed only when semantically intrinsic and encoded in the frozen template",
+    "connective_rule": "class connectives are explicit frozen slot values; shared neutral connectives may appear across classes",
+    "clause_structure_rule": "one main sentence per record role; subordinate clause allowed only by the assigned condition transformation"
+  },
+  "lexicon_contract": {
+    "lexicon_schema_version": "1.0.0",
+    "entry_format": "lowercase, Unicode NFKC, single phrase or token without forbidden class-label marker",
+    "source_provenance": "HUMAN_AUTHORED_NON_MODEL_DETERMINISTIC_LEXICON_MANIFEST",
+    "duplicate_policy": "no duplicate normalized entry within a pool or across pools; pools disjoint by semantic role",
+    "pools": [
+      {"lexicon_id": "L_LOGIC_SUBJECT", "semantic_role": "logical subject/entity", "entry_count": 64},
+      {"lexicon_id": "L_LOGIC_RELATION", "semantic_role": "logical relation/connective", "entry_count": 64},
+      {"lexicon_id": "L_CAUSAL_EVENT", "semantic_role": "causal event/antecedent", "entry_count": 64},
+      {"lexicon_id": "L_CAUSAL_MECHANISM", "semantic_role": "causal mechanism/consequent", "entry_count": 64},
+      {"lexicon_id": "L_ANALOGY_DOMAIN_A", "semantic_role": "analogy source domain", "entry_count": 64},
+      {"lexicon_id": "L_ANALOGY_DOMAIN_B", "semantic_role": "analogy target domain", "entry_count": 64},
+      {"lexicon_id": "L_DEFINITION_TERM", "semantic_role": "defined concept", "entry_count": 64},
+      {"lexicon_id": "L_DEFINITION_DIFFERENTIA", "semantic_role": "definitional distinguishing property", "entry_count": 64},
+      {"lexicon_id": "L_COMMON_MODIFIER", "semantic_role": "shared neutral modifier", "entry_count": 64},
+      {"lexicon_id": "L_COMMON_OBJECT", "semantic_role": "shared neutral object/referent", "entry_count": 64},
+      {"lexicon_id": "L_REGISTER_FORMAL", "semantic_role": "formal-register surface vocabulary", "entry_count": 64},
+      {"lexicon_id": "L_REGISTER_INFORMAL", "semantic_role": "informal-register surface vocabulary", "entry_count": 64}
+    ]
+  },
+  "content_provenance_contract": {
+    "every_item_traces": ["item_id", "source_family_id", "paraphrase_family_id", "condition_id", "semantic_class", "construction_template_id", "lexical_slot_ids", "generation_contract_version"],
+    "orphan_text_forbidden": true,
+    "generation_contract_version": "exp028_panel_content_design_1.0.0"
+  },
+  "candidate_generation_contract": {
+    "enumeration_rule": "deterministic Cartesian product of eligible frozen slot values sorted lexicographically",
+    "candidate_rejection_rule": "reject normalized historical collision, malformed template realization, forbidden duplicate, or blocked semantic contradiction",
+    "deduplication_rule": "normalized raw-text SHA-256 uniqueness",
+    "random_sampling": false,
+    "seed": null
+  },
+  "candidate_selection_contract": {
+    "surplus_policy": "deterministic surplus is permitted only under the fixed canonical sort rule",
+    "canonical_sort_key": "lexicographic tuple (condition_id, semantic_class, template_id, stable_slot_value_key, source_family_id)",
+    "selection_rule": "first_N_valid_candidates_per_cell_after_exclusion",
+    "forbidden_selection": ["human_choosing_better_sentences", "model_scoring", "difficulty_filtering", "semantic_quality_ranking", "result_aware_pruning"]
+  },
+  "split_contract": {
+    "assignment_rule": "stable_sha256_sort_of_source_family_id_then_cell_allocation",
+    "source_family_safe": true,
+    "condition_balance": "exact_allocation_per_condition_partition_class",
+    "class_balance": "exact_allocation_per_condition_partition_class",
+    "paraphrase_family_separation": true,
+    "content_based_split_selection_forbidden": true
+  },
+  "freshness_contract": {
+    "normalization": "unicodedata.normalize_NFKC_then_strip_then_collapse_each_maximal_Unicode_whitespace_run_to_single_ASCII_space",
+    "duplicate_hash": "sha256_of_utf8_normalized_text",
+    "exclusion_checks": [
+      "no_normalized_raw_text_sha256_collision_with_prior_scientific_panels",
+      "no_prior_source_family_reuse_where_source_family_identity_exists",
+      "no_paraphrase_family_leakage_where_such_identity_exists"
+    ],
+    "prior_panel_authorities": [
+      {"name": "EXP-023 independent controlled panel", "path": "experiments/exp023/data/exp023_independent_controlled.json", "sha256": "9143ceceab106c71dedb806190e146401975bf6bd84cb99b3b4cb7adc75afa2a"},
+      {"name": "EXP-024 frozen condition panel dataset", "path": "experiments/exp024/data/exp024_condition_panel_frozen.json", "sha256": "46c832b68b6ac95704bf5143badc1431627d7f935648842a78971491b13ee404"},
+      {"name": "EXP-024 condition panel specification", "path": "experiments/exp024/condition_panel_spec.json", "sha256": "a3b8d565a94ef6041fbe6a29d73102ab4156cc19cfc07ccaeb06206d589f7954"},
+      {"name": "EXP-024 data schema", "path": "experiments/exp024/data_schema.json", "sha256": "e27c33c864c6305522aec0c92839634fb5885aeb50099372b9bf46da7f2fe3ec"},
+      {"name": "EXP-024 frozen manifest", "path": "experiments/exp024/exp024_frozen_manifest.json", "sha256": "1409a33e300463067ffc060afa58ceb238fda8d6dc2479563c886a8474748f59"}
+    ]
+  },
+  "human_review_contract": {
+    "human_review_allowed": true,
+    "permitted_rejection_categories": [
+      "malformed_grammar",
+      "empty_fields",
+      "broken_template_realization",
+      "duplicate_construction",
+      "semantic_contradiction_caused_by_generator_implementation"
+    ],
+    "forbidden_rejection_categories": [
+      "too_easy",
+      "too_hard",
+      "likely_to_help_T2",
+      "likely_to_hurt_T2",
+      "likely_to_confuse_Qwen_OLMo_Llama"
+    ],
+    "deterministic_validation_preferred": true
+  },
+  "validator_spec": [
+    "all_10_conditions_exist",
+    "all_4_classes_defined",
+    "all_template_ids_resolve",
+    "all_lexicon_ids_resolve",
+    "all_source_family_rules_resolve",
+    "all_paraphrase_family_rules_resolve",
+    "candidate_selection_is_deterministic",
+    "split_assignment_is_deterministic",
+    "no_free_form_text_insertion_is_allowed",
+    "no_unregistered_template_is_allowed",
+    "no_unregistered_lexicon_entry_is_allowed",
+    "no_post_hoc_human_content_selection_is_allowed"
+  ],
+  "adversarial_design_review": {
+    "A_class_guessable_from_template_identity": "PASS",
+    "B_condition_guessable_from_lexical_marker": "PASS",
+    "C_FIT_EVAL_share_underlying_proposition": "PASS",
+    "D_paraphrases_cross_partitions": "PASS",
+    "E_human_discretion_selects_favorable_items": "PASS",
+    "F_generator_enumeration_biases_classes": "PASS",
+    "G_historical_items_reappear_under_trivial_substitutions": "PASS",
+    "H_item_length_encodes_class": "PASS",
+    "I_punctuation_syntax_encodes_class": "PASS",
+    "J_construction_rules_create_semantic_contradictions": "PASS",
+    "K_generator_creates_multiple_choices_and_selects_post_hoc": "PASS"
+  },
+  "immutable_non_content_contracts": {
+    "operator_contract_reopened": false,
+    "endpoint_contract_reopened": false,
+    "statistical_contract_reopened": false,
+    "routing_contract_reopened": false,
+    "model_contract_reopened": false,
+    "panel_content_contract_reopened": true
+  },
+  "scientific_firewall": {
+    "REAL_EXP028_INPUT_PANEL_CREATED": false,
+    "REAL_EXP028_MODEL_REPRESENTATIONS_ACCESSED": false,
+    "REAL_EXP028_MODEL_INFERENCE_PERFORMED": false,
+    "EXP028_DELTA_RM_COMPUTED": false,
+    "EXP028_DELTA_RO_COMPUTED": false,
+    "EXP028_BOOTSTRAP_COMPUTED": false,
+    "EXP028_MODEL_STATE_ADJUDICATED": false,
+    "EXP028_THREE_MODEL_ROUTE_ASSIGNED": false,
+    "EXP028_AUTHORIZATION_CREATED": false,
+    "EXP028_FORMAL_RUN_PERFORMED": false,
+    "EXP028_CANONICAL_RESULT_CREATED": false
+  },
+  "preregistration_state": "FINAL_FROZEN_PRE_DATA_V2_CONTENT_DESIGN"
+}

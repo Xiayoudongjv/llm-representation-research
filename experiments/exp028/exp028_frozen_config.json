@@ -106,7 +106,12 @@
     "dual": false,
     "max_iter": 1000,
     "warm_start": false,
-    "class_order": ["logic", "causality", "analogy", "definition"],
+    "class_order": [
+      "logic",
+      "causality",
+      "analogy",
+      "definition"
+    ],
     "probability_mapping": "classifier.classes_",
     "fit_only_rule": "FIT_condition_realization_only",
     "scaler_contract": "StandardScaler(with_mean=true, with_std=true)"
@@ -120,7 +125,11 @@
     "reference_authority": "docs/experiments/EXP-024-PREREGISTRATION.md"
   },
   "operator_families": {
-    "primary_conditions": ["T0_IDENTITY_RAW_FIXED_FRAME", "T1_INHERITED_MOMENT_RECALIBRATION", "T2_PAIRED_COORDINATEWISE_AFFINE_ALIGNMENT"],
+    "primary_conditions": [
+      "T0_IDENTITY_RAW_FIXED_FRAME",
+      "T1_INHERITED_MOMENT_RECALIBRATION",
+      "T2_PAIRED_COORDINATEWISE_AFFINE_ALIGNMENT"
+    ],
     "T0": {
       "name": "IDENTITY_RAW_FIXED_FRAME",
       "mapping": "T0(h_j) = h_j"
@@ -353,7 +362,12 @@
     "no_prior_scientific_items_in_EXP028": true,
     "panel_structure": {
       "n_conditions": 10,
-      "semantic_classes": ["logic", "causality", "analogy", "definition"],
+      "semantic_classes": [
+        "logic",
+        "causality",
+        "analogy",
+        "definition"
+      ],
       "target_allocation": {
         "FIT": 6,
         "DIAGNOSTIC": 8,
@@ -414,5 +428,21 @@
     "TRANSFORMATION_SUCCESS_is_TRANSFORMATION_VALIDITY",
     "KAN_validates_project_operator_theory",
     "Residual_Flow_confirmed"
-  ]
+  ],
+  "panel_content_design": {
+    "path": "experiments/exp028/exp028_panel_content_design.json",
+    "sha256": "be2f365ced61ef6d7f55040494b03b1968aa5cd4bc1fdebcde711b6bbff16c4c",
+    "design_status": "FROZEN_PROSPECTIVE_PRE_INFERENCE",
+    "generation_route": "ROUTE_A_DETERMINISTIC_SLOT_TEMPLATE_PLUS_FROZEN_LEXICON"
+  },
+  "panel_content_design_review": {
+    "path": "docs/experiments/EXP-028-PANEL-CONTENT-DESIGN-REVIEW.md"
+  },
+  "preregistration_state_v2": "FINAL_FROZEN_PRE_DATA_V2_CONTENT_DESIGN",
+  "panel_content_contract_reopened": true,
+  "operator_contract_reopened": false,
+  "endpoint_contract_reopened": false,
+  "statistical_contract_reopened": false,
+  "routing_contract_reopened": false,
+  "model_contract_reopened": false
 }
