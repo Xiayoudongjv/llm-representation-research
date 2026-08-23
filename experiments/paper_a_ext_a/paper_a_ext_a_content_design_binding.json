@@ -1,0 +1,18 @@
+{
+    "panel_content_design_path":  "experiments/paper_a_ext_a/paper_a_ext_a_panel_content_design.json",
+    "schema_version":  "1.0.0",
+    "model_contract_modified":  false,
+    "statistical_contract_modified":  false,
+    "preregistration_state":  "FINAL_FROZEN_PRE_DATA_V2_CONTENT_DESIGN",
+    "panel_content_design_sha256":  "82dd8d944691c49d5586defdf999d0afdb70f95bd5b4f568ffa5c72642829ce6",
+    "protocol_sha256":  "78e58c43c7fabfafaa03084ef17f9c5ff4c02665d242aa57b9f70a9d3b793e5d",
+    "outcome_routing_modified":  false,
+    "measurement_contract_modified":  false,
+    "bound_at_task":  "PA-EXT-A-002",
+    "next_task":  "PA-EXT-A-003_GENERATOR_VALIDATOR_IMPLEMENTATION_AND_SYNTHETIC_QUALIFICATION",
+    "protocol_path":  "experiments/paper_a_ext_a/paper_a_ext_a_frozen_config.json",
+    "binding_id":  "PA-EXT-A-CONTENT-DESIGN-BINDING-V2",
+    "panel_content_status":  "PANEL_CONTENT_NOT_YET_CREATED",
+    "protocol_authority_unchanged":  true,
+    "carrier_contract_modified":  false
+}

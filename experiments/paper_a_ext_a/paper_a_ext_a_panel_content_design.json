@@ -1,0 +1,491 @@
+{
+  "schema_version": "1.0.0",
+  "content_design_id": "PA-EXT-A-PANEL-CONTENT-DESIGN-V2",
+  "task_id": "PA-EXT-A-002",
+  "status": "FINAL_FROZEN_PRE_DATA_V2_CONTENT_DESIGN",
+  "panel_content_status": "PANEL_CONTENT_NOT_YET_CREATED",
+  "protocol_sha256": "78e58c43c7fabfafaa03084ef17f9c5ff4c02665d242aa57b9f70a9d3b793e5d",
+  "protocol_path": "experiments/paper_a_ext_a/paper_a_ext_a_frozen_config.json",
+  "cross_task_independence_level": "NEW_TASK_FAMILIES_AND_NEW_SEMANTIC_RELATIONS",
+  "panel_authority_route": "HUMAN_AUTHORED_SOURCE_BANK_DETERMINISTIC_TRANSFORMATION",
+  "old_panel_semantic_exclusion_registry": {
+    "old_task_family_description": "four-way semantic relation classification over logic/causality/analogy/definition",
+    "old_classes": [
+      "logic",
+      "causality",
+      "analogy",
+      "definition"
+    ],
+    "old_condition_ids": [
+      "c01_lexical_relex",
+      "c02_syntactic_restructure",
+      "c03_controlled_compression",
+      "c04_controlled_elaboration",
+      "c05_relation_explicit",
+      "c06_relation_implicit",
+      "c07_register_formal",
+      "c08_register_informal",
+      "c09_neutral_distractor_prefix",
+      "c10_anaphoric_reference"
+    ],
+    "old_dataset_path": "experiments/exp024/data/exp024_condition_panel_frozen.json",
+    "old_source_family_id_prefix": "exp024_",
+    "old_base_content_id_prefix": "exp024_base_",
+    "item_level_authority": "available_in_frozen_exp024_dataset_to_be_checked_mechanically"
+  },
+  "task_universe": {
+    "new_task_family_count": 4,
+    "new_semantic_relation_count": 4,
+    "class_mapping_rule": "one_task_family_per_class",
+    "argument_schema": [
+      "ARG_A",
+      "ARG_B"
+    ]
+  },
+  "task_families": [
+    {
+      "task_family_id": "exta_tf_spatial",
+      "scientific_definition": "classify a static spatial configuration relation between two concrete referents or regions",
+      "what_is_being_discriminated": "which spatial relation is asserted",
+      "allowed_semantic_relations": [
+        "exta_rel_spatial_configuration"
+      ],
+      "forbidden_relations": [
+        "causality",
+        "logical_entailment",
+        "analogy",
+        "definition",
+        "temporal_order",
+        "quantitative_comparison",
+        "part_whole"
+      ],
+      "class_mapping": "TF_SPATIAL",
+      "condition_mapping": "all_ten_new_conditions",
+      "why_distinct_from_exp024": "static location or containment; not entailment, cause, analogy, or definition",
+      "known_ambiguity_boundary": "causal or temporal readings are invalid"
+    },
+    {
+      "task_family_id": "exta_tf_temporal",
+      "scientific_definition": "classify temporal order or overlap between two events or states without asserting causation",
+      "what_is_being_discriminated": "which temporal relation is asserted",
+      "allowed_semantic_relations": [
+        "exta_rel_temporal_order"
+      ],
+      "forbidden_relations": [
+        "causation",
+        "counterfactual_dependence",
+        "logical_entailment",
+        "analogy",
+        "definition"
+      ],
+      "class_mapping": "TF_TEMPORAL",
+      "condition_mapping": "all_ten_new_conditions",
+      "why_distinct_from_exp024": "temporal order is not causality",
+      "known_ambiguity_boundary": "causal marker or counterfactual reading is invalid"
+    },
+    {
+      "task_family_id": "exta_tf_quantitative",
+      "scientific_definition": "classify a relative magnitude or quantity relation between two measurable arguments",
+      "what_is_being_discriminated": "greater, less, equal, or explicitly marked incomparable magnitude",
+      "allowed_semantic_relations": [
+        "exta_rel_quantitative_comparison"
+      ],
+      "forbidden_relations": [
+        "logical_validity",
+        "causality",
+        "analogy",
+        "definition",
+        "spatial_configuration",
+        "temporal_order",
+        "part_whole"
+      ],
+      "class_mapping": "TF_QUANTITATIVE",
+      "condition_mapping": "all_ten_new_conditions",
+      "why_distinct_from_exp024": "magnitude comparison is not old logic or causality",
+      "known_ambiguity_boundary": "vague non-measurable predicates are invalid"
+    },
+    {
+      "task_family_id": "exta_tf_mereological",
+      "scientific_definition": "classify a part-whole or constituent-membership relation between two entities",
+      "what_is_being_discriminated": "whether one argument is a part, constituent, material, or member of the other",
+      "allowed_semantic_relations": [
+        "exta_rel_part_whole"
+      ],
+      "forbidden_relations": [
+        "definitional_equivalence",
+        "synonymy",
+        "analogy",
+        "logic",
+        "causality",
+        "temporal_order",
+        "spatial_location"
+      ],
+      "class_mapping": "TF_MEREOLOGICAL",
+      "condition_mapping": "all_ten_new_conditions",
+      "why_distinct_from_exp024": "part-whole world relation, not dictionary-style definition",
+      "known_ambiguity_boundary": "dictionary-style definitional equivalence is invalid"
+    }
+  ],
+  "semantic_relations": [
+    {
+      "relation_id": "exta_rel_spatial_configuration",
+      "formal_or_operational_meaning": "static location, containment, adjacency, or separation relation between two concrete referents",
+      "positive_or_negative_or_class_role": "one_of_four_multiclass_labels",
+      "argument_structure": [
+        "ARG_A",
+        "ARG_B"
+      ],
+      "validity_conditions": "spatial relation unambiguously determinable from source text",
+      "invalid_or_ambiguous_cases": "causal or temporal readings, missing argument, figurative spatial language, contradictory location claims",
+      "task_family_membership": "exta_tf_spatial",
+      "old_panel_overlap_check": "no match to logic/causality/analogy/definition"
+    },
+    {
+      "relation_id": "exta_rel_temporal_order",
+      "formal_or_operational_meaning": "order or overlap between two events or states with no causal implication",
+      "positive_or_negative_or_class_role": "one_of_four_multiclass_labels",
+      "argument_structure": [
+        "ARG_A",
+        "ARG_B"
+      ],
+      "validity_conditions": "order or overlap unambiguously determinable and non-causal",
+      "invalid_or_ambiguous_cases": "causal markers, counterfactual dependence, atemporal states, missing event arguments",
+      "task_family_membership": "exta_tf_temporal",
+      "old_panel_overlap_check": "explicitly non-causal; distinct from causality"
+    },
+    {
+      "relation_id": "exta_rel_quantitative_comparison",
+      "formal_or_operational_meaning": "relative magnitude or quantity between two measurable arguments",
+      "positive_or_negative_or_class_role": "one_of_four_multiclass_labels",
+      "argument_structure": [
+        "ARG_A",
+        "ARG_B"
+      ],
+      "validity_conditions": "determinate comparison relation exists without model outcome inference",
+      "invalid_or_ambiguous_cases": "vague predicates, missing quantities, categorical relations, causal or logical claims",
+      "task_family_membership": "exta_tf_quantitative",
+      "old_panel_overlap_check": "no match to logic/causality/analogy/definition"
+    },
+    {
+      "relation_id": "exta_rel_part_whole",
+      "formal_or_operational_meaning": "one argument is a part, constituent, material, or member of the other",
+      "positive_or_negative_or_class_role": "one_of_four_multiclass_labels",
+      "argument_structure": [
+        "ARG_A",
+        "ARG_B"
+      ],
+      "validity_conditions": "part-whole relation unambiguously determinable",
+      "invalid_or_ambiguous_cases": "definitional equivalence, class inclusion as dictionary meaning, metaphor, causal production",
+      "task_family_membership": "exta_tf_mereological",
+      "old_panel_overlap_check": "distinct from old definition"
+    }
+  ],
+  "conditions": [
+    "xa01_synonym_variant",
+    "xa02_constituent_reorder",
+    "xa03_redundancy_reduction",
+    "xa04_explicative_elaboration",
+    "xa05_overt_relation_marker",
+    "xa06_implicit_relation_marker",
+    "xa07_precise_register",
+    "xa08_colloquial_register",
+    "xa09_neutral_context_prefix",
+    "xa10_coreference_shift"
+  ],
+  "authoring_contract": {
+    "authoring_scheme": "FIXED_COUNT_DIRECT_AUTHORING",
+    "surplus_policy": "FIXED_COUNT_DIRECT_AUTHORING",
+    "author_role": "SOURCE_BANK_AUTHOR",
+    "author_may_see": [
+      "frozen_content_design",
+      "source_item_schema",
+      "slot_list",
+      "objective_grammar_and_validity_rules"
+    ],
+    "author_must_not_see": [
+      "model_outputs",
+      "hidden_states",
+      "compatibility_matrices",
+      "probe_scores",
+      "low_d_outcomes",
+      "profile_routes",
+      "item_specific_model_correctness",
+      "old_registered_profiles",
+      "expected_replication_outcome"
+    ],
+    "author_may_not_write_surplus": true,
+    "author_may_not_choose_after_surplus": true
+  },
+  "objective_rejection_contract": {
+    "allowed_codes": [
+      "SEMANTIC_CONTRADICTION",
+      "RELATION_NOT_INSTANTIATED",
+      "DUPLICATE_NORMALIZED_CONTENT",
+      "UNFILLED_ARGUMENT",
+      "UNGRAMMATICAL_UNDER_FROZEN_RULE",
+      "HISTORICAL_OVERLAP",
+      "FORBIDDEN_LEXICAL_LEAKAGE",
+      "FAMILY_ID_COLLISION"
+    ],
+    "forbidden_reasons": [
+      "too_easy",
+      "too_hard",
+      "probably_confusing_to_model",
+      "low_model_confidence",
+      "unusual_hidden_state_geometry",
+      "does_not_reproduce_old_profile",
+      "does_not_look_representative"
+    ],
+    "every_rejection_logged": true
+  },
+  "review_contract": {
+    "reviewer_role": "SOURCE_BANK_REVIEWER",
+    "review_scope": "objective_semantic_and_structural_validity_only",
+    "forbidden_review_inputs": [
+      "model_performance",
+      "hidden_states",
+      "embeddings",
+      "difficulty_estimates_from_tested_models",
+      "compatibility_outputs",
+      "profile_results"
+    ],
+    "reviewer_outcomes": [
+      "VALID",
+      "OBJECTIVE_DEFECT_<CODE>",
+      "AMBIGUOUS_UNDER_PREDEFINED_RULE"
+    ],
+    "no_numeric_subjective_quality_score": true
+  },
+  "disagreement_contract": {
+    "resolution_rule": "AMBIGUOUS_UNDER_PREDEFINED_RULE_is_excluded_and_logged",
+    "reauthoring_limit_per_slot": 1,
+    "no_discussion_until_it_sounds_right": true,
+    "no_replacement_shopping": true
+  },
+  "transformation_contract": {
+    "transformation_owner": "PA-EXT-A-003_GENERATOR",
+    "source_owner": "HUMAN_AUTHORED_SOURCE_BANK",
+    "generator_must_not": [
+      "author_semantic_content",
+      "choose_task_families",
+      "choose_relations",
+      "score_quality",
+      "call_model"
+    ],
+    "trace_fields": [
+      "SOURCE_ITEM_ID",
+      "TRANSFORMATION_ID",
+      "TRANSFORMATION_PARAMETERS"
+    ],
+    "invariant_properties": [
+      "task_family_identity",
+      "semantic_relation",
+      "class_label",
+      "source_family_identity",
+      "logical_truth_conditions_where_applicable"
+    ],
+    "allowed_changes": [
+      "surface_wording",
+      "syntactic_form",
+      "entity_realization_under_frozen_lexicon",
+      "non_semantic_lexical_content"
+    ]
+  },
+  "source_family_contract": {
+    "source_family_id_semantics": "one_source_item_and_its_deterministic_transformed_variant",
+    "records_per_source_family": [
+      "reference_form",
+      "condition_realization"
+    ],
+    "cross_partition_prohibited": true,
+    "deterministic_identity_required": true
+  },
+  "transformation_family_contract": {
+    "transformation_family_scope": "source_family_scoped",
+    "cross_partition_prohibited": true,
+    "no_surface_variant_as_independent_evidence_where_prohibited": true
+  },
+  "panel_structure": {
+    "new_class_count": 4,
+    "new_condition_count": 10,
+    "fit_families_per_class_per_condition": 6,
+    "diag_families_per_class_per_condition": 8,
+    "eval_families_per_class_per_condition": 8,
+    "source_bank_size": 880,
+    "final_panel_size": 1760,
+    "fit_source_families": 240,
+    "fit_records": 480,
+    "diag_source_families": 320,
+    "diag_records": 640,
+    "eval_source_families": 320,
+    "eval_records": 640
+  },
+  "balance_contract": {
+    "balance_by": [
+      "task_family",
+      "semantic_relation",
+      "class",
+      "condition",
+      "source_family",
+      "transformation_family",
+      "partition"
+    ],
+    "model_outcome_balancing_forbidden": true
+  },
+  "surface_length_control": {
+    "primary_measure": "WHITESPACE_TOKEN_COUNT",
+    "secondary_measure": "CHARACTER_COUNT",
+    "canonical_source_item_range_inclusive": [
+      8,
+      28
+    ],
+    "model_tokenizer_length_may_not_control_inclusion": true
+  },
+  "lexical_leakage_control": {
+    "allowed": [
+      "static_vocabulary_audit",
+      "class_conditional_surface_form_counts",
+      "predefined_lexical_overlap_checks",
+      "shared_entity_vocabulary_where_possible",
+      "multiple_lexical_realizations_per_relation_marker"
+    ],
+    "forbidden": [
+      "model_guided_dataset_cleaning",
+      "model_prediction_based_rebalancing",
+      "embedding_based_selection_deduplication_scoring"
+    ]
+  },
+  "historical_freshness_contract": {
+    "must_reject": [
+      "exact_raw_text_recurrence",
+      "normalized_text_recurrence",
+      "source_family_recurrence",
+      "semantic_source_recurrence",
+      "template_recurrence_where_available"
+    ],
+    "new_id_prefix": "exta_"
+  },
+  "public_benchmark_firewall": {
+    "public_benchmark_import_allowed": false,
+    "forbidden_sources": [
+      "MMLU",
+      "BBH",
+      "GLUE",
+      "other_public_benchmark_items"
+    ]
+  },
+  "llm_generation_firewall": {
+    "llm_generated_source_bank_allowed": false,
+    "llm_generate_then_human_filter_allowed": false
+  },
+  "embedding_selection_firewall": {
+    "embedding_selection_allowed": false,
+    "embedding_rejection_clustering_dedup_balancing_scoring_allowed": false,
+    "static_deterministic_normalization_dedup_allowed": true
+  },
+  "item_schema": {
+    "fields": [
+      "item_id",
+      "task_family_id",
+      "semantic_relation_id",
+      "class_id",
+      "condition_id",
+      "source_item_id",
+      "source_family_id",
+      "transformation_id",
+      "transformation_family_id",
+      "raw_text",
+      "normalized_text",
+      "partition",
+      "authoring_provenance",
+      "review_status",
+      "rejection_history",
+      "content_design_sha256"
+    ],
+    "raw_text_not_populated_in_this_task": true
+  },
+  "deterministic_identifiers": {
+    "task_family_id": "exta_tf_<slug>",
+    "semantic_relation_id": "exta_rel_<slug>",
+    "source_family_id": "exta_sf_<condition_id>_<partition>_<task_family_id>_<zero_padded_index>",
+    "source_item_id": "<source_family_id>_source",
+    "transformation_id": "exta_xform_<condition_id>",
+    "transformation_family_id": "<source_family_id>_xform",
+    "final_item_id": "<source_family_id>_<record_role>",
+    "record_roles": [
+      "reference",
+      "realization"
+    ]
+  },
+  "synthetic_fixture_contract": {
+    "placeholders": [
+      "SYNTH_TASK_A",
+      "SYNTH_RELATION_B",
+      "SYNTH_ENTITY_1",
+      "SYNTH_ENTITY_2"
+    ],
+    "synthetic": true,
+    "scientific_use_allowed": false,
+    "formal_panel_allowed": false,
+    "must_not_instantiate_real_task_families": true
+  },
+  "future_generator_requirements": {
+    "must": [
+      "load_exact_frozen_design",
+      "verify_design_sha",
+      "accept_only_contract_valid_source_bank_records",
+      "apply_deterministic_transformations",
+      "construct_deterministic_identities",
+      "apply_static_historical_exclusion",
+      "assign_splits_deterministically",
+      "serialize_reproducibly"
+    ],
+    "must_not": [
+      "author_semantic_content",
+      "choose_task_families",
+      "choose_relations",
+      "score_quality",
+      "call_model"
+    ]
+  },
+  "future_validator_requirements": {
+    "must_check": [
+      "design_hash",
+      "task_family_membership",
+      "semantic_relation_membership",
+      "schema_completeness",
+      "semantic_construction_trace",
+      "source_family_isolation",
+      "transformation_family_isolation",
+      "partition_integrity",
+      "class_task_relation_balance",
+      "historical_freshness",
+      "no_synthetic_content_in_production",
+      "no_free_form_unbound_items"
+    ],
+    "must_not_be_tautological_with_generation": true
+  },
+  "one_panel_stopping_rule": {
+    "one_real_independent_panel_only": true,
+    "no_alternative_task_family_set": true,
+    "no_replacement_source_bank": true,
+    "no_second_panel": true,
+    "no_item_replacement_based_on_model_outcomes": true,
+    "predeclared_correction_policy_only": true
+  },
+  "hard_flags": {
+    "REAL_EXT_A_SOURCE_BANK_CREATED": false,
+    "REAL_EXT_A_PANEL_CREATED": false,
+    "REAL_EXT_A_CANDIDATE_ITEMS_CREATED": false,
+    "REAL_EXT_A_FIT_DATA_CREATED": false,
+    "REAL_EXT_A_DIAG_DATA_CREATED": false,
+    "REAL_EXT_A_EVAL_DATA_CREATED": false,
+    "REAL_EXT_A_HIDDEN_STATES_ACCESSED": false,
+    "REAL_EXT_A_MODEL_INFERENCE_PERFORMED": false,
+    "REAL_EXT_A_RESULTS_CREATED": false,
+    "REAL_EXT_A_AUTHORIZATION_CREATED": false,
+    "PAPER_A_MANUSCRIPT_MODIFIED": false,
+    "EXP028_MODIFIED": false
+  },
+  "next_task": "PA-EXT-A-003_GENERATOR_VALIDATOR_IMPLEMENTATION_AND_SYNTHETIC_QUALIFICATION"
+}
