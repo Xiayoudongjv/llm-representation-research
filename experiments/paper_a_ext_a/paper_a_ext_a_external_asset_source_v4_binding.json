@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0.0",
+  "binding_id": "PA-EXT-A-EXTERNAL-ASSET-SOURCE-V4-BINDING",
+  "bound_at_task": "PA-EXT-A-003A",
+  "bound_head": "6b923e55bd0d541858062444aa62df5d3103a6d0",
+  "predecessor_binding_path": "experiments/paper_a_ext_a/paper_a_ext_a_content_design_v3_binding.json",
+  "predecessor_binding_sha256": "73b572853ae13d597677a7ca421e06dbd623172416f7e04dc5244f0ce586c80e",
+  "protocol_path": "experiments/paper_a_ext_a/paper_a_ext_a_frozen_config.json",
+  "protocol_sha256": "78e58c43c7fabfafaa03084ef17f9c5ff4c02665d242aa57b9f70a9d3b793e5d",
+  "v3_content_design_path": "experiments/paper_a_ext_a/paper_a_ext_a_panel_content_design_v3.json",
+  "v3_content_design_sha256": "205376bbd8704862de2cafeb1fd09719b498688532e6c54aec3a2326b71f0462",
+  "v3_pipeline_generator_sha256": "6508490ec2141f0531f7e61a24c3496e00705fd85d34bc5ca725d24bd38b3953",
+  "v3_pipeline_validator_sha256": "c344ff526948b9b0e98f305095164a643478080427f84786d02668776fb22cb1",
+  "source_manifest_path": "experiments/paper_a_ext_a/paper_a_ext_a_external_asset_source_manifest.json",
+  "source_manifest_sha256": "72bf8de42c315e390269eeb874ee89828c7cc1541e2d4171fd5dc8ae2215faf9",
+  "amendment_scope": [
+    "semantic_asset_source_policy",
+    "external_source_provenance",
+    "external_source_license_policy"
+  ],
+  "scientific_contract_unchanged": {
+    "scientific_question_modified": false,
+    "task_family_set_modified": false,
+    "semantic_relation_set_modified": false,
+    "dataset_shape_modified": false,
+    "generator_semantics_modified": false,
+    "measurement_contract_modified": false,
+    "statistical_contract_modified": false,
+    "outcome_routing_modified": false,
+    "model_contract_modified": false,
+    "carrier_contract_modified": false
+  },
+  "pre_data_status": {
+    "real_ext_a_semantic_asset_bank_created": false,
+    "real_ext_a_source_bank_created": false,
+    "real_ext_a_panel_created": false,
+    "real_ext_a_model_inference_performed": false,
+    "real_ext_a_results_created": false
+  },
+  "v3_pipeline_modified": false,
+  "next_task": "PA-EXT-A-004_MINIMAL_PRE_DATA_RELEASE_GATE"
+}

@@ -1,0 +1,321 @@
+{
+  "schema_version": "1.0.0",
+  "manifest_id": "PA-EXT-A-EXTERNAL-ASSET-SOURCE-MANIFEST",
+  "experiment_id": "PAPER-A-EXT-A",
+  "task_id": "PA-EXT-A-003A",
+  "status": "FINAL_FROZEN_PRE_DATA_EXTERNAL_ASSET_SOURCE_POLICY",
+  "bound_head": "6b923e55bd0d541858062444aa62df5d3103a6d0",
+  "protocol_path": "experiments/paper_a_ext_a/paper_a_ext_a_frozen_config.json",
+  "protocol_sha256": "78e58c43c7fabfafaa03084ef17f9c5ff4c02665d242aa57b9f70a9d3b793e5d",
+  "v3_content_design_path": "experiments/paper_a_ext_a/paper_a_ext_a_panel_content_design_v3.json",
+  "v3_content_design_sha256": "205376bbd8704862de2cafeb1fd09719b498688532e6c54aec3a2326b71f0462",
+  "v3_pipeline_generator_sha256": "6508490ec2141f0531f7e61a24c3496e00705fd85d34bc5ca725d24bd38b3953",
+  "v3_pipeline_validator_sha256": "c344ff526948b9b0e98f305095164a643478080427f84786d02668776fb22cb1",
+  "v3_pipeline_modified": false,
+  "v4_amendment_required": true,
+  "v4_amendment_path": "docs/experiments/PAPER-A-EXT-A-EXTERNAL-ASSET-SOURCE-V4-AMENDMENT.md",
+  "source_policy_version": "V4",
+  "global_source_policy": {
+    "principle": "BORROW_SEMANTIC_STRUCTURE_NOT_FINAL_BENCHMARK_ITEMS",
+    "final_benchmark_text_reused": false,
+    "external_raw_text_used_as_final_panel_text": false,
+    "deterministic_v3_renderer_remains_final_text_authority": true,
+    "model_outcome_based_filtering_forbidden": true,
+    "allowed_filtering": [
+      "task_family_membership",
+      "semantic_relation_membership",
+      "v3_schema_compatibility",
+      "duplicate_removal",
+      "license_allowability",
+      "semantic_validity_rule",
+      "historical_exclusion"
+    ],
+    "forbidden_filtering": [
+      "Qwen_outputs",
+      "OLMo_outputs",
+      "Llama_outputs",
+      "hidden_states",
+      "probe_scores",
+      "compatibility_values",
+      "expected_profile_replication"
+    ]
+  },
+  "task_family_source_policy": {
+    "exta_tf_spatial": {
+      "source_policy": "EXTERNAL_STRUCTURED_ASSET_SOURCE",
+      "selected_external_sources": [
+        {
+          "source_id": "stepgame_hf_v1",
+          "recommended_use": "STRUCTURED_ASSET_SOURCE",
+          "allowed_fields": [
+            "argument_a_canonical_label",
+            "spatial_relation",
+            "argument_b_canonical_label"
+          ],
+          "forbidden_fields": [
+            "story",
+            "question",
+            "answer",
+            "distractor",
+            "final_benchmark_text",
+            "reasoning_chain"
+          ]
+        }
+      ]
+    },
+    "exta_tf_temporal": {
+      "source_policy": "INTERNAL_STRUCTURED_ASSET_BANK",
+      "selected_external_sources": [],
+      "rejected_external_sources": [
+        "torque",
+        "matres",
+        "timebank",
+        "maven_ere"
+      ],
+      "reason": "No examined public temporal-relation dataset had a sufficiently clear dataset-level license for external extraction; temporal assets will be governed by the existing V3 internal structured asset-bank contract."
+    },
+    "exta_tf_quantitative": {
+      "source_policy": "PROGRAMMATIC_GENERATION",
+      "selected_external_sources": [],
+      "reason": "Deterministic internal numeric generation; no external semantic-asset source is used."
+    },
+    "exta_tf_mereological": {
+      "source_policy": "EXTERNAL_STRUCTURED_ASSET_SOURCE",
+      "selected_external_sources": [
+        {
+          "source_id": "wordnet_3_0",
+          "recommended_use": "STRUCTURED_ASSET_SOURCE",
+          "allowed_fields": [
+            "part_lexeme",
+            "meronymy_holonymy_relation",
+            "whole_lexeme"
+          ],
+          "forbidden_fields": [
+            "synset_gloss",
+            "definition",
+            "example_sentence",
+            "lexicographer_file_text",
+            "final_benchmark_text"
+          ]
+        }
+      ]
+    }
+  },
+  "candidate_sources": [
+    {
+      "dataset_or_resource": "StepGame",
+      "primary_reference": "Shi, Zhang, and Lipani. StepGame: A New Benchmark for Robust Multi-Hop Spatial Reasoning in Texts. AAAI 2022.",
+      "official_source": "https://huggingface.co/datasets/ZhengyanShi/StepGame",
+      "code_repository": "https://github.com/ZhengxiangShi/StepGame",
+      "version": "HF dataset revision 6d859381dfd518cae3f073b268aaa323bf4dcf04",
+      "license": "MIT",
+      "license_verified": "PASS",
+      "license_verification_basis": "Hugging Face dataset metadata reports license: mit for the dataset artifact; GitHub README does not show a license, but this manifest selects the HF dataset artifact, not the GitHub code.",
+      "raw_text_required": false,
+      "structured_relation_available": true,
+      "semantic_asset_type": "SPATIAL_RELATION_STRUCTURE",
+      "pretraining_contamination_risk": "MODERATE",
+      "benchmark_style_leakage_risk": "LOW",
+      "old_exp024_overlap_risk": "LOW",
+      "v3_schema_compatibility": "PASS",
+      "recommended_use": "STRUCTURED_ASSET_SOURCE",
+      "selected": true,
+      "notes": "Use only canonicalized spatial relation triples; discard benchmark stories, questions, answers, distractors, and reasoning chains."
+    },
+    {
+      "dataset_or_resource": "WordNet 3.0",
+      "primary_reference": "Princeton University WordNet 3.0.",
+      "official_source": "https://wordnet.princeton.edu/",
+      "license_url": "https://opensource.org/license/wordnet",
+      "version": "3.0",
+      "license": "Princeton WordNet License (SPDX: WordNet)",
+      "license_verified": "PASS",
+      "license_verification_basis": "Official Princeton WordNet 3.0 license text, also listed by OSI and SPDX as WordNet.",
+      "raw_text_required": false,
+      "structured_relation_available": true,
+      "semantic_asset_type": "PART_WHOLE_RELATION_STRUCTURE",
+      "pretraining_contamination_risk": "MODERATE",
+      "benchmark_style_leakage_risk": "LOW",
+      "old_exp024_overlap_risk": "MODERATE",
+      "v3_schema_compatibility": "PASS",
+      "recommended_use": "STRUCTURED_ASSET_SOURCE",
+      "selected": true,
+      "notes": "Use only meronymy/holonymy part-whole links; discard synset glosses, definitions, example sentences, and lexicographic text."
+    },
+    {
+      "dataset_or_resource": "TORQUE",
+      "primary_reference": "Ning, Wu, Han, Peng, Gardner, and Roth. TORQUE: A Reading Comprehension Dataset of Temporal Ordering Questions. EMNLP 2020.",
+      "official_source": "https://github.com/qiangning/TORQUE-dataset",
+      "version": "unresolved",
+      "license": "UNRESOLVED",
+      "license_verified": "AMBIGUOUS",
+      "license_verification_basis": "Repository does not expose a dataset-level license; arXiv paper license is not accepted as dataset license.",
+      "raw_text_required": true,
+      "structured_relation_available": false,
+      "semantic_asset_type": "TEMPORAL_ORDERING_QUESTION_BENCHMARK",
+      "pretraining_contamination_risk": "HIGH",
+      "benchmark_style_leakage_risk": "HIGH",
+      "old_exp024_overlap_risk": "LOW",
+      "v3_schema_compatibility": "FAIL",
+      "recommended_use": "DO_NOT_USE",
+      "selected": false,
+      "notes": "Final questions and news snippets would violate the no-final-benchmark-text-reuse firewall."
+    },
+    {
+      "dataset_or_resource": "MATRES",
+      "primary_reference": "MATRES: Multi-Axis Temporal Relations for Start-points.",
+      "official_source": "https://github.com/qiangning/MATRES",
+      "version": "unresolved",
+      "license": "UNRESOLVED",
+      "license_verified": "AMBIGUOUS",
+      "license_verification_basis": "Likely LDC-derived or otherwise not clearly dataset-licensed from the public repository.",
+      "raw_text_required": true,
+      "structured_relation_available": true,
+      "semantic_asset_type": "TEMPORAL_RELATION_ANNOTATION",
+      "pretraining_contamination_risk": "HIGH",
+      "benchmark_style_leakage_risk": "MODERATE",
+      "old_exp024_overlap_risk": "LOW",
+      "v3_schema_compatibility": "FAIL",
+      "recommended_use": "DO_NOT_USE",
+      "selected": false,
+      "notes": "Unclear dataset license; not selected."
+    },
+    {
+      "dataset_or_resource": "TimeBank",
+      "primary_reference": "TimeBank 1.2 / LDC temporal annotation corpus.",
+      "official_source": "LDC distribution",
+      "version": "unresolved",
+      "license": "LDC_RESTRICTED",
+      "license_verified": "FAIL",
+      "license_verification_basis": "LDC-restricted distribution does not satisfy the clear open dataset-resource requirement.",
+      "raw_text_required": true,
+      "structured_relation_available": true,
+      "semantic_asset_type": "TEMPORAL_RELATION_ANNOTATION",
+      "pretraining_contamination_risk": "HIGH",
+      "benchmark_style_leakage_risk": "MODERATE",
+      "old_exp024_overlap_risk": "LOW",
+      "v3_schema_compatibility": "FAIL",
+      "recommended_use": "DO_NOT_USE",
+      "selected": false,
+      "notes": "Restricted access; not selected."
+    },
+    {
+      "dataset_or_resource": "MAVEN-ERE",
+      "primary_reference": "MAVEN-ERE: A Unified Large-scale Dataset for Event Coreference, Temporal, Causal, and Subevent Relation Extraction. EMNLP 2022.",
+      "official_source": "https://github.com/THU-KEG/MAVEN-ERE",
+      "version": "1.0",
+      "license": "GPLv3 repository; underlying data reported as CC BY-SA 4.0 (MAVEN) and CC BY-SA 3.0 (Wikipedia)",
+      "license_verified": "AMBIGUOUS",
+      "license_verification_basis": "Repository LICENSE is GPLv3, but paper states underlying IP from MAVEN CC BY-SA 4.0 and Wikipedia CC BY-SA 3.0; dataset-vs-code license is non-trivial.",
+      "raw_text_required": true,
+      "structured_relation_available": true,
+      "semantic_asset_type": "EVENT_RELATION_ANNOTATION",
+      "pretraining_contamination_risk": "HIGH",
+      "benchmark_style_leakage_risk": "MODERATE",
+      "old_exp024_overlap_risk": "LOW",
+      "v3_schema_compatibility": "FAIL",
+      "recommended_use": "DO_NOT_USE",
+      "selected": false,
+      "notes": "Temporal sub-relation is entangled with causal/sub-event content and license is ambiguous; not selected."
+    }
+  ],
+  "canonicalization_policy": {
+    "method": "SOURCE_SPECIFIC_CANONICAL_RELATION_STRUCTURE",
+    "spatial": {
+      "input": "spatial relation triple",
+      "output_semantic_relation_id": "exta_rel_spatial_configuration",
+      "output_argument_slots": [
+        "ARG_A",
+        "ARG_B"
+      ],
+      "discard": [
+        "story",
+        "question",
+        "answer",
+        "distractor",
+        "reasoning_chain"
+      ]
+    },
+    "mereological": {
+      "input": "meronymy/holonymy link",
+      "output_semantic_relation_id": "exta_rel_part_whole",
+      "output_argument_slots": [
+        "ARG_A",
+        "ARG_B"
+      ],
+      "discard": [
+        "synset_gloss",
+        "definition",
+        "example_sentence",
+        "lexicographer_file_text"
+      ]
+    },
+    "quantitative": {
+      "input": "deterministic numeric comparison",
+      "output_semantic_relation_id": "exta_rel_quantitative_comparison",
+      "output_argument_slots": [
+        "ARG_A",
+        "ARG_B"
+      ],
+      "discard": []
+    },
+    "temporal": {
+      "input": "internal structured asset bank",
+      "output_semantic_relation_id": "exta_rel_temporal_order",
+      "output_argument_slots": [
+        "ARG_A",
+        "ARG_B"
+      ],
+      "discard": [
+        "causal_marker",
+        "counterfactual_dependence"
+      ]
+    }
+  },
+  "multi_source_policy": {
+    "external_source_count_by_family_upper_bound": 1,
+    "selected_family_source_sets_frozen": true,
+    "no_post_hoc_source_addition": true,
+    "deduplication_rule": "canonical_relation_triple_identity_after_discard",
+    "conflict_handling": "fail_closed_if_two_sources_for_same_family_are_introduced",
+    "source_priority": "not_applicable_single_source_per_family"
+  },
+  "contamination_interpretation": {
+    "external_sources_are_pretraining_exposure_prior_art": true,
+    "novel_fact_generalization_claim_allowed": false,
+    "unseen_world_knowledge_reasoning_claim_allowed": false,
+    "purpose": "cross-task measurement compatibility only",
+    "relation_structure_use_is_not_independent_fact_discovery": true
+  },
+  "provenance_requirements": {
+    "every_generated_asset_must_record": [
+      "source_id",
+      "source_version",
+      "license",
+      "allowed_relation_type",
+      "canonicalization_rule_id",
+      "manifest_id",
+      "manifest_sha256"
+    ],
+    "final_panel_item_must_not_contain": [
+      "external_raw_text",
+      "benchmark_question",
+      "benchmark_answer",
+      "source_story"
+    ],
+    "provenance_trace_required": true
+  },
+  "hard_flags": {
+    "REAL_EXT_A_SEMANTIC_ASSET_BANK_CREATED": false,
+    "REAL_EXT_A_SOURCE_BANK_CREATED": false,
+    "REAL_EXT_A_PANEL_CREATED": false,
+    "REAL_EXT_A_MODEL_INFERENCE_PERFORMED": false,
+    "REAL_EXT_A_RESULTS_CREATED": false,
+    "FINAL_BENCHMARK_TEXT_REUSED": false,
+    "EXTERNAL_RAW_TEXT_USED_AS_FINAL_PANEL_TEXT": false,
+    "V3_PIPELINE_MODIFIED": false,
+    "PAPER_A_MANUSCRIPT_MODIFIED": false,
+    "EXP028_MODIFIED": false
+  },
+  "next_task": "PA-EXT-A-004_MINIMAL_PRE_DATA_RELEASE_GATE"
+}
