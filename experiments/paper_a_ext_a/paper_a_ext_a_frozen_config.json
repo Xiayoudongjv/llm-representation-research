@@ -1,0 +1,219 @@
+{
+  "schema_version": "1.0.0",
+  "experiment_id": "PAPER-A-EXT-A",
+  "task_id": "PA-EXT-A-001",
+  "protocol_status": "FINAL_FROZEN_PRE_DATA_PROTOCOL",
+  "panel_content_status": "PANEL_CONTENT_NOT_YET_CREATED",
+  "authority_commit": "85c1012164dbcef3b34c699bebd11f06a462a960",
+  "scientific_question": "When Qwen3-1.7B, OLMo-2-1B-Instruct, and Meta-Llama-3.2-1B-Instruct are held fixed in model identity, carrier semantics, depth coordinates, fixed-readout procedures, statistics, and routing, are the registered three-component cross-depth compatibility profiles stable when the original EXP-024 semantic task panel is replaced by a prospectively designed, genuinely independent semantic/task panel?",
+  "cross_task_independence_level": "NEW_TASK_FAMILIES_AND_NEW_SEMANTIC_RELATIONS",
+  "rejected_weak_independence_levels": [
+    "NEW_ITEMS_ONLY",
+    "NEW_LEXICAL_REALIZATIONS",
+    "NEW_TEMPLATES_ONLY",
+    "PARAPHRASE_REPLICATION"
+  ],
+  "original_model_count": 3,
+  "new_model_added": false,
+  "model_set_rule": "THREE_MODELS_ONLY_NO_FOURTH_MODEL",
+  "models": {
+    "Qwen": {
+      "model_id": "Qwen/Qwen3-1.7B",
+      "model_revision": "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e",
+      "model_family": "Qwen3",
+      "model_class": "Qwen3ForCausalLM",
+      "model_type": "qwen3",
+      "num_hidden_layers": 28,
+      "hidden_size": 2048
+    },
+    "OLMo": {
+      "model_id": "allenai/OLMo-2-0425-1B-Instruct",
+      "model_revision": "48d788eca847d4d7548f375ad03d3c9312f6139e",
+      "model_family": "OLMo2",
+      "model_class": "Olmo2ForCausalLM",
+      "model_type": "olmo2",
+      "num_hidden_layers": 16,
+      "hidden_size": 2048
+    },
+    "Llama": {
+      "model_id": "Meta-Llama-3.2-1B-Instruct",
+      "model_source": "META_OFFICIAL_NATIVE_DISTRIBUTION",
+      "model_family": "Llama-3.2",
+      "model_class": "LlamaForCausalLM",
+      "model_type": "llama",
+      "converted_model_hash": "1ff795ff6a07e6a68085d206fb84417da2f083f68391c2843cd2b8ac6df8538f",
+      "hidden_size": 2048,
+      "logical_decoder_blocks": 16,
+      "final_hidden_state_semantics": "POST_FINAL_NORM_CONFIRMED",
+      "forbidden_carrier": "outputs.hidden_states[-1]"
+    }
+  },
+  "carrier_rules_frozen": true,
+  "measurement_contract_frozen": true,
+  "statistical_contract_frozen": true,
+  "outcome_routing_frozen": true,
+  "one_extension_stopping_rule": true,
+  "old_panel_authority": {
+    "dataset_path": "experiments/exp024/data/exp024_condition_panel_frozen.json",
+    "condition_panel_path": "experiments/exp024/condition_panel_spec.json",
+    "data_schema_path": "experiments/exp024/data_schema.json",
+    "frozen_manifest_path": "experiments/exp024/exp024_frozen_manifest.json",
+    "n_conditions": 10,
+    "semantic_classes": [
+      "logic",
+      "causality",
+      "analogy",
+      "definition"
+    ],
+    "allocation": {
+      "FIT": 6,
+      "DIAGNOSTIC": 8,
+      "EVAL": 8
+    },
+    "record_count": 1760,
+    "source_family_count": 880
+  },
+  "reference_profiles": {
+    "Qwen": {
+      "distance_association_status": "POSITIVE_SUPPORTED",
+      "dominance_status": "TARGET_DOMINANT",
+      "low_d_recovery_status": "NOT_SUPPORTED"
+    },
+    "OLMo": {
+      "distance_association_status": "POSITIVE_SUPPORTED",
+      "dominance_status": "SOURCE_DOMINANT",
+      "low_d_recovery_status": "SUPPORTED"
+    },
+    "Llama": {
+      "distance_association_status": "POSITIVE_SUPPORTED",
+      "dominance_status": "TARGET_DOMINANT",
+      "low_d_recovery_status": "SUPPORTED"
+    }
+  },
+  "new_panel_authority_route": "HUMAN_AUTHORED_SOURCE_BANK_DETERMINISTIC_TRANSFORMATION",
+  "new_panel_authority_rejected_routes": [
+    "DETERMINISTIC_SLOT_TEMPLATE_FROZEN_LEXICON",
+    "EXISTING_PUBLIC_TASK_SOURCE_FROZEN_SAMPLING"
+  ],
+  "panel_size_policy": {
+    "default_inherited": true,
+    "default_n_classes": 4,
+    "default_n_conditions": 10,
+    "default_allocation": {
+      "FIT": 6,
+      "DIAGNOSTIC": 8,
+      "EVAL": 8
+    },
+    "default_source_family_count": 880,
+    "default_record_count": 1760,
+    "deviation_requires_pre_data_justification": true,
+    "outcome_based_tuning_forbidden": true
+  },
+  "frozen_inheritance": {
+    "input_mode": "RAW_TEXT",
+    "carrier_api": "FORWARD_HOOK_DECODER_BLOCK_OUTPUT",
+    "matrix_orientation": "rows_source_layers_columns_target_layers",
+    "normalized_depth": "layer_index/(num_layers-1)",
+    "diagonal_treatment": "excluded_from_off_diagonal_structural_summaries",
+    "classifier": "LogisticRegression",
+    "solver": "lbfgs",
+    "penalty": "L2",
+    "C": 1.0,
+    "fit_intercept": true,
+    "tol": 0.0001,
+    "class_weight": null,
+    "dual": false,
+    "max_iter": 1000,
+    "warm_start": false,
+    "recalibration_variant": "A_mu_sigma",
+    "condition_pooling": "arithmetic_mean_equal_weight"
+  },
+  "statistical_contract": {
+    "distance_statistic": "Spearman_rho",
+    "distance_tie_handling": "average_ranks",
+    "sdi_formula": "SDI=(SOURCE_VARIANCE-TARGET_VARIANCE)/(SOURCE_VARIANCE+TARGET_VARIANCE)",
+    "sdi_variance_convention": "numpy.var(ddof=0)",
+    "low_d_mask_definition": "DIAGNOSTIC_Dbar_m(i,j)<=0_for_eligible_off_diagonal_pairs",
+    "bootstrap_design": "condition_stratified_source_family_cluster_bootstrap",
+    "resampling_unit": "source_family",
+    "statistical_unit": "source_family_cluster",
+    "strata": "condition",
+    "bit_generator": "numpy.random.PCG64",
+    "seed": 20260819,
+    "replicates": 5000,
+    "quantile_method": "numpy.percentile_method_linear",
+    "one_sided_positive_lower_bound": 5,
+    "one_sided_negative_upper_bound": 95,
+    "invalid_replicate_handling": "skip_replicates_that_do_not_preserve_all_four_classes",
+    "analysis_dtype": "float32"
+  },
+  "outcome_routing": {
+    "method": "EXACT_COMPONENT_MATCH",
+    "continuous_profile_similarity": false,
+    "routes": {
+      "A1": "THREE_MODEL_PROFILE_STABILITY",
+      "A2": "PARTIAL_PROFILE_STABILITY",
+      "A3": "TASK_CONDITIONAL_ORGANIZATION",
+      "A4": "TASK_CONDITIONAL_RECALIBRATABILITY",
+      "A5": "BROAD_TASK_CONDITIONAL_PROFILE",
+      "A6": "NOT_FULLY_ADJUDICATED"
+    },
+    "precedence": [
+      "A6",
+      "A1",
+      "A2",
+      "A3",
+      "A4",
+      "A5"
+    ],
+    "no_majority_vote": true,
+    "no_two_thirds_rescue": true,
+    "no_model_drop": true,
+    "no_replication_success_only": true
+  },
+  "claim_ceilings": {
+    "profile_stability_claim_ceiling": "profile stability across two independently designed task panels in the three tested models",
+    "task_conditional_claim_ceiling": "compatibility profiles are task-conditional in the tested model/task set",
+    "forbidden": [
+      "universal_task_invariance",
+      "architecture_causality",
+      "model_family_causality",
+      "transport",
+      "invariant_preservation",
+      "functional_binding",
+      "mechanism_claim",
+      "causal_independence"
+    ]
+  },
+  "firewalls": {
+    "exp024_anti_rescue_firewall": true,
+    "exp024_remains_negative_result": true,
+    "exp028_firewall": true,
+    "exp028_modified": false,
+    "paper_a_manuscript_modified": false
+  },
+  "hard_flags": {
+    "REAL_EXT_A_PANEL_CREATED": false,
+    "REAL_EXT_A_CANDIDATE_ITEMS_CREATED": false,
+    "REAL_EXT_A_FIT_DATA_CREATED": false,
+    "REAL_EXT_A_DIAG_DATA_CREATED": false,
+    "REAL_EXT_A_EVAL_DATA_CREATED": false,
+    "REAL_EXT_A_MODEL_INFERENCE_PERFORMED": false,
+    "REAL_EXT_A_HIDDEN_STATES_ACCESSED": false,
+    "REAL_EXT_A_RESULTS_CREATED": false,
+    "REAL_EXT_A_AUTHORIZATION_CREATED": false,
+    "PAPER_A_MANUSCRIPT_MODIFIED": false,
+    "EXP028_MODIFIED": false
+  },
+  "future_execution_graph": [
+    "PA-EXT-A-002_PANEL_CONTENT_DESIGN_AND_FREEZE",
+    "PA-EXT-A-003_GENERATOR_VALIDATOR_IMPLEMENTATION_AND_SYNTHETIC_QUALIFICATION",
+    "PA-EXT-A-004_INDEPENDENT_PRE_DATA_REREVIEW",
+    "PA-EXT-A-005_REAL_FRESH_PANEL_GENERATION_VALIDATION_FREEZE",
+    "PA-EXT-A-006_MODEL_HARDWARE_QUALIFICATION_IF_REQUIRED",
+    "PA-EXT-A-007_SINGLE_USE_FORMAL_AUTHORIZATION",
+    "PA-EXT-A-008_EXACTLY_ONE_FORMAL_EXECUTION",
+    "PA-EXT-A-009_RESULT_VALIDATION_AND_SCIENTIFIC_ADJUDICATION"
+  ],
+  "next_task": "PA-EXT-A-002_PANEL_CONTENT_DESIGN_AND_FREEZE"
+}
