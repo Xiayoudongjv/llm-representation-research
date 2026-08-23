@@ -1,0 +1,33 @@
+{
+  "task": "PA-VALUE-000",
+  "status": "COMPLETE",
+  "entry_head": "1054d570774aba6b8b4519641bb747e6af5c232a",
+  "origin_main": "1054d570774aba6b8b4519641bb747e6af5c232a",
+  "current_paper_a_value": "USEFUL_EMPIRICAL_INSIGHT",
+  "major_value_gaps": [
+    {"id": "G1", "name": "PANEL_TASK_DEPENDENCE", "severity": "MAJOR", "addressability": "REQUIRES_NEW_EVIDENCE"},
+    {"id": "G2", "name": "DESCRIPTIVE_TAXONOMY_RISK", "severity": "MODERATE", "addressability": "PARTIALLY_ADDRESSABLE_BY_WRITING"},
+    {"id": "G3", "name": "PREDICTIVE_UTILITY", "severity": "MAJOR", "addressability": "REQUIRES_NEW_EVIDENCE"},
+    {"id": "G4", "name": "GENERALIZATION", "severity": "MODERATE", "addressability": "PARTIALLY_ADDRESSABLE_BY_WRITING"},
+    {"id": "G5", "name": "MECHANISM", "severity": "MAJOR", "addressability": "OUT_OF_SCOPE_FOR_PAPER_A"},
+    {"id": "G6", "name": "PRACTICAL_CONSEQUENCE", "severity": "MODERATE", "addressability": "OUT_OF_SCOPE_FOR_PAPER_A"}
+  ],
+  "route_0_verdict": "NOT_PREFERRED",
+  "route_a_verdict": "ELIGIBLE",
+  "route_a_expected_value": "MODERATE",
+  "route_a_negative_result_value": "HIGH",
+  "route_a_paper_b_contamination": "NONE",
+  "route_b_verdict": "INELIGIBLE_POST_HOC_RESCUE",
+  "route_b_expected_value": "LOW",
+  "route_b_exp024_distinctness": "FAIL",
+  "route_b_negative_result_value": "MODERATE",
+  "targeted_prior_art_update_required": true,
+  "preferred_route": "ROUTE_A_FRESH_CROSS_TASK_REPLICATION",
+  "second_best_route": "NO_EXTENSION",
+  "one_extension_rule": "PASS",
+  "paper_a_manuscript_modified": false,
+  "new_experiment_performed": false,
+  "new_model_inference_performed": false,
+  "exp028_modified": false,
+  "next_task": "PA-EXT-A-001_PROSPECTIVE_CROSS_TASK_REPLICATION_PROTOCOL_DESIGN"
+}
