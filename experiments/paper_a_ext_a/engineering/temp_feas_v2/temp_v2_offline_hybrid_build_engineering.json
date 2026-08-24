@@ -1,0 +1,80 @@
+{
+  "task_id": "PA-EXT-A-TEMP-V2-OFFLINE-HYBRID-BUILD",
+  "engineering_only": true,
+  "base_protocol_sha256": "5018718739045b25514c8e94ede7e7ba6a99faa56b43c2156d27fbb97cfe2b6b",
+  "wdqs_amendment_sha256": "326e2e3312ffd8a8877197d51d6bd4685f30c8a8efbe048bc243128911bf7413",
+  "source_architecture": {
+    "structural_input": "user-supplied *.nt.bz2 dump",
+    "structural_passes": [
+      "finite P279 closure from Q1190554/Q1656682",
+      "direct P31 candidate discovery",
+      "English label collection for structural candidates"
+    ],
+    "final_temporal_authority": "bounded full-entity hydration with P580/P585 precision and calendar metadata",
+    "scientific_logic_reuse": [
+      "prepare_candidate",
+      "select_events",
+      "pair_events",
+      "surface_is_safe"
+    ],
+    "ordering": "deterministic QID ordering for offline work; frozen selection/pairing for final construction"
+  },
+  "streaming": {
+    "reader": "bz2.BZ2File line-wise UTF-8 N-Triples reader",
+    "multi_pass": true,
+    "compressed_position_reported": false,
+    "progress_callback": true
+  },
+  "freshness": {
+    "authority_loader": "acquire_temporal_source_v2.load_freshness_exclusion_authority",
+    "qualified_union_count": 6695,
+    "prior_pool_date_valid_count": 3550,
+    "reuses_existing_authority": true
+  },
+  "hydration": {
+    "endpoint": "https://www.wikidata.org/w/api.php",
+    "batch_size": 50,
+    "bounded_retries": 3,
+    "cache": "one atomic JSON entity file per QID",
+    "checkpoint": "QID-list hash, endpoint, batch size, and hydrated QIDs",
+    "performed_during_build": false
+  },
+  "stopping_rule": {
+    "eligible_reserve_target": 600,
+    "minimum_events": 440,
+    "target_families": 220,
+    "acquisition_order_is_not_event_date": true,
+    "triggered_during_build": false
+  },
+  "required_flags": {
+    "TEMPORAL_SOURCE_V2_OFFLINE_HYBRID_BUILD_COMPLETE": true,
+    "TEMPORAL_SOURCE_V2_STREAMING_BZ2_QUALIFIED": true,
+    "TEMPORAL_SOURCE_V2_OFFLINE_P279_CLOSURE_QUALIFIED": true,
+    "TEMPORAL_SOURCE_V2_OFFLINE_P31_DISCOVERY_QUALIFIED": true,
+    "TEMPORAL_SOURCE_V2_OFFLINE_FRESHNESS_EXCLUSION_QUALIFIED": true,
+    "TEMPORAL_SOURCE_V2_OFFLINE_LABEL_HANDLING_QUALIFIED": true,
+    "TEMPORAL_SOURCE_V2_FULL_ENTITY_HYDRATION_LAYER_QUALIFIED": true,
+    "TEMPORAL_SOURCE_V2_OFFLINE_CHECKPOINT_RESUME_QUALIFIED": true,
+    "TEMPORAL_SOURCE_V2_OFFLINE_PROGRESS_MONITOR_QUALIFIED": true,
+    "TEMPORAL_SOURCE_V2_OFFLINE_ONLINE_NORMALIZED_CONTRACT_EQUIVALENT": true,
+    "TEMPORAL_SOURCE_V2_BASE_PROTOCOL_CHANGED": false,
+    "TEMPORAL_SOURCE_V2_SCIENTIFIC_SEMANTICS_CHANGED": false,
+    "TEMPORAL_SOURCE_V2_FRESHNESS_AUTHORITY_CHANGED": false,
+    "TEMPORAL_SOURCE_V2_SELECTION_CHANGED": false,
+    "TEMPORAL_SOURCE_V2_PAIRING_CHANGED": false,
+    "TEMPORAL_SOURCE_V2_REAL_DUMP_DOWNLOADED": false,
+    "TEMPORAL_SOURCE_V2_REAL_DUMP_SCANNED": false,
+    "TEMPORAL_SOURCE_V2_ENTITY_HYDRATION_PERFORMED": false,
+    "TEMPORAL_SOURCE_V2_FULL_ACQUISITION_PERFORMED": false,
+    "TEMPORAL_SOURCE_V2_CANONICAL_220_CREATED": false,
+    "FORMAL_MODEL_INFERENCE_PERFORMED": false,
+    "FORMAL_SCIENTIFIC_OUTCOME_CREATED": false,
+    "TEMPORAL_SOURCE_V2_OFFLINE_LONG_RUN_READY": true
+  },
+  "real_actions": {
+    "network_access": false,
+    "dump_access": false,
+    "model_access": false,
+    "canonical_outputs": false
+  }
+}
