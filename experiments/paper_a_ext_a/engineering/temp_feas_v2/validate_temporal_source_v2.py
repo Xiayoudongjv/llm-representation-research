@@ -32,7 +32,12 @@ def base_authority_is_bound(ref: str) -> bool:
     if git_value("rev-parse", ref) == EXPECTED_HEAD:
         return True
     try:
-        return git_value("rev-parse", f"{ref}^") == EXPECTED_HEAD
+        target = git_value("rev-parse", ref)
+        return subprocess.run(
+            ["git", "merge-base", "--is-ancestor", EXPECTED_HEAD, target],
+            cwd=ROOT,
+            check=False,
+        ).returncode == 0
     except subprocess.CalledProcessError:
         return False
 
