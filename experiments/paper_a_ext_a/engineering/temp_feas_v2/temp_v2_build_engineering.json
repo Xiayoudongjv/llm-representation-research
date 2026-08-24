@@ -1,0 +1,100 @@
+{
+  "task_id": "PA-EXT-A-TEMP-V2-BUILD-ENGINEERING",
+  "git_head": "9888d7aac652d93f8b07ee5211c763918e6888c3",
+  "protocol_sha256": "5018718739045b25514c8e94ede7e7ba6a99faa56b43c2156d27fbb97cfe2b6b",
+  "engineering_only": true,
+  "full_acquisition_performed": false,
+  "formal_panel_created": false,
+  "model_inference_performed": false,
+  "scientific_outcome_created": false,
+  "runner_path": "experiments/paper_a_ext_a/acquire_temporal_source_v2.py",
+  "runner_validator_path": "experiments/paper_a_ext_a/engineering/temp_feas_v2/validate_temporal_source_v2_runner.py",
+  "protocol_validator_path": "experiments/paper_a_ext_a/engineering/temp_feas_v2/validate_temporal_source_v2.py",
+  "checkpoint_schema": {
+    "path_for_future_run": "experiments/paper_a_ext_a/data/temporal_source_v2_runtime/checkpoint.json",
+    "atomic_write": true,
+    "authority_fields": ["protocol_sha256", "backend", "endpoint", "graph_scope", "main_view_rule_sha256"],
+    "progress_fields": ["fresh_candidates_discovered", "event_root_valid", "time_valid", "p580_used", "p585_fallback_used", "surface_leakage_pass", "surface_leakage_reject", "final_eligible_events", "current_acquisition_offset", "families_count", "status"]
+  },
+  "progress_monitor": {
+    "path": "experiments/paper_a_ext_a/monitor_temporal_source_v2.py",
+    "command": "python experiments/paper_a_ext_a/monitor_temporal_source_v2.py --checkpoint experiments/paper_a_ext_a/data/temporal_source_v2_runtime/checkpoint.json",
+    "read_only": true
+  },
+  "authoritative_reused_infrastructure": [
+    "experiments/paper_a_ext_a/qlever_v7_main_view.py",
+    "experiments/paper_a_ext_a/v7_main_view_rule.json",
+    "experiments/paper_a_ext_a/engineering/temp_feas_v2/temporal_source_v2_protocol.json",
+    "experiments/paper_a_ext_a/acquire_wikidata_temporal_v8.py atomic/cache patterns",
+    "experiments/paper_a_ext_a/engineering/temp_feas_002e ontology closure snapshot"
+  ],
+  "synthetic_qualification": {
+    "focused_test_count": 21,
+    "focused_tests_passed": 21,
+    "protocol_validator": "PASS",
+    "runner_validator": "PASS",
+    "compileall": "PASS",
+    "network_accessed": false,
+    "long_acquisition_started": false,
+    "scenarios": [
+      "backend gate pass",
+      "backend health fail-closed",
+      "backend endpoint identity fail-closed",
+      "fresh QID exclusion",
+      "root-valid/root-invalid behavior",
+      "P580 precedence",
+      "P585 fallback",
+      "ambiguous time rejection",
+      "invalid calendar/precision rejection",
+      "leakage rejection",
+      "deduplication",
+      "class-cap enforcement",
+      "deterministic hash ordering",
+      "duplicate identity fail-closed",
+      "checkpoint creation/resume",
+      "authority mismatch rejection",
+      "stopping paths",
+      "successful 440-to-220 path",
+      "insufficient-pairable path",
+      "progress monitor read-only path",
+      "canonical publication guards and atomic fixture publication"
+    ]
+  },
+  "resume_qualification": {
+    "checkpoint_atomic": true,
+    "verified_chunk_reuse_supported": true,
+    "authority_checked_before_resume": true,
+    "changed_semantics_restart_blocked": true
+  },
+  "publication_guards": {
+    "synthetic_canonical_publication_rejected": true,
+    "unexpected_existing_output_rejected": true,
+    "temporary_fixture_publication_atomic": true,
+    "partial_run_cannot_look_canonical": true
+  },
+  "determinism": {
+    "hash_selection_replay_pass": true,
+    "pairing_replay_pass": true,
+    "protocol_identity_rechecked": true
+  },
+  "required_flags": {
+    "TEMPORAL_SOURCE_V2_BUILD_ENGINEERING_COMPLETE": true,
+    "TEMPORAL_SOURCE_V2_RUNNER_QUALIFIED": true,
+    "TEMPORAL_SOURCE_V2_CHECKPOINT_RESUME_QUALIFIED": true,
+    "TEMPORAL_SOURCE_V2_PROGRESS_MONITOR_QUALIFIED": true,
+    "TEMPORAL_SOURCE_V2_FRESHNESS_GUARD_QUALIFIED": true,
+    "TEMPORAL_SOURCE_V2_TIME_RESOLUTION_QUALIFIED": true,
+    "TEMPORAL_SOURCE_V2_LEAKAGE_GUARD_QUALIFIED": true,
+    "TEMPORAL_SOURCE_V2_DIVERSITY_GUARD_QUALIFIED": true,
+    "TEMPORAL_SOURCE_V2_PAIRING_QUALIFIED": true,
+    "TEMPORAL_SOURCE_V2_PUBLICATION_GUARD_QUALIFIED": true,
+    "TEMPORAL_SOURCE_V2_DETERMINISTIC_REPLAY_PASS": true,
+    "TEMPORAL_SOURCE_V2_FULL_ACQUISITION_PERFORMED": false,
+    "TEMPORAL_SOURCE_V2_CANONICAL_220_CREATED": false,
+    "FORMAL_MODEL_INFERENCE_PERFORMED": false,
+    "FORMAL_SCIENTIFIC_OUTCOME_CREATED": false,
+    "TEMPORAL_SOURCE_V2_LONG_RUN_READY": true
+  },
+  "long_run_ready": true,
+  "artifact_sha256": "00a0c299fec604fd191d10e52599b75c57cace223d33171df70e41074249a4fa"
+}
