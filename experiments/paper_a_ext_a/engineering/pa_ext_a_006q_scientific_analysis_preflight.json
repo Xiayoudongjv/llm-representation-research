@@ -1,0 +1,265 @@
+{
+  "task_id": "PA-EXT-A-006Q",
+  "git_head": "6666b01e618e9a68c01fc0adfeb0680b6aabfc82",
+  "authority_references": {
+    "frozen_config": {
+      "path": "experiments\\paper_a_ext_a\\paper_a_ext_a_frozen_config.json",
+      "sha256": "78e58c43c7fabfafaa03084ef17f9c5ff4c02665d242aa57b9f70a9d3b793e5d"
+    },
+    "outcome_routing": {
+      "path": "docs\\paper\\extension\\PAPER-A-CROSS-TASK-OUTCOME-ROUTING.md",
+      "sha256": "e78e39b96a2aa3619fefe491ffd43bf519791ba208a93e04b877a3116ddcc600"
+    },
+    "exp026_analysis_runner": {
+      "path": "experiments\\exp026\\run_exp026.py",
+      "sha256": "6ab29c35889ce35b9d4bc9ee98d2665865a088312940f10815714a574d2060a0"
+    }
+  },
+  "authoritative_functions": [
+    "experiments/exp026/run_exp026.py:_distance_association_point",
+    "experiments/exp026/run_exp026.py:_summarize_point_profile",
+    "experiments/exp026/run_exp026.py:_support_classes",
+    "docs/paper/extension/PAPER-A-CROSS-TASK-OUTCOME-ROUTING.md: A1-A6"
+  ],
+  "synthetic_only": true,
+  "formal_panel_consumed": false,
+  "formal_inference_performed": false,
+  "scientific_outcome_computed": false,
+  "live_v8_touched": false,
+  "fixture_results": {
+    "CASE_1_TARGET_LOW_D_SUPPORTED": {
+      "expected_profile": [
+        "POSITIVE_SUPPORTED",
+        "TARGET_DOMINANT",
+        "SUPPORTED"
+      ],
+      "observed_profile": [
+        "POSITIVE_SUPPORTED",
+        "TARGET_DOMINANT",
+        "SUPPORTED"
+      ],
+      "distance_statistic": 0.7960851043882889,
+      "distance_status": "POSITIVE_SUPPORTED",
+      "source_target_statistic": -0.48780489655777703,
+      "source_target_status": "TARGET_DOMINANT",
+      "organization_label": "TARGET_DOMINANT",
+      "low_d_status": "SUPPORTED",
+      "status": "PASS"
+    },
+    "CASE_2_TARGET_LOW_D_NOT_SUPPORTED": {
+      "expected_profile": [
+        "POSITIVE_SUPPORTED",
+        "TARGET_DOMINANT",
+        "NOT_SUPPORTED"
+      ],
+      "observed_profile": [
+        "POSITIVE_SUPPORTED",
+        "TARGET_DOMINANT",
+        "NOT_SUPPORTED"
+      ],
+      "distance_statistic": 0.7960851043882889,
+      "distance_status": "POSITIVE_SUPPORTED",
+      "source_target_statistic": -0.48780489655777703,
+      "source_target_status": "TARGET_DOMINANT",
+      "organization_label": "TARGET_DOMINANT",
+      "low_d_status": "NOT_SUPPORTED",
+      "status": "PASS"
+    },
+    "CASE_3_SOURCE_LOW_D_SUPPORTED": {
+      "expected_profile": [
+        "POSITIVE_SUPPORTED",
+        "SOURCE_DOMINANT",
+        "SUPPORTED"
+      ],
+      "observed_profile": [
+        "POSITIVE_SUPPORTED",
+        "SOURCE_DOMINANT",
+        "SUPPORTED"
+      ],
+      "distance_statistic": 0.7960851043882889,
+      "distance_status": "POSITIVE_SUPPORTED",
+      "source_target_statistic": 0.48780489655777703,
+      "source_target_status": "SOURCE_DOMINANT",
+      "organization_label": "SOURCE_DOMINANT",
+      "low_d_status": "SUPPORTED",
+      "status": "PASS"
+    },
+    "CASE_4_SOURCE_LOW_D_NOT_SUPPORTED": {
+      "expected_profile": [
+        "POSITIVE_SUPPORTED",
+        "SOURCE_DOMINANT",
+        "NOT_SUPPORTED"
+      ],
+      "observed_profile": [
+        "POSITIVE_SUPPORTED",
+        "SOURCE_DOMINANT",
+        "NOT_SUPPORTED"
+      ],
+      "distance_statistic": 0.7960851043882889,
+      "distance_status": "POSITIVE_SUPPORTED",
+      "source_target_statistic": 0.48780489655777703,
+      "source_target_status": "SOURCE_DOMINANT",
+      "organization_label": "SOURCE_DOMINANT",
+      "low_d_status": "NOT_SUPPORTED",
+      "status": "PASS"
+    },
+    "CASE_5_NULL": {
+      "expected_profile": [
+        "NOT_EVALUABLE",
+        "NO_ROW_OR_COLUMN_VARIATION",
+        "NOT_SUPPORTED"
+      ],
+      "observed_profile": [
+        "NOT_EVALUABLE",
+        "NO_ROW_OR_COLUMN_VARIATION",
+        "NOT_SUPPORTED"
+      ],
+      "distance_statistic": null,
+      "distance_status": "NOT_EVALUABLE",
+      "source_target_statistic": 0.0,
+      "source_target_status": "NO_ROW_OR_COLUMN_VARIATION",
+      "organization_label": "NO_ROW_OR_COLUMN_VARIATION",
+      "low_d_status": "NOT_SUPPORTED",
+      "status": "PASS"
+    },
+    "CASE_6_BOUNDARY_ORGANIZATION": {
+      "expected_profile": [
+        "POSITIVE_SUPPORTED",
+        "NO_DOMINANCE",
+        "SUPPORTED"
+      ],
+      "observed_profile": [
+        "POSITIVE_SUPPORTED",
+        "NO_DOMINANCE",
+        "SUPPORTED"
+      ],
+      "distance_statistic": 1.0,
+      "distance_status": "POSITIVE_SUPPORTED",
+      "source_target_statistic": 0.0,
+      "source_target_status": "NO_DOMINANCE",
+      "organization_label": "NO_DOMINANCE",
+      "low_d_status": "SUPPORTED",
+      "status": "PASS"
+    }
+  },
+  "profile_routing": {
+    "route_coverage": {
+      "A1": {
+        "route": "A1",
+        "label": "THREE_MODEL_PROFILE_STABILITY",
+        "matching_models": [
+          "Qwen",
+          "OLMo",
+          "Llama"
+        ],
+        "status": "PASS"
+      },
+      "A2": {
+        "route": "A2",
+        "label": "PARTIAL_PROFILE_STABILITY",
+        "matching_models": [
+          "Qwen",
+          "OLMo"
+        ],
+        "status": "PASS"
+      },
+      "A3": {
+        "route": "A3",
+        "label": "TASK_CONDITIONAL_ORGANIZATION",
+        "matching_models": [],
+        "status": "PASS"
+      },
+      "A4": {
+        "route": "A4",
+        "label": "TASK_CONDITIONAL_RECALIBRATABILITY",
+        "matching_models": [],
+        "status": "PASS"
+      },
+      "A5": {
+        "route": "A5",
+        "label": "BROAD_TASK_CONDITIONAL_PROFILE",
+        "matching_models": [],
+        "status": "PASS"
+      },
+      "A6": {
+        "route": "A6",
+        "label": "NOT_FULLY_ADJUDICATED",
+        "status": "PASS"
+      },
+      "invalid_route_rejection": true,
+      "mutually_exclusive": true
+    },
+    "orientation_guard": true
+  },
+  "input_fail_closed_guards": {
+    "valid_synthetic_input": "PASS",
+    "missing_model": "PASS",
+    "missing_layer": "PASS",
+    "duplicate_identity": "PASS",
+    "split_contamination": "PASS",
+    "wrong_authority_hash": "PASS",
+    "partial_model_completion": "PASS",
+    "incomplete_representation": "PASS",
+    "synthetic_as_production": "PASS"
+  },
+  "publication_guards": {
+    "synthetic_rejection": "PASS",
+    "partial_model_rejection": "PASS",
+    "canonical_path_rejection": "PASS"
+  },
+  "determinism": {
+    "repeatability": true,
+    "fixture_hash": "0b62a827285ee7fb3179a23402441ea2bf40cd12d19b85efc514132a2e810ff5"
+  },
+  "disposition": {
+    "task_disposition": "BLOCKED_FINAL_HISTORICAL_INTEGRATION_GATE",
+    "core_synthetic_analysis_qualified": true,
+    "primary_historical_suite": {
+      "collected": 344,
+      "passed": 335,
+      "failed": 9,
+      "warnings": 125,
+      "all_failures_formal_path_collision": true
+    },
+    "r1": {
+      "clean_clone_gate_valid": false,
+      "reason": "MISSING_INHERITED_REPOSITORY_STATE"
+    },
+    "r2": {
+      "faithful_snapshot_constructed": true,
+      "module_origin_guard_pass": true,
+      "focused_006q_passed": 13,
+      "historical_items_collected": 344,
+      "terminal_historical_result_obtained": false,
+      "repeated_nontermination_location": "EXP025_SYNTHETIC_QUALIFICATION",
+      "attempts": 2
+    },
+    "integration_regression_detected": false,
+    "historical_suite_bounded_hermeticity": "NOT_ESTABLISHED",
+    "formal_panel_consumed": false,
+    "formal_inference_performed": false,
+    "scientific_outcome_computed": false,
+    "live_v8_touched": false
+  },
+  "qualification_flags": {
+    "PA_EXT_A_006Q_ENGINEERING_COMPLETE": false,
+    "PA_EXT_A_ANALYSIS_PIPELINE_SYNTH_QUALIFIED": true,
+    "PA_EXT_A_HISTORICAL_GATE_PRIMARY_COLLISION_CONFIRMED": true,
+    "PA_EXT_A_HISTORICAL_GATE_SNAPSHOT_PASS": false,
+    "PA_EXT_A_INTEGRATION_REGRESSION_DETECTED": false,
+    "PA_EXT_A_HISTORICAL_SUITE_BOUNDED_HERMETICITY": "NOT_ESTABLISHED",
+    "PA_EXT_A_SOURCE_TARGET_ORIENTATION_GUARD_PASS": true,
+    "PA_EXT_A_LOW_D_SYNTH_QUALIFIED": true,
+    "PA_EXT_A_A1_A6_ROUTE_COVERAGE_PASS": true,
+    "PA_EXT_A_ANALYSIS_REPEATABILITY_PASS": true,
+    "PA_EXT_A_PARTIAL_PUBLICATION_GUARD_PASS": true,
+    "PA_EXT_A_SYNTHETIC_PUBLICATION_REJECTION_PASS": true,
+    "PA_EXT_A_FORMAL_PANEL_CONSUMED": false,
+    "PA_EXT_A_FORMAL_INFERENCE_PERFORMED": false,
+    "PA_EXT_A_SCIENTIFIC_OUTCOME_COMPUTED": false,
+    "PA_EXT_A_LIVE_V8_TOUCHED": false,
+    "PA_EXT_A_READY_FOR_FORMAL_ANALYSIS_AFTER_AUTHORIZED_INFERENCE": false
+  },
+  "status": "PA_EXT_A_006Q_ENGINEERING_PASS",
+  "artifact_content_sha256": "0610e064b27e5a340e90b2198a6b75cdf0b7b3bf8007f4a80c75f9387deb9bf1"
+}
