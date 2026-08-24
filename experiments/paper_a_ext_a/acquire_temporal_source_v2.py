@@ -155,6 +155,26 @@ LIMIT {limit}
 OFFSET {offset}"""
 
 
+def wdqs_event_page_query(limit: int, offset: int) -> str:
+    """Use WDQS's inverse traversal from the two known roots only."""
+    if limit <= 0 or offset < 0:
+        raise ValueError("limit must be positive and offset must be non-negative")
+    return f"""PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT DISTINCT ?item ?class ?label WHERE {{
+  VALUES ?root {{ wd:Q1190554 wd:Q1656682 }}
+  ?root ^wdt:P279* ?class .
+  ?class ^wdt:P31 ?item .
+  ?item rdfs:label ?label .
+  FILTER(lang(?label)="en")
+  {main_view_filter()}
+}}
+ORDER BY ASC(?item) ASC(?class)
+LIMIT {limit}
+OFFSET {offset}"""
+
+
 def time_metadata_query(qids: Iterable[str]) -> str:
     values = " ".join(f"wd:{qid}" for qid in sorted(set(qids)))
     return f"""PREFIX wd: <http://www.wikidata.org/entity/>
@@ -336,6 +356,12 @@ SELECT ?parent WHERE { wd:Q1656682 wdt:P279 wd:Q1914636 . BIND(wd:Q1914636 AS ?p
             "ontology_visibility": "Q1656682_P279_Q1914636",
             "health_payload_keys": sorted(payload.keys()),
         }
+
+    def fetch_event_page(self, limit: int, offset: int) -> dict[str, Any]:
+        status, payload = self.request(wdqs_event_page_query(limit, offset))
+        if status != 200:
+            raise RuntimeError("TEMPORAL_SOURCE_V2_WDQS_EVENT_PAGE_FAILED")
+        return payload
 
 
 def initial_checkpoint(
