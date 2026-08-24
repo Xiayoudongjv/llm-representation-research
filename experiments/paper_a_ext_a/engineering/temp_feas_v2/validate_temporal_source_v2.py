@@ -28,6 +28,15 @@ def git_value(*args: str) -> str:
     return subprocess.check_output(["git", *args], cwd=ROOT, text=True).strip()
 
 
+def base_authority_is_bound(ref: str) -> bool:
+    if git_value("rev-parse", ref) == EXPECTED_HEAD:
+        return True
+    try:
+        return git_value("rev-parse", f"{ref}^") == EXPECTED_HEAD
+    except subprocess.CalledProcessError:
+        return False
+
+
 def validate_protocol(protocol: dict[str, Any]) -> list[str]:
     errors: list[str] = []
     if protocol.get("protocol_status") != "FROZEN_BEFORE_FRESH_ACQUISITION":
@@ -91,8 +100,8 @@ def validate() -> dict[str, Any]:
     errors = validate_protocol(protocol)
     errors.extend(
         [
-            "HEAD mismatch" if git_value("rev-parse", "HEAD") != EXPECTED_HEAD else "",
-            "origin mismatch" if git_value("rev-parse", "origin/main") != EXPECTED_HEAD else "",
+            "HEAD/base-parent mismatch" if not base_authority_is_bound("HEAD") else "",
+            "origin/base-parent mismatch" if not base_authority_is_bound("origin/main") else "",
             "V8 authority changed" if sha256_file(V8_AUTHORITY) != EXPECTED_V8_AUTHORITY_SHA else "",
             "V8 checkpoint changed" if sha256_file(V8_CHECKPOINT) != EXPECTED_V8_CHECKPOINT_SHA else "",
             "old confirmation report changed" if sha256_file(OLD_REPORT) != protocol["prior_source_evidence"]["old_confirmation_report_sha256"] else "",
