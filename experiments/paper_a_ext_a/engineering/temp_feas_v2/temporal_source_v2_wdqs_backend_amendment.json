@@ -1,0 +1,56 @@
+{
+  "artifact_type": "TEMPORAL_SOURCE_V2_BACKEND_ONLY_AMENDMENT",
+  "amendment_id": "PA-EXT-A-TEMPORAL_SOURCE_V2-WDQS-BACKEND",
+  "amendment_type": "BACKEND_ONLY",
+  "status": "FROZEN_BEFORE_WDQS_ACQUISITION",
+  "base_protocol_sha256": "5018718739045b25514c8e94ede7e7ba6a99faa56b43c2156d27fbb97cfe2b6b",
+  "from_backend": {
+    "name": "QLever",
+    "endpoint": "https://qlever.dev/api/wikidata",
+    "status": "BACKEND_PREFLIGHT_FAILED",
+    "full_acquisition_performed": false
+  },
+  "to_backend": {
+    "name": "WIKIDATA_QUERY_SERVICE_OFFICIAL_MAIN_GRAPH",
+    "endpoint": "https://query.wikidata.org/sparql",
+    "graph": "https://wikiba.se/ontology#WikibaseMain snak",
+    "main_graph_only": true,
+    "health_check": "SELECT * WHERE { BIND(1 AS ?health) } LIMIT 1",
+    "ontology_visibility_check": "Q1656682 --P279--> Q1914636",
+    "user_agent_required": true,
+    "bounded_timeout_seconds": 60,
+    "max_retries": 3,
+    "failure_policy": "FAIL_CLOSED_NO_ACQUISITION"
+  },
+  "scientific_protocol_changed": false,
+  "source_selection_semantics_changed": false,
+  "pairing_semantics_changed": false,
+  "selection_and_filtering_reused": true,
+  "checkpoint_resume_reused": true,
+  "canonical_publication_reused": true,
+  "lineage": {
+    "qlever_production_attempt_stopped_at_preflight": true,
+    "qlever_full_acquisition_performed": false,
+    "fresh_v2_candidate_identities_acquired": false,
+    "eligible_event_pool_existed": false,
+    "canonical_temporal_families_existed": false,
+    "formal_panel_existed": false,
+    "model_inference_performed": false,
+    "scientific_outcome_existed": false,
+    "wdqs_selected_for_operational_unavailability_only": true,
+    "observed_source_yield_motivated_change": false,
+    "base_v2_protocol_immutable": true
+  },
+  "required_flags": {
+    "TEMPORAL_SOURCE_V2_WDQS_AMENDMENT_FROZEN": true,
+    "TEMPORAL_SOURCE_V2_BASE_PROTOCOL_CHANGED": false,
+    "TEMPORAL_SOURCE_V2_SCIENTIFIC_LOGIC_CHANGED": false,
+    "TEMPORAL_SOURCE_V2_WDQS_RUNNER_QUALIFIED": true,
+    "TEMPORAL_SOURCE_V2_FULL_ACQUISITION_PERFORMED": false,
+    "TEMPORAL_SOURCE_V2_CANONICAL_220_CREATED": false,
+    "FORMAL_MODEL_INFERENCE_PERFORMED": false,
+    "FORMAL_SCIENTIFIC_OUTCOME_CREATED": false,
+    "TEMPORAL_SOURCE_V2_WDQS_LONG_RUN_READY": true
+  },
+  "amendment_sha256": "326e2e3312ffd8a8877197d51d6bd4685f30c8a8efbe048bc243128911bf7413"
+}

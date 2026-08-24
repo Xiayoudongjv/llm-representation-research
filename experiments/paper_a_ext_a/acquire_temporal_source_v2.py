@@ -26,11 +26,16 @@ from typing import Any, Callable, Iterable
 
 EXP_DIR = Path(__file__).resolve().parent
 PROTOCOL_PATH = EXP_DIR / "engineering" / "temp_feas_v2" / "temporal_source_v2_protocol.json"
+WDQS_AMENDMENT_PATH = EXP_DIR / "engineering" / "temp_feas_v2" / "temporal_source_v2_wdqs_backend_amendment.json"
 V7_RULE_PATH = EXP_DIR / "v7_main_view_rule.json"
 RUNTIME_DIR = EXP_DIR / "data" / "temporal_source_v2_runtime"
 CANONICAL_DIR = EXP_DIR / "data" / "wikidata_temporal_source_v2"
 DEFAULT_CHECKPOINT_PATH = RUNTIME_DIR / "checkpoint.json"
+WDQS_CHECKPOINT_PATH = RUNTIME_DIR / "wdqs_checkpoint.json"
 QLEVER_ENDPOINT = "https://qlever.dev/api/wikidata"
+WDQS_ENDPOINT = "https://query.wikidata.org/sparql"
+WDQS_BACKEND_NAME = "WIKIDATA_QUERY_SERVICE_OFFICIAL_MAIN_GRAPH"
+WDQS_AMENDMENT_SHA256 = "326e2e3312ffd8a8877197d51d6bd4685f30c8a8efbe048bc243128911bf7413"
 GRAPH_SCOPE = "UNIFIED"
 MAIN_VIEW_RULE_SHA256 = "ece32b16462f6abc42d6cba0b4a5a433fbfdacf51278ea46d7bf1f8d22adec05"
 PROTOCOL_SHA256 = "5018718739045b25514c8e94ede7e7ba6a99faa56b43c2156d27fbb97cfe2b6b"
@@ -98,6 +103,12 @@ def load_protocol() -> dict[str, Any]:
     if protocol.get("required_flags", {}).get("TEMPORAL_SOURCE_V2_DATA_ACCESSED") is not False:
         raise RuntimeError("TEMPORAL_SOURCE_V2_PROTOCOL_DATA_ALREADY_ACCESSED")
     return protocol
+
+
+def wdqs_amendment_authority_sha256() -> str:
+    amendment = json.loads(WDQS_AMENDMENT_PATH.read_text(encoding="utf-8"))
+    amendment.pop("amendment_sha256", None)
+    return sha256_bytes(canonical_json(amendment))
 
 
 def main_view_filter() -> str:
@@ -171,6 +182,9 @@ class QLeverClient:
     def __init__(self, endpoint: str = QLEVER_ENDPOINT, request: Callable[[str], tuple[int, dict[str, Any]]] | None = None):
         self.endpoint = endpoint
         self._request_override = request
+        self.backend_name = "QLever"
+        self.backend_amendment_sha256: str | None = None
+        self.graph_scope = GRAPH_SCOPE
 
     def request(self, query: str) -> tuple[int, dict[str, Any]]:
         if self._request_override is not None:
@@ -223,15 +237,110 @@ class QLeverClient:
         return payload
 
 
-def initial_checkpoint(protocol_sha256: str = PROTOCOL_SHA256, *, timestamp: str | None = None) -> dict[str, Any]:
+class WikidataQueryServiceClient(QLeverClient):
+    """Official WDQS transport for the single frozen backend amendment."""
+
+    def __init__(
+        self,
+        request: Callable[[str], tuple[int, dict[str, Any]]] | None = None,
+        *,
+        sleep: Callable[[float], None] = time.sleep,
+    ):
+        super().__init__(endpoint=WDQS_ENDPOINT, request=request)
+        self.backend_name = WDQS_BACKEND_NAME
+        self.backend_amendment_sha256 = WDQS_AMENDMENT_SHA256
+        self.graph_scope = "OFFICIAL_MAIN_GRAPH"
+        self._sleep = sleep
+
+    def request(self, query: str) -> tuple[int, dict[str, Any]]:
+        if self._request_override is not None:
+            last: Exception | None = None
+            for attempt in range(1, MAX_RETRIES + 1):
+                try:
+                    status, payload = self._request_override(query)
+                    if status == 200:
+                        return status, payload
+                    if status not in {429, 500, 502, 503, 504} or attempt == MAX_RETRIES:
+                        if attempt == MAX_RETRIES and status in {429, 500, 502, 503, 504}:
+                            raise RuntimeError(f"TEMPORAL_SOURCE_V2_WDQS_REQUEST_FAILED_HTTP_{status}")
+                        return status, payload
+                except (TimeoutError, urllib.error.URLError, RuntimeError) as exc:
+                    last = exc
+                    if attempt == MAX_RETRIES:
+                        raise RuntimeError(f"TEMPORAL_SOURCE_V2_WDQS_REQUEST_FAILED:{last}") from exc
+                self._sleep(float(2 ** (attempt - 1)))
+            raise RuntimeError(f"TEMPORAL_SOURCE_V2_WDQS_REQUEST_FAILED:{last}")
+        body = urllib.parse.urlencode({"query": query, "format": "json"}).encode("utf-8")
+        request = urllib.request.Request(
+            self.endpoint,
+            data=body,
+            method="POST",
+            headers={
+                "Accept": "application/sparql-results+json",
+                "Content-Type": "application/x-www-form-urlencoded",
+                "User-Agent": "PA-EXT-A-TEMP-V2-WDQS/1.0 (research; contact=repository-maintainer)",
+            },
+        )
+        last: Exception | None = None
+        for attempt in range(1, MAX_RETRIES + 1):
+            try:
+                with urllib.request.urlopen(request, timeout=60) as response:
+                    return int(response.status), json.loads(response.read().decode("utf-8"))
+            except urllib.error.HTTPError as exc:
+                last = exc
+                if exc.code not in {429, 500, 502, 503, 504} or attempt == MAX_RETRIES:
+                    break
+            except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as exc:
+                last = exc
+                if attempt == MAX_RETRIES:
+                    break
+            self._sleep(float(2 ** (attempt - 1)))
+        raise RuntimeError(f"TEMPORAL_SOURCE_V2_WDQS_REQUEST_FAILED:{last}")
+
+    def preflight(self) -> dict[str, Any]:
+        status, payload = self.request("SELECT * WHERE { BIND(1 AS ?health) } LIMIT 1")
+        if status != 200:
+            raise RuntimeError("TEMPORAL_SOURCE_V2_WDQS_HEALTH_FAILED")
+        if self.endpoint != WDQS_ENDPOINT:
+            raise RuntimeError("TEMPORAL_SOURCE_V2_WDQS_ENDPOINT_IDENTITY_FAILED")
+        if wdqs_amendment_authority_sha256() != WDQS_AMENDMENT_SHA256:
+            raise RuntimeError("TEMPORAL_SOURCE_V2_WDQS_AMENDMENT_SHA_MISMATCH")
+        ontology_query = """PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+SELECT ?parent WHERE { wd:Q1656682 wdt:P279 wd:Q1914636 . BIND(wd:Q1914636 AS ?parent) } LIMIT 1"""
+        ontology_status, ontology_payload = self.request(ontology_query)
+        if ontology_status != 200 or not _bindings(ontology_payload):
+            raise RuntimeError("TEMPORAL_SOURCE_V2_WDQS_ONTOLOGY_VISIBILITY_FAILED")
+        return {
+            "status": status,
+            "endpoint": self.endpoint,
+            "backend": self.backend_name,
+            "graph_scope": "OFFICIAL_MAIN_GRAPH",
+            "base_protocol_sha256": PROTOCOL_SHA256,
+            "backend_amendment_sha256": WDQS_AMENDMENT_SHA256,
+            "ontology_visibility": "Q1656682_P279_Q1914636",
+            "health_payload_keys": sorted(payload.keys()),
+        }
+
+
+def initial_checkpoint(
+    protocol_sha256: str = PROTOCOL_SHA256,
+    *,
+    timestamp: str | None = None,
+    backend: str = "QLever",
+    endpoint: str = QLEVER_ENDPOINT,
+    graph_scope: str = GRAPH_SCOPE,
+    backend_amendment_sha256: str | None = None,
+) -> dict[str, Any]:
     return {
         "schema_version": "1.0.0",
         "status": "INITIALIZED",
         "protocol_sha256": protocol_sha256,
-        "backend": "QLever",
-        "endpoint": QLEVER_ENDPOINT,
-        "graph_scope": GRAPH_SCOPE,
+        "backend": backend,
+        "endpoint": endpoint,
+        "graph_scope": graph_scope,
         "main_view_rule_sha256": MAIN_VIEW_RULE_SHA256,
+        "backend_amendment_sha256": backend_amendment_sha256,
         "retrieval_timestamp": timestamp or utc_now(),
         "fresh_candidates_discovered": 0,
         "prior_identity_rejects": 0,
@@ -261,9 +370,24 @@ def write_checkpoint(path: Path, checkpoint: dict[str, Any]) -> None:
     atomic_write_json(path, checkpoint)
 
 
-def load_checkpoint(path: Path, expected_protocol_sha256: str = PROTOCOL_SHA256) -> dict[str, Any]:
+def load_checkpoint(
+    path: Path,
+    expected_protocol_sha256: str = PROTOCOL_SHA256,
+    *,
+    expected_backend: str = "QLever",
+    expected_endpoint: str = QLEVER_ENDPOINT,
+    expected_graph_scope: str = GRAPH_SCOPE,
+    expected_backend_amendment_sha256: str | None = None,
+) -> dict[str, Any]:
     checkpoint = json.loads(path.read_text(encoding="utf-8"))
-    required = {"protocol_sha256": expected_protocol_sha256, "backend": "QLever", "graph_scope": GRAPH_SCOPE, "main_view_rule_sha256": MAIN_VIEW_RULE_SHA256}
+    required = {
+        "protocol_sha256": expected_protocol_sha256,
+        "backend": expected_backend,
+        "endpoint": expected_endpoint,
+        "graph_scope": expected_graph_scope,
+        "main_view_rule_sha256": MAIN_VIEW_RULE_SHA256,
+        "backend_amendment_sha256": expected_backend_amendment_sha256,
+    }
     for key, expected in required.items():
         if checkpoint.get(key) != expected:
             raise RuntimeError(f"TEMPORAL_SOURCE_V2_CHECKPOINT_AUTHORITY_MISMATCH_{key}")
@@ -551,7 +675,21 @@ def _finish_source(
         families = pair_events(selected, target_families=TARGET_FAMILIES)
         checkpoint["canonical_events_count"] = len(selected)
         checkpoint["families_count"] = len(families)
-        publish_canonical({"eligible_events.json": eligible, "selected_events.json": selected, "families.json": families}, synthetic=False)
+        publish_canonical(
+            {
+                "eligible_events.json": eligible,
+                "selected_events.json": selected,
+                "families.json": families,
+                "provenance.json": {
+                    "base_protocol_sha256": checkpoint["protocol_sha256"],
+                    "backend": checkpoint["backend"],
+                    "backend_amendment_sha256": checkpoint.get("backend_amendment_sha256"),
+                    "endpoint": checkpoint["endpoint"],
+                    "graph_scope": checkpoint["graph_scope"],
+                },
+            },
+            synthetic=False,
+        )
         checkpoint["status"] = "PUBLISHED"
         checkpoint["current_state"] = "TERMINAL"
         checkpoint["canonical_events_count"] = len(selected)
@@ -608,7 +746,7 @@ def production_acquisition_core(client: QLeverClient, checkpoint: dict[str, Any]
 def run_production(
     *,
     client: QLeverClient | None = None,
-    checkpoint_path: Path = DEFAULT_CHECKPOINT_PATH,
+    checkpoint_path: Path | None = None,
     production_core: Callable[[QLeverClient, dict[str, Any]], dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Run the guarded production entry point and return its terminal state.
@@ -619,14 +757,31 @@ def run_production(
     CLI execution uses :func:`production_acquisition_core`.
     """
     load_protocol()
+    active_client = client or WikidataQueryServiceClient()
+    expected_backend = getattr(active_client, "backend_name", "QLever")
+    expected_endpoint = getattr(active_client, "endpoint", QLEVER_ENDPOINT)
+    expected_graph_scope = getattr(active_client, "graph_scope", GRAPH_SCOPE)
+    expected_amendment = getattr(active_client, "backend_amendment_sha256", None)
+    if checkpoint_path is None:
+        checkpoint_path = WDQS_CHECKPOINT_PATH if expected_backend == WDQS_BACKEND_NAME else DEFAULT_CHECKPOINT_PATH
     if checkpoint_path.exists():
-        checkpoint = load_checkpoint(checkpoint_path)
+        checkpoint = load_checkpoint(
+            checkpoint_path,
+            expected_backend=expected_backend,
+            expected_endpoint=expected_endpoint,
+            expected_graph_scope=expected_graph_scope,
+            expected_backend_amendment_sha256=expected_amendment,
+        )
         checkpoint["current_state"] = "RESUMING"
     else:
-        checkpoint = initial_checkpoint()
+        checkpoint = initial_checkpoint(
+            backend=expected_backend,
+            endpoint=expected_endpoint,
+            graph_scope=expected_graph_scope,
+            backend_amendment_sha256=expected_amendment,
+        )
     checkpoint["_checkpoint_path"] = str(checkpoint_path)
     write_checkpoint(checkpoint_path, checkpoint)
-    active_client = client or QLeverClient()
     try:
         gate = active_client.preflight()
     except Exception as exc:

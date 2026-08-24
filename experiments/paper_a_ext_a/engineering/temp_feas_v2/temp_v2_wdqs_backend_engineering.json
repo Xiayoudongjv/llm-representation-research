@@ -1,0 +1,48 @@
+{
+  "task_id": "PA-EXT-A-TEMP-V2-WDQS-BACKEND-AMENDMENT",
+  "base_protocol_sha256": "5018718739045b25514c8e94ede7e7ba6a99faa56b43c2156d27fbb97cfe2b6b",
+  "backend_amendment_sha256": "326e2e3312ffd8a8877197d51d6bd4685f30c8a8efbe048bc243128911bf7413",
+  "backend": "WIKIDATA_QUERY_SERVICE_OFFICIAL_MAIN_GRAPH",
+  "endpoint": "https://query.wikidata.org/sparql",
+  "checkpoint_path": "experiments/paper_a_ext_a/data/temporal_source_v2_runtime/wdqs_checkpoint.json",
+  "engineering_only": true,
+  "network_accessed": false,
+  "full_acquisition_performed": false,
+  "canonical_220_created": false,
+  "model_inference_performed": false,
+  "scientific_outcome_created": false,
+  "base_protocol_changed": false,
+  "scientific_logic_changed": false,
+  "lineage": {
+    "qlever_preflight_failed": true,
+    "qlever_candidate_acquisition_started": false,
+    "wdqs_selected_without_source_yield_observation": true,
+    "prior_v2_candidate_identities_reused": false,
+    "formal_panel_created": false
+  },
+  "qualification": {
+    "wdqs_response_parsing": "PASS",
+    "health_gate": "PASS",
+    "ontology_visibility_gate": "PASS",
+    "endpoint_identity_guard": "PASS",
+    "bounded_retry": "PASS",
+    "checkpoint_authority": "PASS",
+    "fail_closed": "PASS",
+    "deterministic_440_to_220_reuse": "PASS",
+    "focused_test_count": 10,
+    "focused_tests_passed": 10,
+    "network_accessed": false
+  },
+  "required_flags": {
+    "TEMPORAL_SOURCE_V2_WDQS_AMENDMENT_FROZEN": true,
+    "TEMPORAL_SOURCE_V2_BASE_PROTOCOL_CHANGED": false,
+    "TEMPORAL_SOURCE_V2_SCIENTIFIC_LOGIC_CHANGED": false,
+    "TEMPORAL_SOURCE_V2_WDQS_RUNNER_QUALIFIED": true,
+    "TEMPORAL_SOURCE_V2_FULL_ACQUISITION_PERFORMED": false,
+    "TEMPORAL_SOURCE_V2_CANONICAL_220_CREATED": false,
+    "FORMAL_MODEL_INFERENCE_PERFORMED": false,
+    "FORMAL_SCIENTIFIC_OUTCOME_CREATED": false,
+    "TEMPORAL_SOURCE_V2_WDQS_LONG_RUN_READY": true
+  },
+  "artifact_sha256": "9152a49757de214ca1a1f5a0dc1492c1176fded1a2f7ec00503730105d174f6b"
+}

@@ -15,7 +15,7 @@ V8_AUTHORITY = ROOT / "experiments" / "paper_a_ext_a" / "paper_a_ext_a_temporal_
 V8_CHECKPOINT = ROOT / "experiments" / "paper_a_ext_a" / "data" / "raw" / "wikidata_v8" / "acquisition_checkpoint.json"
 OLD_REPORT = ROOT / "experiments" / "paper_a_ext_a" / "engineering" / "temp_feas_002r" / "temp_feas_002r_report.json"
 
-EXPECTED_HEAD = "71393c7972e224c015a01432e3e1679aef61908e"
+EXPECTED_HEAD = "878ef6aabf57af061ff86a81e456347c1461690c"
 EXPECTED_V8_AUTHORITY_SHA = "47a2ce443fe097b32fc391b910d97860593093ec19c9e362ec7019d5f3984ca7"
 EXPECTED_V8_CHECKPOINT_SHA = "a6f21f6bdf2267d14c36f26231a61d8279ed1bbe66ce0265e25c6fde61a59b38"
 
