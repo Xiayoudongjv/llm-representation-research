@@ -1,0 +1,59 @@
+{
+  "artifact_sha256": "2645e89b91185b7968fcb03a31196078202f88312712e1feacf1d691d24a0f95",
+  "task_id": "PA-EXT-A-TEMP-FEAS-002",
+  "status": "TEMP_FEAS_002_BLOCKED_INSUFFICIENT_ONTOLOGY_CLOSURE",
+  "rule_id": "TEMPORAL_EVENT_LIKE_V1",
+  "proposal_sha256": "5ac334a8e788b6c491cf9af375c4926c1db8bda6fd71b53e16ff3dd68b22a9be",
+  "confirmation_manifest_sha256": "3a278b4602aadc361a998eff0910571daae292255beae536c37249efa09843ec",
+  "source_pool_manifest_sha256": "860351f16efa05c8991ee3fc76b7324b0d7a3c383a525e7f7f6c3d85e0f4d592",
+  "split_rule_sha256": "3c8722f4e14b2958fd5095c1e08890d971b91f5961cabeba8da48f121d45bced",
+  "entry_gate": {
+    "proposal_sha_valid": true,
+    "confirmation_manifest_sha_valid": true,
+    "source_pool_sha_valid": true,
+    "split_sha_valid": true,
+    "design_confirmation_nonoverlap_valid": true,
+    "no_formal_model_inference_or_outcome": true,
+    "staging_empty_at_entry": true,
+    "v8_authority_sha256": "47a2ce443fe097b32fc391b910d97860593093ec19c9e362ec7019d5f3984ca7",
+    "v8_checkpoint_sha256": "a6f21f6bdf2267d14c36f26231a61d8279ed1bbe66ce0265e25c6fde61a59b38",
+    "v8_authority_unchanged": true,
+    "v8_checkpoint_unchanged": true
+  },
+  "ontology_closure_sufficiency": {
+    "sufficient": false,
+    "required": "finite P279* closure from every direct P31 class to Q1656682 or Q1190554",
+    "cached_parent_query_semantics": "?class wdt:P279 ?parent",
+    "cached_parent_relation_depth": "one-hop direct edges only",
+    "parent_artifact_count": 6422,
+    "direct_p279_edge_count": 62578,
+    "cached_parent_source_class_count": 150,
+    "parent_targets_without_cached_source_node": 219,
+    "v8_query_contains_p279_property_path": false,
+    "network_accessed": false,
+    "reason": "The cached artifacts do not provide a complete transitive P279 closure. Evaluating the frozen rule for confirmation would require missing ontology edges or network access."
+  },
+  "confirmation_exposure": {
+    "confirmation_semantic_fields_loaded": false,
+    "confirmation_funnel_evaluated": false,
+    "confirmation_candidate_labels_inspected": false,
+    "confirmation_rule_applied": false
+  },
+  "required_flags": {
+    "PA_EXT_A_TEMP_FEAS_002_COMPLETE": true,
+    "PA_EXT_A_TEMP_RULE_SHA_VALID": true,
+    "PA_EXT_A_CONFIRMATION_MANIFEST_SHA_VALID": true,
+    "PA_EXT_A_ONTOLOGY_CLOSURE_SUFFICIENT": false,
+    "PA_EXT_A_CONFIRMATION_SEMANTICS_ACCESSED": false,
+    "PA_EXT_A_TEMP_RULE_CONFIRMED": false,
+    "PA_EXT_A_CONFIRMATION_STATUS": "BLOCKED_INSUFFICIENT_ONTOLOGY_CLOSURE",
+    "PA_EXT_A_FINAL_ELIGIBLE_EVENTS": "NOT_COMPUTED",
+    "PA_EXT_A_TEMPORAL_FAMILIES_POSSIBLE": "NOT_COMPUTED",
+    "PA_EXT_A_TEMPORAL_220_CREATED": false,
+    "PA_EXT_A_FORMAL_PANEL_ACCESSED": false,
+    "PA_EXT_A_FORMAL_INFERENCE_PERFORMED": false,
+    "PA_EXT_A_FORMAL_SCIENTIFIC_OUTCOME_CREATED": false,
+    "PA_EXT_A_V8_LINEAGE_MODIFIED": false,
+    "PA_EXT_A_NETWORK_ACCESSED": false
+  }
+}

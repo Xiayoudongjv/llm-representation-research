@@ -1,0 +1,27 @@
+{
+  "artifact_sha256": "8cbfba5dcfda3898d0722ac241f5a8cbd2dac574a04c1dd61c48d12d1e1c84b9",
+  "task_id": "PA-EXT-A-TEMP-FEAS-002",
+  "status": "BLOCKED_INSUFFICIENT_ONTOLOGY_CLOSURE",
+  "rule_id": "TEMPORAL_EVENT_LIKE_V1",
+  "proposal_sha256": "5ac334a8e788b6c491cf9af375c4926c1db8bda6fd71b53e16ff3dd68b22a9be",
+  "confirmation_manifest_sha256": "3a278b4602aadc361a998eff0910571daae292255beae536c37249efa09843ec",
+  "confirmation_exposure": false,
+  "ontology_closure_sufficient": false,
+  "counts": {
+    "CONFIRMATION_TOTAL": "NOT_COMPUTED",
+    "EVENT_ROOT_VALID": "NOT_COMPUTED",
+    "EVENT_ROOT_INVALID": "NOT_COMPUTED",
+    "EVENT_ROOT_UNKNOWN": "NOT_COMPUTED",
+    "DATE_VALID_AFTER_ROOT": "NOT_COMPUTED",
+    "DEDUP_VALID": "NOT_COMPUTED",
+    "SURFACE_LEAKAGE_PASS": "NOT_COMPUTED",
+    "SURFACE_LEAKAGE_REJECT": "NOT_COMPUTED",
+    "FINAL_ELIGIBLE_EVENTS": "NOT_COMPUTED",
+    "PAIRABLE_EVENTS": "NOT_COMPUTED",
+    "TEMPORAL_FAMILIES_POSSIBLE": "NOT_COMPUTED"
+  },
+  "leakage_survival_rate": "NOT_COMPUTED",
+  "dominant_bottleneck": "ONTOLOGY_ROOT",
+  "stop_rule": "TEMP_FEAS_002_BLOCKED_INSUFFICIENT_ONTOLOGY_CLOSURE",
+  "no_partial_confirmation_evaluation": true
+}
