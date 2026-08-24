@@ -23,13 +23,16 @@ def validate() -> dict[str, object]:
     tree = ast.parse(source)
     functions = {node.name for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)}
     required = {
-        "parse_nt_line", "iter_nt_triples", "scan_p279_closure", "scan_p31_candidates", "scan_labels",
+        "_unquote_literal", "_decode_iri_ref", "parse_nt_line", "iter_nt_triples", "scan_p279_closure", "scan_p31_candidates", "scan_labels",
         "build_structural_snapshot", "compute_root_compatible_classes", "entity_to_candidate",
         "finalize_hydrated_candidates", "preflight", "main",
     }
     missing = sorted(required - functions)
-    if missing or "transformers" in source or "torch" in source:
+    if missing or "transformers" in source or "torch" in source or "json.loads(quoted)" in source:
         raise RuntimeError(f"TEMPORAL_SOURCE_V2_OFFLINE_HYBRID_VALIDATION_FAILED:{missing}")
+    for marker in ('"t": "\\t"', '"u"', '"U"', "invalid Unicode scalar value"):
+        if marker not in source:
+            raise RuntimeError("TEMPORAL_SOURCE_V2_OFFLINE_NTRIPLES_DECODER_MISSING")
     if not MONITOR.exists() or "read_status" not in MONITOR.read_text(encoding="utf-8"):
         raise RuntimeError("TEMPORAL_SOURCE_V2_OFFLINE_MONITOR_MISSING")
     record = json.loads(RECORD.read_text(encoding="utf-8"))
@@ -45,6 +48,11 @@ def validate() -> dict[str, object]:
         "TEMPORAL_SOURCE_V2_OFFLINE_CHECKPOINT_RESUME_QUALIFIED",
         "TEMPORAL_SOURCE_V2_OFFLINE_PROGRESS_MONITOR_QUALIFIED",
         "TEMPORAL_SOURCE_V2_OFFLINE_ONLINE_NORMALIZED_CONTRACT_EQUIVALENT",
+        "TEMPORAL_SOURCE_V2_OFFLINE_R5_COMPLETE",
+        "TEMPORAL_SOURCE_V2_NTRIPLES_LITERAL_PARSER_REPAIRED",
+        "TEMPORAL_SOURCE_V2_NTRIPLES_ECHAR_QUALIFIED",
+        "TEMPORAL_SOURCE_V2_NTRIPLES_UCHAR_QUALIFIED",
+        "TEMPORAL_SOURCE_V2_REALISTIC_BZ2_FIXTURE_QUALIFIED",
         "TEMPORAL_SOURCE_V2_OFFLINE_LONG_RUN_READY",
     }
     if any(required_flags.get(flag) is not True for flag in expected_true):
@@ -52,12 +60,16 @@ def validate() -> dict[str, object]:
     expected_false = {
         "TEMPORAL_SOURCE_V2_BASE_PROTOCOL_CHANGED",
         "TEMPORAL_SOURCE_V2_SCIENTIFIC_SEMANTICS_CHANGED",
+        "TEMPORAL_SOURCE_V2_SCIENTIFIC_LOGIC_CHANGED",
         "TEMPORAL_SOURCE_V2_FRESHNESS_AUTHORITY_CHANGED",
+        "TEMPORAL_SOURCE_V2_FRESHNESS_RULE_CHANGED",
         "TEMPORAL_SOURCE_V2_SELECTION_CHANGED",
         "TEMPORAL_SOURCE_V2_PAIRING_CHANGED",
         "TEMPORAL_SOURCE_V2_REAL_DUMP_DOWNLOADED",
         "TEMPORAL_SOURCE_V2_REAL_DUMP_SCANNED",
+        "REAL_WIKIDATA_DUMP_SCANNED_BY_CODEX",
         "TEMPORAL_SOURCE_V2_ENTITY_HYDRATION_PERFORMED",
+        "REAL_WIKIDATA_ENTITY_HYDRATION_PERFORMED",
         "TEMPORAL_SOURCE_V2_FULL_ACQUISITION_PERFORMED",
         "TEMPORAL_SOURCE_V2_CANONICAL_220_CREATED",
         "FORMAL_MODEL_INFERENCE_PERFORMED",

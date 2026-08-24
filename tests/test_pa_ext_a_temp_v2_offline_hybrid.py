@@ -83,6 +83,56 @@ def test_streaming_bz2_reader_is_linewise_and_reports_bounded_progress(tmp_path:
         list(OFFLINE.iter_nt_triples(tmp_path / "missing.nt.bz2"))
 
 
+def test_standards_compliant_literal_and_iri_escapes(tmp_path: Path) -> None:
+    cases = {
+        '"plain ASCII"': ("plain ASCII", None),
+        '"UTF-8 \u00e9 \u4e2d \U0001f600"': ("UTF-8 \u00e9 \u4e2d \U0001f600", None),
+        r'"tab\tbackspace\bnewline\nreturn\rform\f"': ("tab\tbackspace\bnewline\nreturn\rform\f", None),
+        '"quote' + r'\"' + ' apostrophe' + r"\'" + '"': ('quote" apostrophe\'', None),
+        '"path' + r'\\' + 'name"': ("path\\name", None),
+        r'"unicode \u00E9 \u4E2D \U0001F600"': ("unicode \u00e9 \u4e2d \U0001f600", None),
+        '"English label"@en': ("English label", "en"),
+        '"\u4e2d\u6587\u6807\u7b7e"@zh': ("\u4e2d\u6587\u6807\u7b7e", "zh"),
+        '"typed value"^^<http://www.w3.org/2001/XMLSchema#string>': ("typed value", None),
+    }
+    for token, expected in cases.items():
+        assert OFFLINE._unquote_literal(token) == expected
+
+    for malformed in (
+        '"trailing\\',
+        r'"short\u12"',
+        r'"short\U0001F60"',
+        r'"bad\uZZZZ"',
+        r'"bad\U00110000"',
+        r'"bad\uD800"',
+    ):
+        with pytest.raises(ValueError):
+            OFFLINE._unquote_literal(malformed)
+
+    escaped_iri = r'<http://www.wikidata.org/entity/Q\u0032> <http://www.wikidata.org/prop/direct/P31> <http://www.wikidata.org/entity/Q\u0033> .'
+    subject, predicate, obj = OFFLINE.parse_nt_line(escaped_iri)
+    assert subject.endswith("/Q2")
+    assert predicate.endswith("/P31")
+    assert obj["value"].endswith("/Q3")
+    with pytest.raises(ValueError):
+        OFFLINE.parse_nt_line(r'<http://www.wikidata.org/entity/Q1> <http://www.wikidata.org/prop/direct/P31> <http://www.wikidata.org/entity/Q\t> .')
+
+    fixture_lines = [
+        f'{_uri("Q700")} <{OFFLINE.RDFS_LABEL_URI}> ' + r'"plain ASCII"@en .' + "\n",
+        f'{_uri("Q701")} <{OFFLINE.RDFS_LABEL_URI}> ' + r'"escaped \t \b \n \r \f \" \' \\"@en .' + "\n",
+        f'{_uri("Q702")} <{OFFLINE.RDFS_LABEL_URI}> ' + r'"unicode \u00E9 \u4E2D \U0001F600"@en .' + "\n",
+        f'{_uri("Q703")} <{OFFLINE.RDFS_LABEL_URI}> ' + r'"typed"^^<http://www.w3.org/2001/XMLSchema#string> .' + "\n",
+    ]
+    fixture = tmp_path / "literal-forms.nt.bz2"
+    with bz2.open(fixture, "wb") as handle:
+        handle.write("".join(fixture_lines).encode("utf-8"))
+    parsed = list(OFFLINE.iter_nt_triples(fixture))
+    assert len(parsed) == 4
+    assert parsed[0][2] == {"kind": "literal", "value": "plain ASCII", "language": "en"}
+    assert parsed[2][2]["value"] == "unicode \u00e9 \u4e2d \U0001f600"
+    assert parsed[3][2]["value"] == "typed"
+
+
 def test_root_closure_handles_direct_multihop_cycle_disconnected_and_both_roots(tmp_path: Path) -> None:
     path = _dump(tmp_path)
     parents, compatible, _ = OFFLINE.scan_p279_closure(path)

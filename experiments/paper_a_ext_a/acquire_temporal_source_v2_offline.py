@@ -101,27 +101,98 @@ def _qid(value: str | None) -> str | None:
 def _unquote_literal(token: str) -> tuple[str, str | None]:
     if not token.startswith('"'):
         raise ValueError("not a literal")
-    escaped = False
+
+    def decode_escape(index: int) -> tuple[str, int]:
+        if index >= len(token):
+            raise ValueError("incomplete N-Triples escape")
+        escape = token[index]
+        echar = {
+            "t": "\t",
+            "b": "\b",
+            "n": "\n",
+            "r": "\r",
+            "f": "\f",
+            '"': '"',
+            "'": "'",
+            "\\": "\\",
+        }
+        if escape in echar:
+            return echar[escape], index + 1
+        if escape not in {"u", "U"}:
+            raise ValueError("invalid N-Triples escape")
+        width = 4 if escape == "u" else 8
+        end = index + 1 + width
+        digits = token[index + 1 : end]
+        if len(digits) != width or any(char not in "0123456789abcdefABCDEF" for char in digits):
+            raise ValueError("invalid N-Triples UCHAR escape")
+        codepoint = int(digits, 16)
+        if codepoint > 0x10FFFF or 0xD800 <= codepoint <= 0xDFFF:
+            raise ValueError("invalid Unicode scalar value")
+        return chr(codepoint), end
+
+    value: list[str] = []
+    index = 1
     closing = None
-    for index in range(1, len(token)):
+    while index < len(token):
         char = token[index]
-        if char == '"' and not escaped:
+        if char == '"':
             closing = index
             break
-        if char == "\\" and not escaped:
-            escaped = True
-        else:
-            escaped = False
+        if char == "\\":
+            decoded, index = decode_escape(index + 1)
+            value.append(decoded)
+            continue
+        if char in {"\r", "\n"}:
+            raise ValueError("raw line break in N-Triples literal")
+        value.append(char)
+        index += 1
     if closing is None:
         raise ValueError("unterminated literal")
-    quoted = token[: closing + 1]
+
     suffix = token[closing + 1 :]
-    try:
-        value = json.loads(quoted)
-    except json.JSONDecodeError as exc:
-        raise ValueError("invalid escaped literal") from exc
-    language = suffix[1:] if suffix.startswith("@") else None
-    return value, language
+    language = None
+    if suffix.startswith("@"):
+        language = suffix[1:]
+        if not re.fullmatch(r"[A-Za-z]+(?:-[A-Za-z0-9]+)*", language):
+            raise ValueError("invalid N-Triples language tag")
+    elif suffix.startswith("^^"):
+        # Preserve the existing parser contract: datatype is accepted but not
+        # surfaced. Validate its IRIREF syntax instead of silently accepting a
+        # malformed suffix.
+        _decode_iri_ref(suffix[2:])
+    elif suffix:
+        raise ValueError("invalid N-Triples literal suffix")
+    return "".join(value), language
+
+
+def _decode_iri_ref(token: str) -> str:
+    if not token.startswith("<") or not token.endswith(">"):
+        raise ValueError("invalid IRIREF")
+    body = token[1:-1]
+    value: list[str] = []
+    index = 0
+    while index < len(body):
+        char = body[index]
+        if char == "\\":
+            if index + 1 >= len(body) or body[index + 1] not in {"u", "U"}:
+                raise ValueError("invalid IRIREF escape")
+            escape = body[index + 1]
+            width = 4 if escape == "u" else 8
+            end = index + 2 + width
+            digits = body[index + 2 : end]
+            if len(digits) != width or any(item not in "0123456789abcdefABCDEF" for item in digits):
+                raise ValueError("invalid IRIREF UCHAR escape")
+            codepoint = int(digits, 16)
+            if codepoint > 0x10FFFF or 0xD800 <= codepoint <= 0xDFFF:
+                raise ValueError("invalid Unicode scalar value")
+            value.append(chr(codepoint))
+            index = end
+            continue
+        if ord(char) <= 0x20 or char in '<>"{}|^`':
+            raise ValueError("invalid IRIREF character")
+        value.append(char)
+        index += 1
+    return "".join(value)
 
 
 def parse_nt_line(line: str) -> tuple[str, str, dict[str, str | None]] | None:
@@ -135,12 +206,10 @@ def parse_nt_line(line: str) -> tuple[str, str, dict[str, str | None]] | None:
     if not first:
         raise ValueError("unsupported N-Triples structure")
     subject, predicate, object_token = first.groups()
-    if not subject.startswith("<") or not predicate.startswith("<"):
-        raise ValueError("N-Triples subject/predicate must be URIs")
-    subject = subject[1:-1]
-    predicate = predicate[1:-1]
+    subject = _decode_iri_ref(subject)
+    predicate = _decode_iri_ref(predicate)
     if object_token.startswith("<") and object_token.endswith(">"):
-        obj = {"kind": "uri", "value": object_token[1:-1], "language": None}
+        obj = {"kind": "uri", "value": _decode_iri_ref(object_token), "language": None}
     elif object_token.startswith('"'):
         value, language = _unquote_literal(object_token)
         obj = {"kind": "literal", "value": value, "language": language}
