@@ -1,0 +1,34 @@
+{
+  "artifact_sha256": "8a4c259c84a222b3234cc5f0e96a371e76208cb169eb027281485ba1055414fe",
+  "bottleneck_losses": {
+    "ONTOLOGY_ROOT": 0,
+    "PAIRING": 1,
+    "SURFACE_LEAKAGE": 2837
+  },
+  "confirmation_manifest_sha256": "3a278b4602aadc361a998eff0910571daae292255beae536c37249efa09843ec",
+  "counts": {
+    "CONFIRMATION_TOTAL": 2840,
+    "DATE_VALID_AFTER_ROOT": 2840,
+    "DEDUP_VALID": 2840,
+    "EVENT_ROOT_INVALID": 0,
+    "EVENT_ROOT_UNKNOWN": 0,
+    "EVENT_ROOT_VALID": 2840,
+    "FINAL_ELIGIBLE_EVENTS": 3,
+    "PAIRABLE_EVENTS": 2,
+    "SURFACE_LEAKAGE_PASS": 3,
+    "SURFACE_LEAKAGE_REJECT": 2837,
+    "TEMPORAL_FAMILIES_POSSIBLE": 1
+  },
+  "dominant_bottleneck": "SURFACE_LEAKAGE",
+  "ontology_snapshot_authority_sha256": "cef7da7d6bbfe55f5c754b56e28aa88e93f261eebe8b44d8c6a12f8b4d64dbc1",
+  "pairing_rule_applied": "sorted eligible events, no event reuse, next unused event with a different normalized timeValue",
+  "proposal_sha256": "5ac334a8e788b6c491cf9af375c4926c1db8bda6fd71b53e16ff3dd68b22a9be",
+  "rule_id": "TEMPORAL_EVENT_LIKE_V1",
+  "survival_rates": {
+    "dedup_survival_rate": 1.0,
+    "event_root_survival_rate": 1.0,
+    "final_eligibility_rate": 0.001056338028169014,
+    "surface_leakage_survival_rate": 0.001056338028169014
+  },
+  "task_id": "PA-EXT-A-TEMP-FEAS-002R"
+}

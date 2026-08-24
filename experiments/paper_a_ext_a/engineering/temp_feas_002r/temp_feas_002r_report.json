@@ -1,0 +1,52 @@
+{
+  "artifact_sha256": "b5f497729b3af85503c7fa1ccd80a02e7547d0538b5adc28bf8962e34dacc2cb",
+  "confirmation_artifact_sha256": "a8c8536d4b25b9188d1db8daab66ca0a975941afb9a34fff9e8e13f4690bb011",
+  "confirmation_manifest_sha256": "3a278b4602aadc361a998eff0910571daae292255beae536c37249efa09843ec",
+  "counts": {
+    "CONFIRMATION_TOTAL": 2840,
+    "DATE_VALID_AFTER_ROOT": 2840,
+    "DEDUP_VALID": 2840,
+    "EVENT_ROOT_INVALID": 0,
+    "EVENT_ROOT_UNKNOWN": 0,
+    "EVENT_ROOT_VALID": 2840,
+    "FINAL_ELIGIBLE_EVENTS": 3,
+    "PAIRABLE_EVENTS": 2,
+    "SURFACE_LEAKAGE_PASS": 3,
+    "SURFACE_LEAKAGE_REJECT": 2837,
+    "TEMPORAL_FAMILIES_POSSIBLE": 1
+  },
+  "dominant_bottleneck": "SURFACE_LEAKAGE",
+  "funnel_artifact_sha256": "8a4c259c84a222b3234cc5f0e96a371e76208cb169eb027281485ba1055414fe",
+  "no_canonical_temporal_220_created": true,
+  "no_rule_redesign": true,
+  "ontology_closure_unresolved_seeds": 0,
+  "ontology_snapshot_authority_sha256": "cef7da7d6bbfe55f5c754b56e28aa88e93f261eebe8b44d8c6a12f8b4d64dbc1",
+  "proposal_sha256": "5ac334a8e788b6c491cf9af375c4926c1db8bda6fd71b53e16ff3dd68b22a9be",
+  "required_flags": {
+    "PA_EXT_A_CONFIRMATION_MANIFEST_SHA_VALID": true,
+    "PA_EXT_A_CONFIRMATION_SEMANTICS_ACCESSED": true,
+    "PA_EXT_A_CONFIRMATION_STATUS": "INSUFFICIENT_EXISTING_POOL",
+    "PA_EXT_A_EVENT_ROOT_UNKNOWN": 0,
+    "PA_EXT_A_FORMAL_INFERENCE_PERFORMED": false,
+    "PA_EXT_A_FORMAL_PANEL_ACCESSED": false,
+    "PA_EXT_A_FORMAL_SCIENTIFIC_OUTCOME_CREATED": false,
+    "PA_EXT_A_NETWORK_ACCESSED": false,
+    "PA_EXT_A_ONTOLOGY_CLOSURE_COMPLETE": true,
+    "PA_EXT_A_ONTOLOGY_SNAPSHOT_SHA_VALID": true,
+    "PA_EXT_A_TEMPORAL_220_CREATED": false,
+    "PA_EXT_A_TEMP_FEAS_002R_COMPLETE": true,
+    "PA_EXT_A_TEMP_RULE_CONFIRMED": false,
+    "PA_EXT_A_TEMP_RULE_SHA_VALID": true,
+    "PA_EXT_A_V8_LINEAGE_MODIFIED": false
+  },
+  "rule_confirmed": false,
+  "source_pool_manifest_sha256": "860351f16efa05c8991ee3fc76b7324b0d7a3c383a525e7f7f6c3d85e0f4d592",
+  "status": "INSUFFICIENT_EXISTING_POOL",
+  "survival_rates": {
+    "dedup_survival_rate": 1.0,
+    "event_root_survival_rate": 1.0,
+    "final_eligibility_rate": 0.001056338028169014,
+    "surface_leakage_survival_rate": 0.001056338028169014
+  },
+  "task_id": "PA-EXT-A-TEMP-FEAS-002R"
+}
