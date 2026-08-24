@@ -1,0 +1,15 @@
+{
+  "batch_id": "entity_batch_0000_134b6927881728ec",
+  "raw_response_sha256": "134b6927881728ec3998cb84c59a9d7cf81d21c230e13de77a0f89f602f72414",
+  "requested_qids": [
+    "Q4790326"
+  ],
+  "retrieval_timestamp": "2026-08-24T14:35:53.120355+00:00",
+  "snapshot_fields": [
+    "qid",
+    "resolved_qid",
+    "lastrevid",
+    "redirects",
+    "direct_p279_qids"
+  ]
+}

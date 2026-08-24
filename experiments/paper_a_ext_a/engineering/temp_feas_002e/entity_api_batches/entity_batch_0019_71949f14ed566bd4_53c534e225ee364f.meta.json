@@ -1,0 +1,22 @@
+{
+  "batch_id": "entity_batch_0019_71949f14ed566bd4",
+  "raw_response_sha256": "71949f14ed566bd4ffba2231452d7892cd63d18cef2e32305c4cf2a5ac2b096a",
+  "requested_qids": [
+    "Q10915",
+    "Q28732711",
+    "Q336",
+    "Q37787110",
+    "Q4671286",
+    "Q4897819",
+    "Q59138870",
+    "Q781413"
+  ],
+  "retrieval_timestamp": "2026-08-24T14:35:59.656090+00:00",
+  "snapshot_fields": [
+    "qid",
+    "resolved_qid",
+    "lastrevid",
+    "redirects",
+    "direct_p279_qids"
+  ]
+}
