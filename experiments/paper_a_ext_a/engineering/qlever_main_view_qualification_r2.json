@@ -1,0 +1,98 @@
+{
+  "qualification_id": "PA-EXT-A-005R2-QEQ-R2",
+  "diagnostic_only": true,
+  "frozen_v6_modified": false,
+  "formal_acquisition": false,
+  "temporal_pairs_created": false,
+  "model_inference": false,
+  "qlever_raw_graph_scope": "UNIFIED",
+  "published_graph_split_rule": {
+    "scholarly_if_non_deprecated_p13046": true,
+    "scholarly_if_non_deprecated_direct_p31_in_published_list": true,
+    "p279_ancestry_used_for_graph_split": false,
+    "direct_p31_list_encoded": true
+  },
+  "fixed_qid_probe": {
+    "qid_count": 20,
+    "qid_source": "predefined_offset_zero_probe_window",
+    "literal_p585_membership": {
+      "legacy_wdqs_main_unique_qids": [
+        "Q116756558",
+        "Q1501240",
+        "Q78140346"
+      ],
+      "qlever_unified_unique_qids": [
+        "Q116756558",
+        "Q1501240",
+        "Q78140346"
+      ],
+      "qlever_filtered_main_view_unique_qids": [
+        "Q116756558",
+        "Q1501240",
+        "Q78140346"
+      ],
+      "concordant": true
+    },
+    "p585_metadata": {
+      "legacy_rows": 0,
+      "qlever_rows": 0,
+      "note": "No selected fixed-QID row exposed precision/calendar metadata in this probe; no disagreement was observed, but positive eligibility was not exercised."
+    },
+    "p31_p279_input_rows": {
+      "legacy_rows": 36,
+      "qlever_rows": 36,
+      "exact_row_set_concordant": true
+    },
+    "field_concordance": "PASS",
+    "eligibility_concordance": "PARTIAL",
+    "eligibility_note": "The fixed probe contained no positive fully eligible event record because the selected P585 metadata probe was empty."
+  },
+  "fixed_order_window_probe": {
+    "window": "1900-01-01 inclusive through 1901-01-01 exclusive",
+    "limit": 20,
+    "legacy_wdqs_main_unique_order": [
+      "Q10023110", "Q100552688", "Q1018944", "Q10265412", "Q1028112",
+      "Q10383641", "Q1043979", "Q1044000", "Q1044004", "Q104455137",
+      "Q1045277", "Q104851912", "Q104876226", "Q104880364", "Q105079071",
+      "Q1051412", "Q1051932", "Q1051941", "Q10548924", "Q105561579"
+    ],
+    "qlever_unified_order_equal_to_legacy": true,
+    "qlever_filtered_main_view_order_equal_to_legacy": true,
+    "removed_by_filter_in_window": [],
+    "window_equivalence_only": true
+  },
+  "scholarly_only_literal_p585_probe": {
+    "method": "predefined published scholarly-marker query with literal P585 and global date-order LIMIT 20",
+    "qlever_unified_qids": [
+      "Q112939066",
+      "Q113110828",
+      "Q113608142"
+    ],
+    "qlever_dates": {
+      "Q112939066": "1985-01-01T00:00:00Z",
+      "Q113110828": "2022-01-01T00:00:00Z",
+      "Q113608142": "2022-09-30T00:00:00Z"
+    },
+    "qlever_filtered_main_view_count": 0,
+    "legacy_wdqs_main_count": 0,
+    "direct_non_deprecated_scholarly_p31_observed": true,
+    "marker_observed": "Q13442814 (scholarly article), with Q18918145 additionally on Q112939066",
+    "global_order_risk": "PRESENT",
+    "risk_interpretation": "These literal-P585 scholarly entities enter the raw unified ordered candidate population and can consume page positions before local V6 eligibility filtering; the published main-view filter removes them."
+  },
+  "required_return_values": {
+    "QLEVER_QUERY_COMPATIBILITY": "PASS",
+    "QLEVER_RAW_GRAPH_SCOPE": "UNIFIED",
+    "QLEVER_MAIN_VIEW_FILTER_IMPLEMENTED": true,
+    "MAIN_VIEW_CANDIDATE_EQUIVALENCE": "NOT_ESTABLISHED",
+    "FIELD_CONCORDANCE": "PASS",
+    "ELIGIBILITY_CONCORDANCE": "PARTIAL",
+    "GLOBAL_ORDER_RISK": "PRESENT",
+    "V6_MODIFIED": false,
+    "FORMAL_ACQUISITION": false,
+    "TEMPORAL_PAIRS_CREATED": false,
+    "MODEL_INFERENCE": false,
+    "RECOMMENDATION": "RECOMMEND_MINIMAL_V7_QLEVER_MAIN_VIEW"
+  },
+  "recommendation_scope": "A minimal V7 backend amendment should encode the published main-view filter before any QLever acquisition. This does not authorize formal acquisition and does not alter V6."
+}
