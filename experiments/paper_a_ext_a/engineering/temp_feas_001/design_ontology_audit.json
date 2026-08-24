@@ -1,0 +1,42 @@
+{
+  "cached_ancestry_to_Q1190554_count": 0,
+  "cached_direct_p279_parent_counts": {
+    "Q141022": 848,
+    "Q29512572": 241,
+    "Q3887": 709,
+    "Q751989": 658
+  },
+  "cached_ontology_scope": "direct P31 and one-hop P279 edges present in V8 class/parent artifacts; no network enrichment",
+  "candidates_without_cached_event_root_evidence": 710,
+  "candidates_without_cached_event_root_evidence_fraction": 1.0,
+  "design_count": 710,
+  "direct_Q1190554_membership_count": 0,
+  "direct_p31_class_counts": {
+    "Q11086064": 190,
+    "Q28339417": 38,
+    "Q3887": 658,
+    "Q5681048": 241,
+    "Q5691927": 240
+  },
+  "dominant_direct_p31_class": [
+    "Q3887",
+    658
+  ],
+  "event_like_outside_Q1190554_cached_closure_count": 0,
+  "event_like_outside_Q1190554_cached_closure_status": "NOT_ESTABLISHED_FROM_CACHED_ONE_HOP_ANCESTRY",
+  "exact_duplicate_label_count": 0,
+  "p585_first_bias_assessment": {
+    "basis": [
+      "all_design_labels_trigger_the_frozen_surface_date_leakage_filter",
+      "one_direct_P31_QID_family_dominates_the_design_pool",
+      "cached_event_root_ancestry_is_absent_for_the_design_pool"
+    ],
+    "interpretation": "P585-first acquisition appears to overrepresent a narrow date-labelled phenomenon family; this is a source-design suitability finding, not an implementation defect.",
+    "status": "SUPPORTED_BY_DESIGN_INDICATORS"
+  },
+  "repeated_three_word_label_prefix_groups": {
+    "solar eclipse of": 710
+  },
+  "surface_date_leakage_count": 710,
+  "unique_direct_p31_class_count": 5
+}
