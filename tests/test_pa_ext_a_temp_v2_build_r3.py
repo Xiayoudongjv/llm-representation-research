@@ -44,13 +44,13 @@ def test_wdqs_fetch_event_page_uses_wdqs_query_only() -> None:
         return 200, {"results": {"bindings": []}}
 
     client = RUNNER.WikidataQueryServiceClient(request=request, sleep=lambda _: None)
-    assert client.fetch_event_page(100, 300) == {"results": {"bindings": []}}
+    assert client.fetch_event_page(100, 300)["results"] == {"bindings": []}
     assert captured == [RUNNER.wdqs_event_page_query(100, 300)]
 
 
 def test_same_output_contract_and_english_label_requirement() -> None:
     query = RUNNER.wdqs_event_page_query(100, 300)
-    assert "SELECT DISTINCT ?item ?class ?label WHERE" in query
+    assert "SELECT DISTINCT ?item ?class WHERE" in query
     assert 'FILTER(lang(?label)="en")' in query
     assert RUNNER.main_view_filter() in query
 

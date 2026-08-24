@@ -156,23 +156,39 @@ OFFSET {offset}"""
 
 
 def wdqs_event_page_query(limit: int, offset: int) -> str:
-    """Use WDQS's inverse traversal from the two known roots only."""
+    """Select the structural WDQS page before label hydration."""
     if limit <= 0 or offset < 0:
         raise ValueError("limit must be positive and offset must be non-negative")
     return f"""PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-SELECT DISTINCT ?item ?class ?label WHERE {{
+SELECT DISTINCT ?item ?class WHERE {{
   VALUES ?root {{ wd:Q1190554 wd:Q1656682 }}
   ?root ^wdt:P279* ?class .
   ?class ^wdt:P31 ?item .
-  ?item rdfs:label ?label .
-  FILTER(lang(?label)="en")
+  FILTER EXISTS {{
+    ?item rdfs:label ?label .
+    FILTER(lang(?label)="en")
+  }}
   {main_view_filter()}
 }}
 ORDER BY ASC(?item) ASC(?class)
 LIMIT {limit}
 OFFSET {offset}"""
+
+
+def wdqs_label_hydration_query(qids: Iterable[str]) -> str:
+    values = " ".join(f"wd:{qid}" for qid in sorted(set(qids)))
+    if not values:
+        raise ValueError("label hydration requires at least one QID")
+    return f"""PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT DISTINCT ?item ?label WHERE {{
+  VALUES ?item {{ {values} }}
+  ?item rdfs:label ?label .
+  FILTER(lang(?label)="en")
+}}
+ORDER BY ASC(?item) ASC(?label)"""
 
 
 def time_metadata_query(qids: Iterable[str]) -> str:
@@ -361,7 +377,19 @@ SELECT ?parent WHERE { wd:Q1656682 wdt:P279 wd:Q1914636 . BIND(wd:Q1914636 AS ?p
         status, payload = self.request(wdqs_event_page_query(limit, offset))
         if status != 200:
             raise RuntimeError("TEMPORAL_SOURCE_V2_WDQS_EVENT_PAGE_FAILED")
-        return payload
+        selected_qids = sorted(
+            {
+                item
+                for row in _bindings(payload)
+                if (item := _qid(_binding_value(row, "item"))) is not None
+            }
+        )
+        if not selected_qids:
+            return {"head": {"vars": ["item", "class", "label"]}, "results": {"bindings": []}}
+        label_status, label_payload = self.request(wdqs_label_hydration_query(selected_qids))
+        if label_status != 200:
+            raise RuntimeError("TEMPORAL_SOURCE_V2_WDQS_LABEL_HYDRATION_FAILED")
+        return hydrate_wdqs_event_page(payload, label_payload)
 
 
 def initial_checkpoint(
@@ -640,6 +668,38 @@ def _qid(value: str | None) -> str | None:
     if not value:
         return None
     return value.rsplit("/", 1)[-1]
+
+
+def hydrate_wdqs_event_page(structural_payload: dict[str, Any], label_payload: dict[str, Any]) -> dict[str, Any]:
+    """Rebuild the historical parser contract without allowing membership drift."""
+    structural_rows = _bindings(structural_payload)
+    selected_qids: list[str] = []
+    seen_qids: set[str] = set()
+    for row in structural_rows:
+        item = _qid(_binding_value(row, "item"))
+        clazz = _qid(_binding_value(row, "class"))
+        if item is None or clazz is None:
+            raise RuntimeError("TEMPORAL_SOURCE_V2_WDQS_STRUCTURAL_PAGE_INVALID")
+        if item not in seen_qids:
+            selected_qids.append(item)
+            seen_qids.add(item)
+    labels: dict[str, list[str]] = defaultdict(list)
+    for row in _bindings(label_payload):
+        item = _qid(_binding_value(row, "item"))
+        label_binding = row.get("label")
+        label = _binding_value(row, "label")
+        if item is None or label is None or not isinstance(label_binding, dict) or label_binding.get("xml:lang") != "en":
+            raise RuntimeError("TEMPORAL_SOURCE_V2_WDQS_LABEL_HYDRATION_INVALID")
+        labels[item].append(label)
+    if set(labels) != set(selected_qids) or any(len(values) != 1 for values in labels.values()):
+        raise RuntimeError("TEMPORAL_SOURCE_V2_WDQS_LABEL_HYDRATION_MEMBERSHIP_DRIFT")
+    hydrated_rows: list[dict[str, Any]] = []
+    for row in structural_rows:
+        item = _qid(_binding_value(row, "item"))
+        hydrated = dict(row)
+        hydrated["label"] = {"type": "literal", "xml:lang": "en", "value": labels[item][0]}
+        hydrated_rows.append(hydrated)
+    return {"head": {"vars": ["item", "class", "label"]}, "results": {"bindings": hydrated_rows}}
 
 
 def _parse_event_page(payload: dict[str, Any]) -> list[dict[str, Any]]:
