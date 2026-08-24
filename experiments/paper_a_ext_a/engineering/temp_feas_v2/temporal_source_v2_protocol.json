@@ -1,0 +1,136 @@
+{
+  "artifact_type": "TEMPORAL_SOURCE_CONSTRUCTION_PROTOCOL",
+  "protocol_id": "PA-EXT-A-TEMPORAL_SOURCE_V2",
+  "protocol_status": "FROZEN_BEFORE_FRESH_ACQUISITION",
+  "design_version": "TEMPORAL_SOURCE_V2",
+  "prior_source_evidence": {
+    "v1_rule_id": "TEMPORAL_EVENT_LIKE_V1",
+    "v1_confirmation_status": "INSUFFICIENT_EXISTING_POOL",
+    "confirmation_total": 2840,
+    "event_root_valid": 2840,
+    "date_valid_after_root": 2840,
+    "dedup_valid": 2840,
+    "surface_leakage_pass": 3,
+    "surface_leakage_reject": 2837,
+    "final_eligible_events": 3,
+    "temporal_families_possible": 1,
+    "old_confirmation_report_sha256": "1a6fe43c1c644cf947f8efd01464e04d68862ef4db26a28a1b2141bb85f1b822"
+  },
+  "event_criterion": {
+    "direct_p31_then_finite_p279_closure": true,
+    "allowed_roots": ["Q1190554", "Q1656682"],
+    "ontology_semantics_source": "TEMP-FEAS-002E immutable auxiliary snapshot",
+    "ontology_snapshot_authority_sha256": "cef7da7d6bbfe55f5c754b56e28aa88e93f261eebe8b44d8c6a12f8b4d64dbc1",
+    "zero_length_path_allowed_when_direct_p31_is_root": true,
+    "cycle_policy": "cycle_without_root_is_ineligible",
+    "unknown_closure_policy": "reject_and_record_as_unresolved"
+  },
+  "canonical_time": {
+    "priority": ["P580_start_time", "P585_point_in_time"],
+    "validity": {
+      "calendar_qid": "Q1985727",
+      "minimum_time_precision": 11,
+      "requires_literal_wikibase_time_value": true
+    },
+    "selection": "use exactly one valid statement from the first nonempty priority property",
+    "ambiguity": "reject when multiple distinct valid canonical times remain unresolved",
+    "no_date_editing": true
+  },
+  "surface_leakage_rule": {
+    "frozen_before_acquisition": true,
+    "prompt_language": "en",
+    "action": "reject_candidate",
+    "manual_redaction": false,
+    "patterns": [
+      "four_digit_year",
+      "complete_numeric_date",
+      "month_year",
+      "month_day_year",
+      "explicit_bce_ce_year"
+    ],
+    "case_insensitive": true,
+    "date_removal_is_not_allowed": true,
+    "surface_must_be_nonempty_after_whitespace_normalization": true
+  },
+  "freshness": {
+    "exclude_prior_date_valid_pool": true,
+    "prior_date_valid_pool_manifest_sha256": "860351f16efa05c8991ee3fc76b7324b0d7a3c383a525e7f7f6c3d85e0f4d592",
+    "exclude_prior_v8_candidate_universe": true,
+    "prior_v8_universe_manifest": "derive_and_hash_all_QIDs_in_frozen_V8_candidate_pages_before_acquisition",
+    "qid_reuse": false,
+    "text_reuse": false
+  },
+  "diversity_control": {
+    "unit": "eligible_events",
+    "coarse_class": "lexicographically smallest direct P31 QID whose closure reaches an allowed root",
+    "maximum_single_coarse_class_events": 44,
+    "cap_basis": "10 percent of the fixed 440-event minimum",
+    "selection_behavior": "hash-order scan skips a candidate that would exceed the fixed cap",
+    "threshold_tuning_after_observation": false,
+    "class_balancing_optimization": false
+  },
+  "selection_and_ordering": {
+    "acquisition_order_by_event_date": false,
+    "candidate_selection_order": "ascending SHA256(PA_EXT_A_TEMPORAL_SOURCE_V2|qid|coarse_class)",
+    "date_use_before_final_pairing": false,
+    "final_pair_order": "ascending canonical time, then ascending QID, then canonical identity",
+    "same_date_pair": false,
+    "event_reuse": false,
+    "direction_balance": "alternate pair orientation by deterministic pair index while preserving earlier/later relation",
+    "fresh_identity_filter_precedes_selection": true
+  },
+  "pairing": {
+    "target_temporal_families": 220,
+    "minimum_unique_events": 440,
+    "operational_reserve_eligible_events": 600,
+    "algorithm": "left-to-right deterministic scan; pair unused events with the next unused event having a different canonical time",
+    "no_event_reuse": true,
+    "no_same_date_pair": true,
+    "balanced_earlier_later_direction": true
+  },
+  "acquisition_backend": {
+    "primary": {
+      "name": "QLever",
+      "endpoint": "https://qlever.dev/api/wikidata",
+      "raw_graph_scope": "UNIFIED",
+      "main_view_rule": "V7 frozen QLever main-view rule",
+      "main_view_rule_sha256": "ece32b16462f6abc42d6cba0b4a5a433fbfdacf51278ea46d7bf1f8d22adec05",
+      "health_check_before_acquisition": true,
+      "scope_validation_before_acquisition": true,
+      "lineage_mixing": false
+    },
+    "fallback_policy": {
+      "mode": "FAIL_CLOSED_NO_ACQUISITION",
+      "trigger": "QLever health, endpoint identity, or main-view scope validation fails",
+      "action": "record operational block and do not substitute another backend in the same run",
+      "full_wikidata_dump": false,
+      "silent_backend_mixing": false
+    }
+  },
+  "stopping_rule": {
+    "stop_at_eligible_events": 600,
+    "if_eligible_between_440_and_599": "proceed only when source is exhausted or frozen search budget is reached and deterministic pairing yields at least 220 families",
+    "if_eligible_below_440": "record insufficient fresh source and do not modify V2 during the run",
+    "frozen_search_budget": "one predeclared backend acquisition budget; no adaptive extension after observing yield"
+  },
+  "lineage_and_firewall": {
+    "v1_failed_prospectively_before_model_inference": true,
+    "v2_designed_only_from_source_construction_evidence": true,
+    "old_confirmation_identities_excluded": true,
+    "v2_frozen_before_fresh_acquisition": true,
+    "model_outcome_available": false,
+    "data_accessed": false,
+    "network_accessed": false,
+    "v8_modified": false,
+    "formal_model_inference_performed": false,
+    "formal_scientific_outcome_created": false,
+    "canonical_panel_created": false
+  },
+  "required_flags": {
+    "TEMPORAL_SOURCE_V2_FROZEN": true,
+    "TEMPORAL_SOURCE_V2_DATA_ACCESSED": false,
+    "OLD_CONFIRMATION_REUSED": false,
+    "FORMAL_MODEL_INFERENCE_PERFORMED": false,
+    "FORMAL_SCIENTIFIC_OUTCOME_CREATED": false
+  }
+}
