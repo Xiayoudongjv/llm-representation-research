@@ -1,12 +1,16 @@
 {
   "task_id": "PA-EXT-A-TEMP-V2-BUILD-ENGINEERING",
-  "git_head": "9888d7aac652d93f8b07ee5211c763918e6888c3",
+  "git_head": "71393c7972e224c015a01432e3e1679aef61908e",
   "protocol_sha256": "5018718739045b25514c8e94ede7e7ba6a99faa56b43c2156d27fbb97cfe2b6b",
   "engineering_only": true,
   "full_acquisition_performed": false,
   "formal_panel_created": false,
   "model_inference_performed": false,
   "scientific_outcome_created": false,
+  "previous_long_run_ready_claim": "PREMATURE_CLI_WIRING_MISSING",
+  "cli_execution_wiring_repaired": true,
+  "production_core_scientific_logic_changed": false,
+  "protocol_changed": false,
   "runner_path": "experiments/paper_a_ext_a/acquire_temporal_source_v2.py",
   "runner_validator_path": "experiments/paper_a_ext_a/engineering/temp_feas_v2/validate_temporal_source_v2_runner.py",
   "protocol_validator_path": "experiments/paper_a_ext_a/engineering/temp_feas_v2/validate_temporal_source_v2.py",
@@ -31,6 +35,8 @@
   "synthetic_qualification": {
     "focused_test_count": 21,
     "focused_tests_passed": 21,
+    "r1_focused_test_count": 8,
+    "r1_focused_tests_passed": 8,
     "protocol_validator": "PASS",
     "runner_validator": "PASS",
     "compileall": "PASS",
@@ -78,6 +84,10 @@
     "protocol_identity_rechecked": true
   },
   "required_flags": {
+    "TEMPORAL_SOURCE_V2_BUILD_ENGINEERING_R1_COMPLETE": true,
+    "TEMPORAL_SOURCE_V2_CLI_RUN_WIRING_PASS": true,
+    "TEMPORAL_SOURCE_V2_PROTOCOL_CHANGED": false,
+    "TEMPORAL_SOURCE_V2_SCIENTIFIC_LOGIC_CHANGED": false,
     "TEMPORAL_SOURCE_V2_BUILD_ENGINEERING_COMPLETE": true,
     "TEMPORAL_SOURCE_V2_RUNNER_QUALIFIED": true,
     "TEMPORAL_SOURCE_V2_CHECKPOINT_RESUME_QUALIFIED": true,
@@ -96,5 +106,5 @@
     "TEMPORAL_SOURCE_V2_LONG_RUN_READY": true
   },
   "long_run_ready": true,
-  "artifact_sha256": "00a0c299fec604fd191d10e52599b75c57cace223d33171df70e41074249a4fa"
+  "artifact_sha256": "e348e52f8a2faeea2ef4c3aca8e90946eba22fe639f3d4dc3df9ed06767867c9"
 }

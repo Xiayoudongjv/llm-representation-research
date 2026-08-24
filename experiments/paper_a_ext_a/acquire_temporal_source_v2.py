@@ -29,6 +29,7 @@ PROTOCOL_PATH = EXP_DIR / "engineering" / "temp_feas_v2" / "temporal_source_v2_p
 V7_RULE_PATH = EXP_DIR / "v7_main_view_rule.json"
 RUNTIME_DIR = EXP_DIR / "data" / "temporal_source_v2_runtime"
 CANONICAL_DIR = EXP_DIR / "data" / "wikidata_temporal_source_v2"
+DEFAULT_CHECKPOINT_PATH = RUNTIME_DIR / "checkpoint.json"
 QLEVER_ENDPOINT = "https://qlever.dev/api/wikidata"
 GRAPH_SCOPE = "UNIFIED"
 MAIN_VIEW_RULE_SHA256 = "ece32b16462f6abc42d6cba0b4a5a433fbfdacf51278ea46d7bf1f8d22adec05"
@@ -423,6 +424,233 @@ def publish_canonical(bundle: dict[str, Any], output_dir: Path = CANONICAL_DIR, 
             temporary.rmdir()
 
 
+def _terminal_checkpoint(checkpoint: dict[str, Any], status: str, *, error: str | None = None) -> dict[str, Any]:
+    """Return a terminal checkpoint update without weakening any guard."""
+    updated = dict(checkpoint)
+    updated["status"] = status
+    updated["current_state"] = "TERMINAL"
+    if error is not None:
+        updated["last_verified_artifact"] = {"kind": "terminal_status", "status": status, "error": error}
+    return updated
+
+
+def _binding_value(binding: dict[str, Any], name: str) -> str | None:
+    value = binding.get(name)
+    if not isinstance(value, dict):
+        return None
+    raw = value.get("value")
+    return raw if isinstance(raw, str) else None
+
+
+def _bindings(payload: dict[str, Any]) -> list[dict[str, Any]]:
+    results = payload.get("results", {})
+    rows = results.get("bindings", []) if isinstance(results, dict) else []
+    return [row for row in rows if isinstance(row, dict)]
+
+
+def _qid(value: str | None) -> str | None:
+    if not value:
+        return None
+    return value.rsplit("/", 1)[-1]
+
+
+def _parse_event_page(payload: dict[str, Any]) -> list[dict[str, Any]]:
+    grouped: dict[str, dict[str, Any]] = {}
+    for row in _bindings(payload):
+        item = _qid(_binding_value(row, "item"))
+        clazz = _qid(_binding_value(row, "class"))
+        label = _binding_value(row, "label")
+        if item is None or clazz is None:
+            continue
+        record = grouped.setdefault(item, {"qid": item, "direct_p31_qids": [], "label": label or ""})
+        if clazz not in record["direct_p31_qids"]:
+            record["direct_p31_qids"].append(clazz)
+        if not record["label"] and label:
+            record["label"] = label
+    return [grouped[key] for key in sorted(grouped)]
+
+
+def _parse_time_metadata(payload: dict[str, Any]) -> dict[str, list[dict[str, Any]]]:
+    times: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for row in _bindings(payload):
+        item = _qid(_binding_value(row, "item"))
+        property_name = _binding_value(row, "property")
+        date = _binding_value(row, "timeValue")
+        precision = _binding_value(row, "precision")
+        calendar = _qid(_binding_value(row, "calendar"))
+        if item is None or property_name not in {"P580", "P585"} or date is None or precision is None or calendar is None:
+            continue
+        try:
+            parsed_precision = int(precision)
+        except ValueError:
+            continue
+        times[item].append({"property": property_name, "time_value": date, "precision": parsed_precision, "calendar": calendar})
+    return times
+
+
+def _parse_parent_metadata(payload: dict[str, Any]) -> dict[str, set[str]]:
+    parents: dict[str, set[str]] = defaultdict(set)
+    for row in _bindings(payload):
+        clazz = _qid(_binding_value(row, "class"))
+        parent = _qid(_binding_value(row, "parent"))
+        if clazz and parent:
+            parents[clazz].add(parent)
+    return parents
+
+
+def _load_freshness_exclusions() -> set[str]:
+    """Load and hash-check the two frozen prior-identity sources."""
+    manifest = EXP_DIR / "engineering" / "temp_feas_001" / "date_valid_pool_manifest.json"
+    expected = "860351f16efa05c8991ee3fc76b7324b0d7a3c383a525e7f7f6c3d85e0f4d592"
+    if not manifest.exists() or sha256_file(manifest) != expected:
+        raise RuntimeError("TEMPORAL_SOURCE_V2_FRESHNESS_MANIFEST_UNAVAILABLE")
+    payload = json.loads(manifest.read_text(encoding="utf-8"))
+    excluded = {str(row["wikidata_item_id"]) for row in payload.get("records", []) if row.get("wikidata_item_id")}
+    raw_dir = EXP_DIR / "data" / "raw" / "wikidata_v8"
+    page_paths = sorted(raw_dir.glob("candidate_page_*.json"))
+    if not page_paths:
+        raise RuntimeError("TEMPORAL_SOURCE_V2_V8_UNIVERSE_UNAVAILABLE")
+    for page_path in page_paths:
+        page = json.loads(page_path.read_text(encoding="utf-8"))
+        for row in _bindings(page):
+            item = _qid(_binding_value(row, "item"))
+            if item:
+                excluded.add(item)
+    return excluded
+
+
+def _parent_closure(client: QLeverClient, classes: Iterable[str]) -> dict[str, set[str]]:
+    parents: dict[str, set[str]] = defaultdict(set)
+    pending = set(classes)
+    queried: set[str] = set()
+    while pending:
+        batch = sorted(pending - queried)
+        if not batch:
+            break
+        queried.update(batch)
+        response = client.fetch_parents(batch)
+        discovered = _parse_parent_metadata(response)
+        for clazz, values in discovered.items():
+            parents[clazz].update(values)
+        pending = {parent for values in discovered.values() for parent in values if parent not in queried and parent not in ROOTS}
+    return parents
+
+
+def _finish_source(
+    checkpoint: dict[str, Any],
+    eligible: list[dict[str, Any]],
+    *,
+    budget_exhausted: bool,
+) -> dict[str, Any]:
+    state = stopping_state(len(eligible), budget_exhausted)
+    checkpoint["final_eligible_events"] = len(eligible)
+    checkpoint["eligible_events"] = eligible
+    checkpoint["current_state"] = state
+    if state in {"STOP_AT_RESERVE_AND_SELECT", "READY_TO_PAIR"}:
+        selected = select_events(eligible, target=TARGET_EVENTS, class_cap=CLASS_CAP)
+        families = pair_events(selected, target_families=TARGET_FAMILIES)
+        checkpoint["canonical_events_count"] = len(selected)
+        checkpoint["families_count"] = len(families)
+        publish_canonical({"eligible_events.json": eligible, "selected_events.json": selected, "families.json": families}, synthetic=False)
+        checkpoint["status"] = "PUBLISHED"
+        checkpoint["current_state"] = "TERMINAL"
+        checkpoint["canonical_events_count"] = len(selected)
+        return {"status": "PUBLISHED", "full_acquisition_performed": True, "families_count": len(families)}
+    checkpoint["status"] = state
+    if state == "INSUFFICIENT_FRESH_SOURCE":
+        checkpoint["current_state"] = "TERMINAL"
+    return {"status": state, "full_acquisition_performed": True, "eligible_count": len(eligible)}
+
+
+def production_acquisition_core(client: QLeverClient, checkpoint: dict[str, Any]) -> dict[str, Any]:
+    """Execute the frozen event-first acquisition funnel until a terminal state."""
+    excluded = _load_freshness_exclusions()
+    eligible = [dict(row) for row in checkpoint.get("eligible_events", [])]
+    offset = int(checkpoint.get("current_acquisition_offset", 0))
+    seen = {row.get("canonical_identity") for row in eligible}
+    while True:
+        payload = client.fetch_event_page(PAGE_SIZE, offset)
+        candidates = _parse_event_page(payload)
+        if not candidates:
+            return _finish_source(checkpoint, eligible, budget_exhausted=True)
+        qids = [candidate["qid"] for candidate in candidates]
+        metadata = _parse_time_metadata(client.fetch_time_metadata(qids))
+        classes = {clazz for candidate in candidates for clazz in candidate["direct_p31_qids"]}
+        parents = _parent_closure(client, classes)
+        page_events: list[dict[str, Any]] = []
+        reasons = Counter()
+        for candidate in candidates:
+            candidate["times"] = metadata.get(candidate["qid"], [])
+            prepared, reason = prepare_candidate(candidate, excluded, parents)
+            reasons[reason] += 1
+            if prepared is None or prepared["canonical_identity"] in seen:
+                continue
+            seen.add(prepared["canonical_identity"])
+            page_events.append(prepared)
+        chunk = {"offset": offset, "page": payload, "events": page_events, "reason_counts": dict(reasons), "retrieval_timestamp": utc_now()}
+        atomic_write_json(RUNTIME_DIR / f"candidate_chunk_{offset:09d}.json", chunk)
+        eligible.extend(page_events)
+        checkpoint["fresh_candidates_discovered"] = int(checkpoint.get("fresh_candidates_discovered", 0)) + len(candidates)
+        checkpoint["final_eligible_events"] = len(eligible)
+        checkpoint["surface_leakage_pass"] = int(checkpoint.get("surface_leakage_pass", 0)) + reasons.get("ELIGIBLE", 0)
+        checkpoint["surface_leakage_reject"] = int(checkpoint.get("surface_leakage_reject", 0)) + reasons.get("SURFACE_LEAKAGE_REJECT", 0)
+        checkpoint["current_acquisition_offset"] = offset + PAGE_SIZE
+        checkpoint["current_state"] = "RUNNING"
+        checkpoint["status"] = "RUNNING"
+        checkpoint["artifact_chunk_count"] = int(checkpoint.get("artifact_chunk_count", 0)) + 1
+        checkpoint["eligible_events"] = eligible
+        write_checkpoint(Path(str(checkpoint.get("_checkpoint_path", DEFAULT_CHECKPOINT_PATH))), checkpoint)
+        offset += PAGE_SIZE
+        if len(eligible) >= RESERVE_EVENTS:
+            return _finish_source(checkpoint, eligible, budget_exhausted=False)
+
+
+def run_production(
+    *,
+    client: QLeverClient | None = None,
+    checkpoint_path: Path = DEFAULT_CHECKPOINT_PATH,
+    production_core: Callable[[QLeverClient, dict[str, Any]], dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    """Run the guarded production entry point and return its terminal state.
+
+    Protocol and checkpoint authority are checked before the backend gate.  A
+    failed gate is persisted as a terminal fail-closed state.  The optional
+    ``production_core`` argument is an offline qualification seam; ordinary
+    CLI execution uses :func:`production_acquisition_core`.
+    """
+    load_protocol()
+    if checkpoint_path.exists():
+        checkpoint = load_checkpoint(checkpoint_path)
+        checkpoint["current_state"] = "RESUMING"
+    else:
+        checkpoint = initial_checkpoint()
+    checkpoint["_checkpoint_path"] = str(checkpoint_path)
+    write_checkpoint(checkpoint_path, checkpoint)
+    active_client = client or QLeverClient()
+    try:
+        gate = active_client.preflight()
+    except Exception as exc:
+        terminal = _terminal_checkpoint(checkpoint, "BACKEND_PREFLIGHT_FAILED", error=str(exc))
+        write_checkpoint(checkpoint_path, terminal)
+        return {"status": terminal["status"], "checkpoint": terminal, "error": str(exc)}
+    checkpoint["status"] = "RUNNING"
+    checkpoint["current_state"] = "RESUMING" if checkpoint.get("current_acquisition_offset", 0) else "STARTING"
+    checkpoint["backend_preflight"] = gate
+    write_checkpoint(checkpoint_path, checkpoint)
+    core = production_core or globals()["production_acquisition_core"]
+    try:
+        result = core(active_client, checkpoint)
+    except Exception as exc:
+        terminal = _terminal_checkpoint(checkpoint, "PRODUCTION_CORE_FAILED", error=str(exc))
+        write_checkpoint(checkpoint_path, terminal)
+        return {"status": terminal["status"], "checkpoint": terminal, "error": str(exc)}
+    checkpoint["status"] = result["status"]
+    if result.get("status") in {"RUNNING", "CONTINUE_ACQUISITION"}:
+        result = {**result, "status": "PRODUCTION_CORE_RETURNED_NONTERMINAL"}
+    write_checkpoint(checkpoint_path, checkpoint)
+    return {"status": result["status"], "checkpoint": checkpoint, "result": result}
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--preflight", action="store_true")
@@ -430,7 +658,10 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     load_protocol()
     if args.run:
-        raise RuntimeError("FORMAL_TEMPORAL_SOURCE_V2_RUN_REQUIRES_EXPLICIT_EXTERNAL_EXECUTION")
+        result = run_production()
+        print(f"TEMPORAL_SOURCE_V2_RUN_STATUS={result['status']}")
+        print(f"FULL_ACQUISITION_PERFORMED={str(result.get('result', {}).get('full_acquisition_performed', False)).lower()}")
+        return 0 if result["status"] not in {"BACKEND_PREFLIGHT_FAILED", "PRODUCTION_CORE_FAILED"} else 1
     if args.preflight:
         print("TEMPORAL_SOURCE_V2_PROTOCOL_PREFLIGHT=PASS")
         print("FULL_ACQUISITION_PERFORMED=false")

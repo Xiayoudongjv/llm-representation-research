@@ -29,7 +29,7 @@ def validate() -> dict:
     source = RUNNER.read_text(encoding="utf-8")
     tree = ast.parse(source)
     functions = {node.name for node in ast.walk(tree) if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))}
-    required = {"initial_checkpoint", "write_checkpoint", "load_checkpoint", "resolve_canonical_time", "select_events", "pair_events", "publish_canonical", "stopping_state"}
+    required = {"initial_checkpoint", "write_checkpoint", "load_checkpoint", "resolve_canonical_time", "select_events", "pair_events", "publish_canonical", "stopping_state", "production_acquisition_core", "run_production"}
     errors = []
     if sha256_file(PROTOCOL) != EXPECTED_PROTOCOL_SHA:
         errors.append("protocol_sha_mismatch")
@@ -49,6 +49,8 @@ def validate() -> dict:
         errors.append("canonical_output_already_exists")
     if "transformers" in source or "torch" in source:
         errors.append("model_dependency_present")
+    if "FORMAL_TEMPORAL_SOURCE_V2_RUN_REQUIRES_EXPLICIT_EXTERNAL_EXECUTION" in source:
+        errors.append("cli_run_still_unreachable")
     result = {"valid": not errors, "errors": errors, "network_accessed": False, "full_acquisition_performed": False}
     if errors:
         raise RuntimeError("TEMPORAL_SOURCE_V2_RUNNER_VALIDATION_FAILED:" + json.dumps(result, sort_keys=True))
