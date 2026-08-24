@@ -48,6 +48,13 @@ TARGET_FAMILIES = 220
 RESERVE_EVENTS = 600
 CLASS_CAP = 44
 MAX_RETRIES = 3
+TEMP_FEAS_001_MANIFEST_PATH = EXP_DIR / "engineering" / "temp_feas_001" / "date_valid_pool_manifest.json"
+V8_AUTHORITY_PATH = EXP_DIR / "paper_a_ext_a_temporal_asset_source_v8.json"
+V8_CHECKPOINT_PATH = EXP_DIR / "data" / "raw" / "wikidata_v8" / "acquisition_checkpoint.json"
+EXPECTED_DATE_POOL_MANIFEST_SHA256 = "860351f16efa05c8991ee3fc76b7324b0d7a3c383a525e7f7f6c3d85e0f4d592"
+EXPECTED_DATE_POOL_CHECKPOINT_SHA256 = "a6f21f6bdf2267d14c36f26231a61d8279ed1bbe66ce0265e25c6fde61a59b38"
+EXPECTED_V8_AUTHORITY_SHA256 = "47a2ce443fe097b32fc391b910d97860593093ec19c9e362ec7019d5f3984ca7"
+V8_RESPONSE_NAME_RE = re.compile(r"^candidate_page_offset_(\d{8})_[0-9a-f]{16}\.json$")
 DATE_RE = re.compile(
     r"(?:"
     r"(?<!\d)\d{4}(?!\d)|"
@@ -70,6 +77,14 @@ def sha256_file(path: Path) -> str:
 
 def canonical_json(value: Any) -> bytes:
     return json.dumps(value, ensure_ascii=True, sort_keys=True, separators=(",", ":")).encode("utf-8")
+
+
+def historical_content_hash(value: dict[str, Any], field: str) -> str:
+    """Reproduce TEMP-FEAS-001's logical manifest hash exactly."""
+    without_hash = dict(value)
+    without_hash.pop(field, None)
+    payload = json.dumps(without_hash, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return sha256_bytes(payload)
 
 
 def utc_now() -> str:
@@ -396,6 +411,29 @@ def load_checkpoint(
     return checkpoint
 
 
+def prepare_checkpoint_for_resume(checkpoint: dict[str, Any]) -> dict[str, Any]:
+    """Permit only an authority-preserving restart of the observed zero-data failure."""
+    if checkpoint.get("current_state") != "TERMINAL":
+        return checkpoint
+    zero_data = (
+        checkpoint.get("status") == "PRODUCTION_CORE_FAILED"
+        and int(checkpoint.get("current_acquisition_offset", 0)) == 0
+        and int(checkpoint.get("fresh_candidates_discovered", 0)) == 0
+        and int(checkpoint.get("artifact_chunk_count", 0)) == 0
+        and int(checkpoint.get("final_eligible_events", 0)) == 0
+        and not checkpoint.get("eligible_events")
+    )
+    if not zero_data:
+        raise RuntimeError("TEMPORAL_SOURCE_V2_NONZERO_TERMINAL_CHECKPOINT_REQUIRES_EXPLICIT_REVIEW")
+    resumed = dict(checkpoint)
+    resumed["previous_terminal_status"] = checkpoint.get("status")
+    resumed["previous_terminal_error"] = checkpoint.get("error")
+    resumed["resume_reason"] = "ZERO_DATA_FAILED_ATTEMPT_RESTART"
+    resumed["status"] = "RESUMING"
+    resumed["current_state"] = "RESUMING"
+    return resumed
+
+
 def surface_is_safe(label: str) -> bool:
     normalized = " ".join(label.strip().split())
     return bool(normalized) and DATE_RE.search(normalized) is None
@@ -622,25 +660,80 @@ def _parse_parent_metadata(payload: dict[str, Any]) -> dict[str, set[str]]:
     return parents
 
 
-def _load_freshness_exclusions() -> set[str]:
-    """Load and hash-check the two frozen prior-identity sources."""
-    manifest = EXP_DIR / "engineering" / "temp_feas_001" / "date_valid_pool_manifest.json"
-    expected = "860351f16efa05c8991ee3fc76b7324b0d7a3c383a525e7f7f6c3d85e0f4d592"
-    if not manifest.exists() or sha256_file(manifest) != expected:
+def _frozen_v8_candidate_response_paths(raw_dir: Path) -> list[Path]:
+    """Enumerate only frozen V8 response artifacts, never metadata sidecars."""
+    return sorted(
+        path for path in raw_dir.iterdir()
+        if path.is_file() and V8_RESPONSE_NAME_RE.fullmatch(path.name)
+    )
+
+
+def load_freshness_exclusion_authority(
+    *,
+    manifest_path: Path = TEMP_FEAS_001_MANIFEST_PATH,
+    v8_authority_path: Path = V8_AUTHORITY_PATH,
+    v8_checkpoint_path: Path = V8_CHECKPOINT_PATH,
+    raw_dir: Path | None = None,
+) -> dict[str, Any]:
+    """Load the frozen prior-identity union under its historical authorities."""
+    if not manifest_path.exists():
         raise RuntimeError("TEMPORAL_SOURCE_V2_FRESHNESS_MANIFEST_UNAVAILABLE")
-    payload = json.loads(manifest.read_text(encoding="utf-8"))
-    excluded = {str(row["wikidata_item_id"]) for row in payload.get("records", []) if row.get("wikidata_item_id")}
-    raw_dir = EXP_DIR / "data" / "raw" / "wikidata_v8"
-    page_paths = sorted(raw_dir.glob("candidate_page_*.json"))
-    if not page_paths:
+    payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+    if (
+        payload.get("status") != "FROZEN_DATE_VALID_POOL"
+        or int(payload.get("total_count", -1)) != 3550
+        or payload.get("manifest_sha256") != EXPECTED_DATE_POOL_MANIFEST_SHA256
+        or historical_content_hash(payload, "manifest_sha256") != EXPECTED_DATE_POOL_MANIFEST_SHA256
+        or payload.get("checkpoint_sha256") != EXPECTED_DATE_POOL_CHECKPOINT_SHA256
+        or payload.get("v8_authority_sha256") != EXPECTED_V8_AUTHORITY_SHA256
+    ):
+        raise RuntimeError("TEMPORAL_SOURCE_V2_FRESHNESS_MANIFEST_AUTHORITY_MISMATCH")
+    records = payload.get("records")
+    if not isinstance(records, list) or len(records) != 3550:
+        raise RuntimeError("TEMPORAL_SOURCE_V2_DATE_POOL_COUNT_MISMATCH")
+    date_pool_qids = {str(row["wikidata_item_id"]) for row in records if isinstance(row, dict) and row.get("wikidata_item_id")}
+    if len(date_pool_qids) != 3550:
+        raise RuntimeError("TEMPORAL_SOURCE_V2_DATE_POOL_QID_COUNT_MISMATCH")
+    if not v8_authority_path.exists() or sha256_file(v8_authority_path) != EXPECTED_V8_AUTHORITY_SHA256:
+        raise RuntimeError("TEMPORAL_SOURCE_V2_V8_AUTHORITY_MISMATCH")
+    if not v8_checkpoint_path.exists() or sha256_file(v8_checkpoint_path) != EXPECTED_DATE_POOL_CHECKPOINT_SHA256:
+        raise RuntimeError("TEMPORAL_SOURCE_V2_V8_CHECKPOINT_AUTHORITY_MISMATCH")
+    v8_checkpoint = json.loads(v8_checkpoint_path.read_text(encoding="utf-8"))
+    offsets = sorted(int(value) for value in v8_checkpoint.get("candidate_page_offsets_verified", []))
+    expected_offsets = list(range(0, int(v8_checkpoint.get("next_candidate_offset", 0)), PAGE_SIZE))
+    if offsets != expected_offsets or v8_checkpoint.get("candidate_pages_verified") != len(expected_offsets):
+        raise RuntimeError("TEMPORAL_SOURCE_V2_V8_PAGE_CHECKPOINT_MISMATCH")
+    actual_raw_dir = raw_dir or (EXP_DIR / "data" / "raw" / "wikidata_v8")
+    if not actual_raw_dir.exists():
         raise RuntimeError("TEMPORAL_SOURCE_V2_V8_UNIVERSE_UNAVAILABLE")
+    page_paths = _frozen_v8_candidate_response_paths(actual_raw_dir)
+    if [int(V8_RESPONSE_NAME_RE.fullmatch(path.name).group(1)) for path in page_paths] != offsets:
+        raise RuntimeError("TEMPORAL_SOURCE_V2_V8_RESPONSE_PAGE_SET_MISMATCH")
+    v8_qids: set[str] = set()
     for page_path in page_paths:
         page = json.loads(page_path.read_text(encoding="utf-8"))
         for row in _bindings(page):
             item = _qid(_binding_value(row, "item"))
             if item:
-                excluded.add(item)
-    return excluded
+                v8_qids.add(item)
+    if not v8_qids:
+        raise RuntimeError("TEMPORAL_SOURCE_V2_V8_UNIVERSE_EMPTY")
+    excluded = date_pool_qids | v8_qids
+    return {
+        "date_pool_qids": date_pool_qids,
+        "v8_qids": v8_qids,
+        "excluded_qids": excluded,
+        "date_pool_count": len(date_pool_qids),
+        "v8_page_count": len(page_paths),
+        "v8_qid_count": len(v8_qids),
+        "union_count": len(excluded),
+        "raw_manifest_sha256": sha256_file(manifest_path),
+        "logical_manifest_sha256": historical_content_hash(payload, "manifest_sha256"),
+    }
+
+
+def _load_freshness_exclusions() -> set[str]:
+    return load_freshness_exclusion_authority()["excluded_qids"]
 
 
 def _parent_closure(client: QLeverClient, classes: Iterable[str]) -> dict[str, set[str]]:
@@ -772,7 +865,9 @@ def run_production(
             expected_graph_scope=expected_graph_scope,
             expected_backend_amendment_sha256=expected_amendment,
         )
-        checkpoint["current_state"] = "RESUMING"
+        checkpoint = prepare_checkpoint_for_resume(checkpoint)
+        if checkpoint.get("current_state") != "TERMINAL":
+            checkpoint["current_state"] = "RESUMING"
     else:
         checkpoint = initial_checkpoint(
             backend=expected_backend,
