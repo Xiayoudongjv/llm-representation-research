@@ -1,0 +1,101 @@
+{
+  "rows": [
+    {
+      "claim_id": "C1",
+      "confirmatory_or_exploratory": "CONFIRMATORY",
+      "evidence_status": "VERIFIED",
+      "main_text_or_supplement": "MAIN_TEXT",
+      "primary_evidence": [
+        "EXP-026",
+        "EXP-027"
+      ]
+    },
+    {
+      "claim_id": "C2",
+      "confirmatory_or_exploratory": "CONFIRMATORY",
+      "evidence_status": "VERIFIED_CONDITIONAL",
+      "main_text_or_supplement": "MAIN_TEXT",
+      "primary_evidence": [
+        "EXP-026",
+        "EXP-027"
+      ]
+    },
+    {
+      "claim_id": "C3",
+      "confirmatory_or_exploratory": "CONFIRMATORY",
+      "evidence_status": "VERIFIED",
+      "main_text_or_supplement": "MAIN_TEXT",
+      "primary_evidence": [
+        "EXP-026",
+        "EXP-027"
+      ]
+    },
+    {
+      "claim_id": "C4",
+      "confirmatory_or_exploratory": "CONFIRMATORY",
+      "evidence_status": "VERIFIED_NEGATIVE",
+      "main_text_or_supplement": "MAIN_TEXT",
+      "primary_evidence": [
+        "EXP-024",
+        "EXP-025"
+      ]
+    },
+    {
+      "claim_id": "C5",
+      "confirmatory_or_exploratory": "CONFIRMATORY",
+      "evidence_status": "VERIFIED_SCOPED",
+      "main_text_or_supplement": "MAIN_TEXT",
+      "primary_evidence": [
+        "EXP-026",
+        "EXP-027"
+      ]
+    },
+    {
+      "claim_id": "C6",
+      "confirmatory_or_exploratory": "CONFIRMATORY",
+      "evidence_status": "VERIFIED",
+      "main_text_or_supplement": "MAIN_TEXT",
+      "primary_evidence": [
+        "EXP-026",
+        "EXP-027"
+      ]
+    },
+    {
+      "claim_id": "C7",
+      "confirmatory_or_exploratory": "CONFIRMATORY",
+      "evidence_status": "VERIFIED",
+      "main_text_or_supplement": "MAIN_TEXT",
+      "primary_evidence": [
+        "EXP-022A",
+        "EXP-023",
+        "EXP-025"
+      ]
+    },
+    {
+      "claim_id": "C8",
+      "confirmatory_or_exploratory": "EXPLORATORY",
+      "evidence_status": "SUPPORTED_EXPLORATORILY",
+      "main_text_or_supplement": "SUPPLEMENT",
+      "primary_evidence": [
+        "DIRECTIONALITY_CLOSURE",
+        "EXP-026",
+        "EXP-027"
+      ]
+    },
+    {
+      "claim_id": "C9",
+      "confirmatory_or_exploratory": "NOT_ESTABLISHED",
+      "evidence_status": "NOT_ESTABLISHED",
+      "main_text_or_supplement": "LIMITATIONS",
+      "primary_evidence": []
+    },
+    {
+      "claim_id": "C10",
+      "confirmatory_or_exploratory": "OUT_OF_SCOPE",
+      "evidence_status": "NOT_ESTABLISHED",
+      "main_text_or_supplement": "LIMITATIONS",
+      "primary_evidence": []
+    }
+  ],
+  "table_id": "TABLE-02"
+}

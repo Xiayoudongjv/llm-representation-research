@@ -1,0 +1,393 @@
+{
+  "figure_id": "FIGURE-02",
+  "labels": {
+    "distance": "distance-related degradation statistic",
+    "recovery": "restricted LOW-D recovery",
+    "sdi": "SDI"
+  },
+  "model_order": [
+    "Qwen3-1.7B",
+    "OLMo-2-1B",
+    "Meta-Llama-3.2-1B-Instruct"
+  ],
+  "presentation_transformations": {
+    "distance_scale": "raw canonical statistic",
+    "recovery_scale": "raw canonical statistic",
+    "sdi_scale": "raw canonical statistic",
+    "shared_y_axis": false
+  },
+  "profiles": {
+    "Meta-Llama-3.2-1B-Instruct": {
+      "distance_related_degradation": {
+        "confidence_interval": {
+          "lower": {
+            "provenance": {
+              "canonical_path": "experiments/exp027/results/exp027_results.json",
+              "canonical_sha256": "1f15027d17456f5dc8ff4803452c732af8ba464f70e537195b8833d9d44f6c6d",
+              "experiment": "EXP-027",
+              "field_path": "profile_archive.bootstrap.distance_association_ci[0]"
+            },
+            "value": 0.5949008758383216
+          },
+          "upper": {
+            "provenance": {
+              "canonical_path": "experiments/exp027/results/exp027_results.json",
+              "canonical_sha256": "1f15027d17456f5dc8ff4803452c732af8ba464f70e537195b8833d9d44f6c6d",
+              "experiment": "EXP-027",
+              "field_path": "profile_archive.bootstrap.distance_association_ci[1]"
+            },
+            "value": 0.6154160155280691
+          }
+        },
+        "statistic": {
+          "provenance": {
+            "canonical_path": "experiments/exp027/results/exp027_results.json",
+            "canonical_sha256": "1f15027d17456f5dc8ff4803452c732af8ba464f70e537195b8833d9d44f6c6d",
+            "experiment": "EXP-027",
+            "field_path": "profile_archive.point.distance_association"
+          },
+          "value": 0.6077483252598234
+        },
+        "support": "POSITIVE_SUPPORTED"
+      },
+      "matrix_shape": "16x16x10",
+      "model_profile": "third registered operational profile",
+      "restricted_low_d_recovery": {
+        "confidence_interval": {
+          "lower": {
+            "provenance": {
+              "canonical_path": "experiments/exp027/results/exp027_results.json",
+              "canonical_sha256": "1f15027d17456f5dc8ff4803452c732af8ba464f70e537195b8833d9d44f6c6d",
+              "experiment": "EXP-027",
+              "field_path": "profile_archive.bootstrap.low_d_recovery_ci[0]"
+            },
+            "value": 0.0007325690004461426
+          },
+          "upper": {
+            "provenance": {
+              "canonical_path": "experiments/exp027/results/exp027_results.json",
+              "canonical_sha256": "1f15027d17456f5dc8ff4803452c732af8ba464f70e537195b8833d9d44f6c6d",
+              "experiment": "EXP-027",
+              "field_path": "profile_archive.bootstrap.low_d_recovery_ci[1]"
+            },
+            "value": 0.002186791592619705
+          }
+        },
+        "eligible_pair_count": {
+          "provenance": {
+            "canonical_path": "experiments/exp027/results/exp027_results.json",
+            "canonical_sha256": "1f15027d17456f5dc8ff4803452c732af8ba464f70e537195b8833d9d44f6c6d",
+            "experiment": "EXP-027",
+            "field_path": "profile_archive.point.low_d_recovery.eligible_pair_count"
+          },
+          "value": 49
+        },
+        "mean_recovery": {
+          "provenance": {
+            "canonical_path": "experiments/exp027/results/exp027_results.json",
+            "canonical_sha256": "1f15027d17456f5dc8ff4803452c732af8ba464f70e537195b8833d9d44f6c6d",
+            "experiment": "EXP-027",
+            "field_path": "profile_archive.point.low_d_recovery.mean_recovery"
+          },
+          "value": 0.0014030612453970375
+        },
+        "positive_recovery_fraction": {
+          "provenance": {
+            "canonical_path": "experiments/exp027/results/exp027_results.json",
+            "canonical_sha256": "1f15027d17456f5dc8ff4803452c732af8ba464f70e537195b8833d9d44f6c6d",
+            "experiment": "EXP-027",
+            "field_path": "profile_archive.point.low_d_recovery.positive_recovery_fraction"
+          },
+          "value": 0.32653061224489793
+        },
+        "support": "SUPPORTED"
+      },
+      "sdi": {
+        "classification": "TARGET_DOMINANT",
+        "confidence_interval": {
+          "lower": {
+            "provenance": {
+              "canonical_path": "experiments/exp027/results/exp027_results.json",
+              "canonical_sha256": "1f15027d17456f5dc8ff4803452c732af8ba464f70e537195b8833d9d44f6c6d",
+              "experiment": "EXP-027",
+              "field_path": "profile_archive.bootstrap.sdi_ci[0]"
+            },
+            "value": -0.4342173411679606
+          },
+          "upper": {
+            "provenance": {
+              "canonical_path": "experiments/exp027/results/exp027_results.json",
+              "canonical_sha256": "1f15027d17456f5dc8ff4803452c732af8ba464f70e537195b8833d9d44f6c6d",
+              "experiment": "EXP-027",
+              "field_path": "profile_archive.bootstrap.sdi_ci[1]"
+            },
+            "value": -0.39239628027572504
+          }
+        },
+        "statistic": {
+          "provenance": {
+            "canonical_path": "experiments/exp027/results/exp027_results.json",
+            "canonical_sha256": "1f15027d17456f5dc8ff4803452c732af8ba464f70e537195b8833d9d44f6c6d",
+            "experiment": "EXP-027",
+            "field_path": "profile_archive.point.sdi.sdi"
+          },
+          "value": -0.41426422986393563
+        }
+      }
+    },
+    "OLMo-2-1B": {
+      "distance_related_degradation": {
+        "confidence_interval": {
+          "lower": {
+            "provenance": {
+              "canonical_path": "experiments/exp026/results/exp026_results.json",
+              "canonical_sha256": "9a5bed41b432e2f89b0873869d76e1f5775f9b38caff9472553fca335bbba551",
+              "experiment": "EXP-026",
+              "field_path": "model_profiles.O.bootstrap.distance_association_ci[0]"
+            },
+            "value": 0.7438987161061725
+          },
+          "upper": {
+            "provenance": {
+              "canonical_path": "experiments/exp026/results/exp026_results.json",
+              "canonical_sha256": "9a5bed41b432e2f89b0873869d76e1f5775f9b38caff9472553fca335bbba551",
+              "experiment": "EXP-026",
+              "field_path": "model_profiles.O.bootstrap.distance_association_ci[1]"
+            },
+            "value": 0.7582397801058931
+          }
+        },
+        "statistic": {
+          "provenance": {
+            "canonical_path": "experiments/exp026/results/exp026_results.json",
+            "canonical_sha256": "9a5bed41b432e2f89b0873869d76e1f5775f9b38caff9472553fca335bbba551",
+            "experiment": "EXP-026",
+            "field_path": "model_profiles.O.point.distance_association"
+          },
+          "value": 0.7519250367843754
+        },
+        "support": "POSITIVE_SUPPORTED"
+      },
+      "matrix_shape": "16x16x10",
+      "model_profile": "three-model operational profile",
+      "restricted_low_d_recovery": {
+        "confidence_interval": {
+          "lower": {
+            "provenance": {
+              "canonical_path": "experiments/exp026/results/exp026_results.json",
+              "canonical_sha256": "9a5bed41b432e2f89b0873869d76e1f5775f9b38caff9472553fca335bbba551",
+              "experiment": "EXP-026",
+              "field_path": "model_profiles.O.bootstrap.low_d_recovery_ci[0]"
+            },
+            "value": 0.044028989621438086
+          },
+          "upper": {
+            "provenance": {
+              "canonical_path": "experiments/exp026/results/exp026_results.json",
+              "canonical_sha256": "9a5bed41b432e2f89b0873869d76e1f5775f9b38caff9472553fca335bbba551",
+              "experiment": "EXP-026",
+              "field_path": "model_profiles.O.bootstrap.low_d_recovery_ci[1]"
+            },
+            "value": 0.0515186088984566
+          }
+        },
+        "eligible_pair_count": {
+          "provenance": {
+            "canonical_path": "experiments/exp026/results/exp026_results.json",
+            "canonical_sha256": "9a5bed41b432e2f89b0873869d76e1f5775f9b38caff9472553fca335bbba551",
+            "experiment": "EXP-026",
+            "field_path": "model_profiles.O.point.low_d_recovery.eligible_pair_count"
+          },
+          "value": 35
+        },
+        "mean_recovery": {
+          "provenance": {
+            "canonical_path": "experiments/exp026/results/exp026_results.json",
+            "canonical_sha256": "9a5bed41b432e2f89b0873869d76e1f5775f9b38caff9472553fca335bbba551",
+            "experiment": "EXP-026",
+            "field_path": "model_profiles.O.point.low_d_recovery.mean_recovery"
+          },
+          "value": 0.04785714308465166
+        },
+        "positive_recovery_fraction": {
+          "provenance": {
+            "canonical_path": "experiments/exp026/results/exp026_results.json",
+            "canonical_sha256": "9a5bed41b432e2f89b0873869d76e1f5775f9b38caff9472553fca335bbba551",
+            "experiment": "EXP-026",
+            "field_path": "model_profiles.O.point.low_d_recovery.positive_recovery_fraction"
+          },
+          "value": 0.8285714285714286
+        },
+        "support": "SUPPORTED"
+      },
+      "sdi": {
+        "classification": "SOURCE_DOMINANT",
+        "confidence_interval": {
+          "lower": {
+            "provenance": {
+              "canonical_path": "experiments/exp026/results/exp026_results.json",
+              "canonical_sha256": "9a5bed41b432e2f89b0873869d76e1f5775f9b38caff9472553fca335bbba551",
+              "experiment": "EXP-026",
+              "field_path": "model_profiles.O.bootstrap.sdi_ci[0]"
+            },
+            "value": 0.49101491890702714
+          },
+          "upper": {
+            "provenance": {
+              "canonical_path": "experiments/exp026/results/exp026_results.json",
+              "canonical_sha256": "9a5bed41b432e2f89b0873869d76e1f5775f9b38caff9472553fca335bbba551",
+              "experiment": "EXP-026",
+              "field_path": "model_profiles.O.bootstrap.sdi_ci[1]"
+            },
+            "value": 0.5584696075004959
+          }
+        },
+        "statistic": {
+          "provenance": {
+            "canonical_path": "experiments/exp026/results/exp026_results.json",
+            "canonical_sha256": "9a5bed41b432e2f89b0873869d76e1f5775f9b38caff9472553fca335bbba551",
+            "experiment": "EXP-026",
+            "field_path": "model_profiles.O.point.sdi.sdi"
+          },
+          "value": 0.5249651786448143
+        }
+      }
+    },
+    "Qwen3-1.7B": {
+      "distance_related_degradation": {
+        "confidence_interval": {
+          "lower": {
+            "provenance": {
+              "canonical_path": "experiments/exp026/results/exp026_results.json",
+              "canonical_sha256": "9a5bed41b432e2f89b0873869d76e1f5775f9b38caff9472553fca335bbba551",
+              "experiment": "EXP-026",
+              "field_path": "model_profiles.Q.bootstrap.distance_association_ci[0]"
+            },
+            "value": 0.6851830380886905
+          },
+          "upper": {
+            "provenance": {
+              "canonical_path": "experiments/exp026/results/exp026_results.json",
+              "canonical_sha256": "9a5bed41b432e2f89b0873869d76e1f5775f9b38caff9472553fca335bbba551",
+              "experiment": "EXP-026",
+              "field_path": "model_profiles.Q.bootstrap.distance_association_ci[1]"
+            },
+            "value": 0.7080622074980855
+          }
+        },
+        "statistic": {
+          "provenance": {
+            "canonical_path": "experiments/exp026/results/exp026_results.json",
+            "canonical_sha256": "9a5bed41b432e2f89b0873869d76e1f5775f9b38caff9472553fca335bbba551",
+            "experiment": "EXP-026",
+            "field_path": "model_profiles.Q.point.distance_association"
+          },
+          "value": 0.7049462571528698
+        },
+        "support": "POSITIVE_SUPPORTED"
+      },
+      "matrix_shape": "28x28x10",
+      "model_profile": "three-model operational profile",
+      "restricted_low_d_recovery": {
+        "confidence_interval": {
+          "lower": {
+            "provenance": {
+              "canonical_path": "experiments/exp026/results/exp026_results.json",
+              "canonical_sha256": "9a5bed41b432e2f89b0873869d76e1f5775f9b38caff9472553fca335bbba551",
+              "experiment": "EXP-026",
+              "field_path": "model_profiles.Q.bootstrap.low_d_recovery_ci[0]"
+            },
+            "value": -9.933156284070251e-05
+          },
+          "upper": {
+            "provenance": {
+              "canonical_path": "experiments/exp026/results/exp026_results.json",
+              "canonical_sha256": "9a5bed41b432e2f89b0873869d76e1f5775f9b38caff9472553fca335bbba551",
+              "experiment": "EXP-026",
+              "field_path": "model_profiles.Q.bootstrap.low_d_recovery_ci[1]"
+            },
+            "value": 0.00036107659009100833
+          }
+        },
+        "eligible_pair_count": {
+          "provenance": {
+            "canonical_path": "experiments/exp026/results/exp026_results.json",
+            "canonical_sha256": "9a5bed41b432e2f89b0873869d76e1f5775f9b38caff9472553fca335bbba551",
+            "experiment": "EXP-026",
+            "field_path": "model_profiles.Q.point.low_d_recovery.eligible_pair_count"
+          },
+          "value": 202
+        },
+        "mean_recovery": {
+          "provenance": {
+            "canonical_path": "experiments/exp026/results/exp026_results.json",
+            "canonical_sha256": "9a5bed41b432e2f89b0873869d76e1f5775f9b38caff9472553fca335bbba551",
+            "experiment": "EXP-026",
+            "field_path": "model_profiles.Q.point.low_d_recovery.mean_recovery"
+          },
+          "value": 0.00013923267534205524
+        },
+        "positive_recovery_fraction": {
+          "provenance": {
+            "canonical_path": "experiments/exp026/results/exp026_results.json",
+            "canonical_sha256": "9a5bed41b432e2f89b0873869d76e1f5775f9b38caff9472553fca335bbba551",
+            "experiment": "EXP-026",
+            "field_path": "model_profiles.Q.point.low_d_recovery.positive_recovery_fraction"
+          },
+          "value": 0.07425742574257425
+        },
+        "support": "NOT_SUPPORTED"
+      },
+      "sdi": {
+        "classification": "TARGET_DOMINANT",
+        "confidence_interval": {
+          "lower": {
+            "provenance": {
+              "canonical_path": "experiments/exp026/results/exp026_results.json",
+              "canonical_sha256": "9a5bed41b432e2f89b0873869d76e1f5775f9b38caff9472553fca335bbba551",
+              "experiment": "EXP-026",
+              "field_path": "model_profiles.Q.bootstrap.sdi_ci[0]"
+            },
+            "value": -0.18868527431441903
+          },
+          "upper": {
+            "provenance": {
+              "canonical_path": "experiments/exp026/results/exp026_results.json",
+              "canonical_sha256": "9a5bed41b432e2f89b0873869d76e1f5775f9b38caff9472553fca335bbba551",
+              "experiment": "EXP-026",
+              "field_path": "model_profiles.Q.bootstrap.sdi_ci[1]"
+            },
+            "value": -0.15827487462584097
+          }
+        },
+        "statistic": {
+          "provenance": {
+            "canonical_path": "experiments/exp026/results/exp026_results.json",
+            "canonical_sha256": "9a5bed41b432e2f89b0873869d76e1f5775f9b38caff9472553fca335bbba551",
+            "experiment": "EXP-026",
+            "field_path": "model_profiles.Q.point.sdi.sdi"
+          },
+          "value": -0.17355352410373298
+        }
+      }
+    }
+  },
+  "scientific_role": "CONFIRMATORY_THREE_MODEL_OPERATIONAL_PROFILE",
+  "source_assets": {
+    "Meta-Llama-3.2-1B-Instruct": {
+      "canonical_path": "experiments/exp027/results/exp027_results.json",
+      "canonical_sha256": "1f15027d17456f5dc8ff4803452c732af8ba464f70e537195b8833d9d44f6c6d",
+      "experiment": "EXP-027"
+    },
+    "OLMo-2-1B": {
+      "canonical_path": "experiments/exp026/results/exp026_results.json",
+      "canonical_sha256": "9a5bed41b432e2f89b0873869d76e1f5775f9b38caff9472553fca335bbba551",
+      "experiment": "EXP-026"
+    },
+    "Qwen3-1.7B": {
+      "canonical_path": "experiments/exp026/results/exp026_results.json",
+      "canonical_sha256": "9a5bed41b432e2f89b0873869d76e1f5775f9b38caff9472553fca335bbba551",
+      "experiment": "EXP-026"
+    }
+  }
+}

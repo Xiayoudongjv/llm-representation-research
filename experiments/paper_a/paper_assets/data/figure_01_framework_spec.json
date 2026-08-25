@@ -1,0 +1,19 @@
+{
+  "definitions": {
+    "C0": "direct source-readout reuse",
+    "Ccal": "restricted FIT-only calibration",
+    "D": "direct-transfer degradation",
+    "R": "restricted recoverability"
+  },
+  "figure_id": "FIGURE-01",
+  "labels": [
+    "C0",
+    "D",
+    "Ccal",
+    "R"
+  ],
+  "presentation_transformations": {
+    "numeric_transformation": false
+  },
+  "scientific_role": "SCHEMATIC_MEASUREMENT_FRAMEWORK"
+}

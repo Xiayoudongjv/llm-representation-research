@@ -1,0 +1,147 @@
+{
+  "data": {
+    "available_display": [
+      "mean_abs_A_C",
+      "signed_shallow_deep_bias"
+    ],
+    "figure_id": "FIGURE-04",
+    "model_order": [
+      "Qwen",
+      "OLMo",
+      "Llama"
+    ],
+    "presentation_transformations": {
+      "new_inference": false,
+      "significance_stars": false
+    },
+    "scientific_role": "EXPLORATORY_SECONDARY_MAIN_TEXT",
+    "source_asset": {
+      "canonical_path": "experiments/paper_a/directionality_exploratory_closure.json",
+      "canonical_sha256": "8ea5dbe996c3d3c061e54bbf2d31242426d8e9b2b7fb814266891d203d33bccc",
+      "experiment": "DIRECTIONALITY_CLOSURE"
+    },
+    "status_label": "POST-HOC EXPLORATORY",
+    "unavailable_without_new_analysis": [
+      "A_C_heatmap",
+      "new_p_values",
+      "new_confidence_intervals"
+    ],
+    "values": {
+      "Llama": {
+        "A_C_A_R_spearman": {
+          "provenance": {
+            "canonical_path": "experiments/paper_a/directionality_exploratory_closure.json",
+            "canonical_sha256": "8ea5dbe996c3d3c061e54bbf2d31242426d8e9b2b7fb814266891d203d33bccc",
+            "experiment": "DIRECTIONALITY_CLOSURE",
+            "field_path": "results.Llama.A_C_A_R_spearman"
+          },
+          "value": -0.8878
+        },
+        "C0_SymErr": {
+          "provenance": {
+            "canonical_path": "experiments/paper_a/directionality_exploratory_closure.json",
+            "canonical_sha256": "8ea5dbe996c3d3c061e54bbf2d31242426d8e9b2b7fb814266891d203d33bccc",
+            "experiment": "DIRECTIONALITY_CLOSURE",
+            "field_path": "results.Llama.C0_SymErr"
+          },
+          "value": 0.307183
+        },
+        "mean_abs_A_C": {
+          "provenance": {
+            "canonical_path": "experiments/paper_a/directionality_exploratory_closure.json",
+            "canonical_sha256": "8ea5dbe996c3d3c061e54bbf2d31242426d8e9b2b7fb814266891d203d33bccc",
+            "experiment": "DIRECTIONALITY_CLOSURE",
+            "field_path": "results.Llama.mean_abs_A_C"
+          },
+          "value": 0.167031
+        },
+        "signed_shallow_deep_bias": {
+          "provenance": {
+            "canonical_path": "experiments/paper_a/directionality_exploratory_closure.json",
+            "canonical_sha256": "8ea5dbe996c3d3c061e54bbf2d31242426d8e9b2b7fb814266891d203d33bccc",
+            "experiment": "DIRECTIONALITY_CLOSURE",
+            "field_path": "results.Llama.signed_shallow_deep_bias"
+          },
+          "value": 0.072448
+        }
+      },
+      "OLMo": {
+        "A_C_A_R_spearman": {
+          "provenance": {
+            "canonical_path": "experiments/paper_a/directionality_exploratory_closure.json",
+            "canonical_sha256": "8ea5dbe996c3d3c061e54bbf2d31242426d8e9b2b7fb814266891d203d33bccc",
+            "experiment": "DIRECTIONALITY_CLOSURE",
+            "field_path": "results.OLMo.A_C_A_R_spearman"
+          },
+          "value": -0.4576
+        },
+        "C0_SymErr": {
+          "provenance": {
+            "canonical_path": "experiments/paper_a/directionality_exploratory_closure.json",
+            "canonical_sha256": "8ea5dbe996c3d3c061e54bbf2d31242426d8e9b2b7fb814266891d203d33bccc",
+            "experiment": "DIRECTIONALITY_CLOSURE",
+            "field_path": "results.OLMo.C0_SymErr"
+          },
+          "value": 0.313139
+        },
+        "mean_abs_A_C": {
+          "provenance": {
+            "canonical_path": "experiments/paper_a/directionality_exploratory_closure.json",
+            "canonical_sha256": "8ea5dbe996c3d3c061e54bbf2d31242426d8e9b2b7fb814266891d203d33bccc",
+            "experiment": "DIRECTIONALITY_CLOSURE",
+            "field_path": "results.OLMo.mean_abs_A_C"
+          },
+          "value": 0.137292
+        },
+        "signed_shallow_deep_bias": {
+          "provenance": {
+            "canonical_path": "experiments/paper_a/directionality_exploratory_closure.json",
+            "canonical_sha256": "8ea5dbe996c3d3c061e54bbf2d31242426d8e9b2b7fb814266891d203d33bccc",
+            "experiment": "DIRECTIONALITY_CLOSURE",
+            "field_path": "results.OLMo.signed_shallow_deep_bias"
+          },
+          "value": 0.123646
+        }
+      },
+      "Qwen": {
+        "A_C_A_R_spearman": {
+          "provenance": {
+            "canonical_path": "experiments/paper_a/directionality_exploratory_closure.json",
+            "canonical_sha256": "8ea5dbe996c3d3c061e54bbf2d31242426d8e9b2b7fb814266891d203d33bccc",
+            "experiment": "DIRECTIONALITY_CLOSURE",
+            "field_path": "results.Qwen.A_C_A_R_spearman"
+          },
+          "value": -0.9512
+        },
+        "C0_SymErr": {
+          "provenance": {
+            "canonical_path": "experiments/paper_a/directionality_exploratory_closure.json",
+            "canonical_sha256": "8ea5dbe996c3d3c061e54bbf2d31242426d8e9b2b7fb814266891d203d33bccc",
+            "experiment": "DIRECTIONALITY_CLOSURE",
+            "field_path": "results.Qwen.C0_SymErr"
+          },
+          "value": 0.236573
+        },
+        "mean_abs_A_C": {
+          "provenance": {
+            "canonical_path": "experiments/paper_a/directionality_exploratory_closure.json",
+            "canonical_sha256": "8ea5dbe996c3d3c061e54bbf2d31242426d8e9b2b7fb814266891d203d33bccc",
+            "experiment": "DIRECTIONALITY_CLOSURE",
+            "field_path": "results.Qwen.mean_abs_A_C"
+          },
+          "value": 0.129067
+        },
+        "signed_shallow_deep_bias": {
+          "provenance": {
+            "canonical_path": "experiments/paper_a/directionality_exploratory_closure.json",
+            "canonical_sha256": "8ea5dbe996c3d3c061e54bbf2d31242426d8e9b2b7fb814266891d203d33bccc",
+            "experiment": "DIRECTIONALITY_CLOSURE",
+            "field_path": "results.Qwen.signed_shallow_deep_bias"
+          },
+          "value": -0.066567
+        }
+      }
+    }
+  },
+  "table_id": "TABLE-S2"
+}

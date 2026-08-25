@@ -1,0 +1,258 @@
+{
+  "figure_id": "FIGURE-05",
+  "presentation_transformations": {
+    "new_inference": false,
+    "new_statistic": false
+  },
+  "scientific_role": "SUPPLEMENT_REGISTERED_NEGATIVE_AND_HETEROGENEITY",
+  "source_assets": {
+    "EXP-023": {
+      "canonical_path": "experiments/exp023/results/exp023_results.json",
+      "canonical_sha256": "f30591ad942e82a322e594695ce1d5023586261fd7b8bccaa208b0d46f388000",
+      "experiment": "EXP-023"
+    },
+    "EXP-024": {
+      "canonical_path": "experiments/exp024/results/exp024_results.json",
+      "canonical_sha256": "50a6ea72dbb9c33ae8ec15d0e2ad31b32ebe0cf299679875fe7b34fb6cabcb69",
+      "experiment": "EXP-024"
+    },
+    "EXP-025": {
+      "canonical_path": "experiments/exp025/results/exp025_results.json",
+      "canonical_sha256": "bbac2f03b24bdf2ec93485c201d3c0cf50588ed51659e607bb97b231181765a9",
+      "experiment": "EXP-025"
+    }
+  },
+  "values": {
+    "EXP-023": {
+      "cross_split_classification": "NO_REPLICATION",
+      "dataset_record_count": {
+        "provenance": {
+          "canonical_path": "experiments/exp023/results/exp023_results.json",
+          "canonical_sha256": "f30591ad942e82a322e594695ce1d5023586261fd7b8bccaa208b0d46f388000",
+          "experiment": "EXP-023",
+          "field_path": "dataset.record_count"
+        },
+        "value": 64
+      },
+      "split_A": {
+        "D_fixed": {
+          "estimate": {
+            "provenance": {
+              "canonical_path": "experiments/exp023/results/exp023_results.json",
+              "canonical_sha256": "f30591ad942e82a322e594695ce1d5023586261fd7b8bccaa208b0d46f388000",
+              "experiment": "EXP-023",
+              "field_path": "splits.A.primary.D_fixed.estimate"
+            },
+            "value": -0.34375
+          },
+          "exact_p": {
+            "provenance": {
+              "canonical_path": "experiments/exp023/results/exp023_results.json",
+              "canonical_sha256": "f30591ad942e82a322e594695ce1d5023586261fd7b8bccaa208b0d46f388000",
+              "experiment": "EXP-023",
+              "field_path": "splits.A.primary.D_fixed.exact_p"
+            },
+            "value": 0.001708984375
+          },
+          "supported": true
+        },
+        "G_cal": {
+          "estimate": {
+            "provenance": {
+              "canonical_path": "experiments/exp023/results/exp023_results.json",
+              "canonical_sha256": "f30591ad942e82a322e594695ce1d5023586261fd7b8bccaa208b0d46f388000",
+              "experiment": "EXP-023",
+              "field_path": "splits.A.primary.G_cal.estimate"
+            },
+            "value": 0.25
+          },
+          "exact_p": {
+            "provenance": {
+              "canonical_path": "experiments/exp023/results/exp023_results.json",
+              "canonical_sha256": "f30591ad942e82a322e594695ce1d5023586261fd7b8bccaa208b0d46f388000",
+              "experiment": "EXP-023",
+              "field_path": "splits.A.primary.G_cal.exact_p"
+            },
+            "value": 0.019287109375
+          },
+          "supported": true
+        }
+      },
+      "split_B": {
+        "D_fixed": {
+          "estimate": {
+            "provenance": {
+              "canonical_path": "experiments/exp023/results/exp023_results.json",
+              "canonical_sha256": "f30591ad942e82a322e594695ce1d5023586261fd7b8bccaa208b0d46f388000",
+              "experiment": "EXP-023",
+              "field_path": "splits.B.primary.D_fixed.estimate"
+            },
+            "value": -0.03125
+          },
+          "exact_p": {
+            "provenance": {
+              "canonical_path": "experiments/exp023/results/exp023_results.json",
+              "canonical_sha256": "f30591ad942e82a322e594695ce1d5023586261fd7b8bccaa208b0d46f388000",
+              "experiment": "EXP-023",
+              "field_path": "splits.B.primary.D_fixed.exact_p"
+            },
+            "value": 0.5
+          },
+          "supported": false
+        },
+        "G_cal": {
+          "estimate": {
+            "provenance": {
+              "canonical_path": "experiments/exp023/results/exp023_results.json",
+              "canonical_sha256": "f30591ad942e82a322e594695ce1d5023586261fd7b8bccaa208b0d46f388000",
+              "experiment": "EXP-023",
+              "field_path": "splits.B.primary.G_cal.estimate"
+            },
+            "value": 0.0
+          },
+          "exact_p": {
+            "provenance": {
+              "canonical_path": "experiments/exp023/results/exp023_results.json",
+              "canonical_sha256": "f30591ad942e82a322e594695ce1d5023586261fd7b8bccaa208b0d46f388000",
+              "experiment": "EXP-023",
+              "field_path": "splits.B.primary.G_cal.exact_p"
+            },
+            "value": 0.75
+          },
+          "supported": false
+        }
+      }
+    },
+    "EXP-024": {
+      "condition_count": {
+        "provenance": {
+          "canonical_path": "experiments/exp024/results/exp024_results.json",
+          "canonical_sha256": "50a6ea72dbb9c33ae8ec15d0e2ad31b32ebe0cf299679875fe7b34fb6cabcb69",
+          "experiment": "EXP-024",
+          "field_path": "condition_level.condition_order.length"
+        },
+        "value": 10
+      },
+      "exact_one_sided_p": {
+        "provenance": {
+          "canonical_path": "experiments/exp024/results/exp024_results.json",
+          "canonical_sha256": "50a6ea72dbb9c33ae8ec15d0e2ad31b32ebe0cf299679875fe7b34fb6cabcb69",
+          "experiment": "EXP-024",
+          "field_path": "primary.exact_one_sided_p"
+        },
+        "value": 0.2115079365079365
+      },
+      "permutation_count": {
+        "provenance": {
+          "canonical_path": "experiments/exp024/results/exp024_results.json",
+          "canonical_sha256": "50a6ea72dbb9c33ae8ec15d0e2ad31b32ebe0cf299679875fe7b34fb6cabcb69",
+          "experiment": "EXP-024",
+          "field_path": "primary.permutation_count"
+        },
+        "value": 3628800
+      },
+      "rho": {
+        "provenance": {
+          "canonical_path": "experiments/exp024/results/exp024_results.json",
+          "canonical_sha256": "50a6ea72dbb9c33ae8ec15d0e2ad31b32ebe0cf299679875fe7b34fb6cabcb69",
+          "experiment": "EXP-024",
+          "field_path": "primary.rho"
+        },
+        "value": 0.28401877872187725
+      },
+      "supported": false
+    },
+    "EXP-025": {
+      "D": {
+        "exact_one_sided_p": {
+          "provenance": {
+            "canonical_path": "experiments/exp025/results/exp025_results.json",
+            "canonical_sha256": "bbac2f03b24bdf2ec93485c201d3c0cf50588ed51659e607bb97b231181765a9",
+            "experiment": "EXP-025",
+            "field_path": "d_g_inference.D.exact_one_sided_p"
+          },
+          "value": 0.08984375
+        },
+        "negative_count": {
+          "provenance": {
+            "canonical_path": "experiments/exp025/results/exp025_results.json",
+            "canonical_sha256": "bbac2f03b24bdf2ec93485c201d3c0cf50588ed51659e607bb97b231181765a9",
+            "experiment": "EXP-025",
+            "field_path": "d_g_inference.D.negative_count"
+          },
+          "value": 2
+        },
+        "positive_count": {
+          "provenance": {
+            "canonical_path": "experiments/exp025/results/exp025_results.json",
+            "canonical_sha256": "bbac2f03b24bdf2ec93485c201d3c0cf50588ed51659e607bb97b231181765a9",
+            "experiment": "EXP-025",
+            "field_path": "d_g_inference.D.positive_count"
+          },
+          "value": 7
+        },
+        "support": "NOT_SUPPORTED"
+      },
+      "G": {
+        "exact_one_sided_p": {
+          "provenance": {
+            "canonical_path": "experiments/exp025/results/exp025_results.json",
+            "canonical_sha256": "bbac2f03b24bdf2ec93485c201d3c0cf50588ed51659e607bb97b231181765a9",
+            "experiment": "EXP-025",
+            "field_path": "d_g_inference.G.exact_one_sided_p"
+          },
+          "value": 0.03515625
+        },
+        "negative_count": {
+          "provenance": {
+            "canonical_path": "experiments/exp025/results/exp025_results.json",
+            "canonical_sha256": "bbac2f03b24bdf2ec93485c201d3c0cf50588ed51659e607bb97b231181765a9",
+            "experiment": "EXP-025",
+            "field_path": "d_g_inference.G.negative_count"
+          },
+          "value": 1
+        },
+        "positive_count": {
+          "provenance": {
+            "canonical_path": "experiments/exp025/results/exp025_results.json",
+            "canonical_sha256": "bbac2f03b24bdf2ec93485c201d3c0cf50588ed51659e607bb97b231181765a9",
+            "experiment": "EXP-025",
+            "field_path": "d_g_inference.G.positive_count"
+          },
+          "value": 7
+        },
+        "support": "SUPPORTED"
+      },
+      "predictor": {
+        "exact_one_sided_p": {
+          "provenance": {
+            "canonical_path": "experiments/exp025/results/exp025_results.json",
+            "canonical_sha256": "bbac2f03b24bdf2ec93485c201d3c0cf50588ed51659e607bb97b231181765a9",
+            "experiment": "EXP-025",
+            "field_path": "primary.exact_one_sided_p"
+          },
+          "value": 0.14020502645502644
+        },
+        "permutation_count": {
+          "provenance": {
+            "canonical_path": "experiments/exp025/results/exp025_results.json",
+            "canonical_sha256": "bbac2f03b24bdf2ec93485c201d3c0cf50588ed51659e607bb97b231181765a9",
+            "experiment": "EXP-025",
+            "field_path": "primary.permutation_count"
+          },
+          "value": 3628800
+        },
+        "rho": {
+          "provenance": {
+            "canonical_path": "experiments/exp025/results/exp025_results.json",
+            "canonical_sha256": "bbac2f03b24bdf2ec93485c201d3c0cf50588ed51659e607bb97b231181765a9",
+            "experiment": "EXP-025",
+            "field_path": "primary.rho"
+          },
+          "value": 0.3765432098765432
+        },
+        "supported": false
+      }
+    }
+  }
+}
