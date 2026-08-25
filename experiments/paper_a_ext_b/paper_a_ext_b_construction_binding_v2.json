@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0.0",
+  "binding_id": "PA-EXT-B-CONSTRUCTION-BINDING-V2",
+  "status": "FINAL_PRE_GENERATION_PRE_MODEL_OUTCOME",
+  "parent_commits": {
+    "original_ext_b_freeze": "640ef4cca8c012491c81eed32215b2abfbe7f07e",
+    "amendment_v1": "9e9cae6d542816e8cf5668955f948f7fdc84595e"
+  },
+  "parent_authority_hashes": {
+    "docs/experiments/PAPER-A-EXT-B-PREREGISTRATION.md": "4e25dd8e9bbaf4ac6a3240ddc9f96b01532ed20591e2e1527a4448db8ebd5184",
+    "experiments/paper_a_ext_b/paper_a_ext_b_preregistration.json": "8069439f96db96649a7bbbff3413b2ec6dda37a72d5bbb98a72934349c3e42f8",
+    "experiments/paper_a_ext_b/paper_a_ext_b_frozen_protocol.json": "c67e8786f93d593dfd8ae70c1e1348758997baf097aed4e5393a4e30641a40ac",
+    "experiments/paper_a_ext_b/paper_a_ext_b_outcome_routing.json": "6e0ad230664e10b26849ef284fae11174093d2adf4d36eb79dc37201ab29e7f0",
+    "experiments/paper_a_ext_b/paper_a_ext_b_authority_manifest.json": "63a03e1d3b8aacc6858ea880f7a29b778d064882738075ea1287c6ef0b23f39c"
+  },
+  "v1_authority_hashes": {
+    "experiments/paper_a_ext_b/paper_a_ext_b_construction_amendment_v1.json": "cd147cb513917e411b609915b356e2bbe95c36caf408fbfe408fed4ec655582b",
+    "experiments/paper_a_ext_b/paper_a_ext_b_construction_spec_v1.json": "a24e254cc7e5d8c65165fe529f5ef5b94463e01825b2db5b6690a31e91f24d1d",
+    "experiments/paper_a_ext_b/paper_a_ext_b_rendering_conditions_c01_c10_v1.json": "a2d28c586a98c93fe1b1889e8456640713a5143e1e25e870afd847045cf40f67"
+  },
+  "v2_artifact_hashes": {
+    "experiments/paper_a_ext_b/paper_a_ext_b_construction_amendment_v2.json": "f4aed55dff5ad0f690ade26aae35e2fd923944a598fd0871b5c076dfc0874988",
+    "experiments/paper_a_ext_b/paper_a_ext_b_construction_spec_v2.json": "2344a45a1dff59af63fd8be96a890974b33722e09c7dad0807a4e1e214abee29",
+    "experiments/paper_a_ext_b/paper_a_ext_b_rendering_conditions_c01_c10_v2.json": "dff800b21ac6e96db73724a48e32e8efeb66f210d2424e2869a6d8d7bc94ae13",
+    "experiments/paper_a_ext_b/paper_a_ext_b_source_bank_schema_v2.json": "2ed4b9ccce0f25e7d1c060ed96e39c3c6be3c273de94b691a17168bd963b7989",
+    "experiments/paper_a_ext_b/paper_a_ext_b_record_schema_v2.json": "c50544a29eb267fd5f46d50b07510015e9679b3a7263320e35c8c4ab54bf95eb",
+    "experiments/paper_a_ext_b/paper_a_ext_b_panel_manifest_schema_v2.json": "1888ec78fb94275e38d8c383d9a3a426102e6fbca3bf08dc2600e10337148839",
+    "experiments/paper_a_ext_b/paper_a_ext_b_provenance_schema_v2.json": "8a53460de279ac1b0371c272f0176ac5972a034e977e290bbb2f679710f37fc4",
+    "experiments/paper_a_ext_b/validate_paper_a_ext_b_construction_v2.py": "ee5b9c15f25240bd36b82e42d38b8b4e7e291f435bc768ad86dbe3aca663353a",
+    "tests/test_paper_a_ext_b_construction_v2.py": "f278ccb30bb41dacbd7da4c76ffb0c1945fbfd508d73db45fae1b4c9713a93e6"
+  },
+  "inherited_source_hashes": {
+    "stepgame_train_source": "774b73385c1a6995e121e87f16be790355555c4c18c01eb42464e28c6ea3482c",
+    "wordnet_3_0_archive": "640db279c949a88f61f851dd54ebbb22d003f8b90b85267042ef85a3781d3a52"
+  },
+  "scientific_invariants": {
+    "task_set": ["TF_SPATIAL", "TF_QUANTITATIVE", "TF_MEREOLOGICAL"],
+    "families_per_task": 220,
+    "records_per_task": 440,
+    "records_per_family": 2,
+    "fit_diagnostic_eval_families_per_task": [60, 80, 80],
+    "model_inference_performed": false,
+    "scientific_result_created": false,
+    "further_scientific_amendment_allowed": false
+  },
+  "self_hash_policy": "The binding does not contain its own hash; the committed Git tree binds the file bytes."
+}

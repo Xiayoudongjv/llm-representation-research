@@ -1,0 +1,80 @@
+{
+  "schema_version": "1.0.0",
+  "amendment_id": "PA-EXT-B-FINAL-PREGEN-AMENDMENT-V2",
+  "status": "FINAL_PRE_GENERATION_PRE_MODEL_OUTCOME",
+  "amendment_stage": "PRE_GENERATION",
+  "parent_ext_b_freeze_commit": "640ef4cca8c012491c81eed32215b2abfbe7f07e",
+  "parent_v1_commit": "9e9cae6d542816e8cf5668955f948f7fdc84595e",
+  "production_generation_entered_before_v2": false,
+  "production_records_before_v2": 0,
+  "data_composition_observed_before_v2": false,
+  "model_outcomes_observed_before_v2": false,
+  "scientific_results_observed_before_v2": false,
+  "reason": "PRE_GENERATION_SPECIFICATION_COHERENCE_FAILURE_FOUND_BY_STATIC_VALIDATION",
+  "final_scientific_construction_amendment": true,
+  "further_scientific_amendment_allowed": false,
+  "scientific_scope_unchanged": true,
+  "human_decisions": {
+    "c04_context_phrase": "in the presented example",
+    "c09_context_prefix": "For context",
+    "c03_reference_template": "It is the case that {ARG_A} is {REL_LEX} {ARG_B}.",
+    "c03_realization_template": "{ARG_A} is {REL_LEX} {ARG_B}.",
+    "duplicate_scope": "global exact-byte and normalized-text rejection; no c03 exemption",
+    "task_slugs": {
+      "exta_tf_spatial": "spatial",
+      "exta_tf_quantitative": "quantitative",
+      "exta_tf_mereological": "mereological"
+    },
+    "argument_ordinal_width": 6,
+    "selection_order": "ascending SHA-256 under PA-EXT-B-V1-ORDER over the V2 canonical source tuple",
+    "final_serialization_order": ["task_slug", "split", "condition_id", "family_id", "record_role"],
+    "quantitative_pair_uniqueness": "one numeric pair globally per quantitative source family; no pair reuse",
+    "wordnet_surface_underscore_rule": "replace each source lemma underscore with exactly one ASCII space only for surface rendering"
+  },
+  "artifact_authorities": {
+    "construction_spec": "experiments/paper_a_ext_b/paper_a_ext_b_construction_spec_v2.json",
+    "rendering_conditions": "experiments/paper_a_ext_b/paper_a_ext_b_rendering_conditions_c01_c10_v2.json",
+    "source_bank_schema": "experiments/paper_a_ext_b/paper_a_ext_b_source_bank_schema_v2.json",
+    "record_schema": "experiments/paper_a_ext_b/paper_a_ext_b_record_schema_v2.json",
+    "panel_manifest_schema": "experiments/paper_a_ext_b/paper_a_ext_b_panel_manifest_schema_v2.json",
+    "provenance_schema": "experiments/paper_a_ext_b/paper_a_ext_b_provenance_schema_v2.json",
+    "binding": "experiments/paper_a_ext_b/paper_a_ext_b_construction_binding_v2.json",
+    "validator": "experiments/paper_a_ext_b/validate_paper_a_ext_b_construction_v2.py",
+    "synthetic_tests": "tests/test_paper_a_ext_b_construction_v2.py"
+  },
+  "freeze_gates": {
+    "C01_C10_ALL_STATIC_IDENTITIES_CLOSED": true,
+    "THREE_TASK_ALL_STATIC_IDENTITIES_CLOSED": true,
+    "VALIDATOR_COVERAGE_COMPLETE": true,
+    "C03_DISTINCTNESS_VALID": true,
+    "C04_CONTEXT_BOUND": true,
+    "C09_CONTEXT_BOUND": true,
+    "TASK_SLUGS_BOUND": true,
+    "ARG_ID_PADDING_BOUND": true,
+    "ORDERING_PRECEDENCE_BOUND": true,
+    "QUANT_PAIR_UNIQUENESS_BOUND": true,
+    "WORDNET_SURFACE_RULE_BOUND": true,
+    "SOURCE_BANK_SCHEMA_BOUND": true,
+    "RECORD_SCHEMA_BOUND": true,
+    "MANIFEST_SCHEMA_BOUND": true,
+    "PROVENANCE_SCHEMA_BOUND": true,
+    "SYNTHETIC_TESTS_REQUIRED": true
+  },
+  "no_further_amendment_policy": {
+    "scientific_construction_amendment_v3_permitted": false,
+    "production_attempts_after_v2": 1,
+    "mechanical_recovery_only": true,
+    "mechanical_recovery_must_preserve_v2_scientific_bytes_and_rules": true,
+    "failure_route": "EXT_B_TERMINATES_AT_DATASET_CONSTRUCTION"
+  },
+  "provenance": {
+    "production_data_created": false,
+    "source_banks_created": false,
+    "model_inference_performed": false,
+    "hidden_states_accessed": false,
+    "model_authorization_created_or_consumed": false,
+    "scientific_result_created": false,
+    "temporal_runtime_executed": false
+  },
+  "next_lifecycle_action": "ONE_FINAL_DATASET_CONSTRUCTION_ATTEMPT_UNDER_V2"
+}

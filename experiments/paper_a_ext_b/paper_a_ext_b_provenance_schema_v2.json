@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0.0",
+  "schema_id": "PA-EXT-B-PROVENANCE-SCHEMA-V2",
+  "status": "FINAL_FROZEN_PRE_GENERATION",
+  "required_fields": ["input_source_identities", "generation_identity", "construction_specification_identity", "rendering_identity", "validation_identity", "generation_timestamp_metadata_only", "canonical_hashes", "three_of_three_gate_state"],
+  "generation_identity_fields": ["builder_path", "builder_sha256", "canonical_json_rule", "scientific_payload_timestamp_excluded"],
+  "three_of_three_gate_state_fields": ["SPATIAL_READY", "QUANTITATIVE_READY", "MEREOLOGICAL_READY", "EXT_B_3_OF_3_DATASET_GATE_PASS"],
+  "forbidden_field_fragments": ["model_output", "hidden_state", "probability", "logit", "prediction"],
+  "timestamp_rule": "timestamp is metadata only and never enters scientific IDs, selection hashes, or scientific payload hashes"
+}

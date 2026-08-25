@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0.0",
+  "schema_id": "PA-EXT-B-RECORD-SCHEMA-V2",
+  "status": "FINAL_FROZEN_PRE_GENERATION",
+  "required_fields": ["schema_version", "study_id", "task_id", "task_slug", "label", "family_id", "record_id", "record_role", "split", "condition_id", "arg_a", "arg_b", "semantic_relation", "rendered_text", "source_identity"],
+  "record_roles": ["reference", "realization"],
+  "splits": ["FIT", "DIAGNOSTIC", "EVAL"],
+  "conditions": ["c01_lexical_relex", "c02_syntactic_restructure", "c03_controlled_compression", "c04_controlled_elaboration", "c05_relation_explicit", "c06_relation_implicit", "c07_register_formal", "c08_register_informal", "c09_neutral_distractor_prefix", "c10_anaphoric_reference"],
+  "forbidden_field_fragments": ["model", "hidden", "probability", "logit", "result", "outcome", "prediction", "authorization"],
+  "rendered_text_contract": "UTF-8 deterministic text from the V2 rendering authority; no source benchmark fields"
+}

@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0.0",
+  "schema_id": "PA-EXT-B-SOURCE-BANK-SCHEMA-V2",
+  "status": "FINAL_FROZEN_PRE_GENERATION",
+  "required_fields": ["schema_version", "study_id", "task_id", "task_slug", "source_family_id", "source_identity", "canonical_source_tuple", "arg_a", "arg_b", "semantic_relation", "relation_orientation", "selection_hash", "selection_rank", "source_provenance"],
+  "forbidden_field_fragments": ["model", "hidden", "probability", "logit", "result", "outcome", "prediction", "authorization"],
+  "array_order": "selection_rank ascending within a task source bank",
+  "canonical_json": "V2 canonical_json rule",
+  "source_identity_contract": "source_identity contains only frozen source fields and no rendered benchmark text"
+}

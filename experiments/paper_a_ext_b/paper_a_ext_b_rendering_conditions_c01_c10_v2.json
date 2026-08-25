@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0.0",
+  "rendering_id": "PA-EXT-B-RENDERING-C01-C10-V2",
+  "status": "FINAL_FROZEN_PRE_GENERATION_PRE_MODEL_OUTCOME",
+  "parent_v1_rendering_sha256": "a2d28c586a98c93fe1b1889e8456640713a5143e1e25e870afd847045cf40f67",
+  "shared_rules": {
+    "encoding": "UTF-8",
+    "unicode": "NFKC then NFC before rendering",
+    "whitespace": "exactly one ASCII space between template tokens; no leading/trailing whitespace",
+    "capitalization": "template literals are fixed; source fields are normalized; literal prefixes follow their condition rule",
+    "articles": "no automatic article insertion",
+    "numbers": "canonical signed base-10 numeric format; do not verbalize numbers",
+    "punctuation": "template punctuation is literal ASCII punctuation",
+    "forbidden_fields": ["story", "question", "answer", "distractor", "reasoning_chain", "gloss", "definition", "example", "lexicographer_prose", "model_output", "hidden_state", "probability", "result"],
+    "duplicate_rule": "global exact-byte and normalized-text rejection; no c03 exemption"
+  },
+  "bound_constants": {
+    "CONTEXT_PHRASE": "in the presented example",
+    "CONTEXT_PREFIX": "For context"
+  },
+  "task_lexical_fields": {
+    "TF_SPATIAL": {
+      "REL_LEX": {"left": "is left of", "right": "is right of", "above": "is above", "below": "is below", "upper-left": "is upper-left of", "upper-right": "is upper-right of", "lower-left": "is lower-left of", "lower-right": "is lower-right of", "overlap": "overlaps"},
+      "REL_LEX_ALT": {"left": "lies left of", "right": "lies right of", "above": "lies above", "below": "lies below", "upper-left": "lies upper-left of", "upper-right": "lies upper-right of", "lower-left": "lies lower-left of", "lower-right": "lies lower-right of", "overlap": "is positioned over"},
+      "OVERT_REL": {"left": "is explicitly left of", "right": "is explicitly right of", "above": "is explicitly above", "below": "is explicitly below", "upper-left": "is explicitly upper-left of", "upper-right": "is explicitly upper-right of", "lower-left": "is explicitly lower-left of", "lower-right": "is explicitly lower-right of", "overlap": "explicitly overlaps"},
+      "IMPLICIT_REL": {"left": "has a leftward relation to", "right": "has a rightward relation to", "above": "has an above relation to", "below": "has a below relation to", "upper-left": "has an upper-left relation to", "upper-right": "has an upper-right relation to", "lower-left": "has a lower-left relation to", "lower-right": "has a lower-right relation to", "overlap": "occupies the same position as"}
+    },
+    "TF_QUANTITATIVE": {"REL_LEX": "is greater than", "REL_LEX_ALT": "exceeds", "OVERT_REL": "is explicitly greater than", "IMPLICIT_REL": "has a larger value than"},
+    "TF_MEREOLOGICAL": {"REL_LEX": "is part of", "REL_LEX_ALT": "belongs to", "OVERT_REL": "is explicitly a component of", "IMPLICIT_REL": "is included in"}
+  },
+  "c03_relation_lexicalization": {
+    "TF_SPATIAL": {"left": "left of", "right": "right of", "above": "above", "below": "below", "upper-left": "upper-left of", "upper-right": "upper-right of", "lower-left": "lower-left of", "lower-right": "lower-right of", "overlap": "overlapping"},
+    "TF_QUANTITATIVE": "greater than",
+    "TF_MEREOLOGICAL": "part of"
+  },
+  "conditions": [
+    {"condition_id": "c01_lexical_relex", "surface_transformation": "replace REL_LEX with REL_LEX_ALT", "reference_template": "{ARG_A} {REL_LEX} {ARG_B}.", "realization_template": "{ARG_A} {REL_LEX_ALT} {ARG_B}.", "allowed_variable_fields": ["ARG_A", "ARG_B", "REL_LEX", "REL_LEX_ALT"], "source_of_each_placeholder": "task lexical maps plus task source arguments", "punctuation_rule": "final ASCII period", "capitalization_rule": "no added capitalization", "article_rule": "none", "number_format_rule": "V2 canonical numeric format", "whitespace_rule": "shared exact whitespace"},
+    {"condition_id": "c02_syntactic_restructure", "surface_transformation": "move relation phrase to a label-leading construction", "reference_template": "{ARG_A} {REL_LEX} {ARG_B}.", "realization_template": "{REL_LEX}: {ARG_A}; {ARG_B}.", "allowed_variable_fields": ["ARG_A", "ARG_B", "REL_LEX"], "source_of_each_placeholder": "task lexical maps plus task source arguments", "punctuation_rule": "ASCII colon, semicolon, period", "capitalization_rule": "no added capitalization", "article_rule": "none", "number_format_rule": "V2 canonical numeric format", "whitespace_rule": "shared exact whitespace"},
+    {"condition_id": "c03_controlled_compression", "surface_transformation": "remove optional discourse material while preserving the relational proposition", "reference_template": "It is the case that {ARG_A} is {REL_LEX} {ARG_B}.", "realization_template": "{ARG_A} is {REL_LEX} {ARG_B}.", "allowed_variable_fields": ["ARG_A", "ARG_B", "REL_LEX"], "source_of_each_placeholder": "task-specific c03 bare relation lexicalization plus task source arguments", "punctuation_rule": "final ASCII period", "capitalization_rule": "literal It is the case that capitalization", "article_rule": "none", "number_format_rule": "V2 canonical numeric format", "whitespace_rule": "shared exact whitespace", "pair_semantics": "same ARG_A, ARG_B, REL_LEX and task label; normalized surfaces must differ"},
+    {"condition_id": "c04_controlled_elaboration", "surface_transformation": "append the frozen task-neutral context phrase", "reference_template": "{ARG_A} {REL_LEX} {ARG_B}.", "realization_template": "{ARG_A} {REL_LEX} {ARG_B}; {CONTEXT_PHRASE}.", "allowed_variable_fields": ["ARG_A", "ARG_B", "REL_LEX", "CONTEXT_PHRASE"], "source_of_each_placeholder": "task lexical maps, task source arguments, and bound_constants.CONTEXT_PHRASE", "punctuation_rule": "ASCII semicolon and periods", "capitalization_rule": "context phrase lowercase", "article_rule": "none", "number_format_rule": "V2 canonical numeric format", "whitespace_rule": "shared exact whitespace"},
+    {"condition_id": "c05_relation_explicit", "surface_transformation": "use overt relation marker", "reference_template": "{ARG_A} {REL_LEX} {ARG_B}.", "realization_template": "{ARG_A} {OVERT_REL} {ARG_B}.", "allowed_variable_fields": ["ARG_A", "ARG_B", "REL_LEX", "OVERT_REL"], "source_of_each_placeholder": "task lexical maps plus task source arguments", "punctuation_rule": "final ASCII period", "capitalization_rule": "no added capitalization", "article_rule": "none", "number_format_rule": "V2 canonical numeric format", "whitespace_rule": "shared exact whitespace"},
+    {"condition_id": "c06_relation_implicit", "surface_transformation": "use implicit relation marker", "reference_template": "{ARG_A} {REL_LEX} {ARG_B}.", "realization_template": "{ARG_A} {IMPLICIT_REL} {ARG_B}.", "allowed_variable_fields": ["ARG_A", "ARG_B", "REL_LEX", "IMPLICIT_REL"], "source_of_each_placeholder": "task lexical maps plus task source arguments", "punctuation_rule": "final ASCII period", "capitalization_rule": "no added capitalization", "article_rule": "none", "number_format_rule": "V2 canonical numeric format", "whitespace_rule": "shared exact whitespace"},
+    {"condition_id": "c07_register_formal", "surface_transformation": "add fixed formal register prefix", "reference_template": "{ARG_A} {REL_LEX} {ARG_B}.", "realization_template": "Formally, {ARG_A} {REL_LEX} {ARG_B}.", "allowed_variable_fields": ["ARG_A", "ARG_B", "REL_LEX"], "source_of_each_placeholder": "task lexical maps plus task source arguments", "punctuation_rule": "comma after Formally and final period", "capitalization_rule": "literal Formally capitalized", "article_rule": "none", "number_format_rule": "V2 canonical numeric format", "whitespace_rule": "shared exact whitespace"},
+    {"condition_id": "c08_register_informal", "surface_transformation": "add fixed plain-language prefix", "reference_template": "{ARG_A} {REL_LEX} {ARG_B}.", "realization_template": "In plain terms, {ARG_A} {REL_LEX} {ARG_B}.", "allowed_variable_fields": ["ARG_A", "ARG_B", "REL_LEX"], "source_of_each_placeholder": "task lexical maps plus task source arguments", "punctuation_rule": "comma after terms and final period", "capitalization_rule": "literal In capitalized", "article_rule": "none", "number_format_rule": "V2 canonical numeric format", "whitespace_rule": "shared exact whitespace"},
+    {"condition_id": "c09_neutral_distractor_prefix", "surface_transformation": "add the frozen neutral context prefix", "reference_template": "{ARG_A} {REL_LEX} {ARG_B}.", "realization_template": "{CONTEXT_PREFIX}: {ARG_A} {REL_LEX} {ARG_B}.", "allowed_variable_fields": ["ARG_A", "ARG_B", "REL_LEX", "CONTEXT_PREFIX"], "source_of_each_placeholder": "task lexical maps, task source arguments, and bound_constants.CONTEXT_PREFIX", "punctuation_rule": "ASCII colon and final period; colon is template punctuation", "capitalization_rule": "bound prefix capitalized", "article_rule": "none", "number_format_rule": "V2 canonical numeric format", "whitespace_rule": "shared exact whitespace"},
+    {"condition_id": "c10_anaphoric_reference", "surface_transformation": "append fixed anaphoric confirmation", "reference_template": "{ARG_A} {REL_LEX} {ARG_B}.", "realization_template": "{ARG_A} {REL_LEX} {ARG_B}; this relation holds.", "allowed_variable_fields": ["ARG_A", "ARG_B", "REL_LEX"], "source_of_each_placeholder": "task lexical maps plus task source arguments", "punctuation_rule": "ASCII semicolon and periods", "capitalization_rule": "this lowercase", "article_rule": "none", "number_format_rule": "V2 canonical numeric format", "whitespace_rule": "shared exact whitespace"}
+  ],
+  "reference_realization_contract": "reference and realization share family, task, label, source identity, semantic relation and source arguments; only the frozen condition template differs"
+}

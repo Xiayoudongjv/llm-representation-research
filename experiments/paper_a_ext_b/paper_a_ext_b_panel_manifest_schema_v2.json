@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0.0",
+  "schema_id": "PA-EXT-B-PANEL-MANIFEST-SCHEMA-V2",
+  "status": "FINAL_FROZEN_PRE_GENERATION",
+  "required_fields": ["schema_version", "study_id", "authority_hashes", "amendment_v1_sha256", "amendment_v2_sha256", "source_bank_hashes", "task_dataset_hashes", "combined_panel_sha256", "validator_hashes", "family_counts", "record_counts", "class_counts", "split_counts", "condition_counts", "schema_hashes"],
+  "expected_totals": {"families": 660, "records": 1320},
+  "expected_class_counts": {"TF_SPATIAL": 440, "TF_QUANTITATIVE": 440, "TF_MEREOLOGICAL": 440},
+  "expected_split_counts": {"FIT": 360, "DIAGNOSTIC": 480, "EVAL": 480},
+  "timestamp_rule": "generation timestamp is metadata only and excluded from scientific payload hashes",
+  "forbidden_field_fragments": ["model_output", "hidden_state", "probability", "logit", "prediction", "scientific_result"]
+}
