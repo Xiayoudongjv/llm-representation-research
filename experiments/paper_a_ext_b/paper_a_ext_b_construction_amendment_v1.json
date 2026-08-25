@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0.0",
+  "amendment_id": "PA-EXT-B-PREGEN-CONSTRUCTION-AMENDMENT-V1",
+  "status": "FROZEN_PRE_GENERATION_PRE_MODEL_OUTCOME",
+  "amendment_classification": "PRE_GENERATION_PRE_MODEL_OUTCOME_PROSPECTIVE_PROTOCOL_AMENDMENT",
+  "amendment_reason": "FIRST_FORMAL_DATASET_CONSTRUCTION_ATTEMPT_BLOCKED_BEFORE_GENERATION_DUE_TO_UNBOUND_CONSTRUCTION_IDENTITIES",
+  "parent_commit": "640ef4cca8c012491c81eed32215b2abfbe7f07e",
+  "parent_authorities_unchanged": true,
+  "data_observed_before_amendment": false,
+  "generated_records_before_amendment": 0,
+  "model_outcome_observed_before_amendment": false,
+  "scientific_result_observed_before_amendment": false,
+  "changes_permitted": ["construction identity", "deterministic ordering", "source projection", "byte-level rendering", "validator binding"],
+  "changes_forbidden": ["task definition", "task count", "source universe", "class labels", "family count", "split count", "model panel", "primary metric", "outcome routing"],
+  "recovered_preexisting_rules": {
+    "ext_a_v3_content_design": "EXACT_PREEXISTING_AUTHORITY_FOUND; conceptual rendering, identity, and ordering conventions",
+    "ext_a_source_manifest": "EXACT_PREEXISTING_AUTHORITY_FOUND; source permissions and leakage firewall",
+    "ext_a_v3_generator": "PREEXISTING_ENGINEERING_RULE_FOUND_BUT_NOT_SCIENTIFICALLY_BOUND; legacy xa IDs and synthetic-only status retained as evidence, not reused as EXT-B authority",
+    "stepgame_source": "EXACT_PREEXISTING_AUTHORITY_FOUND; revision and SHA bound by parent manifest",
+    "wordnet_source": "EXACT_PREEXISTING_AUTHORITY_FOUND; version, archive and SHA bound by parent manifest",
+    "quantitative_rule": "PROSPECTIVE_NEW_CONSTRUCTION_SPECIFICATION grounded in the only pre-existing deterministic engineering candidate and frozen before EXT-B data"
+  },
+  "new_authorities": {
+    "construction_spec": "experiments/paper_a_ext_b/paper_a_ext_b_construction_spec_v1.json",
+    "rendering_conditions": "experiments/paper_a_ext_b/paper_a_ext_b_rendering_conditions_c01_c10_v1.json",
+    "binding": "experiments/paper_a_ext_b/paper_a_ext_b_construction_binding_v1.json",
+    "validator": "experiments/paper_a_ext_b/validate_paper_a_ext_b_construction_spec_v1.py",
+    "synthetic_tests": "tests/test_paper_a_ext_b_construction_spec.py"
+  },
+  "freeze_gates": {
+    "SPATIAL_CONSTRUCTION_FULLY_BOUND": true,
+    "QUANTITATIVE_CONSTRUCTION_FULLY_BOUND": true,
+    "MEREOLOGICAL_CONSTRUCTION_FULLY_BOUND": true,
+    "C01_C10_RENDERING_FULLY_BOUND": true,
+    "DETERMINISTIC_IDENTITY_FULLY_BOUND": true,
+    "DETERMINISTIC_ORDERING_FULLY_BOUND": true
+  },
+  "provenance": {
+    "source_banks_created": false,
+    "final_dataset_created": false,
+    "combined_panel_created": false,
+    "model_run": false,
+    "hidden_states_accessed": false,
+    "model_authorization_created": false,
+    "scientific_outcome_created": false,
+    "temporal_runtime_executed": false
+  },
+  "next_lifecycle_action": "EXT_B_DATASET_CONSTRUCTION_RETRY_UNDER_AMENDMENT_V1"
+}

@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0.0",
+  "binding_id": "PA-EXT-B-CONSTRUCTION-BINDING-V1",
+  "status": "FROZEN_PRE_GENERATION_PRE_MODEL_OUTCOME",
+  "parent_commit": "640ef4cca8c012491c81eed32215b2abfbe7f07e",
+  "parent_authorities": {
+    "docs/experiments/PAPER-A-EXT-B-PREREGISTRATION.md": "4e25dd8e9bbaf4ac6a3240ddc9f96b01532ed20591e2e1527a4448db8ebd5184",
+    "experiments/paper_a_ext_b/paper_a_ext_b_preregistration.json": "8069439f96db96649a7bbbff3413b2ec6dda37a72d5bbb98a72934349c3e42f8",
+    "experiments/paper_a_ext_b/paper_a_ext_b_frozen_protocol.json": "c67e8786f93d593dfd8ae70c1e1348758997baf097aed4e5393a4e30641a40ac",
+    "experiments/paper_a_ext_b/paper_a_ext_b_outcome_routing.json": "6e0ad230664e10b26849ef284fae11174093d2adf4d36eb79dc37201ab29e7f0",
+    "experiments/paper_a_ext_b/paper_a_ext_b_authority_manifest.json": "63a03e1d3b8aacc6858ea880f7a29b778d064882738075ea1287c6ef0b23f39c"
+  },
+  "new_authorities": {
+    "experiments/paper_a_ext_b/paper_a_ext_b_construction_amendment_v1.json": "cd147cb513917e411b609915b356e2bbe95c36caf408fbfe408fed4ec655582b",
+    "experiments/paper_a_ext_b/paper_a_ext_b_construction_spec_v1.json": "a24e254cc7e5d8c65165fe529f5ef5b94463e01825b2db5b6690a31e91f24d1d",
+    "experiments/paper_a_ext_b/paper_a_ext_b_rendering_conditions_c01_c10_v1.json": "a2d28c586a98c93fe1b1889e8456640713a5143e1e25e870afd847045cf40f67",
+    "docs/experiments/PAPER-A-EXT-B-PREGEN-CONSTRUCTION-AMENDMENT.md": "1379e810f5600bb035620ee0e1b15172ef6d3cff471623291cee19564cc4c569",
+    "experiments/paper_a_ext_b/validate_paper_a_ext_b_construction_spec_v1.py": "21896841a3162176b8a5c233449f9466d23a54a1bbeaf6b1609155dde6158aa2",
+    "tests/test_paper_a_ext_b_construction_spec.py": "281bc15d92e50937bbaa0f96f61412f297b5c064f5ce54d79ea9b72ccdab3b9f"
+  },
+  "inherited_source_authorities": {
+    "ext_a_v3_content_design": {"path": "experiments/paper_a_ext_a/paper_a_ext_a_panel_content_design_v3.json", "sha256": "205376bbd8704862de2cafeb1fd09719b498688532e6c54aec3a2326b71f0462"},
+    "ext_a_source_manifest": {"path": "experiments/paper_a_ext_a/paper_a_ext_a_external_asset_source_manifest.json", "sha256": "72bf8de42c315e390269eeb874ee89828c7cc1541e2d4171fd5dc8ae2215faf9"},
+    "ext_a_source_binding": {"path": "experiments/paper_a_ext_a/paper_a_ext_a_external_asset_source_v4_binding.json", "sha256": "b23fc6329b7863bfa0a7f80c06bf582706ce1457c5b04ecffaefd74bfefddc7f"},
+    "ext_a_v3_generator": {"path": "experiments/paper_a_ext_a/pa_ext_a_v3_pipeline.py", "sha256": "6508490ec2141f0531f7e61a24c3496e00705fd85d34bc5ca725d24bd38b3953", "classification": "PREEXISTING_ENGINEERING_RULE_FOUND_BUT_NOT_SCIENTIFICALLY_BOUND"},
+    "ext_a_v3_validator": {"path": "experiments/paper_a_ext_a/validate_pa_ext_a_v3_pipeline.py", "sha256": "c344ff526948b9b0e98f305095164a643478080427f84786d02668776fb22cb1"},
+    "stepgame_train_source": {"path": "D:/AI_Cache/huggingface/hub/datasets--ZhengyanShi--StepGame/snapshots/6d859381dfd518cae3f073b268aaa323bf4dcf04/train.jsonl", "revision": "6d859381dfd518cae3f073b268aaa323bf4dcf04", "sha256": "774b73385c1a6995e121e87f16be790355555c4c18c01eb42464e28c6ea3482c"},
+    "wordnet_archive": {"path": "experiments/paper_a_ext_a/data/raw/WordNet-3.0.tar.gz", "version": "3.0", "sha256": "640db279c949a88f61f851dd54ebbb22d003f8b90b85267042ef85a3781d3a52"}
+  },
+  "scientific_invariants": {
+    "task_panel_unchanged": true,
+    "model_panel_unchanged": true,
+    "counts_unchanged": true,
+    "splits_unchanged": true,
+    "conditions_renamed_only_from_legacy_ids": true,
+    "primary_metric_unchanged": true,
+    "outcome_routing_unchanged": true,
+    "model_outcome_accessed": false,
+    "production_data_created": false
+  },
+  "self_hash_policy": "binding raw SHA-256 is reported in the final archive record; it is not embedded in itself"
+}
