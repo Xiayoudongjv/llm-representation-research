@@ -1,0 +1,117 @@
+{
+  "analysis_id": "PAPER-A-DIRECTIONALITY-SCIENTIFIC-CLOSURE-ARCHIVAL",
+  "analysis_class": "POST_HOC_EXPLORATORY_DESCRIPTIVE",
+  "canonical_inputs": {
+    "exp026_result": {
+      "path": "experiments/exp026/results/exp026_results.json",
+      "sha256": "9a5bed41b432e2f89b0873869d76e1f5775f9b38caff9472553fca335bbba551"
+    },
+    "exp027_result": {
+      "path": "experiments/exp027/results/exp027_results.json",
+      "sha256": "1f15027d17456f5dc8ff4803452c732af8ba464f70e537195b8833d9d44f6c6d"
+    },
+    "exp027_manifest": {
+      "path": "docs/experiments/canonical/EXP-027-CANONICAL-RESULT-MANIFEST.json",
+      "sha256": "0f5c7319d3b2cd2148b3a21c3afae218545b13cf987f4a7850579dfea45042d0"
+    }
+  },
+  "definitions": {
+    "A_C": "C0(i,j) - C0(j,i)",
+    "A_D": "D(i,j) - D(j,i)",
+    "A_R": "R(i,j) - R(j,i)",
+    "pair_unit": "unordered off-diagonal source-target layer pair",
+    "matrix_orientation": "rows are source probe layers; columns are target representation layers",
+    "condition_aggregation": "arithmetic mean over the ten frozen evaluation conditions before asymmetry summaries",
+    "distance": "absolute source-target layer index gap divided by num_layers - 1"
+  },
+  "results": {
+    "Qwen": {
+      "mean_abs_A_C": 0.129067,
+      "signed_shallow_deep_bias": -0.066567,
+      "C0_SymErr": 0.236573,
+      "mean_abs_A_D": 0.129191,
+      "signed_A_D": 0.066791,
+      "mean_abs_A_R": 0.133796,
+      "signed_A_R": 0.047173,
+      "A_C_A_R_spearman": -0.9512,
+      "distance_025": {"pair_count": 231, "mean_abs_A_C": 0.183983, "signed_A_C": -0.125433},
+      "distance_050": {"pair_count": 105, "mean_abs_A_C": 0.218423, "signed_A_C": -0.166994}
+    },
+    "OLMo": {
+      "mean_abs_A_C": 0.137292,
+      "signed_shallow_deep_bias": 0.123646,
+      "C0_SymErr": 0.313139,
+      "mean_abs_A_D": 0.155755,
+      "signed_A_D": -0.112526,
+      "mean_abs_A_R": 0.128359,
+      "signed_A_R": -0.092370,
+      "A_C_A_R_spearman": -0.4576,
+      "distance_025": {"pair_count": 78, "mean_abs_A_C": 0.170913, "signed_A_C": 0.160016},
+      "distance_050": {"pair_count": 36, "mean_abs_A_C": 0.112674, "signed_A_C": 0.104687}
+    },
+    "Llama": {
+      "mean_abs_A_C": 0.167031,
+      "signed_shallow_deep_bias": 0.072448,
+      "C0_SymErr": 0.307183,
+      "mean_abs_A_D": 0.171198,
+      "signed_A_D": -0.075625,
+      "mean_abs_A_R": 0.160234,
+      "signed_A_R": -0.050755,
+      "A_C_A_R_spearman": -0.8878,
+      "distance_025": {"pair_count": 78, "mean_abs_A_C": 0.187420, "signed_A_C": 0.051923},
+      "distance_050": {"pair_count": 36, "mean_abs_A_C": 0.139583, "signed_A_C": 0.022396}
+    }
+  },
+  "classification": {
+    "PA_DIRECTIONALITY_ANALYSIS_COMPLETE": true,
+    "PA_DIRECTIONALITY_STATISTICAL_CLOSURE": "COMPLETE",
+    "PA_DIRECTIONALITY_CLASSIFICATION": "E1_DIRECTIONALITY_MATERIALLY_PRESENT_ACROSS_ALL_THREE_MODELS",
+    "PA_DIRECTIONALITY_CONCEPTUAL_STATEMENT": "SUPPORTED_EXPLORATORILY",
+    "PA_DIRECTIONALITY_SCIENTIFIC_LINE": "CLOSED_NO_FURTHER_MATRIX_MINING",
+    "DIRECTIONALITY_SURVIVES_DISTANCE_025": true,
+    "DIRECTIONALITY_SURVIVES_DISTANCE_050": true,
+    "RECOVERY_DIRECTIONALITY_OBSERVED": true
+  },
+  "statistical_closure": {
+    "inference_class": "POST_HOC_EXPLORATORY_DESCRIPTIVE",
+    "new_bootstrap_inference": "NOT_PERFORMED_AND_NOT_REQUIRED_FOR_CLOSURE",
+    "p_values": false,
+    "significance_labels": false,
+    "bootstrap_confidence_intervals": false,
+    "permutation_tests": false
+  },
+  "paper_role": "EXPLORATORY_SECONDARY_MAIN_TEXT",
+  "figure_recommended": true,
+  "claim_ceiling": [
+    "Operational fixed-readout compatibility is directed as a measurement.",
+    "Substantial forward/reverse asymmetry is descriptively present in all three tested models.",
+    "The preferred shallow/deep orientation is not uniform across the three tested models.",
+    "The asymmetry persists after excluding adjacent layers and under larger normalized depth thresholds."
+  ],
+  "forbidden_overclaims": [
+    "statistically confirmed",
+    "universal",
+    "early-to-deep universally favored",
+    "representation geometry is asymmetric",
+    "information flows asymmetrically",
+    "recovery asymmetry proves compensation",
+    "architecture causes the observed direction"
+  ],
+  "validation": {
+    "C0_ORIENTATION_VALID": true,
+    "A_C_RECOMPUTATION_MATCH": true,
+    "A_D_RECOMPUTATION_MATCH": true,
+    "A_R_RECOMPUTATION_MATCH": true,
+    "DISTANCE_ROBUSTNESS_MATCH": true,
+    "canonical_matrices_copied_or_modified": false
+  },
+  "flags": {
+    "EXP026_CANONICAL_UNCHANGED": true,
+    "EXP027_CANONICAL_UNCHANGED": true,
+    "MODEL_INFERENCE_RUN": false,
+    "FORMAL_SCIENTIFIC_OUTCOME_CREATED": false,
+    "PA_DIRECTIONALITY_NEW_BOOTSTRAP_INFERENCE": false,
+    "PA_DIRECTIONALITY_FIGURE_RECOMMENDED": true
+  },
+  "next_action": "PAPER_A_CKA_ASSET_FEASIBILITY_AUDIT"
+}

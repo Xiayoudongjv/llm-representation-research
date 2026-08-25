@@ -1,0 +1,34 @@
+{
+  "manifest_id": "PAPER-A-DIRECTIONALITY-EXPLORATORY-CLOSURE-MANIFEST",
+  "analysis_artifact": {
+    "path": "experiments/paper_a/directionality_exploratory_closure.json",
+    "sha256": "8ea5dbe996c3d3c061e54bbf2d31242426d8e9b2b7fb814266891d203d33bccc"
+  },
+  "validator": {
+    "path": "experiments/paper_a/validate_directionality_exploratory_closure.py"
+  },
+  "canonical_inputs": {
+    "exp026_result_path": "experiments/exp026/results/exp026_results.json",
+    "exp026_result_sha256": "9a5bed41b432e2f89b0873869d76e1f5775f9b38caff9472553fca335bbba551",
+    "exp027_result_path": "experiments/exp027/results/exp027_results.json",
+    "exp027_result_sha256": "1f15027d17456f5dc8ff4803452c732af8ba464f70e537195b8833d9d44f6c6d",
+    "exp027_manifest_path": "docs/experiments/canonical/EXP-027-CANONICAL-RESULT-MANIFEST.json",
+    "exp027_manifest_sha256": "0f5c7319d3b2cd2148b3a21c3afae218545b13cf987f4a7850579dfea45042d0"
+  },
+  "matrix_bindings": {
+    "exp026_profiles": {"Qwen": "model_profiles.Q", "OLMo": "model_profiles.O"},
+    "exp027_profile": "profile_archive",
+    "metrics": {"C0": "c0_eval", "D": "d_eval", "R": "r_eval"},
+    "orientation": "source rows / target columns",
+    "condition_aggregation": "mean across ten frozen evaluation conditions"
+  },
+  "status": {
+    "analysis_complete": true,
+    "statistical_closure": "COMPLETE",
+    "scientific_line": "CLOSED_NO_FURTHER_MATRIX_MINING",
+    "model_inference_run": false,
+    "formal_scientific_outcome_created": false,
+    "canonical_inputs_modified": false
+  },
+  "next_action": "PAPER_A_CKA_ASSET_FEASIBILITY_AUDIT"
+}
