@@ -1,0 +1,33 @@
+{
+  "record_id": "PA-EXT-B-V2-RECOVERY-PRODUCTION-ATTEMPT",
+  "attempt_class": "SCIENCE_NEUTRAL_RECOVERY_PRODUCTION_ATTEMPT",
+  "parent_failure": "COUNT_GATE_FAILED",
+  "recovery_class": "SCIENCE_NEUTRAL",
+  "outcome": "EXT_B_DATASET_VALIDATION_FAILURE",
+  "failure_signal": "DUPLICATE_GATE_FAILED",
+  "failure_stage": "pre_publication_global_duplicate_gate",
+  "scientific_rule_change": false,
+  "v3_created": false,
+  "production_files_written": false,
+  "canonical_files_written": false,
+  "source_bank_files_written": false,
+  "temporary_publication_directory_created": false,
+  "record_content_displayed": false,
+  "source_selection_displayed": false,
+  "task_composition_displayed": false,
+  "model_inference_run": false,
+  "hidden_states_accessed": false,
+  "model_authorization_created": false,
+  "model_authorization_consumed": false,
+  "scientific_model_result_created": false,
+  "identities": {
+    "head": "157bf3c217dc1c66582851c440f7e12d1f45518f",
+    "origin_main": "157bf3c217dc1c66582851c440f7e12d1f45518f",
+    "builder_sha256": "3165a3fb2d63be3b9fb631cbd75890b510ada1884e56e065c5e60a95a7d8d18f",
+    "validator_sha256": "f9f62743b4b919ccc3e3d3e3ba68b92375224a93f5dc7b503a19750b35bf1b88",
+    "v2_amendment_sha256": "f4aed55dff5ad0f690ade26aae35e2fd923944a598fd0871b5c076dfc0874988",
+    "v2_spec_sha256": "2344a45a1dff59af63fd8be96a890974b33722e09c7dad0807a4e1e214abee29"
+  },
+  "stop_rule": "STOP_WITHOUT_REPAIR_OR_V3",
+  "next_action": "INDEPENDENT_REVIEW_OF_FROZEN_DUPLICATE_FAILURE_REQUIRED"
+}

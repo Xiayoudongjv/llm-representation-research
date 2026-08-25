@@ -1,0 +1,74 @@
+{
+  "manifest_id": "PAPER-A-EXT-B-TERMINAL-MANIFEST",
+  "schema_version": "1.0.0",
+  "status": "TERMINAL_DATASET_STAGE_FAILURE_ARCHIVE",
+  "lifecycle": {
+    "status": "TERMINATED",
+    "termination_stage": "DATASET_CONSTRUCTION",
+    "termination_reason": "FROZEN_GLOBAL_RENDERED_TEXT_DUPLICATE_GATE_FAILURE",
+    "duplicate_failure_class": "CLASS_A_TRUE_FROZEN_DATASET_VALIDATION_FAILURE",
+    "further_scientific_amendment_allowed": false,
+    "further_dataset_retry_allowed": false,
+    "v3_created": false
+  },
+  "scientific_boundary": {
+    "canonical_panel_created": false,
+    "model_inference_performed": false,
+    "model_authorization_created_or_consumed": false,
+    "scientific_model_result_created": false,
+    "cross_task_robustness_tested": false,
+    "cross_task_robustness_status": "NOT_ESTABLISHED",
+    "core_paper_a_science_complete": true,
+    "exp026_exp027_results_affected": false
+  },
+  "authority_hashes": {
+    "docs/experiments/PAPER-A-EXT-B-PREREGISTRATION.md": "4e25dd8e9bbaf4ac6a3240ddc9f96b01532ed20591e2e1527a4448db8ebd5184",
+    "experiments/paper_a_ext_b/paper_a_ext_b_preregistration.json": "8069439f96db96649a7bbbff3413b2ec6dda37a72d5bbb98a72934349c3e42f8",
+    "experiments/paper_a_ext_b/paper_a_ext_b_frozen_protocol.json": "c67e8786f93d593dfd8ae70c1e1348758997baf097aed4e5393a4e30641a40ac",
+    "experiments/paper_a_ext_b/paper_a_ext_b_outcome_routing.json": "6e0ad230664e10b26849ef284fae11174093d2adf4d36eb79dc37201ab29e7f0",
+    "experiments/paper_a_ext_b/paper_a_ext_b_authority_manifest.json": "63a03e1d3b8aacc6858ea880f7a29b778d064882738075ea1287c6ef0b23f39c",
+    "experiments/paper_a_ext_b/paper_a_ext_b_construction_amendment_v1.json": "cd147cb513917e411b609915b356e2bbe95c36caf408fbfe408fed4ec655582b",
+    "experiments/paper_a_ext_b/paper_a_ext_b_construction_amendment_v2.json": "f4aed55dff5ad0f690ade26aae35e2fd923944a598fd0871b5c076dfc0874988",
+    "experiments/paper_a_ext_b/paper_a_ext_b_construction_spec_v2.json": "2344a45a1dff59af63fd8be96a890974b33722e09c7dad0807a4e1e214abee29",
+    "experiments/paper_a_ext_b/paper_a_ext_b_rendering_conditions_c01_c10_v2.json": "dff800b21ac6e96db73724a48e32e8efeb66f210d2424e2869a6d8d7bc94ae13",
+    "experiments/paper_a_ext_b/paper_a_ext_b_source_bank_schema_v2.json": "2ed4b9ccce0f25e7d1c060ed96e39c3c6be3c273de94b691a17168bd963b7989",
+    "experiments/paper_a_ext_b/paper_a_ext_b_record_schema_v2.json": "c50544a29eb267fd5f46d50b07510015e9679b3a7263320e35c8c4ab54bf95eb",
+    "experiments/paper_a_ext_b/paper_a_ext_b_panel_manifest_schema_v2.json": "1888ec78fb94275e38d8c383d9a3a426102e6fbca3bf08dc2600e10337148839",
+    "experiments/paper_a_ext_b/paper_a_ext_b_provenance_schema_v2.json": "8a53460de279ac1b0371c272f0176ac5972a034e977e290bbb2f679710f37fc4",
+    "experiments/paper_a_ext_b/paper_a_ext_b_construction_binding_v2.json": "03e53a9936452925ea3d8242246b05ea30bb422112d9b9ed20778bdcb0707ec7"
+  },
+  "implementation_hashes": {
+    "experiments/paper_a_ext_b/build_paper_a_ext_b_dataset_v2.py": "3165a3fb2d63be3b9fb631cbd75890b510ada1884e56e065c5e60a95a7d8d18f",
+    "experiments/paper_a_ext_b/validate_paper_a_ext_b_dataset_v2.py": "f9f62743b4b919ccc3e3d3e3ba68b92375224a93f5dc7b503a19750b35bf1b88",
+    "experiments/paper_a_ext_b/validate_paper_a_ext_b_construction_v2.py": "ee5b9c15f25240bd36b82e42d38b8b4e7e291f435bc768ad86dbe3aca663353a",
+    "experiments/paper_a_ext_b/engineering/paper_a_ext_b_v2_science_neutral_recovery.json": "1a9d512d143e66f984306302237f92e111eca0a788d4a88e66f58191a3b9bf65"
+  },
+  "failure_record": {
+    "path": "experiments/paper_a_ext_b/engineering/paper_a_ext_b_v2_recovery_production_attempt.json",
+    "sha256": "f8792c158bf8b3a31b9e3617fb4acb0fb770d8a9a7fadb838325c85dfcf6f255",
+    "failure_signal": "DUPLICATE_GATE_FAILED",
+    "publication_reached": false
+  },
+  "independent_review": {
+    "review_commit": "157bf3c217dc1c66582851c440f7e12d1f45518f",
+    "review_class": "CLASS_A_TRUE_FROZEN_DATASET_VALIDATION_FAILURE",
+    "review_document": {
+      "path": "docs/experiments/PAPER-A-EXT-B-TERMINAL-DATASET-FAILURE.md",
+      "sha256": "28a97957d7fcf23c8f3241a8e6cf7f0433e68a2bf5b0b67923681bb16ea32f0e"
+    }
+  },
+  "terminal_disposition": {
+    "path": "experiments/paper_a_ext_b/canonical/paper_a_ext_b_terminal_disposition.json",
+    "sha256": "cd26e8b8b6bb781f1af302e4899fe1da4a0bc4bf75403e3eca6024773e6be1f4"
+  },
+  "source_hashes": {
+    "stepgame_train": "774b73385c1a6995e121e87f16be790355555c4c18c01eb42464e28c6ea3482c",
+    "wordnet_3_0_archive": "640db279c949a88f61f851dd54ebbb22d003f8b90b85267042ef85a3781d3a52"
+  },
+  "canonical_panel": {
+    "created": false,
+    "path": null,
+    "sha256": null
+  },
+  "self_hash_policy": "This manifest excludes its own hash; the committed Git tree binds the manifest bytes."
+}

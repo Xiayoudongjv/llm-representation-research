@@ -1,0 +1,35 @@
+{
+  "record_id": "PA-EXT-B-TERMINAL-DISPOSITION",
+  "status": "TERMINATED",
+  "termination_stage": "DATASET_CONSTRUCTION",
+  "termination_reason": "FROZEN_GLOBAL_RENDERED_TEXT_DUPLICATE_GATE_FAILURE",
+  "duplicate_failure_class": "CLASS_A_TRUE_FROZEN_DATASET_VALIDATION_FAILURE",
+  "duplicate_scope_frozen": true,
+  "validator_matches_frozen_duplicate_rule": true,
+  "builder_matches_frozen_duplicate_rule": true,
+  "further_scientific_amendment_allowed": false,
+  "further_dataset_retry_allowed": false,
+  "canonical_panel_created": false,
+  "cross_task_robustness_tested": false,
+  "cross_task_robustness_status": "NOT_ESTABLISHED",
+  "model_inference_performed": false,
+  "model_authorization_created": false,
+  "scientific_model_result_created": false,
+  "v3_created": false,
+  "core_paper_a_science_complete": true,
+  "paper_a_cross_task_claim": "NOT_ESTABLISHED",
+  "archival_review_document": {
+    "path": "docs/experiments/PAPER-A-EXT-B-TERMINAL-DATASET-FAILURE.md",
+    "sha256": "28a97957d7fcf23c8f3241a8e6cf7f0433e68a2bf5b0b67923681bb16ea32f0e"
+  },
+  "source_failure_record": {
+    "path": "experiments/paper_a_ext_b/engineering/paper_a_ext_b_v2_recovery_production_attempt.json",
+    "sha256": "f8792c158bf8b3a31b9e3617fb4acb0fb770d8a9a7fadb838325c85dfcf6f255"
+  },
+  "review_identity": {
+    "review_commit": "157bf3c217dc1c66582851c440f7e12d1f45518f",
+    "review_result": "EXT_B_DUPLICATE_FAILURE_CLASS=CLASS_A",
+    "review_scope": "read_only_independent_frozen_duplicate_failure_review"
+  },
+  "self_hash_policy": "This disposition record is bound by the terminal manifest and excludes its own hash."
+}
