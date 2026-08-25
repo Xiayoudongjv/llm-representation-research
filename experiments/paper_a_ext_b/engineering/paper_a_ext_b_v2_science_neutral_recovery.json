@@ -1,0 +1,64 @@
+{
+  "record_id": "PA-EXT-B-V2-SCIENCE-NEUTRAL-CONSTRUCTION-RECOVERY",
+  "recovery_class": "SCIENCE_NEUTRAL_IMPLEMENTATION_RECOVERY",
+  "failed_attempt": {
+    "status": "COUNT_GATE_FAILED",
+    "root_cause": "BUILDER_EXPANDED_EACH_FAMILY_ACROSS_ALL_10_CONDITIONS",
+    "failed_builder_sha256": "f61d4661c5cbe5b29c0064a6f06f8478035d6181ec947b9154517ce51b7c8dcd",
+    "production_files_written": false,
+    "canonical_files_written": false,
+    "source_bank_files_written": false,
+    "record_content_displayed": false,
+    "source_selection_displayed": false,
+    "task_composition_displayed": false,
+    "only_count_failure_observed": true,
+    "transient_in_memory_construction_not_published": true
+  },
+  "frozen_rule_executed": {
+    "one_condition_per_family": true,
+    "two_records_per_family": true,
+    "condition_assignment": "selected source rank // 22 selects c01 through c10",
+    "split_assignment": {
+      "FIT": 60,
+      "DIAGNOSTIC": 80,
+      "EVAL": 80
+    },
+    "families_per_condition": 22,
+    "records_per_condition": 44
+  },
+  "recovery_decision_depends_on_observed_composition": false,
+  "repair_identity": {
+    "repaired_builder_sha256": "3165a3fb2d63be3b9fb631cbd75890b510ada1884e56e065c5e60a95a7d8d18f",
+    "production_validator_sha256": "f9f62743b4b919ccc3e3d3e3ba68b92375224a93f5dc7b503a19750b35bf1b88",
+    "recovery_test_sha256": "e6cfc312e535a68459a845e650ede462c4701151a1ac253defe2f00a6b63cdd2"
+  },
+  "v2_authority_hashes": {
+    "amendment_v2": "f4aed55dff5ad0f690ade26aae35e2fd923944a598fd0871b5c076dfc0874988",
+    "construction_spec_v2": "2344a45a1dff59af63fd8be96a890974b33722e09c7dad0807a4e1e214abee29",
+    "rendering_v2": "dff800b21ac6e96db73724a48e32e8efeb66f210d2424e2869a6d8d7bc94ae13",
+    "source_bank_schema_v2": "2ed4b9ccce0f25e7d1c060ed96e39c3c6be3c273de94b691a17168bd963b7989",
+    "record_schema_v2": "c50544a29eb267fd5f46d50b07510015e9679b3a7263320e35c8c4ab54bf95eb",
+    "panel_manifest_schema_v2": "1888ec78fb94275e38d8c383d9a3a426102e6fbca3bf08dc2600e10337148839",
+    "provenance_schema_v2": "8a53460de279ac1b0371c272f0176ac5972a034e977e290bbb2f679710f37fc4",
+    "construction_binding_v2": "03e53a9936452925ea3d8242246b05ea30bb422112d9b9ed20778bdcb0707ec7"
+  },
+  "qualification": {
+    "static_validator": "PASS",
+    "existing_v2_tests": "4 passed",
+    "recovery_tests": "4 passed",
+    "compileall": "PASS",
+    "production_data_generated": false,
+    "model_inference_run": false,
+    "hidden_states_accessed": false,
+    "authorization_created_or_consumed": false,
+    "scientific_result_created": false
+  },
+  "scientific_status": {
+    "recovery_changes_scientific_rules": false,
+    "scientific_authority_changed": false,
+    "dataset_composition_used_to_select_fix": false,
+    "ext_b_amendment_v2_final": true,
+    "ext_b_no_further_scientific_amendment": true,
+    "v3_created": false
+  }
+}
