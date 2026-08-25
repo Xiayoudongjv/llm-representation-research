@@ -1,0 +1,169 @@
+{
+  "schema_version": "1.0.0",
+  "protocol_id": "PA-EXT-B-FROZEN-PROTOCOL",
+  "status": "FROZEN_BEFORE_DATA_AND_OUTCOME",
+  "model_panel": {
+    "models": ["Qwen/Qwen3-1.7B", "allenai/OLMo-2-0425-1B-Instruct", "Meta-Llama-3.2-1B-Instruct"],
+    "normalized_depth": "block_index/(num_logical_decoder_blocks-1)",
+    "denominators": {"Qwen/Qwen3-1.7B": 27, "allenai/OLMo-2-0425-1B-Instruct": 15, "Meta-Llama-3.2-1B-Instruct": 15},
+    "carrier": "observational forward hook on each decoder block output before model final normalization",
+    "embedding_state_included": false,
+    "lm_head_state_included": false,
+    "post_final_normalized_only_state_included": false
+  },
+  "task_panel": {
+    "classes": ["TF_SPATIAL", "TF_QUANTITATIVE", "TF_MEREOLOGICAL"],
+    "task_ids": ["exta_tf_spatial", "exta_tf_quantitative", "exta_tf_mereological"],
+    "temporal": "EXCLUDED",
+    "replacement_fourth_task": false,
+    "label_contract": "one global three-class label per record",
+    "role_contract": ["reference", "realization"],
+    "condition_contract": "surface-realization condition, never a classification target"
+  },
+  "source_policies": {
+    "TF_SPATIAL": {
+      "source": "StepGame structured relation data",
+      "allowed_fields": ["argument_a_canonical_label", "spatial_relation", "argument_b_canonical_label"],
+      "forbidden_fields": ["story", "question", "answer", "distractor", "reasoning_chain", "final_benchmark_text"],
+      "relation": "ARG_A relative to ARG_B"
+    },
+    "TF_QUANTITATIVE": {
+      "source": "deterministic programmatic numeric comparison",
+      "allowed_input": "frozen numeric-comparison program fields",
+      "outcome_adaptive_ranges": false,
+      "outcome_adaptive_filtering": false
+    },
+    "TF_MEREOLOGICAL": {
+      "source": "WordNet 3.0 meronymy/holonymy structure",
+      "orientation": {"ARG_A": "part/member/substance", "ARG_B": "whole"},
+      "allowed_fields": ["part_lexeme", "meronymy_holonymy_relation", "whole_lexeme"],
+      "forbidden_fields": ["gloss", "definition", "example", "lexicographer_prose", "final_benchmark_text"]
+    }
+  },
+  "construction_order": [
+    "bind_frozen_source_revision_and_authority",
+    "extract_allowed_structured_fields",
+    "canonicalize_relation_assets",
+    "construct_two_records_per_family",
+    "apply_deterministic_surface_conditions",
+    "deduplicate_and_apply_leakage_rules",
+    "assign_frozen_family_splits",
+    "validate_each_task_chain",
+    "require_all_three_task_chains",
+    "freeze_panel_hash_and_manifest",
+    "only_then_consider_model_authorization"
+  ],
+  "shape": {
+    "families_per_class": 220,
+    "records_per_class": 440,
+    "records_per_family": 2,
+    "families_total": 660,
+    "records_total": 1320,
+    "split_families_per_class": {"FIT": 60, "DIAGNOSTIC": 80, "EVAL": 80},
+    "split_records_per_class": {"FIT": 120, "DIAGNOSTIC": 160, "EVAL": 160},
+    "condition_family_counts": {"FIT": 6, "DIAGNOSTIC": 8, "EVAL": 8},
+    "class_balance": "exact across the three classes"
+  },
+  "conditions": [
+    "c01_lexical_relex",
+    "c02_syntactic_restructure",
+    "c03_controlled_compression",
+    "c04_controlled_elaboration",
+    "c05_relation_explicit",
+    "c06_relation_implicit",
+    "c07_register_formal",
+    "c08_register_informal",
+    "c09_neutral_distractor_prefix",
+    "c10_anaphoric_reference"
+  ],
+  "pairing": {
+    "records_per_family": 2,
+    "reference_realization_pairing": true,
+    "family_reuse": false,
+    "same_class_pairing": true,
+    "cross_split_family": false,
+    "deterministic": true
+  },
+  "leakage": {
+    "surface_and_normalized_duplicate_rejection": true,
+    "source_text_benchmark_reuse": false,
+    "stories_questions_answers_distractors_reasoning_reused": false,
+    "source_gloss_definition_example_reuse": false,
+    "outcome_based_filtering": false,
+    "model_output_filtering": false
+  },
+  "readout": {
+    "fit_scope": "FIT only, all three classes",
+    "scaler": "StandardScaler(with_mean=true, with_std=true)",
+    "classifier": "LogisticRegression(solver=lbfgs, penalty=L2, C=1.0, fit_intercept=true, tol=0.0001, max_iter=1000, class_weight=null)",
+    "global_three_class_readout": true,
+    "task_specific_primary_readout": false,
+    "one_vs_rest_primary_readout": false,
+    "class_order": ["TF_SPATIAL", "TF_QUANTITATIVE", "TF_MEREOLOGICAL"]
+  },
+  "metrics": {
+    "balanced_accuracy": "macro-average of per-class recall over TF_SPATIAL, TF_QUANTITATIVE, and TF_MEREOLOGICAL",
+    "C0": "direct EVAL balanced accuracy at target layer j from source-layer i FIT readout",
+    "Cself": "C0(i,i,c)",
+    "D": "Cself-C0",
+    "A_mu_sigma": "FIT-only calibration inherited from Paper-A core",
+    "Ccal": "EVAL balanced accuracy after frozen FIT-only calibration",
+    "R": "Ccal-C0",
+    "pooling": "equal arithmetic mean over all ten conditions"
+  },
+  "structural_support_rules": {
+    "distance_degradation": {
+      "quantity": "Spearman rho(Dbar, absolute normalized source-target depth distance) over eligible off-diagonal cells",
+      "tie_handling": "average ranks",
+      "support": "POSITIVE_SUPPORTED iff point estimate and one-sided 95 percent cluster-bootstrap lower bound are both greater than zero"
+    },
+    "sdi": {
+      "formula": "(SOURCE_VARIANCE-TARGET_VARIANCE)/(SOURCE_VARIANCE+TARGET_VARIANCE)",
+      "variance_convention": "numpy.var(ddof=0)",
+      "support": "SOURCE_DOMINANT iff SDI>0 and lower bound>0; TARGET_DOMINANT iff SDI<0 and upper bound<0; otherwise NO_DOMINANCE or NO_ROW_OR_COLUMN_VARIATION"
+    },
+    "low_d_recovery": {
+      "mask": "DIAGNOSTIC pooled off-diagonal Dbar(i,j)<=0",
+      "estimand": "mean EVAL Rbar over the frozen diagnostic-selected pair set",
+      "support": "SUPPORTED iff point estimate>0 and one-sided 95 percent cluster-bootstrap lower bound>0; otherwise NOT_SUPPORTED or NOT_EVALUABLE"
+    }
+  },
+  "profile": {
+    "components": ["distance_degradation_state", "SDI_source_target_dominance_state", "LOW_D_recovery_support_state"],
+    "exact_match_only": true,
+    "partial_match_reported": true,
+    "partial_match_counts_as_replication": false,
+    "continuous_similarity_or_tolerance": false,
+    "cross_class_count_numeric_equivalence": false
+  },
+  "low_d": {
+    "selection_data": "DIAGNOSTIC only",
+    "mask_frozen_before_eval": true,
+    "eval_selection": false,
+    "post_outcome_threshold_change": false
+  },
+  "bootstrap": {
+    "replicates": 5000,
+    "seed": 20260819,
+    "resampling_unit": "source_family",
+    "stratification": ["condition", "task_class"],
+    "family_integrity": true,
+    "preserve_three_class_balance": true,
+    "preserve_condition_balance": true,
+    "layer_pairs_records_tasks_iid": false
+  },
+  "fail_closed_gate": {
+    "chain": ["SOURCE_INPUT_VALID", "SOURCE_BANK_VALID", "DATASET_SHAPE_VALID", "PAIRING_VALID", "SEMANTIC_VALID", "LEAKAGE_VALID", "SPLIT_VALID", "HASH_BOUND"],
+    "task_count_required": 3,
+    "partial_panel_allowed": false,
+    "fallback_or_substitution": false,
+    "panel_ready_after": "all three independent task chains pass"
+  },
+  "execution_boundary": {
+    "formal_model_inference_before_panel_ready": false,
+    "formal_authorization_created_here": false,
+    "data_created_at_freeze": false,
+    "result_created_at_freeze": false,
+    "next_action": "EXT_B_DATASET_CONSTRUCTION"
+  }
+}

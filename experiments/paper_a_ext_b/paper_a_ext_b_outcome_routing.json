@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0.0",
+  "routing_id": "PA-EXT-B-OUTCOME-ROUTING",
+  "status": "FROZEN_BEFORE_OUTCOME",
+  "primary_unit": "MODEL_LEVEL_THREE_CLASS_EXTERNAL_PANEL_PROFILE",
+  "primary_profile_count": 3,
+  "canonical_core_profiles": {
+    "Qwen": {"distance_degradation": "POSITIVE_SUPPORTED", "sdi": "TARGET_DOMINANT", "low_d_recovery": "NOT_SUPPORTED"},
+    "OLMo": {"distance_degradation": "POSITIVE_SUPPORTED", "sdi": "SOURCE_DOMINANT", "low_d_recovery": "SUPPORTED"},
+    "Llama": {"distance_degradation": "POSITIVE_SUPPORTED", "sdi": "TARGET_DOMINANT", "low_d_recovery": "SUPPORTED"}
+  },
+  "match": {
+    "definition": "MATCH_m=1 iff each of the three observed components equals the corresponding canonical core component",
+    "component_order": ["distance_degradation", "sdi", "low_d_recovery"],
+    "partial_matches": "reported component-by-component, not counted as exact",
+    "forbidden": ["weighted_similarity", "majority_component_rescue", "favorable_component_selection", "post_hoc_tolerance", "near_match_relabeling"]
+  },
+  "routing": {
+    "K": "MATCH_Qwen + MATCH_OLMo + MATCH_Llama",
+    "B0_MEASUREMENT_INVALID_OR_INCONCLUSIVE": {"when": "any required primary measurement is technically invalid or scientifically undefined", "scientific_conclusion": "none"},
+    "B1_BROAD_EXTERNAL_PANEL_STABILITY": {"when": "K=3", "claim_ceiling": "The registered structural compatibility profiles were stable on the prospectively constructed three-class external panel in all three tested models."},
+    "B2_MOSTLY_STABLE_WITH_MODEL_SPECIFIC_CHANGE": {"when": "K=2", "claim_ceiling": "External-panel stability held for two of the three tested models, with one model exhibiting a profile change."},
+    "B3_LIMITED_EXTERNAL_PANEL_STABILITY": {"when": "K=1", "claim_ceiling": "Only limited model-level external-panel stability was observed."},
+    "B4_BROAD_EXTERNAL_PANEL_PROFILE_CHANGE": {"when": "K=0", "claim_ceiling": "All three tested models changed structural profile on the external panel, indicating substantial panel/task conditionality of the registered profile summaries."}
+  },
+  "routing_properties": {"exhaustive": true, "mutually_exclusive": true, "new_routes_after_outcome": false, "llama_route": "THIRD_REGISTERED_PROFILE"},
+  "secondary_diagnostics": {
+    "allowed": ["per_class_recall", "task_conditioned_C0", "task_conditioned_D", "task_conditioned_R", "confusion_error_contribution", "task_stratified_condition_summary"],
+    "readout": "same global three-class readout",
+    "primary_profile_count_changed": false,
+    "match_or_K_changed": false,
+    "interpretation": "Task-stratified diagnostics localize which semantic classes contributed to the aggregate external-panel result."
+  },
+  "technical_vs_scientific_failure": {
+    "SOURCE_FAILURE": "source requirements cannot be satisfied",
+    "DATASET_VALIDATION_FAILURE": "shape, semantic, leakage, pairing, split, or hash validation fails",
+    "MEASUREMENT_FAILURE": "required metric cannot be validly computed",
+    "MODEL_EXECUTION_FAILURE": "runtime prevents valid measurement",
+    "SCIENTIFIC_NONREPLICATION": "valid measurement exists but one or more model profiles do not match"
+  },
+  "hard_stop": {
+    "after_one_technically_valid_result": true,
+    "no_new_task": true,
+    "no_replacement_task": true,
+    "no_temporal_rescue": true,
+    "no_fourth_model": true,
+    "no_new_primary_metric": true,
+    "no_new_profile_component": true,
+    "no_outcome_adaptive_rescue": true,
+    "next_phase": "Paper-A final manuscript phase; technical recovery only without scientific semantic change"
+  },
+  "pre_freeze_flags": {"outcome_observed": false, "formal_authorization": false, "formal_result": false}
+}

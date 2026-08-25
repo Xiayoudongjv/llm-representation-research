@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0.0",
+  "manifest_id": "PA-EXT-B-AUTHORITY-MANIFEST",
+  "status": "FROZEN_PRE_DATA_PRE_MODEL_OUTCOME",
+  "experiment_id": "PAPER-A-EXT-B",
+  "manifest_scope": "Bind the four JSON authority artifacts, the reviewer-facing preregistration, and inherited authorities that determine EXT-B semantics. The manifest's own raw SHA-256 is reported in the preregistration document because a file cannot contain its own fixed-point hash.",
+  "new_ext_b_authorities": [
+    {"path": "experiments/paper_a_ext_b/paper_a_ext_b_preregistration.json", "sha256": "8069439f96db96649a7bbbff3413b2ec6dda37a72d5bbb98a72934349c3e42f8"},
+    {"path": "experiments/paper_a_ext_b/paper_a_ext_b_frozen_protocol.json", "sha256": "c67e8786f93d593dfd8ae70c1e1348758997baf097aed4e5393a4e30641a40ac"},
+    {"path": "experiments/paper_a_ext_b/paper_a_ext_b_outcome_routing.json", "sha256": "6e0ad230664e10b26849ef284fae11174093d2adf4d36eb79dc37201ab29e7f0"},
+    {"path": "docs/experiments/PAPER-A-EXT-B-PREREGISTRATION.md", "sha256": "4e25dd8e9bbaf4ac6a3240ddc9f96b01532ed20591e2e1527a4448db8ebd5184"}
+  ],
+  "manifest_self_hash_policy": "raw SHA-256 reported in PAPER-A-EXT-B-PREREGISTRATION.md and bound by the final commit; no self-referential field is used",
+  "inherited_authorities": {
+    "exp026_metric_authority": {"path": "experiments/exp026/EXP-026-MATRIX-METRIC-SPECIFICATION.md", "sha256": "5f58445e26eee7effddd7cd5b4ae255b7153d61fa7a76b5c0684fa1dbb08d8db"},
+    "exp026_frozen_config": {"path": "experiments/exp026/exp026_frozen_config.json", "sha256": "ccf60c8a9dc6f3b9d3cce533910334e1f8ec33665a1cf692b98a8aaf683afb57"},
+    "exp026_canonical_result": {"path": "experiments/exp026/results/exp026_results.json", "sha256": "9a5bed41b432e2f89b0873869d76e1f5775f9b38caff9472553fca335bbba551"},
+    "exp026_routing_rules": {"path": "experiments/exp026/EXP-026-ROUTING-RULES.md", "sha256": "4ff6be135066e1cd0bbcad54ee6c7472d693d35063df8202326b5bd0b4308856"},
+    "exp027_frozen_design": {"path": "experiments/exp027/exp027_frozen_design.json", "sha256": "b37bfd9c3d57bf891ef1993b3a1d7737fcedbe143813d61f5c7ae9ecb0bc5b1a"},
+    "exp027_canonical_result": {"path": "experiments/exp027/results/exp027_results.json", "sha256": "1f15027d17456f5dc8ff4803452c732af8ba464f70e537195b8833d9d44f6c6d"},
+    "exp027_canonical_manifest": {"path": "docs/experiments/canonical/EXP-027-CANONICAL-RESULT-MANIFEST.json", "sha256": "0f5c7319d3b2cd2148b3a21c3afae218545b13cf987f4a7850579dfea45042d0"},
+    "ext_a_frozen_config": {"path": "experiments/paper_a_ext_a/paper_a_ext_a_frozen_config.json", "sha256": "78e58c43c7fabfafaa03084ef17f9c5ff4c02665d242aa57b9f70a9d3b793e5d"},
+    "ext_a_v3_content_design": {"path": "experiments/paper_a_ext_a/paper_a_ext_a_panel_content_design_v3.json", "sha256": "205376bbd8704862de2cafeb1fd09719b498688532e6c54aec3a2326b71f0462"},
+    "ext_a_v3_content_binding": {"path": "experiments/paper_a_ext_a/paper_a_ext_a_content_design_v3_binding.json", "sha256": "73b572853ae13d597677a7ca421e06dbd623172416f7e04dc5244f0ce586c80e"},
+    "ext_a_source_manifest": {"path": "experiments/paper_a_ext_a/paper_a_ext_a_external_asset_source_manifest.json", "sha256": "72bf8de42c315e390269eeb874ee89828c7cc1541e2d4171fd5dc8ae2215faf9"},
+    "ext_a_source_binding": {"path": "experiments/paper_a_ext_a/paper_a_ext_a_external_asset_source_v4_binding.json", "sha256": "b23fc6329b7863bfa0a7f80c06bf582706ce1457c5b04ecffaefd74bfefddc7f"},
+    "ext_a_v3_generator": {"path": "experiments/paper_a_ext_a/pa_ext_a_v3_pipeline.py", "sha256": "6508490ec2141f0531f7e61a24c3496e00705fd85d34bc5ca725d24bd38b3953", "scope": "tracked validated construction infrastructure; not a completed EXT-B dataset"},
+    "ext_a_v3_pipeline_validator": {"path": "experiments/paper_a_ext_a/validate_pa_ext_a_v3_pipeline.py", "sha256": "c344ff526948b9b0e98f305095164a643478080427f84786d02668776fb22cb1"},
+    "ext_a_v3_content_validator": {"path": "experiments/paper_a_ext_a/validate_paper_a_ext_a_content_design_v3.py", "sha256": "704df4bda0f92426cd6298672646a954649c31b990065d57717f3fdc358b18ab"},
+    "stepgame_source_revision": {"path": "D:/AI_Cache/huggingface/hub/datasets--ZhengyanShi--StepGame/snapshots/6d859381dfd518cae3f073b268aaa323bf4dcf04/train.jsonl", "revision": "6d859381dfd518cae3f073b268aaa323bf4dcf04", "bytes": 12624082, "sha256": "774b73385c1a6995e121e87f16be790355555c4c18c01eb42464e28c6ea3482c"},
+    "wordnet_3_0_archive": {"path": "experiments/paper_a_ext_a/data/raw/WordNet-3.0.tar.gz", "version": "3.0", "bytes": 11537239, "sha256": "640db279c949a88f61f851dd54ebbb22d003f8b90b85267042ef85a3781d3a52"},
+    "quantitative_source_generation_identity": {"path": "experiments/paper_a_ext_a/pa_ext_a_v3_pipeline.py", "sha256": "6508490ec2141f0531f7e61a24c3496e00705fd85d34bc5ca725d24bd38b3953", "scope": "programmatic numeric-comparison construction identity, constrained by the frozen EXT-B quantitative policy"}
+  },
+  "provenance_rules": {
+    "fresh_ext_b_dataset_required": true,
+    "completed_ext_b_dataset_preexisted_freeze": false,
+    "old_final_benchmark_text_reused": false,
+    "model_outcome_based_filtering": false,
+    "source_policy_adaptation_after_outcome": false,
+    "mutable_unqualified_engineering_bound_as_scientific_authority": false
+  },
+  "freeze_flags": {
+    "EXT_B_AUTHORITY_MANIFEST_CREATED": true,
+    "DATASET_GENERATED": false,
+    "MODEL_INFERENCE_RUN": false,
+    "SCIENTIFIC_RESULT_CREATED": false,
+    "AUTHORIZATION_CREATED_OR_CONSUMED": false,
+    "TEMPORAL_RUNTIME_EXECUTED": false,
+    "CORE_CANONICAL_RESULT_MODIFIED": false
+  }
+}

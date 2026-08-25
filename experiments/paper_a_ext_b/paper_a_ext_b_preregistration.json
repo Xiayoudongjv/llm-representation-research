@@ -1,0 +1,234 @@
+{
+  "schema_version": "1.0.0",
+  "experiment_id": "PAPER-A-EXT-B",
+  "task_id": "PA-EXT-B-FORMAL-PREREGISTRATION-AND-FREEZE",
+  "status": "FROZEN_PRE_DATA_PRE_MODEL_OUTCOME",
+  "classification": "POST_EXT_A_FEASIBILITY_PRE_MODEL_OUTCOME_NEW_PROSPECTIVE_STUDY",
+  "scientific_question": "Do the registered structural cross-depth operational-compatibility profiles observed in the Paper-A core remain stable on a newly prospectively constructed three-class external semantic panel?",
+  "study_boundary": {
+    "new_study": true,
+    "ext_a_continuation": false,
+    "ext_a_amendment": false,
+    "reduced_ext_a": false,
+    "temporal_v2_or_v3_continuation": false,
+    "rescue_experiment": false,
+    "model_outcomes_observed_at_freeze": false,
+    "datasets_created_at_freeze": false,
+    "authorization_created_or_consumed": false,
+    "formal_inference_performed": false
+  },
+  "models": [
+    {
+      "model_id": "Qwen/Qwen3-1.7B",
+      "model_family": "Qwen3",
+      "model_revision": "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e",
+      "normalized_depth_denominator": 27,
+      "logical_decoder_blocks": 28
+    },
+    {
+      "model_id": "allenai/OLMo-2-0425-1B-Instruct",
+      "model_family": "OLMo2",
+      "model_revision": "48d788eca847d4d7548f375ad03d3c9312f6139e",
+      "normalized_depth_denominator": 15,
+      "logical_decoder_blocks": 16
+    },
+    {
+      "model_id": "Meta-Llama-3.2-1B-Instruct",
+      "model_family": "Llama-3.2",
+      "model_revision": "BOUND_BY_EXP027_LLAMA_MODEL_AUTHORITY",
+      "normalized_depth_denominator": 15,
+      "logical_decoder_blocks": 16
+    }
+  ],
+  "task_panel": [
+    {"task_class": "TF_SPATIAL", "task_id": "exta_tf_spatial"},
+    {"task_class": "TF_QUANTITATIVE", "task_id": "exta_tf_quantitative"},
+    {"task_class": "TF_MEREOLOGICAL", "task_id": "exta_tf_mereological"}
+  ],
+  "temporal_included": false,
+  "replacement_task_allowed": false,
+  "new_model_allowed": false,
+  "dataset_design": {
+    "families_per_task": 220,
+    "records_per_task": 440,
+    "records_per_family": 2,
+    "total_families": 660,
+    "total_records": 1320,
+    "exact_three_class_balance": true,
+    "split_families_per_task": {"FIT": 60, "DIAGNOSTIC": 80, "EVAL": 80},
+    "split_records_per_task": {"FIT": 120, "DIAGNOSTIC": 160, "EVAL": 160},
+    "condition_family_allocation_per_task": {"FIT": 6, "DIAGNOSTIC": 8, "EVAL": 8},
+    "condition_count": 10,
+    "condition_order": [
+      "c01_lexical_relex",
+      "c02_syntactic_restructure",
+      "c03_controlled_compression",
+      "c04_controlled_elaboration",
+      "c05_relation_explicit",
+      "c06_relation_implicit",
+      "c07_register_formal",
+      "c08_register_informal",
+      "c09_neutral_distractor_prefix",
+      "c10_anaphoric_reference"
+    ],
+    "reference_and_realization_are_roles": true,
+    "conditions_are_surface_realizations_not_targets": true
+  },
+  "primary_readout": {
+    "unit": "MODEL_LEVEL_THREE_CLASS_EXTERNAL_PANEL_PROFILE",
+    "profile_count": 3,
+    "global_three_class_readout": true,
+    "task_stratified_primary": false,
+    "fit_data": "FIT records from all three classes",
+    "scaler": "StandardScaler(with_mean=true, with_std=true)",
+    "classifier": "multinomial LogisticRegression",
+    "classifier_settings": {
+      "solver": "lbfgs",
+      "penalty": "L2",
+      "C": 1.0,
+      "fit_intercept": true,
+      "tol": 0.0001,
+      "max_iter": 1000,
+      "class_weight": null,
+      "random_state": null
+    },
+    "task_specific_primary_classifiers": false,
+    "one_vs_rest_primary_classifiers": false
+  },
+  "primary_measurements": {
+    "balanced_accuracy": "macro-average of per-class recall over TF_SPATIAL, TF_QUANTITATIVE, and TF_MEREOLOGICAL",
+    "C0": "direct EVAL balanced accuracy of the FIT source-layer readout applied to target-layer representations under condition c",
+    "Cself": "C0(i,i,c)",
+    "D": "Cself-C0",
+    "calibration": "FIT-only A_mu_sigma",
+    "Ccal": "EVAL balanced accuracy after the frozen FIT-only A_mu_sigma calibration",
+    "R": "Ccal-C0",
+    "pooling": "equal-weight arithmetic mean over the same ten frozen conditions",
+    "primary_matching_unit": "model-level three-component categorical profile"
+  },
+  "structural_support_rules": {
+    "distance_degradation": {
+      "quantity": "Spearman rho between pooled off-diagonal Dbar(i,j) and absolute normalized source-target depth distance",
+      "tie_handling": "average ranks",
+      "support": "POSITIVE_SUPPORTED iff point estimate and one-sided 95 percent cluster-bootstrap lower bound are both greater than zero"
+    },
+    "sdi": {
+      "formula": "(SOURCE_VARIANCE-TARGET_VARIANCE)/(SOURCE_VARIANCE+TARGET_VARIANCE)",
+      "source_variance": "variance of off-diagonal row means over eligible source rows, ddof=0",
+      "target_variance": "variance of off-diagonal column means over eligible source rows, ddof=0",
+      "support": "SOURCE_DOMINANT iff SDI>0 and lower bound>0; TARGET_DOMINANT iff SDI<0 and upper bound<0; otherwise NO_DOMINANCE or NO_ROW_OR_COLUMN_VARIATION"
+    },
+    "low_d_recovery": {
+      "mask": "DIAGNOSTIC pooled off-diagonal Dbar(i,j)<=0",
+      "estimand": "mean EVAL Rbar over the frozen diagnostic-selected pair set",
+      "support": "SUPPORTED iff point estimate>0 and one-sided 95 percent cluster-bootstrap lower bound>0; otherwise NOT_SUPPORTED or NOT_EVALUABLE"
+    }
+  },
+  "comparability": {
+    "raw_ba_directly_comparable_to_core": false,
+    "structural_profile_comparable_to_core": true,
+    "raw_quantities_status": "STRUCTURALLY_COMPARABLE_ONLY",
+    "bounded_quantities": ["C0", "Cself", "Ccal", "D", "R", "distance_rho", "SDI", "LOW_D_recovery"],
+    "forbidden_claims": ["absolute balanced-accuracy equality", "semantic equivalence", "universal task invariance", "architecture causality", "behavioral control"]
+  },
+  "profile_components": ["DISTANCE_DEGRADATION_STATE", "SDI_SOURCE_TARGET_DOMINANCE_STATE", "LOW_D_RECOVERY_SUPPORT_STATE"],
+  "canonical_core_profiles": {
+    "Qwen": {"distance": "POSITIVE_SUPPORTED", "SDI": "TARGET_DOMINANT", "LOW_D_recovery": "NOT_SUPPORTED"},
+    "OLMo": {"distance": "POSITIVE_SUPPORTED", "SDI": "SOURCE_DOMINANT", "LOW_D_recovery": "SUPPORTED"},
+    "Llama": {"distance": "POSITIVE_SUPPORTED", "SDI": "TARGET_DOMINANT", "LOW_D_recovery": "SUPPORTED", "route": "THIRD_REGISTERED_PROFILE"}
+  },
+  "exact_profile_match": {
+    "rule": "MATCH_m=1 iff all three EXT-B components exactly equal the corresponding canonical core profile",
+    "partial_matches_count_as_exact": false,
+    "weighted_similarity": false,
+    "majority_component_rescue": false,
+    "post_hoc_tolerance": false
+  },
+  "routing": {
+    "K": "MATCH_Qwen+MATCH_OLMo+MATCH_Llama",
+    "B0": "B0_MEASUREMENT_INVALID_OR_INCONCLUSIVE if any required primary measurement is technically invalid or scientifically undefined",
+    "B1": "B1_BROAD_EXTERNAL_PANEL_STABILITY if K=3",
+    "B2": "B2_MOSTLY_STABLE_WITH_MODEL_SPECIFIC_CHANGE if K=2",
+    "B3": "B3_LIMITED_EXTERNAL_PANEL_STABILITY if K=1",
+    "B4": "B4_BROAD_EXTERNAL_PANEL_PROFILE_CHANGE if K=0",
+    "exhaustive_and_mutually_exclusive": true,
+    "post_outcome_new_routes": false
+  },
+  "secondary_diagnostics": {
+    "allowed": ["per_class_recall", "task_conditioned_C0_contribution", "task_conditioned_D_contribution", "task_conditioned_R_contribution", "confusion_error_contribution", "task_stratified_condition_summary"],
+    "same_global_readout": true,
+    "independent_task_profiles": false,
+    "may_change_match_or_K": false,
+    "preferred_interpretation": "Task-stratified diagnostics localize which semantic classes contributed to the aggregate external-panel result."
+  },
+  "bootstrap": {
+    "replicates": 5000,
+    "seed": 20260819,
+    "rng": "numpy.random.Generator(numpy.random.PCG64(20260819))",
+    "resampling_unit": "source_family",
+    "strata": ["condition", "task_class"],
+    "preserve": ["condition_balance", "three_class_balance", "source_family_integrity"],
+    "ci_level": 0.95,
+    "ci_method": "percentile",
+    "iid_units_forbidden": ["layer_pairs", "individual_records", "tasks"],
+    "population_inference_over_all_tasks": false
+  },
+  "low_d": {
+    "mask_source": "DIAGNOSTIC only",
+    "mask_definition": "canonical LOW-D rule applied to diagnostic D quantities",
+    "mask_frozen_before_eval_recovery": true,
+    "eval_used_for_mask": false,
+    "post_outcome_threshold_change": false
+  },
+  "dataset_gate": {
+    "required_for_each_task": ["SOURCE_INPUT_VALID", "SOURCE_BANK_VALID", "DATASET_SHAPE_VALID", "PAIRING_VALID", "SEMANTIC_VALID", "LEAKAGE_VALID", "SPLIT_VALID", "HASH_BOUND"],
+    "three_of_three_required": true,
+    "spatial_ready": "only after spatial chain passes",
+    "quantitative_ready": "only after quantitative chain passes",
+    "mereological_ready": "only after mereological chain passes",
+    "panel_ready": "only after all three chains pass",
+    "failure_route": "EXT_B_SOURCE_OR_DATASET_FAILURE",
+    "model_inference_after_partial_gate": false,
+    "fallback_or_substitution": false
+  },
+  "failure_states": ["SOURCE_FAILURE", "DATASET_VALIDATION_FAILURE", "MEASUREMENT_FAILURE", "MODEL_EXECUTION_FAILURE", "SCIENTIFIC_NONREPLICATION"],
+  "hard_stop_after_first_valid_result": true,
+  "hard_stop": {
+    "new_task": false,
+    "replacement_task": false,
+    "temporal_rescue": false,
+    "fourth_model": false,
+    "new_primary_metric": false,
+    "new_profile_component": false,
+    "outcome_adaptive_rescue": false,
+    "paper_phase_after_result": "FINAL_MANUSCRIPT_PHASE"
+  },
+  "historical_disclosure": {
+    "ext_a_required_four_tasks_including_temporal": true,
+    "ext_a_terminated_before_canonical_four_task_panel": true,
+    "ext_a_model_inference_occurred": false,
+    "ext_b_is_new_three_class_study": true,
+    "preexisting_policies_not_completed_ext_b_dataset": true,
+    "temporal_runtime_chain": "TEMP-V2 QLever runtime",
+    "temporal_feasibility_chain": "TEMP-FEAS-002R V8 feasibility analysis",
+    "numerical_conflation": false
+  },
+  "next_lifecycle_action": "EXT_B_DATASET_CONSTRUCTION",
+  "flags": {
+    "EXT_B_PREREGISTRATION_CREATED": true,
+    "EXT_B_PROTOCOL_FROZEN": true,
+    "EXT_B_OUTCOME_ROUTING_FROZEN": true,
+    "EXT_B_AUTHORITY_MANIFEST_CREATED": true,
+    "EXT_B_GLOBAL_THREE_CLASS_READOUT_VALID": true,
+    "EXT_B_3_OF_3_GATE_FROZEN": true,
+    "EXT_B_MODEL_OUTCOMES_OBSERVED_AT_FREEZE": false,
+    "EXT_B_DATASETS_CREATED_AT_FREEZE": false,
+    "EXT_B_FREEZE_VALIDATION_PASS": true,
+    "DATASET_GENERATED": false,
+    "MODEL_INFERENCE_RUN": false,
+    "SCIENTIFIC_RESULT_CREATED": false,
+    "AUTHORIZATION_CREATED_OR_CONSUMED": false,
+    "TEMPORAL_RUNTIME_EXECUTED": false,
+    "CORE_CANONICAL_RESULT_MODIFIED": false
+  }
+}
