@@ -45,6 +45,9 @@ def _dump(tmp_path: Path) -> Path:
         _triple("Q2", OFFLINE.RDFS_LABEL_URI, "Safe event", literal=True, language="en"),
         _triple("Q3", OFFLINE.RDFS_LABEL_URI, "Bilingual event", literal=True, language="en"),
         _triple("Q5", OFFLINE.RDFS_LABEL_URI, "非英文", literal=True, language="zh"),
+        "_:orphan <http://example.org/p> <http://example.org/o> .\n",
+        "<http://example.org/s> <http://www.wikidata.org/prop/direct/P31> _:orphan .\n",
+        "_:orphan-class <http://www.wikidata.org/prop/direct/P279> <http://www.wikidata.org/entity/Q1190554> .\n",
     ]
     path = tmp_path / "mini-wikidata.nt.bz2"
     with bz2.open(path, "wb") as handle:
@@ -75,12 +78,44 @@ def test_streaming_bz2_reader_is_linewise_and_reports_bounded_progress(tmp_path:
     path = _dump(tmp_path)
     counters = OFFLINE.ProgressCounters(path.stat().st_size)
     triples = list(OFFLINE.iter_nt_triples(path, counters))
-    assert len(triples) == 15
+    assert len(triples) == 18
     assert counters.compressed_file_size_bytes == path.stat().st_size
     assert counters.compressed_file_position_bytes is None
-    assert counters.triples_scanned == 15
+    assert counters.triples_scanned == 18
     with pytest.raises(FileNotFoundError):
         list(OFFLINE.iter_nt_triples(tmp_path / "missing.nt.bz2"))
+
+
+def test_blank_node_subject_object_grammar_and_identity() -> None:
+    subject, predicate, obj = OFFLINE.parse_nt_line(
+        "_:abc <http://example.org/p> <http://example.org/o> ."
+    )
+    assert subject == "_:abc"
+    assert predicate == "http://example.org/p"
+    assert obj["kind"] == "uri"
+
+    first = OFFLINE.parse_nt_line("<http://example.org/s> <http://example.org/p> _:a_b-2 .")
+    second = OFFLINE.parse_nt_line("<http://example.org/s2> <http://example.org/p> _:a_b-2 .")
+    assert first and second
+    assert first[2] == {"kind": "blank_node", "value": "_:a_b-2", "language": None}
+    assert second[2]["value"] == first[2]["value"]
+
+    for label in ("_:a", "_:0", "_:a_b-2", "_:é·a", "_:a\u0301b"):
+        parsed = OFFLINE.parse_nt_line(f"{label} <http://example.org/p> <http://example.org/o> .")
+        assert parsed and parsed[0] == label
+
+    malformed = (
+        "_: <http://example.org/p> <http://example.org/o> .",
+        "_:abc. <http://example.org/p> <http://example.org/o> .",
+        "<http://example.org/s> <http://example.org/p> _:. .",
+        "_:ab c <http://example.org/p> <http://example.org/o> .",
+        "_:abc <http://example.org/p> _:def ghi .",
+        "_:abc .",
+        "<http://example.org/s> _:predicate <http://example.org/o> .",
+    )
+    for line in malformed:
+        with pytest.raises(ValueError):
+            OFFLINE.parse_nt_line(line)
 
 
 def test_standards_compliant_literal_and_iri_escapes(tmp_path: Path) -> None:
@@ -140,6 +175,10 @@ def test_root_closure_handles_direct_multihop_cycle_disconnected_and_both_roots(
     assert {"Q1190554", "Q100", "Q101", "Q102", "Q1656682"} <= compatible
     assert "Q200" not in compatible
     assert "Q300" not in compatible
+
+    candidates, _ = OFFLINE.scan_p31_candidates(path, compatible)
+    assert "http://example.org/s" not in candidates
+    assert "_:orphan-class" not in parents
 
 
 def test_structural_pass_filters_prior_ids_before_hydration(tmp_path: Path) -> None:

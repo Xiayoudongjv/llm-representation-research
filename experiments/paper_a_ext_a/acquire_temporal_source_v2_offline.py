@@ -195,6 +195,78 @@ def _decode_iri_ref(token: str) -> str:
     return "".join(value)
 
 
+def _is_pn_chars_base(char: str) -> bool:
+    codepoint = ord(char)
+    return (
+        0x41 <= codepoint <= 0x5A
+        or 0x61 <= codepoint <= 0x7A
+        or 0x00C0 <= codepoint <= 0x00D6
+        or 0x00D8 <= codepoint <= 0x00F6
+        or 0x00F8 <= codepoint <= 0x02FF
+        or 0x0370 <= codepoint <= 0x037D
+        or 0x037F <= codepoint <= 0x1FFF
+        or 0x200C <= codepoint <= 0x200D
+        or 0x2070 <= codepoint <= 0x218F
+        or 0x2C00 <= codepoint <= 0x2FEF
+        or 0x3001 <= codepoint <= 0xD7FF
+        or 0xF900 <= codepoint <= 0xFDCF
+        or 0xFDF0 <= codepoint <= 0xFFFD
+        or 0x10000 <= codepoint <= 0xEFFFF
+    )
+
+
+def _is_pn_chars_u(char: str) -> bool:
+    return char == "_" or _is_pn_chars_base(char)
+
+
+def _is_pn_chars(char: str) -> bool:
+    codepoint = ord(char)
+    return (
+        _is_pn_chars_u(char)
+        or char == "-"
+        or "0" <= char <= "9"
+        or codepoint == 0x00B7
+        or 0x0300 <= codepoint <= 0x036F
+        or 0x203F <= codepoint <= 0x2040
+    )
+
+
+def _validate_blank_node_label(token: str) -> str:
+    if not token.startswith("_:"):
+        raise ValueError("invalid BLANK_NODE_LABEL prefix")
+    label = token[2:]
+    if not label or not (_is_pn_chars_u(label[0]) or "0" <= label[0] <= "9"):
+        raise ValueError("invalid BLANK_NODE_LABEL start")
+    if len(label) > 1:
+        if not (_is_pn_chars_u(label[-1]) or "0" <= label[-1] <= "9"):
+            raise ValueError("invalid BLANK_NODE_LABEL end")
+        if any(not _is_pn_chars(char) for char in label[1:-1]):
+            raise ValueError("invalid BLANK_NODE_LABEL character")
+    return token
+
+
+def _read_term(text: str, index: int) -> tuple[str, int]:
+    if index >= len(text):
+        raise ValueError("missing N-Triples term")
+    if text[index] == "<":
+        closing = text.find(">", index + 1)
+        if closing < 0:
+            raise ValueError("unterminated IRIREF")
+        return text[index : closing + 1], closing + 1
+    if text.startswith("_:", index):
+        closing = index + 2
+        while closing < len(text) and not text[closing].isspace():
+            closing += 1
+        return text[index:closing], closing
+    raise ValueError("unsupported N-Triples term")
+
+
+def _skip_space(text: str, index: int) -> int:
+    while index < len(text) and text[index].isspace():
+        index += 1
+    return index
+
+
 def parse_nt_line(line: str) -> tuple[str, str, dict[str, str | None]] | None:
     stripped = line.strip()
     if not stripped or stripped.startswith("#"):
@@ -202,14 +274,23 @@ def parse_nt_line(line: str) -> tuple[str, str, dict[str, str | None]] | None:
     if not stripped.endswith("."):
         raise ValueError("N-Triples line does not end with a period")
     body = stripped[:-1].rstrip()
-    first = re.match(r"^(<[^>]+>)\s+(<[^>]+>)\s+(.+)$", body)
-    if not first:
-        raise ValueError("unsupported N-Triples structure")
-    subject, predicate, object_token = first.groups()
-    subject = _decode_iri_ref(subject)
-    predicate = _decode_iri_ref(predicate)
+    index = 0
+    subject_token, index = _read_term(body, index)
+    if subject_token.startswith("<"):
+        subject = _decode_iri_ref(subject_token)
+    else:
+        subject = _validate_blank_node_label(subject_token)
+    index = _skip_space(body, index)
+    predicate_token, index = _read_term(body, index)
+    if not predicate_token.startswith("<"):
+        raise ValueError("N-Triples predicate must be IRIREF")
+    predicate = _decode_iri_ref(predicate_token)
+    index = _skip_space(body, index)
+    object_token = body[index:]
     if object_token.startswith("<") and object_token.endswith(">"):
         obj = {"kind": "uri", "value": _decode_iri_ref(object_token), "language": None}
+    elif object_token.startswith("_:"):
+        obj = {"kind": "blank_node", "value": _validate_blank_node_label(object_token), "language": None}
     elif object_token.startswith('"'):
         value, language = _unquote_literal(object_token)
         obj = {"kind": "literal", "value": value, "language": language}

@@ -23,14 +23,14 @@ def validate() -> dict[str, object]:
     tree = ast.parse(source)
     functions = {node.name for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)}
     required = {
-        "_unquote_literal", "_decode_iri_ref", "parse_nt_line", "iter_nt_triples", "scan_p279_closure", "scan_p31_candidates", "scan_labels",
+        "_unquote_literal", "_decode_iri_ref", "_validate_blank_node_label", "_read_term", "parse_nt_line", "iter_nt_triples", "scan_p279_closure", "scan_p31_candidates", "scan_labels",
         "build_structural_snapshot", "compute_root_compatible_classes", "entity_to_candidate",
         "finalize_hydrated_candidates", "preflight", "main",
     }
     missing = sorted(required - functions)
     if missing or "transformers" in source or "torch" in source or "json.loads(quoted)" in source:
         raise RuntimeError(f"TEMPORAL_SOURCE_V2_OFFLINE_HYBRID_VALIDATION_FAILED:{missing}")
-    for marker in ('"t": "\\t"', '"u"', '"U"', "invalid Unicode scalar value"):
+    for marker in ('"t": "\\t"', '"u"', '"U"', "invalid Unicode scalar value", "blank_node"):
         if marker not in source:
             raise RuntimeError("TEMPORAL_SOURCE_V2_OFFLINE_NTRIPLES_DECODER_MISSING")
     if not MONITOR.exists() or "read_status" not in MONITOR.read_text(encoding="utf-8"):
@@ -53,6 +53,10 @@ def validate() -> dict[str, object]:
         "TEMPORAL_SOURCE_V2_NTRIPLES_ECHAR_QUALIFIED",
         "TEMPORAL_SOURCE_V2_NTRIPLES_UCHAR_QUALIFIED",
         "TEMPORAL_SOURCE_V2_REALISTIC_BZ2_FIXTURE_QUALIFIED",
+        "TEMPORAL_SOURCE_V2_OFFLINE_R5_CORRECTION_COMPLETE",
+        "TEMPORAL_SOURCE_V2_NTRIPLES_BLANK_NODE_SUPPORT_QUALIFIED",
+        "TEMPORAL_SOURCE_V2_NTRIPLES_SUBJECT_GRAMMAR_COMPLETE",
+        "TEMPORAL_SOURCE_V2_NTRIPLES_OBJECT_GRAMMAR_COMPLETE",
         "TEMPORAL_SOURCE_V2_OFFLINE_LONG_RUN_READY",
     }
     if any(required_flags.get(flag) is not True for flag in expected_true):

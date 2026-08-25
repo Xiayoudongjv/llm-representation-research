@@ -70,6 +70,17 @@
     "malformed_escape_fail_closed": true,
     "real_dump_scanned_by_codex": false
   },
+  "r5_correction_evidence": {
+    "real_attempt_failure_phase": "PASS1_P279",
+    "real_attempt_failure": "BLANK_NODE_LABEL unsupported by parse_nt_line",
+    "blank_node_subject_supported": true,
+    "blank_node_object_supported": true,
+    "predicate_remains_iri_only": true,
+    "blank_nodes_enter_qid_extraction": false,
+    "blank_nodes_enter_scientific_selection": false,
+    "real_dump_scanned_by_codex": false,
+    "preserved_paths": ["E:\\TEMP_V2_OFFLINE", "E:\\TEMP_V2_OFFLINE_RUN1", "E:\\TEMP_V2_OFFLINE_RUN2"]
+  },
   "required_flags": {
     "TEMPORAL_SOURCE_V2_OFFLINE_HYBRID_BUILD_COMPLETE": true,
     "TEMPORAL_SOURCE_V2_STREAMING_BZ2_QUALIFIED": true,
@@ -86,6 +97,10 @@
     "TEMPORAL_SOURCE_V2_NTRIPLES_ECHAR_QUALIFIED": true,
     "TEMPORAL_SOURCE_V2_NTRIPLES_UCHAR_QUALIFIED": true,
     "TEMPORAL_SOURCE_V2_REALISTIC_BZ2_FIXTURE_QUALIFIED": true,
+    "TEMPORAL_SOURCE_V2_OFFLINE_R5_CORRECTION_COMPLETE": true,
+    "TEMPORAL_SOURCE_V2_NTRIPLES_BLANK_NODE_SUPPORT_QUALIFIED": true,
+    "TEMPORAL_SOURCE_V2_NTRIPLES_SUBJECT_GRAMMAR_COMPLETE": true,
+    "TEMPORAL_SOURCE_V2_NTRIPLES_OBJECT_GRAMMAR_COMPLETE": true,
     "TEMPORAL_SOURCE_V2_BASE_PROTOCOL_CHANGED": false,
     "TEMPORAL_SOURCE_V2_SCIENTIFIC_LOGIC_CHANGED": false,
     "TEMPORAL_SOURCE_V2_SCIENTIFIC_SEMANTICS_CHANGED": false,
