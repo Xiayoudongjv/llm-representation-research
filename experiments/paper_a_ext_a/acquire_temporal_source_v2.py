@@ -43,6 +43,8 @@ ROOTS = ("Q1190554", "Q1656682")
 GREGORIAN_QID = "Q1985727"
 MIN_PRECISION = 11
 PAGE_SIZE = 100
+QID_URI_RE = re.compile(r"^http://www\.wikidata\.org/entity/(Q[1-9][0-9]*)$")
+QID_URI_SPARQL_PATTERN = "^http://www[.]wikidata[.]org/entity/Q[1-9][0-9]*$"
 TARGET_EVENTS = 440
 TARGET_FAMILIES = 220
 RESERVE_EVENTS = 600
@@ -141,11 +143,15 @@ def event_page_query(limit: int, offset: int) -> str:
         raise ValueError("limit must be positive and offset must be non-negative")
     return f"""PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT DISTINCT ?item ?class ?label WHERE {{
   ?item wdt:P31 ?class .
   ?class wdt:P279* ?root .
   VALUES ?root {{ wd:Q1190554 wd:Q1656682 }}
+  FILTER(REGEX(STR(?item), "{QID_URI_SPARQL_PATTERN}"))
   ?item rdfs:label ?label .
   FILTER(lang(?label)="en")
   {main_view_filter()}
@@ -470,7 +476,7 @@ def prepare_checkpoint_for_resume(checkpoint: dict[str, Any]) -> dict[str, Any]:
     if checkpoint.get("current_state") != "TERMINAL":
         return checkpoint
     zero_data = (
-        checkpoint.get("status") == "PRODUCTION_CORE_FAILED"
+        checkpoint.get("status") in {"BACKEND_PREFLIGHT_FAILED", "PRODUCTION_CORE_FAILED"}
         and int(checkpoint.get("current_acquisition_offset", 0)) == 0
         and int(checkpoint.get("fresh_candidates_discovered", 0)) == 0
         and int(checkpoint.get("artifact_chunk_count", 0)) == 0
@@ -665,9 +671,10 @@ def _bindings(payload: dict[str, Any]) -> list[dict[str, Any]]:
 
 
 def _qid(value: str | None) -> str | None:
-    if not value:
+    if not isinstance(value, str):
         return None
-    return value.rsplit("/", 1)[-1]
+    match = QID_URI_RE.fullmatch(value)
+    return match.group(1) if match else None
 
 
 def hydrate_wdqs_event_page(structural_payload: dict[str, Any], label_payload: dict[str, Any]) -> dict[str, Any]:
@@ -936,7 +943,7 @@ def run_production(
     CLI execution uses :func:`production_acquisition_core`.
     """
     load_protocol()
-    active_client = client or WikidataQueryServiceClient()
+    active_client = client or QLeverClient()
     expected_backend = getattr(active_client, "backend_name", "QLever")
     expected_endpoint = getattr(active_client, "endpoint", QLEVER_ENDPOINT)
     expected_graph_scope = getattr(active_client, "graph_scope", GRAPH_SCOPE)

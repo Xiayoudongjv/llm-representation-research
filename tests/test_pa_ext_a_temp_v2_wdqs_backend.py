@@ -37,21 +37,21 @@ def test_wdqs_response_parsing_preserves_query_fields() -> None:
     page = {
         "results": {
             "bindings": [
-                binding(item="http://www.wikidata.org/entity/Q1", **{"class": "http://www.wikidata.org/entity/QC", "label": "An event"}),
-                binding(item="http://www.wikidata.org/entity/Q1", **{"class": "http://www.wikidata.org/entity/QD", "label": "An event"}),
+                binding(item="http://www.wikidata.org/entity/Q1", **{"class": "http://www.wikidata.org/entity/Q100", "label": "An event"}),
+                binding(item="http://www.wikidata.org/entity/Q1", **{"class": "http://www.wikidata.org/entity/Q101", "label": "An event"}),
             ]
         }
     }
     parsed = RUNNER._parse_event_page(page)
-    assert parsed == [{"qid": "Q1", "direct_p31_qids": ["QC", "QD"], "label": "An event"}]
+    assert parsed == [{"qid": "Q1", "direct_p31_qids": ["Q100", "Q101"], "label": "An event"}]
     times = RUNNER._parse_time_metadata(
         {"results": {"bindings": [binding(item="http://www.wikidata.org/entity/Q1", property="P585", timeValue="+2000-01-01T00:00:00Z", precision="11", calendar="http://www.wikidata.org/entity/Q1985727")]}}
     )
     assert times["Q1"][0]["property"] == "P585"
     parents = RUNNER._parse_parent_metadata(
-        {"results": {"bindings": [binding(**{"class": "http://www.wikidata.org/entity/QC", "parent": "http://www.wikidata.org/entity/Q1190554"})]}}
+        {"results": {"bindings": [binding(**{"class": "http://www.wikidata.org/entity/Q100", "parent": "http://www.wikidata.org/entity/Q1190554"})]}}
     )
-    assert parents == {"QC": {"Q1190554"}}
+    assert parents == {"Q100": {"Q1190554"}}
 
 
 def test_wdqs_health_failure_is_bounded_and_fail_closed() -> None:

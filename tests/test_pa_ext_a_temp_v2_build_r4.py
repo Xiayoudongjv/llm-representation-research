@@ -95,11 +95,11 @@ def test_wdqs_fetch_runs_structural_then_hydration_only_for_page() -> None:
 
 
 def test_old_and_new_fixture_contracts_are_identical() -> None:
-    structural_rows = [_row(f"Q{i:03d}", f"Q{i % 4:03d}") for i in range(98)]
-    structural_rows.extend([_row("Q098", "Q001"), _row("Q098", "Q002")])
-    labels = {f"Q{i:03d}": f"Event {i}" for i in range(99)}
+    structural_rows = [_row(f"Q{100 + i}", f"Q{1000 + i % 4}") for i in range(98)]
+    structural_rows.extend([_row("Q198", "Q1001"), _row("Q198", "Q1002")])
+    labels = {f"Q{100 + i}": f"Event {i}" for i in range(99)}
     structural = {"results": {"bindings": structural_rows}}
-    label_rows = [_row(qid, "Q000", text, language="en") for qid, text in labels.items()]
+    label_rows = [_row(qid, "Q1000", text, language="en") for qid, text in labels.items()]
     hydrated = RUNNER.hydrate_wdqs_event_page(structural, {"results": {"bindings": label_rows}})
     old_rows = [dict(row, label={"type": "literal", "xml:lang": "en", "value": labels[RUNNER._qid(row["item"]["value"])]}) for row in structural_rows]
     old_rows.append(dict(old_rows[0]))  # duplicate graph path, removed by the historical parser grouping
