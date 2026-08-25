@@ -1,0 +1,33 @@
+{
+  "authorization_id": "7df5cc05-2ce7-4a90-ba64-61d575a18885",
+  "authorized_execution_count": 1,
+  "authorized_head": "3bf6dce33960075f74380e8b11da18d4d479f149",
+  "classification": "EXP027_FORMAL_AUTHORIZATION",
+  "created_at_utc": "2026-08-22T04:48:00.998601+00:00",
+  "execution_binding": {
+    "dataset_hashes": {
+      "condition_panel_sha256": "a3b8d565a94ef6041fbe6a29d73102ab4156cc19cfc07ccaeb06206d589f7954",
+      "data_schema_sha256": "e27c33c864c6305522aec0c92839634fb5885aeb50099372b9bf46da7f2fe3ec",
+      "dataset_sha256": "46c832b68b6ac95704bf5143badc1431627d7f935648842a78971491b13ee404",
+      "exp024_preregistration_sha256": "55f9604d904fd389da28c6214082028faca081f7e3a0c87c8ba8d961f792d810",
+      "frozen_manifest_sha256": "1409a33e300463067ffc060afa58ceb238fda8d6dc2479563c886a8474748f59"
+    },
+    "frozen_design_sha256": "b37bfd9c3d57bf891ef1993b3a1d7737fcedbe143813d61f5c7ae9ecb0bc5b1a",
+    "model_identity": {
+      "converted_model_hash": "1ff795ff6a07e6a68085d206fb84417da2f083f68391c2843cd2b8ac6df8538f",
+      "model_class": "LlamaForCausalLM",
+      "model_id": "Meta-Llama-3.2-1B-Instruct",
+      "model_source": "META_OFFICIAL_NATIVE_DISTRIBUTION"
+    },
+    "preregistration_sha256": "83ba4bb14e87334a6c52a8746f86874eab9578e646abc736057fbd1f4e6322fe",
+    "repository_commit": "3bf6dce33960075f74380e8b11da18d4d479f149",
+    "runner_sha256": "d2a21c589f00bdd4811e3001896be19a68e251cbde73e386375021919fa0b746"
+  },
+  "experiment": "EXP-027",
+  "formal_mode": "--formal-run",
+  "purpose": "SINGLE_USE_FORMAL_RUN",
+  "runner_sha256": "d2a21c589f00bdd4811e3001896be19a68e251cbde73e386375021919fa0b746",
+  "schema_version": "1.0.0",
+  "single_use": true,
+  "state_machine_repair_qualification_sha256": "9ccc0a981d77fee46ade0a13734c427554508fa3df078a49bd75a078caeb7751"
+}
