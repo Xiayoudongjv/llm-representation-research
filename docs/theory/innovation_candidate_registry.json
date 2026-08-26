@@ -69,7 +69,13 @@
     "ICR-013: Later terminology must not be retroactively attributed to early work unless an explicit mapping exists.",
     "ICR-014: An innovation candidate may not modify the interpretation of a completed canonical experiment.",
     "ICR-015: Innovation candidates must not automatically determine the next experiment.",
-    "ICR-016: Candidate selection for experimentation must occur through a separate scientific route review."
+    "ICR-016: Candidate selection for experimentation must occur through a separate scientific route review.",
+    "ICR-017: Claim contamination is what is isolated, not intellectual influence; provenance may be retained without granting authority.",
+    "ICR-018: A Cross-Gap Audit is required before a prospective bridge can be considered for promotion.",
+    "ICR-019: Similarity, recovery, final return, local validity, and analogy have no implied stronger bridge without an independently defined test.",
+    "ICR-020: A recovered refinement must link to an existing candidate or remain unregistered; it must not create a new IC identifier by implication.",
+    "ICR-021: Post-closure secondary analysis may be recorded as association-only and may not retrofit confirmatory evidence.",
+    "ICR-022: Mathematical and systems inspiration require a prior-art boundary before any novelty or mechanism claim."
   ],
   "paper_routing": {
     "Paper_A": {
@@ -96,6 +102,35 @@
       "IC-010",
       "IC-011"
     ]
+  },
+  "post_anchor_reconciliation": {
+    "anchor": "LAST_PROMPT_INGESTED",
+    "pre_anchor_label": "PRE_ANCHOR_EXISTING_ASSET",
+    "recovered_delta_label": "POST_ANCHOR_RECOVERED_DELTA",
+    "provenance_chain": [
+      "USER_PROBLEM_SEED",
+      "DEEPSEEK_INSPIRATION",
+      "HISTORICAL_GPT_REFINEMENT",
+      "CURRENT_RECONCILED_FORM"
+    ],
+    "scientific_authority": "NONE_BY_DEFAULT",
+    "new_official_ic_created": false,
+    "candidate_count_changed": false,
+    "relationships": {
+      "IC-001": ["minimal sufficient realization", "sparse operator/search structure"],
+      "IC-002": ["structural/profile to admissible-operator prediction"],
+      "IC-003": ["recovery or return does not imply structural validity"],
+      "IC-004": ["invariant-constrained navigation", "total-cost constrained alignment"],
+      "IC-005": ["long-horizon composition", "return tests"],
+      "IC-006": ["operator itinerary", "path dependence", "noncommutative effects"],
+      "IC-007": ["architecture/resources to feasible realization complexity"],
+      "IC-008": ["coverage", "structural complexity", "minimum sufficient structure"],
+      "IC-009": ["typed and variable-arity operator discovery", "Open Structural Degree refinement"],
+      "IC-010": ["state-dependent routing", "trajectory/return/escape prediction"],
+      "IC-011": ["auditable Harness planner/verifier"],
+      "IC-012": ["counterexample-guided invariant refinement", "Collatz sandbox"]
+    },
+    "paper_a_firewall": "Recovered theory and post-closure CKA association analysis do not alter Paper A confirmatory evidence or claim scope."
   },
   "current_activation_firewall": {
     "innovation_registry_does_not_control_current_experiment_state": true,

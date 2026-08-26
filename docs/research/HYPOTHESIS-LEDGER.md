@@ -3,6 +3,17 @@
 This file records hypotheses, not established claims. Speculative entries must
 not be cited as findings or moved into `CLAIM-LEDGER.md` as fact.
 
+## Post-Anchor Reconciliation Guardrail
+
+Recovered theory material is retained in `RESEARCH-ASSET-MAP.md` and defined
+where needed in `CONSTRUCT-REGISTRY.md` before it can enter this ledger. A
+coherent theory candidate, analogy, innovation candidate, or historical AI
+refinement is not a registered hypothesis. Promotion requires the existing
+prospective route, a Cross-Gap Audit, a falsifiable prediction, a defined
+equivalence/invariant condition where relevant, and separate route-review
+approval. This guardrail does not revise the evidence or status of any
+existing hypothesis.
+
 ## HYP-CALIBRATION-001
 
 - ID: `HYP-CALIBRATION-001`

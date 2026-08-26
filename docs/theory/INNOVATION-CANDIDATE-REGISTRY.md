@@ -30,6 +30,12 @@ This registry is a lower-authority epistemic layer than registered hypotheses, p
 - ICR-014: An innovation candidate may not modify the interpretation of a completed canonical experiment.
 - ICR-015: Innovation candidates must not automatically determine the next experiment.
 - ICR-016: Candidate selection for experimentation must occur through a separate scientific route review.
+- ICR-017: Claim contamination is what is isolated, not intellectual influence; provenance may be retained without granting authority.
+- ICR-018: A Cross-Gap Audit is required before a prospective bridge can be considered for promotion.
+- ICR-019: Similarity, recovery, final return, local validity, and analogy have no implied stronger bridge without an independently defined test.
+- ICR-020: A recovered refinement must link to an existing candidate or remain unregistered; it must not create a new IC identifier by implication.
+- ICR-021: Post-closure secondary analysis may be recorded as association-only and may not retrofit confirmatory evidence.
+- ICR-022: Mathematical and systems inspiration require a prior-art boundary before any novelty or mechanism claim.
 
 ## Controlled Vocabulary
 
@@ -420,3 +426,30 @@ This routing is strategic/prospective. It does not guarantee that any candidate 
 - CHAT_STATE_IMPORT_ALLOWED_FOR_CURRENT_EXECUTION_STATE = `false`
 
 No innovation candidate has been promoted to a scientific hypothesis by this task.
+
+## Post-Anchor Recovered-Delta Relationships
+
+This is a relationship index, not an IC definition update, activation, or
+evidence record. The provenance chain is `USER_PROBLEM_SEED ->
+DEEPSEEK_INSPIRATION -> HISTORICAL_GPT_REFINEMENT ->
+CURRENT_RECONCILED_FORM` when applicable. Recovered material is mapped as
+follows:
+
+| Existing IC | Recovered relationship | Status / ceiling |
+| --- | --- | --- |
+| IC-001 MOCP | minimal sufficient realization; sparse operator/search structure | prospective only; no complexity theorem |
+| IC-002 P2M | structural/profile to admissible operator prediction | prospective; requires independent prediction test |
+| IC-003 MRSD | recovery/return does not imply structural validity | matched recovery is not an invariant |
+| IC-004 SCMA | invariant-constrained navigation and total-cost alignment | no independent invariant yet |
+| IC-005 LGC | long-horizon composition and return tests | local validity does not imply global validity |
+| IC-006 CCPD | itineraries, path dependence, and noncommutative effects | requires explicit composition semantics |
+| IC-007 AOCL | architecture/resources to feasible realization complexity | no architecture causality claim |
+| IC-008 MEIDB | coverage, structural complexity, minimum sufficient structure | Kakeya/covering is inspiration only |
+| IC-009 EOPD | typed and variable-arity primitive discovery; Open Structural Degree refinement | historical `234` is not a primitive taxonomy |
+| IC-010 OPWM | state-dependent routing; trajectory/return/escape prediction | no world-model or causal-reasoning evidence |
+| IC-011 AOC | auditable Harness planner/verifier | systems concept; no implementation or novelty claim |
+| IC-012 CEGID | counterexample-guided invariant refinement; Collatz sandbox | discriminating statistic is not automatically invariant |
+
+No `IC-013` was created. All listed candidates retain
+`SCIENTIFIC_AUTHORITY = NONE_BY_DEFAULT`, remain not activated, and cannot
+change Paper A or a completed experiment.

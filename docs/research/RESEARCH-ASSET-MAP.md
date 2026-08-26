@@ -21,7 +21,10 @@ Allowed provenance tags include:
 
 - `USER_ORIGINAL_IDEA`
 - `USER_QUESTION_DERIVED`
+- `USER_PROBLEM_SEED`
 - `DEEPSEEK_PROPOSED_INTERPRETATION`
+- `HISTORICAL_GPT_REFINEMENT`
+- `POST_ANCHOR_RECONCILED_FORM`
 - `PROJECT_SYNTHESIS`
 - `EXPERIMENT_DERIVED`
 - `ESTABLISHED_RESEARCH_PARADIGM`
@@ -74,6 +77,102 @@ Huang's-Law-style structural scaling inspiration -> future Representational Scal
 KAN / constrained operator family -> operator-complexity ladder -> future minimum sufficient alignment operator
 Residual-Flow Hypothesis -> Accumulated Compatibility Distortion -> Minimum Sufficient Alignment -> Invariant/Conserved Structure
 ```
+
+## Post-Anchor Recovered Theory Asset Reconciliation
+
+### Scope and provenance
+
+`LAST_PROMPT_INGESTED` is the conceptual reconciliation anchor. Assets already
+present before this update remain `PRE_ANCHOR_EXISTING_ASSET`; this section
+records only the `POST_ANCHOR_RECOVERED_DELTA`. It is a migration index into
+the existing SSOT, not a second theory library and not a scientific authority.
+
+Where a recovered asset has a known chain, retain it as:
+
+```text
+USER_PROBLEM_SEED -> DEEPSEEK_INSPIRATION -> HISTORICAL_GPT_REFINEMENT
+-> CURRENT_RECONCILED_FORM
+```
+
+The source chain records intellectual influence, not scientific authority.
+DeepSeek and historical GPT material are proposals to audit; neither is
+evidence. `CLAIM CONTAMINATION IS WHAT IS ISOLATED, NOT INTELLECTUAL
+INFLUENCE`: theory may discipline interpretation and generate future tests,
+but may not retrofit a completed experiment or promote itself into evidence.
+
+### Current scientific firewall
+
+- EXP-020A has recovered canonical scientific evidence for same-family,
+  held-out target-directed representational manipulation in Qwen3-4B. It is
+  an evidence anchor in the manipulation branch, but remains outside the
+  fixed-readout compatibility evidence selected for Paper A.
+- EXP-021 is retained only as an engineering/measurement qualification and
+  negative-boundary bridge. It does not support the final prospective theory.
+- Paper A remains about `FIXED-READOUT OPERATIONAL COMPATIBILITY`: Qwen and
+  Llama are target-dominant, OLMo is source-dominant, all three tested models
+  have positive depth-distance association, and LOW-D recovery is unsupported
+  in Qwen but supported in OLMo and Llama. Use canonical wording when a
+  manuscript-facing statement is needed.
+- Cross-task robustness is `NOT_ESTABLISHED`; directionality remains
+  exploratory/secondary.
+- Post-closure centered linear CKA is a supplementary association analysis.
+  It does not establish compatibility, causality, semantic equivalence, a
+  geometry mechanism, or an explanation of directionality.
+
+### Recovered delta classification and SSOT routing
+
+| Recovered delta | Current reconciled classification | Existing SSOT home / relationship |
+| --- | --- | --- |
+| Cross-Gap Audit | governance and prospective-design method | construct registry; innovation-candidate promotion gate |
+| Task-relative admissibility, structural signature, typed transformations | unregistered prospective framework | construct registry; Paper B/C boundary |
+| Representation-relative computation and algorithmic realization equivalence | unregistered theory candidate | construct registry; relates to IC-001/004/005/006 |
+| Control, memory, realization polymorphism, sparse execution | unregistered systems/theory candidates | construct registry; relates to IC-002/007/010/011 |
+| Memory folding, state-overlap quotient, memory-compute exchange | prospective realization constructs | construct registry; exact equivalence requires a defined invariant |
+| Open Structural Degree Principle (historical `234`) | user-originated open-structure intuition | construct registry; refines IC-009 without defining new primitives |
+| Return hierarchy and compositional validity | prospective bridge/problem | construct registry; relates to IC-005/006/012 |
+| Invariant-constrained navigation and geometry selection | mathematical framework inspiration | construct registry; relates to IC-001/004/011 |
+| Cross-representation problem solving and operator coverage | mathematical inspiration / prior-art-bound candidate | construct registry; relates to IC-001/008/009 |
+| Harness and Project C / GIR | long-term systems direction | existing Harness and operator-routed assets; no implementation claim |
+| Collatz, Kakeya, Erdos, Ramanujan, quantum examples | mathematical inspiration or rejected literal analogy | existing analogy assets and construct-registry boundaries |
+
+### Recovery firewalls
+
+The following implications are prohibited unless a future, independently
+defined and prospectively tested bridge establishes them:
+
+```text
+geometry != validity
+representational similarity != operational compatibility
+operational compatibility != semantic equivalence
+similarity != mergeability
+manipulability != transport
+transport != invariant preservation
+invariant preservation != functional binding
+functional binding != behavioral consequence
+recovery != transport
+final return != pathwise validity
+local contraction != global recurrence
+typical recurrence != universal recurrence
+local validity != global compositional validity
+analogy != theoretical bridge
+mathematical intuition != theorem
+innovation candidate != registered hypothesis != evidence
+```
+
+Transformations may redistribute cost; they do not make computational or
+control information disappear without sufficient structure. A reduced call
+stack is not a proof of constant total memory, and logical structural freedom
+does not imply greater physical storage capacity.
+
+### Historical evolution markers
+
+The following are retained only as early metaphors or rejected literal
+interpretations: `2 = rotate`, `3 = fold`, `4 = jump`; a literal spiral stack;
+curvature memory; a Ricci-curvature runtime controller; free physical RAM from
+state overlap; quantum entanglement as transport; decoherence as Collatz
+convergence; and direct Kakeya/Ramanujan/Collatz proofs about neural latent
+states. The current forms are the Open Structural Degree Principle, typed
+transformations, state realization, and prospective composition tests.
 
 ## Foundation and Background Assets
 
@@ -268,7 +367,7 @@ Residual-Flow Hypothesis -> Accumulated Compatibility Distortion -> Minimum Suff
 - Potential Formalization: Checkpoint-indexed representation maps.
 - Potential Testable Consequence: `D_fixed` and `G_scale`-style measurements.
 - Dependencies: Transformer, hidden-state extraction.
-- Current Evidence: EXP-021 failure and EXP-022A partial/split-dependent degradation.
+- Current Evidence: EXP-021 engineering/measurement qualification and EXP-022A partial/split-dependent degradation.
 - Counterevidence / Limitations: Small controlled data; split-dependent.
 - Overclaim Boundary: Not a universal layer dynamics law.
 - Priority: `TIER 1`
@@ -337,7 +436,7 @@ Residual-Flow Hypothesis -> Accumulated Compatibility Distortion -> Minimum Suff
 - Origin / Provenance: `EXPERIMENT_DERIVED`
 - Core Insight: A fixed reference readout can degrade across deeper clean checkpoints.
 - Connection to Current Research: Direct bridge from EXP-021 to EXP-022A.
-- Connection to Experiments: EXP-021 failure; EXP-022A `D_fixed`.
+- Connection to Experiments: EXP-021 engineering/measurement qualification bridge; EXP-022A `D_fixed`.
 - Potential Scientific Value: Central organizing phenomenon for calibration/transport.
 - Potential Engineering Value: Layer-aware readout diagnostics.
 - Potential Formalization: `D_fixed = BA_final^(A0) - BA_ref^(A0)`.
