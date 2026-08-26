@@ -1,0 +1,54 @@
+{
+  "canonical_results_modified": false,
+  "condition_pooling": "arithmetic_mean_over_ten_frozen_EVAL_conditions",
+  "deterministic": true,
+  "hidden_state_extraction_performed": false,
+  "input_hashes": {
+    "asset_manifest_sha256": "bf4ee044b26706594ff262567997c1acee534b608ff5d002c3f98dcb77403ba2",
+    "cka_matrix_sha256": {
+      "Llama": "aa06ed6f45886dfb1927c3cc361707897dc5b93d4d0a2bc7ef528c593cac2e9d",
+      "OLMo": "effb9b8bad61594a2423ecb5f0f6f424d5e44ec21adea3c59cca5989a88845d5",
+      "Qwen": "6920b642f5085b9411befb8eaf55ad98537892dfb2050edb0490ef074e41b3c2"
+    },
+    "cka_result_manifest_sha256": "c2469ca526ae5701f334c776d6338c1e1daa90fffc4d0474866b2a878d0b628a",
+    "exp026_results_sha256": "9a5bed41b432e2f89b0873869d76e1f5775f9b38caff9472553fca335bbba551",
+    "exp027_results_sha256": "1f15027d17456f5dc8ff4803452c732af8ba464f70e537195b8833d9d44f6c6d",
+    "paper_a_asset_manifest_sha256": "d0e4a5caee548a200ed64387d6955631fc8c54214e650f86f2f7284a0e1ad5aa",
+    "paper_a_claim_register_sha256": "2e274b716a7d6d8a235988f88fada92cea1670b28ddfe28e2521f180a303813e",
+    "paper_a_figure_03_matrix_data_sha256": "faac6f63379bbee4c4b116856683ff27cdee032c54b7a40df2416f65c6c6e599",
+    "paper_a_scientific_results_sha256": "77ffef1b4f253505e30baf50eee0039a925345b831744bf5d7f4f59b8980ed4c",
+    "sample_order_hash": "6ff5adb902c7bc691b078c73b3b267005fe37f74b6fd675ba1225d4f8971baea"
+  },
+  "manifest_id": "PA-CKA-FUNCTIONAL-COMPARISON-V1",
+  "metrics_computed": [
+    "CKA_vs_C0",
+    "CKA_vs_D",
+    "CKA_vs_R"
+  ],
+  "model_inference_performed": false,
+  "models": [
+    "Qwen",
+    "OLMo",
+    "Llama"
+  ],
+  "output_files": {
+    "summary": {
+      "filename": "cka_functional_summary.json",
+      "sha256": "5b02152b9caf2fa4969dbee5e39fd78aa1d9d6ea02ff777b00bf54b7ef7685af"
+    },
+    "table": {
+      "filename": "cka_functional_comparison.csv",
+      "sha256": "e94d2aa3c84b965d1c55a99fe603556c8360e5da34e1ea2c6c7d23d2538dcc33"
+    }
+  },
+  "pair_counts": {
+    "Llama": 240,
+    "OLMo": 240,
+    "Qwen": 756
+  },
+  "pair_scope": "off_diagonal_directed_layer_pairs_only",
+  "scientific_interpretation_performed": false,
+  "split": "EVAL",
+  "statistic": "Spearman",
+  "status": "VALIDATED_COMPARISON_ARTIFACTS"
+}

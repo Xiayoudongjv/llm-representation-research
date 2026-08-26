@@ -1,0 +1,43 @@
+{
+  "condition_pooling": "arithmetic_mean_over_ten_frozen_EVAL_conditions",
+  "manifest_id": "PA-CKA-FUNCTIONAL-COMPARISON-SUMMARY-V1",
+  "models": {
+    "Llama": {
+      "pair_count": 240,
+      "spearman": {
+        "CKA_vs_C0": 0.770616497595761,
+        "CKA_vs_D": -0.7633765918249892,
+        "CKA_vs_R": -0.5188534646866533
+      }
+    },
+    "OLMo": {
+      "pair_count": 240,
+      "spearman": {
+        "CKA_vs_C0": 0.7588530438644798,
+        "CKA_vs_D": -0.8082050892065848,
+        "CKA_vs_R": -0.3729283753818091
+      }
+    },
+    "Qwen": {
+      "pair_count": 756,
+      "spearman": {
+        "CKA_vs_C0": 0.8371975188315528,
+        "CKA_vs_D": -0.8373251441408364,
+        "CKA_vs_R": -0.6738306903755658
+      }
+    }
+  },
+  "pair_counts": {
+    "Llama": 240,
+    "OLMo": 240,
+    "Qwen": 756
+  },
+  "primary": "CKA_vs_C0",
+  "scientific_interpretation_performed": false,
+  "secondary": [
+    "CKA_vs_D",
+    "CKA_vs_R"
+  ],
+  "split": "EVAL",
+  "statistic": "Spearman"
+}

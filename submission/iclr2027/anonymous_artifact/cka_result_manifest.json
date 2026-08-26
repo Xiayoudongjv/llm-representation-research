@@ -1,0 +1,61 @@
+{
+  "accumulation_dtype": "float64",
+  "c0_comparison_performed": false,
+  "correlation_computed": false,
+  "d_comparison_performed": false,
+  "input_asset_manifest": "assets/paper_a_cka_asset_manifest.json",
+  "input_manifest_sha256": "bf4ee044b26706594ff262567997c1acee534b608ff5d002c3f98dcb77403ba2",
+  "manifest_id": "PA-CKA-MATRIX-RESULTS-V1",
+  "method": "linear_centered_cka",
+  "model_inference_run": false,
+  "models": [
+    {
+      "diagonal_valid": true,
+      "finite_values_valid": true,
+      "input_manifest_sha256": "bf4ee044b26706594ff262567997c1acee534b608ff5d002c3f98dcb77403ba2",
+      "matrix_shape": [
+        28,
+        28
+      ],
+      "method": "linear_centered_cka",
+      "model": "Qwen",
+      "output_sha256": "6920b642f5085b9411befb8eaf55ad98537892dfb2050edb0490ef074e41b3c2",
+      "result_filename": "cka_matrix_Qwen3-1.7B.json",
+      "symmetry_valid": true,
+      "validation_status": "VALID"
+    },
+    {
+      "diagonal_valid": true,
+      "finite_values_valid": true,
+      "input_manifest_sha256": "bf4ee044b26706594ff262567997c1acee534b608ff5d002c3f98dcb77403ba2",
+      "matrix_shape": [
+        16,
+        16
+      ],
+      "method": "linear_centered_cka",
+      "model": "OLMo",
+      "output_sha256": "effb9b8bad61594a2423ecb5f0f6f424d5e44ec21adea3c59cca5989a88845d5",
+      "result_filename": "cka_matrix_OLMo-2-1B.json",
+      "symmetry_valid": true,
+      "validation_status": "VALID"
+    },
+    {
+      "diagonal_valid": true,
+      "finite_values_valid": true,
+      "input_manifest_sha256": "bf4ee044b26706594ff262567997c1acee534b608ff5d002c3f98dcb77403ba2",
+      "matrix_shape": [
+        16,
+        16
+      ],
+      "method": "linear_centered_cka",
+      "model": "Llama",
+      "output_sha256": "aa06ed6f45886dfb1927c3cc361707897dc5b93d4d0a2bc7ef528c593cac2e9d",
+      "result_filename": "cka_matrix_Meta-Llama-3.2-1B-Instruct.json",
+      "symmetry_valid": true,
+      "validation_status": "VALID"
+    }
+  ],
+  "r_comparison_performed": false,
+  "scientific_interpretation_performed": false,
+  "status": "VALIDATED_CKA_MATRICES"
+}

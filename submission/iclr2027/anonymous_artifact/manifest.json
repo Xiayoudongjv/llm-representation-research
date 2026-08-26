@@ -1,0 +1,95 @@
+{
+  "artifact_id": "PAPER_A_ICLR2027_ANONYMOUS_ARTIFACT_V1",
+  "status": "ANONYMOUS_REPRODUCIBILITY_COMPANION",
+  "split": "EVAL",
+  "models": ["Qwen3-1.7B", "OLMo-2-1B-Instruct", "Meta-Llama-3.2-1B-Instruct"],
+  "included": [
+    "cka_functional_comparison.csv",
+    "cka_functional_summary.json",
+    "cka_comparison_manifest.json",
+    "cka_result_manifest.json",
+    "cka_matrix_Qwen3-1.7B.json",
+    "cka_matrix_OLMo-2-1B.json",
+    "cka_matrix_Meta-Llama-3.2-1B-Instruct.json",
+    "paper_a_profile_values.json"
+  ],
+  "sha256": {
+    "cka_functional_comparison.csv": "e94d2aa3c84b965d1c55a99fe603556c8360e5da34e1ea2c6c7d23d2538dcc33",
+    "cka_functional_summary.json": "5b02152b9caf2fa4969dbee5e39fd78aa1d9d6ea02ff777b00bf54b7ef7685af",
+    "cka_comparison_manifest.json": "1a50c69df2be9b80f180c2c10e0ea0e3d3733963163e4756b0428a4ccb4dfd9e",
+    "cka_result_manifest.json": "c2469ca526ae5701f334c776d6338c1e1daa90fffc4d0474866b2a878d0b628a",
+    "cka_matrix_Qwen3-1.7B.json": "6920b642f5085b9411befb8eaf55ad98537892dfb2050edb0490ef074e41b3c2",
+    "cka_matrix_OLMo-2-1B.json": "effb9b8bad61594a2423ecb5f0f6f424d5e44ec21adea3c59cca5989a88845d5",
+    "cka_matrix_Meta-Llama-3.2-1B-Instruct.json": "aa06ed6f45886dfb1927c3cc361707897dc5b93d4d0a2bc7ef528c593cac2e9d",
+    "paper_a_profile_values.json": "38a041da7bd64d9a7545a8afa878c5345f01b0b59d0b1831769dbef581b9c5df"
+  },
+  "model_provenance": {
+    "carrier": "decoder block output post-block residual before model-level final normalization; last valid token",
+    "Qwen3-1.7B": {
+      "model_id": "Qwen/Qwen3-1.7B",
+      "revision": "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e",
+      "model_class": "Qwen3ForCausalLM",
+      "decoder_blocks": 28
+    },
+    "OLMo-2-1B-Instruct": {
+      "model_id": "allenai/OLMo-2-0425-1B-Instruct",
+      "revision": "48d788eca847d4d7548f375ad03d3c9312f6139e",
+      "model_class": "Olmo2ForCausalLM",
+      "decoder_blocks": 16
+    },
+    "Meta-Llama-3.2-1B-Instruct": {
+      "official_model_identity": "Meta-Llama-3.2-1B-Instruct",
+      "official_source": "META_OFFICIAL_NATIVE_DISTRIBUTION",
+      "native_checksum_authority": {
+        "checklist.chk": "efefc79fc47ecce1c3e06a6ae77a4cddc7e6078f822efba22e4fc7f9da02400e",
+        "consolidated.00.pth": "fc17d497df5e4175b3a8acb4f5865b26f7fc1b009b25bef814b95fde10e8a1f3",
+        "params.json": "1d616a44f3cdac29b9288cf14718b76eb1bed56ed38be1f7e39b06ed139e3733",
+        "tokenizer.model": "82e9d31979e92ab929cd544440f129d9ecd797b69e327f80f17e1c50d5551b55"
+      },
+      "tokenizer_provenance": "official native tokenizer.model; vocab 128256; BOS/EOS/EOT identity recorded in the version-controlled model authority",
+      "conversion_procedure": "official native Meta checkpoint converted to Hugging Face safetensors using the recorded Meta-to-HF Q/K permutation; direct tensor mapping verified",
+      "conversion_script": "llama32_native_converted_provenance.py",
+      "conversion_environment": {
+        "transformers": "4.46.3",
+        "tokenizers": "0.20.3",
+        "torch": "2.12.1+cpu",
+        "accelerate": "installed"
+      },
+      "converted_config": {
+        "architecture": "LlamaForCausalLM",
+        "hidden_size": 2048,
+        "intermediate_size": 8192,
+        "decoder_blocks": 16,
+        "attention_heads": 32,
+        "kv_heads": 8,
+        "vocab_size": 128256,
+        "max_position_embeddings": 131072,
+        "rope_theta": 500000.0,
+        "tie_word_embeddings": true,
+        "dtype": "bfloat16"
+      },
+      "converted_snapshot_sha256": "1ff795ff6a07e6a68085d206fb84417da2f083f68391c2843cd2b8ac6df8538f",
+      "carrier_hook": "FORWARD_HOOK_DECODER_BLOCK_OUTPUT; model.model.layers[l]; post-block before model final RMSNorm; last-valid-token",
+      "weights_redistributed": false
+    }
+  },
+  "third_model_route": {
+    "route_authority": "experiments/exp027/exp027_frozen_design.json",
+    "route_authority_sha256": "b37bfd9c3d57bf891ef1993b3a1d7737fcedbe143813d61f5c7ae9ecb0bc5b1a",
+    "route_freeze_commit": "f36e84a7fc883a3e5f5d777d3193e76cf6fcce13",
+    "route_freeze_date": "2026-08-22T09:13:03+08:00",
+    "result_authority": "experiments/exp027/results/exp027_results.json",
+    "result_authority_sha256": "1f15027d17456f5dc8ff4803452c732af8ba464f70e537195b8833d9d44f6c6d",
+    "pre_result_ordering_verifiable": true,
+    "llama_exact_profile_predicted": false
+  },
+  "excluded": [
+    "model weights",
+    "hidden-state tensors",
+    "prompts and source material",
+    "repository history",
+    "private metadata",
+    "author identity"
+  ],
+  "no_model_execution_in_packaging": true
+}
