@@ -1,0 +1,269 @@
+{
+  "analysis_identity": {
+    "name": "PAPER_A_POST_CLOSURE_CONSTRUCT_SENSITIVITY",
+    "status": "POST_CLOSURE_DESCRIPTIVE_SENSITIVITY",
+    "preregistration": "experiments/paper_a_construct_sensitivity/PAPER-A-CONSTRUCT-SENSITIVITY-PREREGISTRATION-V1.md"
+  },
+  "authority_hashes": {
+    "experiments/exp026/EXP-026-MATRIX-METRIC-SPECIFICATION.md": "5f58445e26eee7effddd7cd5b4ae255b7153d61fa7a76b5c0684fa1dbb08d8db",
+    "experiments/exp026/EXP-026-PREREGISTRATION.md": "730175071e315b484e360b6359945f567bfe8edf4f52e6a0893c3f2a7dadf8e1",
+    "experiments/exp026/exp026_frozen_config.json": "ccf60c8a9dc6f3b9d3cce533910334e1f8ec33665a1cf692b98a8aaf683afb57",
+    "docs/experiments/EXP-026-SCIENTIFIC-REVIEW.md": "383e9c99cb585aad110cc01489727a8d70c05d0ad96f36f11788b7568b0dd1c5",
+    "docs/experiments/EXP-027-PREREGISTRATION.md": "83ba4bb14e87334a6c52a8746f86874eab9578e646abc736057fbd1f4e6322fe",
+    "experiments/exp027/exp027_frozen_design.json": "b37bfd9c3d57bf891ef1993b3a1d7737fcedbe143813d61f5c7ae9ecb0bc5b1a",
+    "docs/experiments/EXP-027-SCIENTIFIC-REVIEW.md": "3db403913c443d8f08ad3553289d26cd14b49713a43243e8d3d43b027881a7a7",
+    "experiments/exp026/results/exp026_results.json": "9a5bed41b432e2f89b0873869d76e1f5775f9b38caff9472553fca335bbba551",
+    "experiments/exp027/results/exp027_results.json": "1f15027d17456f5dc8ff4803452c732af8ba464f70e537195b8833d9d44f6c6d"
+  },
+  "execution_environment": {
+    "python_version": "3.11.9",
+    "numpy_version": "2.4.6",
+    "model_inference": false,
+    "model_fitting": false,
+    "bootstrap": false,
+    "permutation": false
+  },
+  "models": {
+    "qwen": {
+      "model_key": "qwen",
+      "num_layers": 28,
+      "module_a": {
+        "source_variance": 0.016990820274462307,
+        "target_variance": 0.024126955092747177,
+        "variance_sum": 0.04111777536720948,
+        "registered_sdi": -0.17355352410373298,
+        "registered_sdi_status": "EVALUABLE",
+        "route": "REGISTERED_COMPONENT_EXPOSURE",
+        "sdi_reproduction_error": 0.0
+      },
+      "module_b0": {
+        "eligible_pair_count": 202,
+        "positive_recovery_pair_fraction": 0.07425742574257425,
+        "registered_low_d_recovery": 0.00013923267534205524,
+        "registered_low_d_interval": [
+          -9.933156284070251e-05,
+          0.00036107659009100833
+        ],
+        "registered_low_d_status": "EVALUABLE",
+        "route": "REGISTERED_LOW_D_AUXILIARY_EXPOSURE"
+      },
+      "module_b1": {
+        "pair_count": 202,
+        "c0bar_eval": {
+          "mean": 0.9996596534653466,
+          "median": 1.0,
+          "q25": 1.0,
+          "q75": 1.0
+        },
+        "headroom": {
+          "mean": 0.0003403465346534685,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0,
+          "min": 0.0,
+          "max": 0.006249999999999978
+        },
+        "reference": {
+          "registered_low_d_recovery": 0.00013923267534205524,
+          "registered_low_d_status": "EVALUABLE"
+        }
+      },
+      "validation": {
+        "low_d_mask_diagnostic_only": true,
+        "b0_b1_pair_counts_match": true,
+        "ten_eval_conditions_verified": true,
+        "headroom_bounds_valid": true,
+        "source_eligibility": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ]
+      }
+    },
+    "olmo": {
+      "model_key": "olmo",
+      "num_layers": 16,
+      "module_a": {
+        "source_variance": 0.02307575058960775,
+        "target_variance": 0.007188219909855588,
+        "variance_sum": 0.03026397049946334,
+        "registered_sdi": 0.5249651786448143,
+        "registered_sdi_status": "EVALUABLE",
+        "route": "REGISTERED_COMPONENT_EXPOSURE",
+        "sdi_reproduction_error": 0.0
+      },
+      "module_b0": {
+        "eligible_pair_count": 35,
+        "positive_recovery_pair_fraction": 0.8285714285714286,
+        "registered_low_d_recovery": 0.04785714308465166,
+        "registered_low_d_interval": [
+          0.044028989621438086,
+          0.0515186088984566
+        ],
+        "registered_low_d_status": "EVALUABLE",
+        "route": "REGISTERED_LOW_D_AUXILIARY_EXPOSURE"
+      },
+      "module_b1": {
+        "pair_count": 35,
+        "c0bar_eval": {
+          "mean": 0.8232142857142857,
+          "median": 0.81875,
+          "q25": 0.815625,
+          "q75": 0.81875
+        },
+        "headroom": {
+          "mean": 0.1767857142857143,
+          "median": 0.18125000000000002,
+          "q25": 0.18125000000000002,
+          "q75": 0.18437499999999996,
+          "min": 0.11562499999999998,
+          "max": 0.19374999999999998
+        },
+        "reference": {
+          "registered_low_d_recovery": 0.04785714308465166,
+          "registered_low_d_status": "EVALUABLE"
+        }
+      },
+      "validation": {
+        "low_d_mask_diagnostic_only": true,
+        "b0_b1_pair_counts_match": true,
+        "ten_eval_conditions_verified": true,
+        "headroom_bounds_valid": true,
+        "source_eligibility": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ]
+      }
+    },
+    "llama": {
+      "model_key": "llama",
+      "num_layers": 16,
+      "module_a": {
+        "source_variance": 0.012573354969246692,
+        "target_variance": 0.030358477472285587,
+        "variance_sum": 0.04293183244153228,
+        "registered_sdi": -0.41426422986393563,
+        "registered_sdi_status": "EVALUABLE",
+        "route": "REGISTERED_COMPONENT_EXPOSURE",
+        "sdi_reproduction_error": 0.0
+      },
+      "module_b0": {
+        "eligible_pair_count": 49,
+        "positive_recovery_pair_fraction": 0.32653061224489793,
+        "registered_low_d_recovery": 0.0014030612453970375,
+        "registered_low_d_interval": [
+          0.0007325690004461426,
+          0.002186791592619705
+        ],
+        "registered_low_d_status": "EVALUABLE",
+        "route": "REGISTERED_LOW_D_AUXILIARY_EXPOSURE"
+      },
+      "module_b1": {
+        "pair_count": 49,
+        "c0bar_eval": {
+          "mean": 0.997704081632653,
+          "median": 1.0,
+          "q25": 0.996875,
+          "q75": 1.0
+        },
+        "headroom": {
+          "mean": 0.002295918367346944,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0031250000000000444,
+          "min": 0.0,
+          "max": 0.012499999999999956
+        },
+        "reference": {
+          "registered_low_d_recovery": 0.0014030612453970375,
+          "registered_low_d_status": "EVALUABLE"
+        }
+      },
+      "validation": {
+        "low_d_mask_diagnostic_only": true,
+        "b0_b1_pair_counts_match": true,
+        "ten_eval_conditions_verified": true,
+        "headroom_bounds_valid": true,
+        "source_eligibility": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ]
+      }
+    }
+  },
+  "validation": {
+    "canonical_inputs_verified": true,
+    "diag_eval_separation_preserved": true,
+    "forbidden_derivatives_absent": true,
+    "new_inference": false,
+    "new_fitting": false,
+    "new_bootstrap": false,
+    "new_permutation": false,
+    "new_hypothesis_test": false
+  },
+  "epistemic_status": {
+    "ANALYSIS_STATUS": "POST_CLOSURE_CONSTRUCT_SENSITIVITY",
+    "CONFIRMATORY_STATUS": "NONE",
+    "PRIMARY_PAPER_A_RESULTS_CHANGED": false,
+    "REGISTERED_EXP026_027_OUTCOMES_REINTERPRETED": false,
+    "NEW_MODEL_INFERENCE": false,
+    "NEW_MODEL_FITTING": false,
+    "NEW_BOOTSTRAP": false,
+    "NEW_PERMUTATION_TEST": false,
+    "NEW_HYPOTHESIS_TEST": false,
+    "NEW_SENSITIVITY_RESULTS_EXPOSED": true
+  }
+}
