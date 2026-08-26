@@ -1,0 +1,146 @@
+{
+  "schema_version": "1.0",
+  "generated_by": "scripts/paper/generate_paper_a_v1_figures.py",
+  "no_new_inference": true,
+  "no_model_inference": true,
+  "canonical_values_transcribed": true,
+  "sources": {
+    "exp026_results": {
+      "path": "experiments\\exp026\\results\\exp026_results.json",
+      "sha256": "9a5bed41b432e2f89b0873869d76e1f5775f9b38caff9472553fca335bbba551"
+    },
+    "exp027_results": {
+      "path": "experiments\\exp027\\results\\exp027_results.json",
+      "sha256": "1f15027d17456f5dc8ff4803452c732af8ba464f70e537195b8833d9d44f6c6d"
+    },
+    "matrix_metric_specification": {
+      "path": "experiments\\exp026\\EXP-026-MATRIX-METRIC-SPECIFICATION.md",
+      "sha256": "5f58445e26eee7effddd7cd5b4ae255b7153d61fa7a76b5c0684fa1dbb08d8db"
+    },
+    "positioning_freeze": {
+      "path": "docs\\paper_a\\PAPER-A-POSITIONING-FREEZE-V1.md",
+      "sha256": "f57894b899d3d6a89fbd06a5a96485a28ffe3661379c14ec092201bfc95c0874"
+    },
+    "manuscript_v1_1": {
+      "path": "docs\\paper\\PAPER-A-MANUSCRIPT-V1.1.md",
+      "sha256": "0bb3ed688c426a70159c5a6e71e56f58f417d6efa6d7d0c4e53cbbb51adf248d"
+    },
+    "post_audit_architecture": {
+      "path": "docs\\paper\\revision\\PAPER-A-POST-AUDIT-MANUSCRIPT-ARCHITECTURE.md",
+      "sha256": "3149cd2451a670f60fc6282f4126b187084987281a0b8a1f3c86ab953e43c00c"
+    }
+  },
+  "canonical_result_hashes_verified": {
+    "exp026": "9a5bed41b432e2f89b0873869d76e1f5775f9b38caff9472553fca335bbba551",
+    "exp027": "1f15027d17456f5dc8ff4803452c732af8ba464f70e537195b8833d9d44f6c6d"
+  },
+  "figures": {
+    "figure_1": {
+      "png": "docs\\paper\\figures\\paper_a_v1_fig01_measurement_framework.png",
+      "svg": "docs\\paper\\figures\\paper_a_v1_fig01_measurement_framework.svg",
+      "png_sha256": "7822663aa66043b9309528cd7c7fd8972351323a61da24670a76661051270d6c",
+      "svg_sha256": "66b445b92cfa9004735262da1bc0fa62956532f49da7915a4c8a364ee9263d5c",
+      "renderer": "scripts/paper/generate_paper_a_v1_figures.py",
+      "source_files": {
+        "positioning_freeze": {
+          "path": "docs\\paper_a\\PAPER-A-POSITIONING-FREEZE-V1.md",
+          "sha256": "f57894b899d3d6a89fbd06a5a96485a28ffe3661379c14ec092201bfc95c0874"
+        },
+        "manuscript_v1_1": {
+          "path": "docs\\paper\\PAPER-A-MANUSCRIPT-V1.1.md",
+          "sha256": "0bb3ed688c426a70159c5a6e71e56f58f417d6efa6d7d0c4e53cbbb51adf248d"
+        }
+      },
+      "panel_type": "CONCEPTUAL",
+      "exact_quantities": [
+        "C0",
+        "D",
+        "C_cal",
+        "R"
+      ],
+      "fit_eval_boundary": "parameters estimated on FIT only, frozen before EVAL application",
+      "no_new_inference": true
+    },
+    "figure_2": {
+      "png": "docs\\paper\\figures\\paper_a_v1_fig02_three_model_synthesis.png",
+      "svg": "docs\\paper\\figures\\paper_a_v1_fig02_three_model_synthesis.svg",
+      "png_sha256": "cc9609f1dba845560756acd78d59419a96c3ad99714f05ca57fd8e7fd8dc314a",
+      "svg_sha256": "96bbdc285125a8d6104086490edf312c5952a383f29109ff6705c9e3634a60ce",
+      "renderer": "scripts/paper/generate_paper_a_v1_figures.py",
+      "source_files": {
+        "exp026_results": {
+          "path": "experiments\\exp026\\results\\exp026_results.json",
+          "sha256": "9a5bed41b432e2f89b0873869d76e1f5775f9b38caff9472553fca335bbba551"
+        },
+        "exp027_results": {
+          "path": "experiments\\exp027\\results\\exp027_results.json",
+          "sha256": "1f15027d17456f5dc8ff4803452c732af8ba464f70e537195b8833d9d44f6c6d"
+        },
+        "manuscript_v1_1": {
+          "path": "docs\\paper\\PAPER-A-MANUSCRIPT-V1.1.md",
+          "sha256": "0bb3ed688c426a70159c5a6e71e56f58f417d6efa6d7d0c4e53cbbb51adf248d"
+        },
+        "post_audit_architecture": {
+          "path": "docs\\paper\\revision\\PAPER-A-POST-AUDIT-MANUSCRIPT-ARCHITECTURE.md",
+          "sha256": "3149cd2451a670f60fc6282f4126b187084987281a0b8a1f3c86ab953e43c00c"
+        }
+      },
+      "panel_type": "CANONICAL_NUMERIC_PLUS_FROZEN_CATEGORICAL_SYNTHESIS",
+      "exact_quantities": [
+        "distance_association",
+        "SDI",
+        "LOW_D_RECOVERY",
+        "registered profile statuses"
+      ],
+      "categorical_panel_layout": "2x2 discrete grid",
+      "continuous_values_visible": true,
+      "no_new_inference": true
+    },
+    "figure_3": {
+      "png": "docs\\paper\\figures\\paper_a_v1_fig03_directed_matrices.png",
+      "svg": "docs\\paper\\figures\\paper_a_v1_fig03_directed_matrices.svg",
+      "png_sha256": "14505f899e5b0e9a4735b881250f3ac588e5ae4013e1946f684cc59d8bba597a",
+      "svg_sha256": "500679c99c04bc66266a125d70de36eac0b1fa1e3235a2d08d5647a28cf11937",
+      "renderer": "scripts/paper/generate_paper_a_v1_figures.py",
+      "source_files": {
+        "exp026_results": {
+          "path": "experiments\\exp026\\results\\exp026_results.json",
+          "sha256": "9a5bed41b432e2f89b0873869d76e1f5775f9b38caff9472553fca335bbba551"
+        },
+        "exp027_results": {
+          "path": "experiments\\exp027\\results\\exp027_results.json",
+          "sha256": "1f15027d17456f5dc8ff4803452c732af8ba464f70e537195b8833d9d44f6c6d"
+        },
+        "matrix_metric_specification": {
+          "path": "experiments\\exp026\\EXP-026-MATRIX-METRIC-SPECIFICATION.md",
+          "sha256": "5f58445e26eee7effddd7cd5b4ae255b7153d61fa7a76b5c0684fa1dbb08d8db"
+        },
+        "manuscript_v1_1": {
+          "path": "docs\\paper\\PAPER-A-MANUSCRIPT-V1.1.md",
+          "sha256": "0bb3ed688c426a70159c5a6e71e56f58f417d6efa6d7d0c4e53cbbb51adf248d"
+        }
+      },
+      "panel_type": "CANONICAL_NUMERIC",
+      "exact_quantities": [
+        "Dbar_eval"
+      ],
+      "matrix_metadata": {
+        "matrix_quantity": "Dbar_eval",
+        "direction_convention": "source rows → target columns",
+        "common_scale": true,
+        "interpolation": false,
+        "common_abs_limit": 0.793749988079071
+      },
+      "data_unchanged_from_previous_v1": true,
+      "no_new_inference": true
+    }
+  },
+  "historical_figure_dispositions": {
+    "fig01_framework": "SUPPLEMENT_REUSE_WITH_CAPTION_UPDATE",
+    "fig02_manipulability": "STALE_FOR_CURRENT_PAPER",
+    "fig03_fixed_readout_degradation": "SUPPLEMENT_REUSE_WITH_CAPTION_UPDATE",
+    "fig04_exp023_heterogeneity": "SUPPLEMENT_REUSE_WITH_CAPTION_UPDATE",
+    "fig05_exp024_primary_scatter": "SUPPLEMENT_REUSE_WITH_CAPTION_UPDATE",
+    "fig06_exp024_broad_benefit": "STALE_FOR_CURRENT_PAPER"
+  }
+}
